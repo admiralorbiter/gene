@@ -8,7 +8,7 @@ from gene.worlds.schema import Fact, Rule, World, Mutation
 
 @pytest.fixture
 def golden_world() -> World:
-    """A hand-authored minimal golden world with known deterministic derivations.
+    """A hand-authored minimal golden world with known deterministic derivations and no functional contradictions.
     
     Structure:
     - Stations: VELORA
@@ -19,10 +19,9 @@ def golden_world() -> World:
         located_in(VELORA, SECTOR_K)
     - Rules:
         If manager(?s, ?p) and reports_to(?p, TAL) -> uses_protocol(?s, PROTOCOL_GREEN)
-        If located_in(?s, SECTOR_K) -> uses_protocol(?s, PROTOCOL_AMBER)
+        If located_in(?s, SECTOR_K) -> team_lead(UNIT_TITAN, TAL)
     - Expected Derivations:
-        uses_protocol(VELORA, PROTOCOL_GREEN) supported by {manager(VELORA, NERIN), reports_to(NERIN, TAL)}
-        uses_protocol(VELORA, PROTOCOL_AMBER) supported by {located_in(VELORA, SECTOR_K)}
+        uses_protocol(VELORA, PROTOCOL_GREEN) supported by {manager(VELORA, NERIN), reports_to(NERIN, TAL), RULE_GOLDEN_GREEN}
     """
     f1 = Fact(subject="VELORA", predicate="manager", object="NERIN", source_type="generated")
     f2 = Fact(subject="NERIN", predicate="reports_to", object="TAL", source_type="generated")
@@ -44,9 +43,9 @@ def golden_world() -> World:
         antecedents=[
             ("?station", "located_in", "SECTOR_K"),
         ],
-        consequent=("?station", "uses_protocol", "PROTOCOL_AMBER"),
+        consequent=("UNIT_TITAN", "team_lead", "TAL"),
         depth=1,
-        description="Stations in SECTOR_K use AMBER protocol",
+        description="Unit Titan is led by TAL if a station is in SECTOR_K",
     )
 
     mutation = Mutation(
@@ -64,7 +63,8 @@ def golden_world() -> World:
             "people": ["NERIN", "TAL", "SOREN"],
             "stations": ["VELORA"],
             "sectors": ["SECTOR_K"],
-            "protocols": ["PROTOCOL_GREEN", "PROTOCOL_AMBER"],
+            "protocols": ["PROTOCOL_GREEN"],
+            "teams": ["UNIT_TITAN"],
         },
         facts=[f1, f2, f3],
         rules=[r1, r2],

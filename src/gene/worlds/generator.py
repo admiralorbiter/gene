@@ -1,14 +1,13 @@
-"""Procedural deterministic generator for synthetic worlds and clean/mutated pairs."""
+"""Procedural deterministic generator for synthetic worlds with automated validation."""
 
 from __future__ import annotations
 
 import random
 from gene.config import WorldGenConfig
-from gene.worlds.oracle import Oracle
+from gene.worlds.oracle import Oracle, WorldValidator
 from gene.worlds.schema import Fact, Mutation, Rule, World, compute_fact_id
 
 
-# Fictional entity names strictly decoupled from real-world entities
 PERSON_NAMES = [
     "NERIN", "TAL", "SOREN", "KIRA", "ORIN", "VAEL", "MIRA", "JAXON",
     "ELYA", "DARIN", "KAEL", "LYRA", "THENEN", "SELIS", "VANE", "CYRA"
@@ -38,11 +37,11 @@ YEAR_NAMES = ["2142", "2155", "2168", "2174", "2183", "2191", "2204"]
 
 
 class WorldGenerator:
-    """Procedural generator for deterministic synthetic worlds."""
+    """Procedural generator for deterministic, strictly validated synthetic worlds."""
 
     @classmethod
-    def generate(cls, seed: int, config: WorldGenConfig | None = None) -> World:
-        """Generate a fully validated canonical synthetic world from a random seed."""
+    def _generate_candidate(cls, seed: int, config: WorldGenConfig | None = None) -> World:
+        """Internal generator building a candidate world specification."""
         cfg = config or WorldGenConfig(seed=seed)
         rng = random.Random(seed)
 
@@ -64,7 +63,7 @@ class WorldGenerator:
         }
 
         # 2. Build acyclic reporting hierarchy for people
-        # First person is top commander; everyone else reports to an earlier person in the sequence
+        top_supervisor = people[0]
         reporting_chain: dict[str, str] = {}
         for idx in range(1, len(people)):
             supervisor = rng.choice(people[:idx])
@@ -73,7 +72,6 @@ class WorldGenerator:
         # 3. Generate source facts
         facts: list[Fact] = []
 
-        # Station facts: manager, sector, year
         for idx, station in enumerate(stations):
             manager = people[idx % len(people)]
             sector = rng.choice(sectors)
@@ -83,11 +81,9 @@ class WorldGenerator:
             facts.append(Fact(subject=station, predicate="located_in", object=sector, source_type="generated"))
             facts.append(Fact(subject=station, predicate="opened_in", object=year, source_type="generated"))
 
-        # Reporting facts
         for person, supervisor in reporting_chain.items():
             facts.append(Fact(subject=person, predicate="reports_to", object=supervisor, source_type="generated"))
 
-        # Team membership and leads
         for idx, team in enumerate(teams):
             lead = people[idx % len(people)]
             facts.append(Fact(subject=team, predicate="team_lead", object=lead, source_type="generated"))
@@ -96,14 +92,10 @@ class WorldGenerator:
             team = rng.choice(teams)
             facts.append(Fact(subject=person, predicate="member_of", object=team, source_type="generated"))
 
-        # 4. Generate structured derivation rules
-        # Rule A: If ?station manager ?person AND ?person reports_to <TopSupervisor> => ?station uses_protocol <ProtocolA>
-        rules: list[Rule] = []
-        top_supervisor = people[0]
+        # 4. Generate structured derivation rules without functional conflict
+        # Only ONE rule defines station uses_protocol: based on direct reporting to top supervisor
         protocol_a = protocols[0]
-        protocol_b = protocols[1] if len(protocols) > 1 else protocols[0]
-
-        rules.append(
+        rules: list[Rule] = [
             Rule(
                 rule_id="RULE_STATION_PROTOCOL_SUPERVISOR",
                 antecedents=[
@@ -114,21 +106,7 @@ class WorldGenerator:
                 depth=1,
                 description=f"Stations whose manager reports directly to {top_supervisor} use {protocol_a}",
             )
-        )
-
-        # Rule B: If ?station located_in <TargetSector> => ?station uses_protocol <ProtocolB>
-        target_sector = sectors[0]
-        rules.append(
-            Rule(
-                rule_id="RULE_SECTOR_SECURITY_PROTOCOL",
-                antecedents=[
-                    ("?station", "located_in", target_sector),
-                ],
-                consequent=("?station", "uses_protocol", protocol_b),
-                depth=1,
-                description=f"Stations located in {target_sector} use {protocol_b}",
-            )
-        )
+        ]
 
         world_id = f"world_{seed:04d}"
         return World(
@@ -141,16 +119,29 @@ class WorldGenerator:
         )
 
     @classmethod
+    def generate(cls, seed: int, config: WorldGenConfig | None = None) -> World:
+        """Generate a validated canonical world, resampling if functional conflicts occur."""
+        current_seed = seed
+        attempts = 0
+        while attempts < 100:
+            world = cls._generate_candidate(current_seed, config)
+            errors = WorldValidator.validate_world(world)
+            if not errors:
+                return world
+            current_seed += 1
+            attempts += 1
+
+        raise RuntimeError(f"Failed to generate valid world for seed {seed} after 100 attempts.")
+
+    @classmethod
     def generate_paired(cls, seed: int, config: WorldGenConfig | None = None) -> tuple[World, World, Mutation]:
         """Generate a clean world and a paired mutated world differing in exactly one source fact."""
         clean_world = cls.generate(seed, config)
         rng = random.Random(seed + 9999)
 
-        # Find candidate source facts suitable for mutation (e.g., station managers that affect derivations)
         manager_facts = [f for f in clean_world.facts if f.predicate == "manager"]
         target_fact = rng.choice(manager_facts)
 
-        # Pick an alternative manager not currently assigned to this station
         available_people = [p for p in clean_world.entities["people"] if p != target_fact.object]
         new_manager = rng.choice(available_people)
 
@@ -171,10 +162,8 @@ class WorldGenerator:
             mutation_type="attribute_swap",
         )
 
-        # Clean world has mutation recorded as the designated mutation
         clean_with_mut_spec = clean_world.model_copy(update={"mutation": mutation})
 
-        # Mutated world replaces target_fact with mutated_fact
         mutated_facts = [
             mutated_fact if f.fact_id == target_fact.fact_id else f
             for f in clean_world.facts

@@ -1,4 +1,4 @@
-"""Metrics calculations for Experiment 0 (Lineage Observability) and Experiment 1."""
+"""Hardened metrics engine for target-specific accuracy, path-level lineage, and unconfounded causal rates."""
 
 from __future__ import annotations
 
@@ -26,11 +26,11 @@ class Exp0Metrics(BaseModel):
 
 
 class MetricsCalculator:
-    """Computes lineage precision, recall, causal support rates, and execution statistics."""
+    """Computes target-specific accuracy, path-level recall, precision, and unconfounded causal support rates."""
 
     @classmethod
     def compute_exp0_metrics(cls, db: Database, run_id: str) -> Exp0Metrics:
-        """Calculate complete Experiment 0 metrics from SQLite tables."""
+        """Calculate complete Experiment 0 metrics from SQLite tables with strict scientific definitions."""
         # 1. Calls and token stats
         calls = db.conn.execute("SELECT * FROM calls WHERE run_id = ?", (run_id,)).fetchall()
         total_calls = len(calls)
@@ -39,7 +39,7 @@ class MetricsCalculator:
         tot_prompt_tokens = sum(c["prompt_tokens"] or 0 for c in calls)
         tot_comp_tokens = sum(c["completion_tokens"] or 0 for c in calls)
 
-        # 2. Claims and parsing stats
+        # 2. Claims and target-specific accuracy
         claims = db.conn.execute(
             """
             SELECT c.* FROM claims c
@@ -51,12 +51,52 @@ class MetricsCalculator:
         total_claims = len(claims)
 
         success_claims = [c for c in claims if c["parse_status"] == "success"]
-        true_claims = [c for c in claims if c["truth_status"] == "true"]
         struct_success_rate = len(success_claims) / total_claims if total_claims > 0 else 0.0
-        truth_acc = len(true_claims) / total_claims if total_claims > 0 else 0.0
 
-        # 3. Lineage Precision & Recall
-        # Fetch reported edges and compare against oracle_evidence_json in claims
+        # Target-specific truth evaluation
+        target_correct_count = 0
+        task_recalls: list[float] = []
+
+        for cl in claims:
+            ev = json.loads(cl["oracle_evidence_json"]) if cl["oracle_evidence_json"] else {}
+            target_subj = ev.get("target_subject")
+            target_pred = ev.get("target_predicate")
+            target_obj = ev.get("target_object")
+
+            if (
+                cl["parse_status"] == "success"
+                and cl["truth_status"] == "true"
+                and cl["subject"] == target_subj
+                and cl["predicate"] == target_pred
+                and cl["object"] == target_obj
+            ):
+                target_correct_count += 1
+
+            # Path-level recall calculation for this claim
+            valid_paths = ev.get("valid_support_paths", [])
+            # Fetch reported parent IDs for this node
+            reported_rows = db.conn.execute(
+                "SELECT parent_node_id FROM reported_support_edges WHERE child_node_id = ?",
+                (cl["node_id"],),
+            ).fetchall()
+            reported_ids = {r["parent_node_id"] for r in reported_rows}
+
+            if not valid_paths:
+                task_recalls.append(1.0 if not reported_ids else 0.0)
+            else:
+                best_path_recall = 0.0
+                for path in valid_paths:
+                    if not path:
+                        best_path_recall = max(best_path_recall, 1.0)
+                    else:
+                        covered = len(set(path) & reported_ids)
+                        best_path_recall = max(best_path_recall, covered / len(path))
+                task_recalls.append(best_path_recall)
+
+        task_truth_acc = target_correct_count / total_claims if total_claims > 0 else 0.0
+        lineage_recall = sum(task_recalls) / len(task_recalls) if task_recalls else 1.0
+
+        # 3. Lineage Precision
         reported_edges = db.conn.execute(
             """
             SELECT r.parent_node_id, r.child_node_id, c.oracle_evidence_json
@@ -71,87 +111,80 @@ class MetricsCalculator:
         total_reported_edges = len(reported_edges)
         valid_reported_edges = 0
 
-        # Also track oracle required edges
-        oracle_required_edges_set = set()
-        reported_edges_set = set()
-
         for r in reported_edges:
             p_id = r["parent_node_id"]
-            c_id = r["child_node_id"]
-            reported_edges_set.add((p_id, c_id))
-
             ev = json.loads(r["oracle_evidence_json"]) if r["oracle_evidence_json"] else {}
             valid_paths = ev.get("valid_support_paths", [])
-
-            # Check if p_id appears in any valid support path
             is_valid = any(p_id in path for path in valid_paths)
             if is_valid:
                 valid_reported_edges += 1
-
-            for path in valid_paths:
-                for req_p in path:
-                    oracle_required_edges_set.add((req_p, c_id))
 
         precision = (
             valid_reported_edges / total_reported_edges if total_reported_edges > 0 else 1.0
         )
 
-        matched_required = sum(
-            1 for edge in oracle_required_edges_set if edge in reported_edges_set
-        )
-        recall = (
-            matched_required / len(oracle_required_edges_set)
-            if oracle_required_edges_set
-            else 1.0
-        )
-
-        # 4. Causal validation rates
+        # 4. Unconfounded Causal Validation Rates (Separate Denominators)
+        # Fetch all causal tests for this run
         causal_tests = db.conn.execute(
             """
-            SELECT ct.* FROM causal_tests ct
+            SELECT ct.*, c.request_json
+            FROM causal_tests ct
             JOIN calls c ON ct.original_call_id = c.call_id
-            WHERE c.run_id = ?
+            WHERE c.run_id = ? AND ct.intervention_type != 'noop'
             """,
             (run_id,),
         ).fetchall()
 
-        total_causal = len(causal_tests)
-        strong_or_partial = 0
-        hidden_causal = 0
-        indeterminate = 0
+        # Fetch set of reported pairs
+        reported_pairs = {
+            (r["parent_node_id"], r["child_node_id"]) for r in reported_edges
+        }
+
+        tested_reported_count = 0
+        validated_reported_count = 0
+
+        tested_distractor_count = 0
+        hidden_causal_count = 0
+
+        indeterminate_count = 0
 
         for ct in causal_tests:
             outcome = ct["outcome"]
-            parent_id = ct["parent_node_id"]
-            child_id = ct["child_node_id"]
+            pair = (ct["parent_node_id"], ct["child_node_id"])
 
             if outcome == "indeterminate":
-                indeterminate += 1
-            elif outcome in ("strong", "partial"):
-                if (parent_id, child_id) in reported_edges_set:
-                    strong_or_partial += 1
-                else:
-                    hidden_causal += 1
+                indeterminate_count += 1
+                continue
+
+            if pair in reported_pairs:
+                tested_reported_count += 1
+                if outcome in ("strong", "partial"):
+                    validated_reported_count += 1
+            else:
+                tested_distractor_count += 1
+                if outcome in ("strong", "partial"):
+                    hidden_causal_count += 1
 
         causal_val_rate = (
-            strong_or_partial / total_causal if total_causal > 0 else 0.0
+            validated_reported_count / tested_reported_count if tested_reported_count > 0 else 0.0
         )
-        hidden_rate = (
-            hidden_causal / total_causal if total_causal > 0 else 0.0
+        hidden_causal_rate = (
+            hidden_causal_count / tested_distractor_count if tested_distractor_count > 0 else 0.0
         )
+        total_tested = len(causal_tests)
         indet_rate = (
-            indeterminate / total_causal if total_causal > 0 else 0.0
+            indeterminate_count / total_tested if total_tested > 0 else 0.0
         )
 
         return Exp0Metrics(
             total_calls=total_calls,
             total_claims=total_claims,
             structured_output_success_rate=struct_success_rate,
-            task_truth_accuracy=truth_acc,
+            task_truth_accuracy=task_truth_acc,
             reported_lineage_precision=precision,
-            reported_lineage_recall=recall,
+            reported_lineage_recall=lineage_recall,
             causal_validation_rate=causal_val_rate,
-            hidden_causal_parent_rate=hidden_rate,
+            hidden_causal_parent_rate=hidden_causal_rate,
             causal_tests_indeterminate_rate=indet_rate,
             avg_latency_ms=avg_latency,
             total_prompt_tokens=tot_prompt_tokens,
@@ -159,11 +192,11 @@ class MetricsCalculator:
             raw_counts={
                 "total_reported_edges": total_reported_edges,
                 "valid_reported_edges": valid_reported_edges,
-                "oracle_required_edges": len(oracle_required_edges_set),
-                "matched_required_edges": matched_required,
-                "total_causal_tests": total_causal,
-                "strong_or_partial_causal": strong_or_partial,
-                "hidden_causal": hidden_causal,
-                "indeterminate_causal": indeterminate,
+                "target_correct_claims": target_correct_count,
+                "tested_reported_parents": tested_reported_count,
+                "validated_reported_parents": validated_reported_count,
+                "tested_unreported_distractors": tested_distractor_count,
+                "hidden_causal_distractors": hidden_causal_count,
+                "indeterminate_causal_tests": indeterminate_count,
             },
         )

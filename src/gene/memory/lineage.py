@@ -52,7 +52,7 @@ class LineageRecorder:
 
     @classmethod
     def build_lineage_graph(cls, db: Database, run_id: str) -> nx.MultiDiGraph:
-        """Construct a NetworkX multi-directed graph representing exposure, reported, and causal lineage."""
+        """Construct a NetworkX multi-directed graph representing exposure, reported, and verified causal lineage."""
         G = nx.MultiDiGraph()
 
         # 1. Add all memory nodes with claim attributes
@@ -125,7 +125,7 @@ class LineageRecorder:
                 reported_role=r["reported_role"] or "support",
             )
 
-        # 4. Add causal edges
+        # 4. Add causal edges (only confirmed causal shifts, or tag non-causal explicitly)
         causal_tests = db.conn.execute(
             """
             SELECT ct.parent_node_id, ct.child_node_id, ct.causal_test_id,
@@ -146,6 +146,7 @@ class LineageRecorder:
                 intervention_type=ct["intervention_type"],
                 outcome=ct["outcome"],
                 score=ct["score"],
+                causal_verified=(ct["outcome"] in ("strong", "partial")),
             )
 
         return G
@@ -159,13 +160,19 @@ class LineageRecorder:
         output_dir: str | Path,
         metrics: dict[str, Any] | None = None,
     ) -> Path:
-        """Export all 10 required experiment run artifacts to output directory."""
+        """Export all 10 required experiment run artifacts to output directory with full manifest config."""
         out = Path(output_dir)
         out.mkdir(parents=True, exist_ok=True)
 
-        # 1. manifest.json
+        # 1. manifest.json (include parsed config)
         run_row = db.conn.execute("SELECT * FROM runs WHERE run_id = ?", (run_id,)).fetchone()
         manifest = dict(run_row) if run_row else {"run_id": run_id}
+        if "config_json" in manifest and manifest["config_json"]:
+            try:
+                manifest["config"] = json.loads(manifest["config_json"])
+            except Exception:
+                pass
+
         with open(out / "manifest.json", "w", encoding="utf-8") as f:
             json.dump(manifest, f, indent=2)
 

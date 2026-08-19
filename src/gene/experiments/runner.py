@@ -1,4 +1,4 @@
-"""Single-call execution and audit logging runner for GENE experiments."""
+"""Single-call execution and audit logging runner using unified CallSpec."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ import uuid
 from typing import Any
 from gene.config import ExperimentConfig
 from gene.evaluation.claims import ClaimEvaluator, EvaluatedClaim
-from gene.ollama_client import ModelCallResult, OllamaClient
+from gene.ollama_client import CallSpec, ModelCallResult, OllamaClient
 from gene.persistence.db import Database
 from gene.prompts.templates import PromptTemplate
 from gene.worlds.oracle import Oracle
@@ -47,13 +47,16 @@ class SingleCallRunner:
         self.git_commit = get_git_commit()
 
     def create_run(self, world: World, condition: str = "clean") -> str:
-        """Initialize a new experiment run in the database."""
+        """Initialize a new experiment run in the database with full configuration persistence."""
         run_id = f"run_{uuid.uuid4().hex[:10]}"
         model_info = self.client.get_model_info(self.config.model.model_name)
         now = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
 
         # Ensure world is persisted
         self.db.save_world(world)
+
+        config_json = self.config.model_dump_json(indent=2)
+        config_hash = self.config.config_hash()
 
         with self.db.conn:
             self.db.conn.execute(
@@ -62,8 +65,8 @@ class SingleCallRunner:
                     run_id, experiment_name, experiment_version, condition, world_id,
                     model_name, model_digest, ollama_version, seed, num_ctx, temperature,
                     prompt_version, prompt_hash, retrieval_policy, memory_policy,
-                    git_commit, started_at, status
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    git_commit, config_json, config_hash, started_at, status
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     run_id,
@@ -82,6 +85,8 @@ class SingleCallRunner:
                     self.config.retrieval.policy,
                     "append_only",
                     self.git_commit,
+                    config_json,
+                    config_hash,
                     now,
                     "running",
                 ),
@@ -94,27 +99,25 @@ class SingleCallRunner:
         world: World,
         task: Task,
         oracle: Oracle,
-        generation: int = 0,
+        generation: int = 1,
         exposed_memories: list[dict[str, str]] | None = None,
     ) -> tuple[ModelCallResult, EvaluatedClaim, str, str]:
         """Execute a single task call against Ollama, evaluate with oracle, and record all audit tables."""
         # 1. Prepare memory representations if not explicitly provided
         if exposed_memories is None:
-            # Standard controlled exposure: render source facts as initial memory items
             exposed_memories = []
             for fact in world.facts:
                 exposed_memories.append({
                     "memory_id": fact.fact_id,
                     "text": NaturalLanguageRenderer.render_fact(fact),
                 })
-            # Also render rules if D1 deduction
             for rule in world.rules:
                 exposed_memories.append({
                     "memory_id": rule.rule_id,
                     "text": NaturalLanguageRenderer.render_rule(rule),
                 })
 
-        # 2. Format prompt
+        # 2. Format user prompt
         user_prompt = self.prompt_template.format_user_prompt(
             memories=exposed_memories,
             question_prompt=task.prompt,
@@ -122,8 +125,8 @@ class SingleCallRunner:
             target_predicate=task.target_fact.predicate,
         )
 
-        # 3. Invoke model
-        call_result = self.client.chat(
+        # 3. Create canonical CallSpec
+        call_spec = CallSpec(
             model_name=self.config.model.model_name,
             system_prompt=self.prompt_template.system_prompt,
             user_prompt=user_prompt,
@@ -132,7 +135,10 @@ class SingleCallRunner:
             seed=self.config.decoding_seed,
         )
 
-        # 4. Mechanically evaluate claim against oracle
+        # 4. Invoke model
+        call_result = self.client.chat(call_spec)
+
+        # 5. Mechanically evaluate claim against oracle and target fact
         evaluated_claim = ClaimEvaluator.evaluate_response(
             raw_text=call_result.raw_response_text,
             parsed_json=call_result.parsed_json,
@@ -140,13 +146,13 @@ class SingleCallRunner:
             condition=self.config.condition,
         )
 
-        # 5. Persist call, memory node, and claim to SQLite
+        # 6. Persist call, memory node, and claim to SQLite
         call_id = f"call_{uuid.uuid4().hex[:12]}"
         node_id = f"node_{uuid.uuid4().hex[:12]}"
         now = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
 
         with self.db.conn:
-            # 5a. Save call record
+            # 6a. Save call record with serialized CallSpec
             self.db.conn.execute(
                 """
                 INSERT INTO calls (
@@ -160,7 +166,7 @@ class SingleCallRunner:
                     run_id,
                     generation,
                     task.task_id,
-                    json.dumps(call_result.request_payload),
+                    call_spec.model_dump_json(),
                     call_result.raw_response_text,
                     json.dumps(call_result.parsed_json) if call_result.parsed_json else None,
                     call_result.prompt_tokens,
@@ -170,7 +176,7 @@ class SingleCallRunner:
                 ),
             )
 
-            # 5b. Save generated memory node
+            # 6b. Save generated memory node
             natural_text = (
                 f"{evaluated_claim.subject} {evaluated_claim.predicate} {evaluated_claim.object}"
                 if evaluated_claim.parse_status == "success"
@@ -197,7 +203,7 @@ class SingleCallRunner:
                 ),
             )
 
-            # 5c. Save evaluated claim
+            # 6c. Save evaluated claim
             unique_claim_id = f"claim_{uuid.uuid4().hex[:12]}"
             self.db.conn.execute(
                 """
@@ -215,7 +221,13 @@ class SingleCallRunner:
                     evaluated_claim.parse_status,
                     evaluated_claim.truth_status.value,
                     evaluated_claim.infection_status,
-                    json.dumps({"valid_support_paths": task.valid_support_path_ids}),
+                    json.dumps({
+                        "task_id": task.task_id,
+                        "target_subject": task.target_fact.subject,
+                        "target_predicate": task.target_fact.predicate,
+                        "target_object": task.target_fact.object,
+                        "valid_support_paths": task.valid_support_path_ids,
+                    }),
                 ),
             )
 

@@ -1,15 +1,17 @@
-"""Unit tests for Experiment 0 metric calculations."""
+"""Unit tests for hardened Experiment 0 metric calculations."""
 
 from __future__ import annotations
 
 import json
 from gene.evaluation.metrics import MetricsCalculator
+from gene.ollama_client import CallSpec
 from gene.persistence.db import Database
 
 
 def test_metrics_calculation():
     db = Database(":memory:")
     run_id = "run_metric_test"
+    spec = CallSpec(model_name="test_model", system_prompt="sys", user_prompt="usr")
 
     with db.conn:
         db.conn.execute(
@@ -31,7 +33,7 @@ def test_metrics_calculation():
             INSERT INTO calls (call_id, run_id, generation, task_id, request_json, response_text, prompt_tokens, completion_tokens, latency_ms, created_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
-            ("call_1", run_id, 0, "task_1", "{}", "resp", 100, 20, 50.0, "2026-08-19T00:00:01Z"),
+            ("call_1", run_id, 0, "task_1", spec.model_dump_json(), "resp", 100, 20, 50.0, "2026-08-19T00:00:01Z"),
         )
         db.conn.execute(
             """
@@ -54,7 +56,12 @@ def test_metrics_calculation():
                 "success",
                 "true",
                 "clean",
-                json.dumps({"valid_support_paths": [["fact_p1"]]}),
+                json.dumps({
+                    "target_subject": "VELORA",
+                    "target_predicate": "manager",
+                    "target_object": "NERIN",
+                    "valid_support_paths": [["fact_p1"]],
+                }),
             ),
         )
         db.conn.execute(

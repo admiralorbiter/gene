@@ -65,12 +65,12 @@ def run_milestone_b_inspection():
     print(f"    Question: '{test_d0.prompt}'")
     print(f"    Target: ({test_d0.target_fact.subject}, {test_d0.target_fact.predicate}, {test_d0.target_fact.object})")
     
-    call_res_0, claim_0 = runner.execute_task(
+    call_res_0, claim_0, call_id_0, node_id_0 = runner.execute_task(
         run_id=run_id,
         world=world,
         task=test_d0,
         oracle=oracle,
-        generation=0,
+        generation=1,
     )
 
     print(f"    --> Latency: {call_res_0.latency_ms:.1f}ms | Prompt Tokens: {call_res_0.prompt_tokens} | Completion Tokens: {call_res_0.completion_tokens}")
@@ -86,12 +86,12 @@ def run_milestone_b_inspection():
     print(f"    Target: ({test_d1.target_fact.subject}, {test_d1.target_fact.predicate}, {test_d1.target_fact.object})")
     print(f"    Oracle Valid Support Paths: {test_d1.valid_support_path_ids}")
 
-    call_res_1, claim_1 = runner.execute_task(
+    call_res_1, claim_1, call_id_1, node_id_1 = runner.execute_task(
         run_id=run_id,
         world=world,
         task=test_d1,
         oracle=oracle,
-        generation=1,
+        generation=2,
     )
 
     print(f"    --> Latency: {call_res_1.latency_ms:.1f}ms | Prompt Tokens: {call_res_1.prompt_tokens} | Completion Tokens: {call_res_1.completion_tokens}")

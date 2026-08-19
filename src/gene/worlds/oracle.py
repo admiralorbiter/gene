@@ -1,4 +1,4 @@
-"""Forward-chaining deterministic inference oracle and support-path tracker for GENE."""
+"""Forward-chaining deterministic inference oracle, rule-inclusive support-path tracker, and WorldValidator."""
 
 from __future__ import annotations
 
@@ -16,19 +16,19 @@ class TruthStatus(str, Enum):
 
 
 class DerivationNode:
-    """Node in the derivation DAG tracking which parent facts produced a derived fact."""
+    """Node in the derivation DAG tracking both parent facts and the inference rule used."""
     def __init__(self, fact: Fact, rule: Rule | None = None, parent_nodes: list[DerivationNode] | None = None):
         self.fact = fact
         self.rule = rule
         self.parent_nodes = parent_nodes or []
 
     def get_minimal_support_sets(self) -> set[frozenset[str]]:
-        """Compute all minimal sets of base source fact IDs supporting this derivation."""
+        """Compute all minimal sets of base source fact IDs and rule IDs supporting this derivation."""
         if not self.parent_nodes:
             # Base source fact
             return {frozenset([self.fact.fact_id])}
 
-        # For derived fact, combine Cartesian product of parent support sets
+        # For derived fact, combine Cartesian product of parent support sets and include rule ID
         parent_sets_list = [p.get_minimal_support_sets() for p in self.parent_nodes]
         combined: set[frozenset[str]] = {frozenset()}
         for p_sets in parent_sets_list:
@@ -37,6 +37,12 @@ class DerivationNode:
                 for p_set in p_sets:
                     next_combined.add(current | p_set)
             combined = next_combined
+
+        # Add the inference rule itself as an essential member of the support set
+        if self.rule:
+            rule_set = frozenset([self.rule.rule_id])
+            combined = {c | rule_set for c in combined}
+
         return combined
 
 
@@ -59,6 +65,7 @@ class Oracle:
         self.rules: list[Rule] = list(world.rules)
         self.closure_facts: dict[str, Fact] = {}
         self.derivation_trees: dict[str, list[DerivationNode]] = {}
+        self.functional_conflicts: list[str] = []
         self._compute_closure()
 
     def _compute_closure(self) -> None:
@@ -78,14 +85,28 @@ class Oracle:
             iteration += 1
 
             for rule in self.rules:
-                # Find all valid variable bindings for rule antecedents
                 matched_bindings = self._match_antecedents(rule.antecedents)
 
                 for binding, parent_facts in matched_bindings:
-                    # Construct consequent fact
                     c_subj = self._substitute(rule.consequent[0], binding)
                     c_pred = self._substitute(rule.consequent[1], binding)
                     c_obj = self._substitute(rule.consequent[2], binding)
+
+                    # Check functional conflict with existing closure facts
+                    if c_pred.lower() in self.FUNCTIONAL_PREDICATES:
+                        for existing_fact in self.closure_facts.values():
+                            if (
+                                existing_fact.subject.upper() == c_subj.upper()
+                                and existing_fact.predicate.lower() == c_pred.lower()
+                                and existing_fact.object.upper() != c_obj.upper()
+                                and existing_fact.truth_value
+                            ):
+                                conflict_msg = (
+                                    f"Functional conflict on ({c_subj}, {c_pred}): "
+                                    f"Existing='{existing_fact.object}', New='{c_obj}' from Rule '{rule.rule_id}'"
+                                )
+                                if conflict_msg not in self.functional_conflicts:
+                                    self.functional_conflicts.append(conflict_msg)
 
                     fact_id = compute_fact_id(c_subj, c_pred, c_obj)
                     if fact_id not in self.closure_facts:
@@ -103,7 +124,6 @@ class Oracle:
                     # Add derivation tree node
                     parent_nodes = []
                     for pf in parent_facts:
-                        # Use first available derivation node of parent
                         p_node = self.derivation_trees[pf.fact_id][0]
                         parent_nodes.append(p_node)
 
@@ -123,7 +143,6 @@ class Oracle:
         for clause in antecedents:
             new_results = []
             for binding, matched_facts in results:
-                # Try matching clause against all current closure facts
                 for fact in self.closure_facts.values():
                     if not fact.truth_value:
                         continue
@@ -163,7 +182,7 @@ class Oracle:
         return element
 
     def get_support_paths(self, fact_id: str) -> list[list[str]]:
-        """Get all minimal valid support paths (as lists of base fact IDs) for a fact."""
+        """Get all minimal valid support paths (as sorted lists of base fact IDs and rule IDs) for a fact."""
         if fact_id not in self.derivation_trees:
             return []
         all_sets: set[frozenset[str]] = set()
@@ -177,7 +196,6 @@ class Oracle:
         if target_id in self.closure_facts:
             return TruthStatus.TRUE if self.closure_facts[target_id].truth_value else TruthStatus.FALSE
 
-        # Check for functional contradiction
         norm_subj = subject.strip().upper()
         norm_pred = predicate.strip().lower()
         norm_obj = obj.strip().upper()
@@ -194,11 +212,39 @@ class Oracle:
         """Evaluate a Fact object against the oracle."""
         return self.evaluate_triple(claim.subject, claim.predicate, claim.object)
 
-    def get_canonical_answer(self, subject: str, predicate: str) -> str | None:
-        """Retrieve the canonical object for a (subject, predicate) query if known."""
+    def get_canonical_answers(self, subject: str, predicate: str) -> list[str]:
+        """Retrieve all canonical objects for a (subject, predicate) query."""
         norm_subj = subject.strip().upper()
         norm_pred = predicate.strip().lower()
+        answers = []
         for f in self.closure_facts.values():
             if f.subject.upper() == norm_subj and f.predicate.lower() == norm_pred and f.truth_value:
-                return f.object
-        return None
+                answers.append(f.object)
+        return answers
+
+
+class WorldValidator:
+    """Validator ensuring worlds have no functional contradictions and unambiguous task ground truth."""
+
+    @classmethod
+    def validate_world(cls, world: World, oracle: Oracle | None = None) -> list[str]:
+        """Return list of validation errors found in world, empty list if world is strictly valid."""
+        orc = oracle or Oracle(world)
+        errors: list[str] = []
+
+        # 1. Check functional conflicts in closure
+        if orc.functional_conflicts:
+            errors.extend(orc.functional_conflicts)
+
+        # 2. Check that functional predicates on known entities have at most one answer
+        station_names = world.entities.get("stations", [])
+        for station in station_names:
+            protocols = orc.get_canonical_answers(station, "uses_protocol")
+            if len(protocols) > 1:
+                errors.append(f"Ambiguous uses_protocol for station '{station}': {protocols}")
+
+            managers = orc.get_canonical_answers(station, "manager")
+            if len(managers) > 1:
+                errors.append(f"Ambiguous manager for station '{station}': {managers}")
+
+        return errors

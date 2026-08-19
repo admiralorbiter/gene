@@ -1,4 +1,4 @@
-"""Unit tests for SQLite database persistence and round-trip world storage."""
+"""Unit tests for SQLite database persistence, composite keys, and round-trip world storage."""
 
 from __future__ import annotations
 
@@ -9,7 +9,6 @@ from gene.worlds.schema import World
 
 def test_sqlite_schema_init_in_memory():
     db = Database(":memory:")
-    # Verify tables exist
     cursor = db.conn.execute("SELECT name FROM sqlite_master WHERE type='table'")
     tables = {row[0] for row in cursor.fetchall()}
     assert "worlds" in tables
@@ -43,17 +42,21 @@ def test_world_save_and_load_roundtrip(golden_world: World):
     db.close()
 
 
-def test_procedural_paired_worlds_persistence():
-    clean_world, mutated_world, mutation = WorldGenerator.generate_paired(seed=1234)
+def test_composite_keys_across_multiple_worlds():
+    """Verify that saving multiple worlds with identical rule IDs preserves all worlds independently."""
+    w1 = WorldGenerator.generate(seed=101)
+    w2 = WorldGenerator.generate(seed=202)
+
     db = Database(":memory:")
-    db.save_world(clean_world)
-    db.save_world(mutated_world)
+    db.save_world(w1)
+    db.save_world(w2)
 
-    loaded_clean = db.load_world(clean_world.world_id)
-    loaded_mut = db.load_world(mutated_world.world_id)
+    # Both worlds should exist in DB with their respective facts and rules
+    loaded_w1 = db.load_world(w1.world_id)
+    loaded_w2 = db.load_world(w2.world_id)
 
-    assert loaded_clean is not None
-    assert loaded_mut is not None
-    assert loaded_clean.validation_hash() == clean_world.validation_hash()
-    assert loaded_mut.validation_hash() == mutated_world.validation_hash()
+    assert loaded_w1 is not None
+    assert loaded_w2 is not None
+    assert loaded_w1.validation_hash() == w1.validation_hash()
+    assert loaded_w2.validation_hash() == w2.validation_hash()
     db.close()

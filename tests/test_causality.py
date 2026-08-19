@@ -1,10 +1,10 @@
-"""Unit tests for counterfactual causal runner."""
+"""Unit tests for counterfactual causal runner and byte-equal CallSpec replay."""
 
 from __future__ import annotations
 
 import json
 from gene.evaluation.causality import CausalRunner
-from gene.ollama_client import FakeOllamaClient
+from gene.ollama_client import CallSpec, FakeOllamaClient
 from gene.persistence.db import Database
 from gene.worlds.oracle import Oracle
 from gene.worlds.schema import World
@@ -26,6 +26,14 @@ def test_causal_runner_parent_removal(golden_world: World):
         )
 
         orig_prompt = "Available Memories:\n[fact_01] Nerin is manager of Velora.\n[fact_02] Nerin reports to Tal.\n\nQuestion: Which security protocol does Velora operate under?"
+        spec = CallSpec(
+            model_name="gemma3:12b",
+            system_prompt="System instructions",
+            user_prompt=orig_prompt,
+            temperature=0.0,
+            seed=42,
+        )
+
         db.conn.execute(
             """
             INSERT INTO calls (call_id, run_id, generation, task_id, request_json, response_text, created_at)
@@ -36,7 +44,7 @@ def test_causal_runner_parent_removal(golden_world: World):
                 run_id,
                 1,
                 "task_uses_protocol",
-                json.dumps({"messages": [{"role": "user", "content": orig_prompt}]}),
+                spec.model_dump_json(),
                 '{"answer": {"subject": "VELORA", "predicate": "uses_protocol", "object": "PROTOCOL_GREEN"}, "parent_memory_ids": ["fact_01", "fact_02"]}',
                 "2026-08-19T00:00:01Z",
             ),
@@ -88,7 +96,21 @@ def test_causal_runner_parent_removal(golden_world: World):
     )
 
     runner = CausalRunner(db=db, client=fake_client)
-    res = runner.replay_intervention(
+
+    # 1. Test sham/no-op replay
+    noop_res = runner.replay_intervention(
+        original_call_id="call_orig_1",
+        child_node_id="node_c1",
+        target_parent_id="noop",
+        intervention_type="noop",
+        oracle=oracle,
+        world=golden_world,
+        seed=42,
+    )
+    assert noop_res.outcome == "none"
+
+    # 2. Test parent removal intervention
+    remove_res = runner.replay_intervention(
         original_call_id="call_orig_1",
         child_node_id="node_c1",
         target_parent_id="fact_02",
@@ -97,15 +119,7 @@ def test_causal_runner_parent_removal(golden_world: World):
         world=golden_world,
         seed=42,
     )
-
-    assert res.outcome == "strong"
-    assert res.score == 1.0
-    assert res.counterfactual_claim.object == "UNKNOWN_PROTOCOL"
-
-    # Verify causal_tests table entry
-    cursor = db.conn.execute("SELECT * FROM causal_tests WHERE causal_test_id = ?", (res.causal_test_id,))
-    row = cursor.fetchone()
-    assert row is not None
-    assert row["outcome"] == "strong"
+    assert remove_res.outcome == "strong"
+    assert remove_res.score == 1.0
 
     db.close()

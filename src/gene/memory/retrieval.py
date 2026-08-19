@@ -1,4 +1,4 @@
-"""Controlled memory retrieval policy for Experiment 0 and 1."""
+"""Controlled memory retrieval policy with fail-closed instrumentation guarantees."""
 
 from __future__ import annotations
 
@@ -6,6 +6,11 @@ import random
 from typing import Any
 from pydantic import BaseModel
 from gene.memory.store import MemoryNode
+
+
+class InstrumentationError(Exception):
+    """Raised when measurement instrumentation fails (e.g. required support cannot be exposed)."""
+    pass
 
 
 class ExposedMemory(BaseModel):
@@ -26,7 +31,7 @@ class RetrievalResult(BaseModel):
 
 
 class ControlledRetriever:
-    """Deterministic controlled retrieval policy (Required Support + N Distractors)."""
+    """Deterministic controlled retrieval policy with fail-closed support guarantees."""
 
     @classmethod
     def retrieve(
@@ -36,16 +41,20 @@ class ControlledRetriever:
         num_distractors: int = 3,
         seed: int = 42,
     ) -> RetrievalResult:
-        """Select required support nodes plus N distractors, shuffled deterministically."""
+        """Select required support nodes plus N distractors, failing closed if support is missing."""
         rng = random.Random(seed)
         candidate_map = {node.node_id: node for node in candidate_nodes}
         candidate_node_ids = list(candidate_map.keys())
 
-        # 1. Identify support nodes
+        # 1. Fail closed on missing required support
         support_nodes: list[MemoryNode] = []
         for sid in required_support_ids:
-            if sid in candidate_map:
-                support_nodes.append(candidate_map[sid])
+            if sid not in candidate_map:
+                raise InstrumentationError(
+                    f"Instrumentation Failure: Required support ID '{sid}' was not available in candidate memory pool. "
+                    f"Available candidates: {candidate_node_ids}"
+                )
+            support_nodes.append(candidate_map[sid])
 
         # 2. Identify distractor pool (nodes not in required support)
         support_id_set = set(required_support_ids)
@@ -60,7 +69,6 @@ class ControlledRetriever:
 
         # 4. Combine and assign retrieval rank
         selected_nodes = support_nodes + sampled_distractors
-        # Retrieval rank based on selection order
         rank_map = {node.node_id: idx for idx, node in enumerate(selected_nodes)}
 
         # 5. Deterministically shuffle presentation order (context position)

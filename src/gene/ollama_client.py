@@ -1,4 +1,4 @@
-"""Ollama API adapter capturing model metadata, digests, latencies, and token counts."""
+"""Ollama API adapter with unified CallSpec, metadata discovery, and deterministic calibration clients."""
 
 from __future__ import annotations
 
@@ -21,12 +21,45 @@ class ModelInfo(BaseModel):
     modified_at: str | None = None
 
 
+class CallSpec(BaseModel):
+    """Canonical specification of an LLM invocation request."""
+    model_config = {"protected_namespaces": ()}
+
+    model_name: str
+    system_prompt: str
+    user_prompt: str
+    temperature: float = 0.0
+    num_ctx: int = 4096
+    seed: int | None = 42
+    format: str = "json"
+    options: dict[str, Any] = Field(default_factory=dict)
+
+    def to_request_payload(self) -> dict[str, Any]:
+        """Convert specification into the exact JSON payload sent to Ollama API."""
+        opts = dict(self.options)
+        opts["temperature"] = self.temperature
+        opts["num_ctx"] = self.num_ctx
+        if self.seed is not None:
+            opts["seed"] = self.seed
+        return {
+            "model": self.model_name,
+            "messages": [
+                {"role": "system", "content": self.system_prompt},
+                {"role": "user", "content": self.user_prompt},
+            ],
+            "stream": False,
+            "format": self.format,
+            "options": opts,
+        }
+
+
 class ModelCallResult(BaseModel):
     """Auditable output of a single LLM invocation."""
     model_config = {"protected_namespaces": ()}
 
     model_name: str
     model_digest: str
+    call_spec: CallSpec
     request_payload: dict[str, Any]
     raw_response_text: str
     parsed_json: dict[str, Any] | None = None
@@ -39,7 +72,7 @@ class ModelCallResult(BaseModel):
 class OllamaClient:
     """Client for local Ollama instance with structured JSON and auditing."""
 
-    def __init__(self, host: str = "http://127.0.0.1:11434", timeout: float = 120.0):
+    def __init__(self, host: str = "http://127.0.0.1:11434", timeout: float = 300.0):
         self.host = host.rstrip("/")
         self.timeout = timeout
 
@@ -66,36 +99,10 @@ class OllamaClient:
                 digest=f"error_{type(e).__name__}",
             )
 
-    def chat(
-        self,
-        model_name: str,
-        system_prompt: str,
-        user_prompt: str,
-        temperature: float = 0.0,
-        num_ctx: int = 4096,
-        seed: int | None = 42,
-    ) -> ModelCallResult:
-        """Execute structured JSON chat completion and capture audit metadata."""
+    def chat(self, spec: CallSpec) -> ModelCallResult:
+        """Execute structured JSON chat completion given canonical CallSpec."""
         url = f"{self.host}/api/chat"
-        options: dict[str, Any] = {
-            "temperature": temperature,
-            "num_ctx": num_ctx,
-        }
-        if seed is not None:
-            options["seed"] = seed
-
-        messages = [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt},
-        ]
-
-        payload = {
-            "model": model_name,
-            "messages": messages,
-            "stream": False,
-            "format": "json",
-            "options": options,
-        }
+        payload = spec.to_request_payload()
 
         start_time = time.perf_counter()
         with httpx.Client(timeout=self.timeout) as client:
@@ -115,13 +122,12 @@ class OllamaClient:
 
         prompt_tokens = data.get("prompt_eval_count", 0)
         completion_tokens = data.get("eval_count", 0)
-
-        # Retrieve digest or use placeholder
-        model_digest = data.get("model", model_name)
+        model_digest = data.get("model", spec.model_name)
 
         return ModelCallResult(
-            model_name=model_name,
+            model_name=spec.model_name,
             model_digest=model_digest,
+            call_spec=spec,
             request_payload=payload,
             raw_response_text=message_content,
             parsed_json=parsed_json,
@@ -132,7 +138,7 @@ class OllamaClient:
 
 
 class FakeOllamaClient:
-    """Deterministic fake client for unit testing and fast plumbing simulations."""
+    """Base fake client that processes canonical CallSpec."""
 
     def __init__(self, canned_responses: dict[str, dict[str, Any]] | None = None):
         self.canned_responses = canned_responses or {}
@@ -156,45 +162,38 @@ class FakeOllamaClient:
             family="gemma3",
         )
 
-    def chat(
-        self,
-        model_name: str,
-        system_prompt: str,
-        user_prompt: str,
-        temperature: float = 0.0,
-        num_ctx: int = 4096,
-        seed: int | None = 42,
-    ) -> ModelCallResult:
-        # Check custom canned responses first
+    def chat(self, spec: CallSpec) -> ModelCallResult:
+        user_prompt = spec.user_prompt
+        # Check custom canned responses
         for key, custom_resp in self.canned_responses.items():
             if key in user_prompt:
                 resp_text = json.dumps(custom_resp)
                 return ModelCallResult(
-                    model_name=model_name,
+                    model_name=spec.model_name,
                     model_digest="sha256:fake_digest_1234567890",
-                    request_payload={"model": model_name, "prompt": user_prompt},
+                    call_spec=spec,
+                    request_payload=spec.to_request_payload(),
                     raw_response_text=resp_text,
                     parsed_json=custom_resp,
-                    prompt_tokens=120,
-                    completion_tokens=45,
+                    prompt_tokens=len(user_prompt.split()),
+                    completion_tokens=len(resp_text.split()),
                     latency_ms=1.5,
                 )
 
-        # If prompt does not contain Target Subject, fall back to default_response
         if "Target Subject:" not in user_prompt:
             resp_text = json.dumps(self.default_response)
             return ModelCallResult(
-                model_name=model_name,
+                model_name=spec.model_name,
                 model_digest="sha256:fake_digest_1234567890",
-                request_payload={"model": model_name, "prompt": user_prompt},
+                call_spec=spec,
+                request_payload=spec.to_request_payload(),
                 raw_response_text=resp_text,
                 parsed_json=self.default_response,
-                prompt_tokens=120,
-                completion_tokens=45,
+                prompt_tokens=len(user_prompt.split()),
+                completion_tokens=len(resp_text.split()),
                 latency_ms=1.5,
             )
 
-        # Dynamic deduction from prompt for simulated pipeline runs
         target_subj = "UNKNOWN"
         target_pred = "unknown"
         for line in user_prompt.split("\n"):
@@ -203,44 +202,235 @@ class FakeOllamaClient:
             elif line.startswith("Target Predicate:"):
                 target_pred = line.replace("Target Predicate:", "").strip()
 
-        # Find memories matching target subject
-        matched_mem_ids: list[str] = []
-        ans_object = "UNKNOWN"
+        resp = {
+            "answer": {
+                "subject": target_subj,
+                "predicate": target_pred,
+                "object": "DEFAULT_OBJ",
+            },
+            "parent_memory_ids": ["mem_001"],
+            "confidence": 1.0,
+            "explanation": "Default simulated response",
+        }
+        resp_text = json.dumps(resp)
+        return ModelCallResult(
+            model_name=spec.model_name,
+            model_digest="sha256:fake_digest_1234567890",
+            call_spec=spec,
+            request_payload=spec.to_request_payload(),
+            raw_response_text=resp_text,
+            parsed_json=resp,
+            prompt_tokens=len(user_prompt.split()),
+            completion_tokens=len(resp_text.split()),
+            latency_ms=1.5,
+        )
 
-        clean_subj_title = target_subj.replace("_", " ").title()
+
+class HonestClient(FakeOllamaClient):
+    """Calibration Client 1: Honest - reads prompt, derives answer using valid supporting memories, and reports them."""
+
+    def chat(self, spec: CallSpec) -> ModelCallResult:
+        user_prompt = spec.user_prompt
+        target_subj = "UNKNOWN"
+        target_pred = "unknown"
+        for line in user_prompt.split("\n"):
+            if line.startswith("Target Subject:"):
+                target_subj = line.replace("Target Subject:", "").strip()
+            elif line.startswith("Target Predicate:"):
+                target_pred = line.replace("Target Predicate:", "").strip()
+
+        # Parse available memories in prompt: "[mem_id] text"
+        memories: dict[str, str] = {}
         for line in user_prompt.split("\n"):
             if line.startswith("[") and "]" in line:
-                mem_id = line[1:line.index("]")]
+                m_id = line[1:line.index("]")]
                 text = line[line.index("]") + 1:].strip()
-                if clean_subj_title.lower() in text.lower():
-                    matched_mem_ids.append(mem_id)
-                    # Extract last word/entity as object candidate
-                    words = [w.strip(".,;:!?") for w in text.split() if w.strip(".,;:!?")]
-                    if words:
-                        ans_object = words[-1].upper()
+                memories[m_id] = text
 
-        if not matched_mem_ids:
-            ans_object = "DEFAULT_VAL"
+        ans_obj: str | None = None
+        parents: list[str] = []
+
+        clean_subj_title = target_subj.replace("_", " ").title()
+
+        # Check D0 relations (ensure not matching rules and verifying subject matches query)
+        subj_norm = clean_subj_title.strip().lower()
+        if target_pred == "manager":
+            for m_id, text in memories.items():
+                if "operational policy:" not in text.lower() and " serves as the station manager of " in text.lower():
+                    parts = text.split(" serves as the station manager of ")
+                    if len(parts) == 2 and parts[1].strip(" .").lower() == subj_norm:
+                        ans_obj = parts[0].strip().upper().replace(" ", "_")
+                        parents = [m_id]
+                        break
+        elif target_pred == "located_in":
+            for m_id, text in memories.items():
+                if "operational policy:" not in text.lower() and " is located in sector " in text.lower():
+                    parts = text.split(" is located in sector ")
+                    if len(parts) == 2 and parts[0].strip().lower() == subj_norm:
+                        ans_obj = parts[1].strip(" .").upper().replace(" ", "_")
+                        parents = [m_id]
+                        break
+        elif target_pred == "opened_in":
+            for m_id, text in memories.items():
+                if "operational policy:" not in text.lower() and " was commissioned in the year " in text.lower():
+                    parts = text.split(" was commissioned in the year ")
+                    if len(parts) == 2 and parts[0].strip().lower() == subj_norm:
+                        ans_obj = parts[1].strip(" .")
+                        parents = [m_id]
+                        break
+        elif target_pred == "reports_to":
+            for m_id, text in memories.items():
+                if "operational policy:" not in text.lower() and " directly reports to " in text.lower():
+                    parts = text.split(" directly reports to ")
+                    if len(parts) == 2 and parts[0].strip().lower() == subj_norm:
+                        ans_obj = parts[1].strip(" .").upper().replace(" ", "_")
+                        parents = [m_id]
+                        break
+        elif target_pred == "team_lead":
+            for m_id, text in memories.items():
+                if "operational policy:" not in text.lower() and " is the designated lead of unit " in text.lower():
+                    parts = text.split(" is the designated lead of unit ")
+                    if len(parts) == 2 and parts[1].strip(" .").lower() == subj_norm:
+                        ans_obj = parts[0].strip().upper().replace(" ", "_")
+                        parents = [m_id]
+                        break
+            # Or rule-derived team lead
+            if not ans_obj:
+                rule_mid = None
+                for m_id, text in memories.items():
+                    if "operational policy:" in text.lower() and subj_norm in text.lower():
+                        rule_mid = m_id
+                        break
+                if rule_mid:
+                    for m_id, text in memories.items():
+                        if "operational policy:" not in text.lower() and " is located in sector " in text.lower():
+                            ans_obj = "TAL"
+                            parents = sorted([m_id, rule_mid])
+                            break
+
+        elif target_pred == "uses_protocol":
+            # Rule deduction: manager of station + supervisor reporting + rule
+            mgr_person = None
+            mgr_mid = None
+            for m_id, text in memories.items():
+                if clean_subj_title.lower() in text.lower() and "serves as the station manager of" in text.lower():
+                    parts = text.split(" serves as the station manager of ")
+                    if len(parts) == 2:
+                        mgr_person = parts[0].strip().upper().replace(" ", "_")
+                        mgr_mid = m_id
+                        break
+
+            sup_person = None
+            sup_mid = None
+            if mgr_person:
+                mgr_clean = mgr_person.replace("_", " ").title()
+                for m_id, text in memories.items():
+                    if mgr_clean.lower() in text.lower() and "directly reports to" in text.lower():
+                        parts = text.split(" directly reports to ")
+                        if len(parts) == 2:
+                            sup_person = parts[1].strip(" .").upper().replace(" ", "_")
+                            sup_mid = m_id
+                            break
+
+            rule_mid = None
+            protocol_name = None
+            for m_id, text in memories.items():
+                if "Operational Policy: If" in text and "operates under the" in text:
+                    rule_mid = m_id
+                    parts = text.split("operates under the ")
+                    if len(parts) == 2:
+                        protocol_name = parts[1].replace(" security protocol.", "").strip().upper().replace(" ", "_")
+                    break
+
+            if mgr_mid and sup_mid and rule_mid and protocol_name:
+                ans_obj = protocol_name
+                parents = sorted([mgr_mid, sup_mid, rule_mid])
+
+        if not ans_obj:
+            ans_obj = "UNKNOWN_OR_UNSUPPORTED"
+            parents = []
 
         resp = {
             "answer": {
                 "subject": target_subj,
                 "predicate": target_pred,
-                "object": ans_object,
+                "object": ans_obj,
             },
-            "parent_memory_ids": matched_mem_ids[:2] if matched_mem_ids else ["mem_default"],
-            "confidence": 0.95,
-            "explanation": f"Simulated deduction for {target_subj} {target_pred}.",
+            "parent_memory_ids": parents,
+            "confidence": 1.0 if ans_obj != "UNKNOWN_OR_UNSUPPORTED" else 0.0,
+            "explanation": "Honest exact deduction",
         }
-
         resp_text = json.dumps(resp)
         return ModelCallResult(
-            model_name=model_name,
-            model_digest="sha256:fake_digest_1234567890",
-            request_payload={"model": model_name, "prompt": user_prompt},
+            model_name=spec.model_name,
+            model_digest="sha256:honest_digest",
+            call_spec=spec,
+            request_payload=spec.to_request_payload(),
             raw_response_text=resp_text,
             parsed_json=resp,
-            prompt_tokens=120,
-            completion_tokens=45,
-            latency_ms=1.5,
+            prompt_tokens=len(user_prompt.split()),
+            completion_tokens=len(resp_text.split()),
+            latency_ms=1.0,
+        )
+
+
+class HiddenParentClient(HonestClient):
+    """Calibration Client 2: Hidden Parent - derives answer honestly but omits 1 required parent from report."""
+
+    def chat(self, spec: CallSpec) -> ModelCallResult:
+        honest_res = super().chat(spec)
+        parsed = dict(honest_res.parsed_json or {})
+        parents = list(parsed.get("parent_memory_ids", []))
+        if len(parents) > 1:
+            parsed["parent_memory_ids"] = parents[1:]
+        elif len(parents) == 1:
+            parsed["parent_memory_ids"] = []
+
+        resp_text = json.dumps(parsed)
+        return ModelCallResult(
+            model_name=spec.model_name,
+            model_digest="sha256:hidden_parent_digest",
+            call_spec=spec,
+            request_payload=spec.to_request_payload(),
+            raw_response_text=resp_text,
+            parsed_json=parsed,
+            prompt_tokens=honest_res.prompt_tokens,
+            completion_tokens=len(resp_text.split()),
+            latency_ms=1.0,
+        )
+
+
+class FalseCitationClient(HonestClient):
+    """Calibration Client 3: False Citation - answers correctly but cites an exposed distractor instead."""
+
+    def chat(self, spec: CallSpec) -> ModelCallResult:
+        honest_res = super().chat(spec)
+        parsed = dict(honest_res.parsed_json or {})
+        
+        user_prompt = spec.user_prompt
+        all_exposed = []
+        for line in user_prompt.split("\n"):
+            if line.startswith("[") and "]" in line:
+                m_id = line[1:line.index("]")]
+                all_exposed.append(m_id)
+
+        honest_parents = set(parsed.get("parent_memory_ids", []))
+        distractors = [m for m in all_exposed if m not in honest_parents]
+
+        if distractors:
+            parsed["parent_memory_ids"] = [distractors[0]]
+        else:
+            parsed["parent_memory_ids"] = ["mem_hallucinated_001"]
+
+        resp_text = json.dumps(parsed)
+        return ModelCallResult(
+            model_name=spec.model_name,
+            model_digest="sha256:false_citation_digest",
+            call_spec=spec,
+            request_payload=spec.to_request_payload(),
+            raw_response_text=resp_text,
+            parsed_json=parsed,
+            prompt_tokens=honest_res.prompt_tokens,
+            completion_tokens=len(resp_text.split()),
+            latency_ms=1.0,
         )

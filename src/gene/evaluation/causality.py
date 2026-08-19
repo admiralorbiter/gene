@@ -1,15 +1,14 @@
-"""Counterfactual causal runner and intervention comparator for GENE."""
+"""Counterfactual causal runner, CallSpec byte-equal replays, and intervention outcome comparator."""
 
 from __future__ import annotations
 
 import json
-import re
 import uuid
 from typing import Any, Literal
 from pydantic import BaseModel, Field
 from gene.config import ExperimentConfig
 from gene.evaluation.claims import ClaimEvaluator, EvaluatedClaim
-from gene.ollama_client import OllamaClient
+from gene.ollama_client import CallSpec, OllamaClient
 from gene.persistence.db import Database
 from gene.worlds.oracle import Oracle, TruthStatus
 from gene.worlds.renderer import NaturalLanguageRenderer
@@ -22,7 +21,7 @@ class CausalTestResult(BaseModel):
     parent_node_id: str
     child_node_id: str
     original_call_id: str
-    intervention_type: Literal["remove", "replace_clean", "replace_other"]
+    intervention_type: Literal["remove", "replace_clean", "noop"]
     intervention_seed: int
     counterfactual_call_id: str
     original_claim: EvaluatedClaim
@@ -33,7 +32,7 @@ class CausalTestResult(BaseModel):
 
 
 class CausalRunner:
-    """Replays LLM calls under controlled counterfactual parent interventions."""
+    """Replays LLM calls under controlled counterfactual parent interventions using stored CallSpec."""
 
     def __init__(
         self,
@@ -50,13 +49,13 @@ class CausalRunner:
         original_call_id: str,
         child_node_id: str,
         target_parent_id: str,
-        intervention_type: Literal["remove", "replace_clean"] = "remove",
+        intervention_type: Literal["remove", "replace_clean", "noop"] = "remove",
         clean_counterpart_fact: Fact | None = None,
         oracle: Oracle | None = None,
         world: World | None = None,
         seed: int = 42,
     ) -> CausalTestResult:
-        """Replay an original model call with a candidate parent memory removed or replaced."""
+        """Replay an original model call with a candidate parent memory removed, replaced, or unmodified (noop)."""
         # 1. Fetch original call record
         orig_call = self.db.conn.execute(
             "SELECT * FROM calls WHERE call_id = ?", (original_call_id,)
@@ -64,21 +63,19 @@ class CausalRunner:
         if not orig_call:
             raise ValueError(f"Original call {original_call_id} not found in database.")
 
-        req_payload = json.loads(orig_call["request_json"])
-        messages = req_payload.get("messages", [])
-        system_prompt = next((m["content"] for m in messages if m["role"] == "system"), "")
-        user_prompt = next((m["content"] for m in messages if m["role"] == "user"), "")
+        orig_spec = CallSpec.model_validate_json(orig_call["request_json"])
+        user_prompt = orig_spec.user_prompt
 
-        # 2. Modify prompt according to intervention
-        new_user_prompt = user_prompt
-        if intervention_type == "remove":
-            # Remove lines starting with [target_parent_id]
-            lines = new_user_prompt.split("\n")
+        # 2. Modify prompt strictly per intervention type while holding all other CallSpec fields byte-equal
+        if intervention_type == "noop":
+            new_user_prompt = user_prompt
+        elif intervention_type == "remove":
+            lines = user_prompt.split("\n")
             filtered_lines = [l for l in lines if not l.startswith(f"[{target_parent_id}]")]
             new_user_prompt = "\n".join(filtered_lines)
         elif intervention_type == "replace_clean" and clean_counterpart_fact:
             clean_text = NaturalLanguageRenderer.render_fact(clean_counterpart_fact)
-            lines = new_user_prompt.split("\n")
+            lines = user_prompt.split("\n")
             replaced_lines = []
             for l in lines:
                 if l.startswith(f"[{target_parent_id}]"):
@@ -86,18 +83,18 @@ class CausalRunner:
                 else:
                     replaced_lines.append(l)
             new_user_prompt = "\n".join(replaced_lines)
+        else:
+            new_user_prompt = user_prompt
+
+        cf_spec = orig_spec.model_copy(update={
+            "user_prompt": new_user_prompt,
+            "seed": seed,
+        })
 
         # 3. Execute counterfactual call
-        cf_call_result = self.client.chat(
-            model_name=orig_call["run_id"] if False else self.config.model.model_name,
-            system_prompt=system_prompt,
-            user_prompt=new_user_prompt,
-            temperature=self.config.model.temperature,
-            num_ctx=self.config.model.num_ctx,
-            seed=seed,
-        )
+        cf_call_result = self.client.chat(cf_spec)
 
-        # 4. Parse original claim from db
+        # 4. Fetch original claim from db
         orig_claim_row = self.db.conn.execute(
             "SELECT * FROM claims WHERE node_id = ?", (child_node_id,)
         ).fetchone()
@@ -146,7 +143,7 @@ class CausalRunner:
             )
         )
 
-        # 6. Compare outcomes and assign causal evidence label
+        # 6. Compare outcomes
         outcome, score, details = self._classify_causal_outcome(orig_claim, cf_claim, intervention_type)
 
         # 7. Persist counterfactual call and causal test to SQLite
@@ -168,7 +165,7 @@ class CausalRunner:
                     orig_call["run_id"],
                     orig_call["generation"],
                     f"{orig_call['task_id']}_cf",
-                    json.dumps(cf_call_result.request_payload),
+                    cf_spec.model_dump_json(),
                     cf_call_result.raw_response_text,
                     json.dumps(cf_call_result.parsed_json) if cf_call_result.parsed_json else None,
                     cf_call_result.prompt_tokens,
@@ -237,17 +234,24 @@ class CausalRunner:
         if cf.parse_status != "success":
             return "indeterminate", 0.0, details
 
-        # Check if descendant claim changed
         orig_triple = (orig.subject, orig.predicate, orig.object)
         cf_triple = (cf.subject, cf.predicate, cf.object)
 
+        if intervention_type == "noop":
+            # Sham replay: outcome is "none" if stable, "strong" if stochastic shift
+            if orig_triple == cf_triple:
+                return "none", 0.0, details
+            else:
+                return "strong", 1.0, details
+
         if intervention_type == "remove":
-            # If removing candidate parent caused previously true claim to change / become unsupported
+            # If removing candidate parent caused previously true claim to change or become unsupported
             if orig_triple != cf_triple:
                 return "strong", 1.0, details
             else:
                 return "none", 0.0, details
-        elif intervention_type == "replace_clean":
+
+        if intervention_type == "replace_clean":
             if orig_triple != cf_triple and cf.truth_status == TruthStatus.TRUE:
                 return "strong", 1.0, details
             elif orig_triple != cf_triple:

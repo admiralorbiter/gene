@@ -23,33 +23,36 @@ CREATE TABLE IF NOT EXISTS worlds (
 );
 
 CREATE TABLE IF NOT EXISTS world_facts (
-    fact_id TEXT PRIMARY KEY,
     world_id TEXT NOT NULL,
+    fact_id TEXT NOT NULL,
     subject TEXT NOT NULL,
     predicate TEXT NOT NULL,
     object TEXT NOT NULL,
     truth_value INTEGER NOT NULL,
     source_type TEXT NOT NULL,
     canonical_json TEXT NOT NULL,
+    PRIMARY KEY(world_id, fact_id),
     FOREIGN KEY(world_id) REFERENCES worlds(world_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS rules (
-    rule_id TEXT PRIMARY KEY,
     world_id TEXT NOT NULL,
+    rule_id TEXT NOT NULL,
     rule_json TEXT NOT NULL,
     rule_depth INTEGER NOT NULL,
+    PRIMARY KEY(world_id, rule_id),
     FOREIGN KEY(world_id) REFERENCES worlds(world_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS mutations (
-    mutation_id TEXT PRIMARY KEY,
     world_id TEXT NOT NULL,
+    mutation_id TEXT NOT NULL,
     true_fact_id TEXT NOT NULL,
     mutated_subject TEXT NOT NULL,
     mutated_predicate TEXT NOT NULL,
     mutated_object TEXT NOT NULL,
     mutation_type TEXT NOT NULL,
+    PRIMARY KEY(world_id, mutation_id),
     FOREIGN KEY(world_id) REFERENCES worlds(world_id) ON DELETE CASCADE
 );
 
@@ -70,6 +73,8 @@ CREATE TABLE IF NOT EXISTS runs (
     retrieval_policy TEXT,
     memory_policy TEXT,
     git_commit TEXT,
+    config_json TEXT,
+    config_hash TEXT,
     started_at TEXT NOT NULL,
     completed_at TEXT,
     status TEXT NOT NULL,

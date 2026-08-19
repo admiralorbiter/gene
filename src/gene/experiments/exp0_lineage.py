@@ -1,4 +1,4 @@
-"""Experiment 0: Lineage Observability orchestrator and benchmark suite."""
+"""Experiment 0: Lineage Observability orchestrator with fail-closed retrieval and causal calibration."""
 
 from __future__ import annotations
 
@@ -81,9 +81,9 @@ class Exp0LineageExperiment:
         tasks = TaskGenerator.generate_all_tasks(target_world, oracle)
         active_candidate_nodes = mem_store.get_all_active_nodes(max_generation=0)
 
-        # 4. Execute tasks across generations
+        # 4. Execute tasks across generations (newly derived memories written to Generation 1)
         for task_idx, task in enumerate(tasks):
-            gen = 1 if task.reasoning_depth > 0 else 0
+            gen = 1 + task.reasoning_depth  # D0 is Gen 1 derived from Gen 0; D1 is Gen 2
             mapped_support_paths = [
                 [fact_to_node[fid] for fid in path if fid in fact_to_node]
                 for path in task.valid_support_path_ids
@@ -91,7 +91,7 @@ class Exp0LineageExperiment:
             task_mapped = task.model_copy(update={"valid_support_path_ids": mapped_support_paths})
             required_support_ids = mapped_support_paths[0] if mapped_support_paths else []
 
-            # 4a. Controlled retrieval
+            # 4a. Controlled retrieval (fail-closed if any required premise or rule is absent)
             retrieval_res = ControlledRetriever.retrieve(
                 candidate_nodes=active_candidate_nodes,
                 required_support_ids=required_support_ids,
@@ -104,7 +104,7 @@ class Exp0LineageExperiment:
                 for em in retrieval_res.exposed_memories
             ]
 
-            # 4b. LLM Execution
+            # 4b. LLM Execution with unified CallSpec
             call_res, evaluated_claim, call_id, child_node_id = self.single_runner.execute_task(
                 run_id=run_id,
                 world=target_world,
@@ -128,8 +128,20 @@ class Exp0LineageExperiment:
             ]
             LineageRecorder.record_reported_support_edges(self.db, reported_tuples)
 
-            # 4e. Causal counterfactual testing on reported edges and 1 distractor
+            # 4e. Causal counterfactual testing on reported edges, 1 distractor, and 1 sham no-op test
             if perform_causal_tests and evaluated_claim.parse_status == "success":
+                # Sham / no-op replay test
+                self.causal_runner.replay_intervention(
+                    original_call_id=call_id,
+                    child_node_id=child_node_id,
+                    target_parent_id="noop",
+                    intervention_type="noop",
+                    oracle=oracle,
+                    world=target_world,
+                    seed=self.config.decoding_seed,
+                )
+
+                # Replay removal on reported parents
                 for p_id in evaluated_claim.reported_parent_ids:
                     self.causal_runner.replay_intervention(
                         original_call_id=call_id,
@@ -141,7 +153,7 @@ class Exp0LineageExperiment:
                         seed=self.config.decoding_seed,
                     )
 
-                # Also test 1 un-reported distractor for hidden causal parent check
+                # Replay removal on 1 unreported distractor (negative control for hidden causal rate)
                 unreported_distractors = [
                     em.memory_id
                     for em in retrieval_res.exposed_memories

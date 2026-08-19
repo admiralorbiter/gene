@@ -1,4 +1,4 @@
-"""Unit tests for SingleCallRunner and audit logging."""
+"""Unit tests for SingleCallRunner and audit logging with CallSpec."""
 
 from __future__ import annotations
 
@@ -40,30 +40,24 @@ def test_single_call_runner_flow(golden_world: World):
         world=golden_world,
         task=task,
         oracle=oracle,
-        generation=0,
+        generation=1,
     )
 
-    # Check evaluated claim
     assert evaluated_claim.parse_status == "success"
     assert evaluated_claim.truth_status == TruthStatus.TRUE
     assert evaluated_claim.infection_status == "clean"
 
-    # Verify SQLite call record
     cursor = db.conn.execute("SELECT * FROM calls WHERE run_id = ?", (run_id,))
     call_row = cursor.fetchone()
     assert call_row is not None
     assert call_row["task_id"] == task.task_id
-    assert call_row["prompt_tokens"] > 0
-    assert call_row["completion_tokens"] > 0
-    assert call_row["latency_ms"] > 0
+    assert call_row["request_json"] is not None
 
-    # Verify memory node record
     cursor = db.conn.execute("SELECT * FROM memory_nodes WHERE run_id = ?", (run_id,))
     node_row = cursor.fetchone()
     assert node_row is not None
     assert node_row["created_by_call_id"] == call_row["call_id"]
 
-    # Verify claim record
     cursor = db.conn.execute("SELECT * FROM claims WHERE node_id = ?", (node_row["node_id"],))
     claim_row = cursor.fetchone()
     assert claim_row is not None

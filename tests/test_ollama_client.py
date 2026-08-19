@@ -1,21 +1,21 @@
-"""Unit tests for Ollama client and mock client."""
+"""Unit tests for Ollama client, CallSpec, and mock client."""
 
 from __future__ import annotations
 
-from gene.ollama_client import FakeOllamaClient, OllamaClient
+from gene.ollama_client import CallSpec, FakeOllamaClient, OllamaClient
 
 
 def test_fake_ollama_client_chat():
     client = FakeOllamaClient()
-    result = client.chat(
+    spec = CallSpec(
         model_name="gemma3:12b",
         system_prompt="System instructions",
         user_prompt="User question",
     )
+    result = client.chat(spec)
 
     assert result.model_name == "gemma3:12b"
-    assert result.prompt_tokens == 120
-    assert result.completion_tokens == 45
+    assert result.call_spec.model_name == "gemma3:12b"
     assert result.latency_ms > 0
     assert result.parsed_json is not None
     assert result.parsed_json["answer"]["subject"] == "VELORA"
