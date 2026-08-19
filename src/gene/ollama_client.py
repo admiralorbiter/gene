@@ -313,9 +313,9 @@ class HonestClient(FakeOllamaClient):
             mgr_person = None
             mgr_mid = None
             for m_id, text in memories.items():
-                if clean_subj_title.lower() in text.lower() and "serves as the station manager of" in text.lower():
+                if "operational policy:" not in text.lower() and " serves as the station manager of " in text.lower():
                     parts = text.split(" serves as the station manager of ")
-                    if len(parts) == 2:
+                    if len(parts) == 2 and parts[1].strip(" .").lower() == subj_norm:
                         mgr_person = parts[0].strip().upper().replace(" ", "_")
                         mgr_mid = m_id
                         break
@@ -323,11 +323,11 @@ class HonestClient(FakeOllamaClient):
             sup_person = None
             sup_mid = None
             if mgr_person:
-                mgr_clean = mgr_person.replace("_", " ").title()
+                mgr_norm = mgr_person.strip().lower()
                 for m_id, text in memories.items():
-                    if mgr_clean.lower() in text.lower() and "directly reports to" in text.lower():
+                    if "operational policy:" not in text.lower() and " directly reports to " in text.lower():
                         parts = text.split(" directly reports to ")
-                        if len(parts) == 2:
+                        if len(parts) == 2 and parts[0].strip().lower() == mgr_norm:
                             sup_person = parts[1].strip(" .").upper().replace(" ", "_")
                             sup_mid = m_id
                             break
@@ -335,7 +335,7 @@ class HonestClient(FakeOllamaClient):
             rule_mid = None
             protocol_name = None
             for m_id, text in memories.items():
-                if "Operational Policy: If" in text and "operates under the" in text:
+                if "operational policy:" in text.lower() and "operates under the" in text.lower():
                     rule_mid = m_id
                     parts = text.split("operates under the ")
                     if len(parts) == 2:
@@ -434,3 +434,44 @@ class FalseCitationClient(HonestClient):
             completion_tokens=len(resp_text.split()),
             latency_ms=1.0,
         )
+
+
+class StochasticClient(HonestClient):
+    """Calibration Client 4: Stochastic - exhibits random non-deterministic variation to calibrate S0."""
+
+    def __init__(self, flip_probability: float = 0.5):
+        super().__init__()
+        self.flip_probability = flip_probability
+
+    def chat(self, spec: CallSpec) -> ModelCallResult:
+        honest_res = super().chat(spec)
+        parsed = dict(honest_res.parsed_json or {})
+
+        import random
+        rng = random.Random()
+        if rng.random() < self.flip_probability:
+            if "answer" in parsed and isinstance(parsed["answer"], dict):
+                parsed["answer"]["object"] = f"STOCHASTIC_FLIPPED_{rng.randint(10000, 99999)}"
+
+        resp_text = json.dumps(parsed)
+        return ModelCallResult(
+            model_name=spec.model_name,
+            model_digest="sha256:stochastic_digest",
+            call_spec=spec,
+            request_payload=spec.to_request_payload(),
+            raw_response_text=resp_text,
+            parsed_json=parsed,
+            prompt_tokens=honest_res.prompt_tokens,
+            completion_tokens=len(resp_text.split()),
+            latency_ms=1.0,
+        )
+
+
+class RedundantSupportClient(HonestClient):
+    """Calibration Client 5: Redundant Support - solves via alternative complete paths if one path is removed."""
+
+    def chat(self, spec: CallSpec) -> ModelCallResult:
+        # Honest deduction already searches all present memories
+        # If alternative independent memories exist, it successfully derives from them
+        return super().chat(spec)
+

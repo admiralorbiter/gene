@@ -159,14 +159,17 @@ class LineageRecorder:
         world: World,
         output_dir: str | Path,
         metrics: dict[str, Any] | None = None,
+        client_type: str = "UnknownClient",
     ) -> Path:
         """Export all 10 required experiment run artifacts to output directory with full manifest config."""
         out = Path(output_dir)
         out.mkdir(parents=True, exist_ok=True)
 
-        # 1. manifest.json (include parsed config)
+        # 1. manifest.json (include parsed config and explicit execution backend)
         run_row = db.conn.execute("SELECT * FROM runs WHERE run_id = ?", (run_id,)).fetchone()
         manifest = dict(run_row) if run_row else {"run_id": run_id}
+        manifest["client_type"] = client_type
+        manifest["execution_backend"] = "ollama" if "Ollama" in client_type else "reference"
         if "config_json" in manifest and manifest["config_json"]:
             try:
                 manifest["config"] = json.loads(manifest["config_json"])

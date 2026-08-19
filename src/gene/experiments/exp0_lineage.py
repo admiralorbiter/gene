@@ -1,4 +1,4 @@
-"""Experiment 0: Lineage Observability orchestrator with fail-closed retrieval and causal calibration."""
+"""Experiment 0: Lineage Observability orchestrator with separated causal tests and generation semantics."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from gene.evaluation.claims import ClaimEvaluator
 from gene.evaluation.metrics import Exp0Metrics, MetricsCalculator
 from gene.experiments.runner import SingleCallRunner, get_git_commit
 from gene.memory.lineage import LineageRecorder
-from gene.memory.retrieval import ControlledRetriever
+from gene.memory.retrieval import ControlledRetriever, InstrumentationError
 from gene.memory.store import MemoryStore
 from gene.ollama_client import OllamaClient
 from gene.persistence.db import Database
@@ -81,13 +81,20 @@ class Exp0LineageExperiment:
         tasks = TaskGenerator.generate_all_tasks(target_world, oracle)
         active_candidate_nodes = mem_store.get_all_active_nodes(max_generation=0)
 
-        # 4. Execute tasks across generations (newly derived memories written to Generation 1)
+        # 4. Execute tasks across generations (All newly derived memory written to Generation 1)
         for task_idx, task in enumerate(tasks):
-            gen = 1 + task.reasoning_depth  # D0 is Gen 1 derived from Gen 0; D1 is Gen 2
-            mapped_support_paths = [
-                [fact_to_node[fid] for fid in path if fid in fact_to_node]
-                for path in task.valid_support_path_ids
-            ]
+            # Upstream fail-closed mapping
+            mapped_support_paths: list[list[str]] = []
+            for path in task.valid_support_path_ids:
+                mapped_p = []
+                for fid in path:
+                    if fid not in fact_to_node:
+                        raise InstrumentationError(
+                            f"Instrumentation Failure: Oracle support ID '{fid}' was not registered in Generation 0 memory nodes."
+                        )
+                    mapped_p.append(fact_to_node[fid])
+                mapped_support_paths.append(mapped_p)
+
             task_mapped = task.model_copy(update={"valid_support_path_ids": mapped_support_paths})
             required_support_ids = mapped_support_paths[0] if mapped_support_paths else []
 
@@ -104,13 +111,13 @@ class Exp0LineageExperiment:
                 for em in retrieval_res.exposed_memories
             ]
 
-            # 4b. LLM Execution with unified CallSpec
+            # 4b. LLM Execution with unified CallSpec (generation=1 for newly produced memory)
             call_res, evaluated_claim, call_id, child_node_id = self.single_runner.execute_task(
                 run_id=run_id,
                 world=target_world,
                 task=task_mapped,
                 oracle=oracle,
-                generation=gen,
+                generation=1,
                 exposed_memories=exposed_payload,
             )
 
@@ -128,9 +135,9 @@ class Exp0LineageExperiment:
             ]
             LineageRecorder.record_reported_support_edges(self.db, reported_tuples)
 
-            # 4e. Causal counterfactual testing on reported edges, 1 distractor, and 1 sham no-op test
+            # 4e. Causal counterfactual testing
             if perform_causal_tests and evaluated_claim.parse_status == "success":
-                # Sham / no-op replay test
+                # 1. Sham / no-op replay test (measures S0 baseline instability)
                 self.causal_runner.replay_intervention(
                     original_call_id=call_id,
                     child_node_id=child_node_id,
@@ -141,7 +148,7 @@ class Exp0LineageExperiment:
                     seed=self.config.decoding_seed,
                 )
 
-                # Replay removal on reported parents
+                # 2. Replay removal on reported parents (measures necessity of cited ancestry)
                 for p_id in evaluated_claim.reported_parent_ids:
                     self.causal_runner.replay_intervention(
                         original_call_id=call_id,
@@ -153,7 +160,23 @@ class Exp0LineageExperiment:
                         seed=self.config.decoding_seed,
                     )
 
-                # Replay removal on 1 unreported distractor (negative control for hidden causal rate)
+                # 3. Replay removal on UNREPORTED REQUIRED parents (measures HR: true hidden parents)
+                unreported_required = [
+                    sid for sid in required_support_ids
+                    if sid not in evaluated_claim.reported_parent_ids
+                ]
+                for p_id in unreported_required:
+                    self.causal_runner.replay_intervention(
+                        original_call_id=call_id,
+                        child_node_id=child_node_id,
+                        target_parent_id=p_id,
+                        intervention_type="remove",
+                        oracle=oracle,
+                        world=target_world,
+                        seed=self.config.decoding_seed,
+                    )
+
+                # 4. Replay removal on UNREPORTED DISTRACTORS (measures HD: distractor influence control)
                 unreported_distractors = [
                     em.memory_id
                     for em in retrieval_res.exposed_memories
@@ -190,6 +213,7 @@ class Exp0LineageExperiment:
             world=target_world,
             output_dir=run_output_dir,
             metrics=metrics.model_dump(mode="json"),
+            client_type=self.client.__class__.__name__,
         )
 
         return run_id, metrics, run_output_dir

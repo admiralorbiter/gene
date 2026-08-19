@@ -69,10 +69,12 @@ class CausalRunner:
         # 2. Modify prompt strictly per intervention type while holding all other CallSpec fields byte-equal
         if intervention_type == "noop":
             new_user_prompt = user_prompt
+            replay_seed = orig_spec.seed
         elif intervention_type == "remove":
             lines = user_prompt.split("\n")
             filtered_lines = [l for l in lines if not l.startswith(f"[{target_parent_id}]")]
             new_user_prompt = "\n".join(filtered_lines)
+            replay_seed = seed
         elif intervention_type == "replace_clean" and clean_counterpart_fact:
             clean_text = NaturalLanguageRenderer.render_fact(clean_counterpart_fact)
             lines = user_prompt.split("\n")
@@ -83,12 +85,14 @@ class CausalRunner:
                 else:
                     replaced_lines.append(l)
             new_user_prompt = "\n".join(replaced_lines)
+            replay_seed = seed
         else:
             new_user_prompt = user_prompt
+            replay_seed = seed
 
         cf_spec = orig_spec.model_copy(update={
             "user_prompt": new_user_prompt,
-            "seed": seed,
+            "seed": replay_seed,
         })
 
         # 3. Execute counterfactual call
