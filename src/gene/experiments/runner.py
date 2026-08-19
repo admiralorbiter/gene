@@ -31,6 +31,30 @@ def get_git_commit() -> str:
         return "unknown_commit"
 
 
+def get_environment_info() -> dict[str, Any]:
+    """Retrieve host hardware and runtime environment details for auditable experiment reproducibility."""
+    import platform
+    info: dict[str, Any] = {
+        "os": platform.system(),
+        "os_release": platform.release(),
+        "os_version": platform.version(),
+        "architecture": platform.machine(),
+        "python_version": platform.python_version(),
+    }
+    try:
+        import torch
+        if torch.cuda.is_available():
+            info["gpu_available"] = True
+            info["gpu_name"] = torch.cuda.get_device_name(0)
+            info["gpu_count"] = torch.cuda.device_count()
+            info["cuda_version"] = torch.version.cuda
+        else:
+            info["gpu_available"] = False
+    except ImportError:
+        info["gpu_available"] = None
+    return info
+
+
 class SingleCallRunner:
     """Orchestrates an individual model query, parses claims, evaluates oracle truth, and persists call audit data."""
 
@@ -55,7 +79,16 @@ class SingleCallRunner:
         # Ensure world is persisted
         self.db.save_world(world)
 
-        config_json = self.config.model_dump_json(indent=2)
+        # Dynamic Ollama version and environment metadata
+        if hasattr(self.client, "get_version"):
+            ollama_ver = self.client.get_version()
+        else:
+            ollama_ver = self.client.__class__.__name__
+
+        env_info = get_environment_info()
+        config_data = self.config.model_dump()
+        config_data["environment"] = env_info
+        config_json = json.dumps(config_data, indent=2)
         config_hash = self.config.config_hash()
 
         with self.db.conn:
@@ -76,7 +109,7 @@ class SingleCallRunner:
                     world.world_id,
                     self.config.model.model_name,
                     model_info.digest,
-                    "ollama_v0",
+                    ollama_ver,
                     self.config.decoding_seed,
                     self.config.model.num_ctx,
                     self.config.model.temperature,
@@ -223,6 +256,7 @@ class SingleCallRunner:
                     evaluated_claim.infection_status,
                     json.dumps({
                         "task_id": task.task_id,
+                        "reasoning_depth": task.reasoning_depth,
                         "target_subject": task.target_fact.subject,
                         "target_predicate": task.target_fact.predicate,
                         "target_object": task.target_fact.object,

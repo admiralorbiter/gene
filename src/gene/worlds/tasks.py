@@ -74,8 +74,17 @@ class TaskGenerator:
 
     @classmethod
     def generate_all_tasks(cls, world: World, oracle: Oracle | None = None) -> list[Task]:
-        """Generate both D0 and D1 tasks for a world."""
+        """Generate both D0 and D1 tasks for a world, deterministically interleaved."""
         orc = oracle or Oracle(world)
         d0 = cls.generate_d0_tasks(world, orc)
         d1 = cls.generate_d1_tasks(world, orc)
-        return d0 + d1
+
+        # Deterministically interleave D0 and D1 tasks (d0[0], d1[0], d0[1], d1[1], ...)
+        interleaved: list[Task] = []
+        max_len = max(len(d0), len(d1))
+        for i in range(max_len):
+            if i < len(d0):
+                interleaved.append(d0[i])
+            if i < len(d1):
+                interleaved.append(d1[i])
+        return interleaved

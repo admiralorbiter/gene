@@ -228,6 +228,7 @@ class CausalRunner:
             "orig_predicate": orig.predicate,
             "orig_object": orig.object,
             "orig_truth": orig.truth_status.value,
+            "orig_parse": orig.parse_status,
             "cf_subject": cf.subject,
             "cf_predicate": cf.predicate,
             "cf_object": cf.object,
@@ -235,21 +236,28 @@ class CausalRunner:
             "cf_parse": cf.parse_status,
         }
 
-        if cf.parse_status != "success":
-            return "indeterminate", 0.0, details
-
         orig_triple = (orig.subject, orig.predicate, orig.object)
         cf_triple = (cf.subject, cf.predicate, cf.object)
 
+        # 1. Sham / No-op replay: strict stability definition
+        # S0 = 1 - P(exact same normalized answer under identical replay)
         if intervention_type == "noop":
-            # Sham replay: outcome is "none" if stable, "strong" if stochastic shift
-            if orig_triple == cf_triple:
-                return "none", 0.0, details
-            else:
+            if cf.parse_status != "success":
+                details["instability_reason"] = f"parse_failure_{cf.parse_status}"
                 return "strong", 1.0, details
+            elif orig_triple != cf_triple:
+                details["instability_reason"] = "answer_shift"
+                return "strong", 1.0, details
+            else:
+                return "none", 0.0, details
+
+        # 2. Interventions on parents / distractors: unparseable output is indeterminate
+        if cf.parse_status != "success":
+            details["indeterminate_reason"] = f"parse_failure_{cf.parse_status}"
+            return "indeterminate", 0.0, details
 
         if intervention_type == "remove":
-            # If removing candidate parent caused previously true claim to change or become unsupported
+            # If removing candidate parent caused claim to shift or drop
             if orig_triple != cf_triple:
                 return "strong", 1.0, details
             else:

@@ -5,6 +5,12 @@ from __future__ import annotations
 import json
 import os
 import sys
+import time
+from pathlib import Path
+
+# Ensure src is on Python path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
+
 from gene.config import ExperimentConfig, ModelConfig
 from gene.experiments.runner import SingleCallRunner
 from gene.ollama_client import OllamaClient
@@ -19,10 +25,8 @@ def run_milestone_b_inspection():
     print("   GENE MILESTONE B INSPECTION: LIVE AUDITABLE OLLAMA CALL")
     print("=" * 65)
 
-    db_path = "gene_audit_milestone_b.db"
-    if os.path.exists(db_path):
-        os.remove(db_path)
-
+    timestamp = time.strftime("%Y%m%d_%H%M%S")
+    db_path = f"gene_audit_milestone_b_{timestamp}.db"
     db = Database(db_path)
 
     # 1. Inspect Ollama Availability
@@ -114,8 +118,7 @@ def run_milestone_b_inspection():
         print(f"      - {cl['claim_id']}: ({cl['subject']}, {cl['predicate']}, {cl['object']}) -> truth={cl['truth_status']}, parse={cl['parse_status']}")
 
     db.close()
-    if os.path.exists(db_path):
-        os.remove(db_path)
+    print(f"    Audit database preserved at: {db_path}")
 
     print("\n" + "=" * 65)
     print("   MILESTONE B VERIFICATION COMPLETE AND AUDITABLE!")

@@ -50,11 +50,12 @@ class CallSpec(BaseModel):
             "stream": False,
             "format": self.format,
             "options": opts,
+            "keep_alive": "1h",
         }
 
 
 class ModelCallResult(BaseModel):
-    """Auditable output of a single LLM invocation."""
+    """Auditable output of a single LLM invocation with rich timing telemetry."""
     model_config = {"protected_namespaces": ()}
 
     model_name: str
@@ -66,15 +67,32 @@ class ModelCallResult(BaseModel):
     prompt_tokens: int = 0
     completion_tokens: int = 0
     latency_ms: float = 0.0
+    load_duration_ms: float = 0.0
+    prompt_eval_duration_ms: float = 0.0
+    eval_duration_ms: float = 0.0
     created_at: str = Field(default_factory=lambda: time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()))
 
 
 class OllamaClient:
-    """Client for local Ollama instance with structured JSON and auditing."""
+    """Client for local Ollama instance with structured JSON, telemetry, and auditing."""
 
-    def __init__(self, host: str = "http://127.0.0.1:11434", timeout: float = 300.0):
+    def __init__(self, host: str = "http://127.0.0.1:11434", timeout: float = 600.0):
         self.host = host.rstrip("/")
         self.timeout = timeout
+        self._digest_cache: dict[str, str] = {}
+
+    def get_version(self) -> str:
+        """Fetch installed Ollama server version."""
+        url = f"{self.host}/api/version"
+        try:
+            with httpx.Client(timeout=5.0) as client:
+                res = client.get(url)
+                if res.status_code == 200:
+                    data = res.json()
+                    return str(data.get("version", "unknown"))
+        except Exception:
+            pass
+        return "unknown"
 
     def get_model_info(self, model_name: str) -> ModelInfo:
         """Fetch model metadata and SHA256 digest from Ollama."""
@@ -85,9 +103,11 @@ class OllamaClient:
                 res.raise_for_status()
                 data = res.json()
                 details = data.get("details", {})
+                digest = data.get("digest", "unknown")
+                self._digest_cache[model_name] = digest
                 return ModelInfo(
                     model_name=model_name,
-                    digest=data.get("digest", "unknown"),
+                    digest=digest,
                     parameter_size=details.get("parameter_size"),
                     quantization_level=details.get("quantization_level"),
                     family=details.get("family"),
@@ -104,8 +124,15 @@ class OllamaClient:
         url = f"{self.host}/api/chat"
         payload = spec.to_request_payload()
 
+        # Cache/resolve digest
+        digest = self._digest_cache.get(spec.model_name)
+        if not digest:
+            info = self.get_model_info(spec.model_name)
+            digest = info.digest
+
         start_time = time.perf_counter()
-        with httpx.Client(timeout=self.timeout) as client:
+        timeout_cfg = httpx.Timeout(self.timeout, connect=60.0)
+        with httpx.Client(timeout=timeout_cfg) as client:
             res = client.post(url, json=payload)
             res.raise_for_status()
             data = res.json()
@@ -122,11 +149,13 @@ class OllamaClient:
 
         prompt_tokens = data.get("prompt_eval_count", 0)
         completion_tokens = data.get("eval_count", 0)
-        model_digest = data.get("model", spec.model_name)
+        load_duration_ms = data.get("load_duration", 0) / 1e6
+        prompt_eval_duration_ms = data.get("prompt_eval_duration", 0) / 1e6
+        eval_duration_ms = data.get("eval_duration", 0) / 1e6
 
         return ModelCallResult(
             model_name=spec.model_name,
-            model_digest=model_digest,
+            model_digest=digest,
             call_spec=spec,
             request_payload=payload,
             raw_response_text=message_content,
@@ -134,6 +163,9 @@ class OllamaClient:
             prompt_tokens=prompt_tokens,
             completion_tokens=completion_tokens,
             latency_ms=latency_ms,
+            load_duration_ms=load_duration_ms,
+            prompt_eval_duration_ms=prompt_eval_duration_ms,
+            eval_duration_ms=eval_duration_ms,
         )
 
 
@@ -309,7 +341,7 @@ class HonestClient(FakeOllamaClient):
                             break
 
         elif target_pred == "uses_protocol":
-            # Rule deduction: manager of station + supervisor reporting + rule
+            # 1. Candidate Path A: manager of station + supervisor reporting + 2-hop protocol rule
             mgr_person = None
             mgr_mid = None
             for m_id, text in memories.items():
@@ -335,7 +367,7 @@ class HonestClient(FakeOllamaClient):
             rule_mid = None
             protocol_name = None
             for m_id, text in memories.items():
-                if "operational policy:" in text.lower() and "operates under the" in text.lower():
+                if "operational policy:" in text.lower() and ("reports to" in text.lower() or "directly reports" in text.lower()) and "operates under the" in text.lower():
                     rule_mid = m_id
                     parts = text.split("operates under the ")
                     if len(parts) == 2:
@@ -345,6 +377,32 @@ class HonestClient(FakeOllamaClient):
             if mgr_mid and sup_mid and rule_mid and protocol_name:
                 ans_obj = protocol_name
                 parents = sorted([mgr_mid, sup_mid, rule_mid])
+            else:
+                # 2. Candidate Path B: alternative direct sector location rule
+                loc_sector = None
+                loc_mid = None
+                for m_id, text in memories.items():
+                    if "operational policy:" not in text.lower() and " is located in sector " in text.lower():
+                        parts = text.split(" is located in sector ")
+                        if len(parts) == 2 and parts[0].strip().lower() == subj_norm:
+                            loc_sector = parts[1].strip(" .").upper().replace(" ", "_")
+                            loc_mid = m_id
+                            break
+
+                sec_rule_mid = None
+                sec_protocol_name = None
+                if loc_sector:
+                    for m_id, text in memories.items():
+                        if "operational policy:" in text.lower() and loc_sector.lower() in text.lower() and "operates under the" in text.lower():
+                            sec_rule_mid = m_id
+                            parts = text.split("operates under the ")
+                            if len(parts) == 2:
+                                sec_protocol_name = parts[1].replace(" security protocol.", "").strip().upper().replace(" ", "_")
+                            break
+
+                if loc_mid and sec_rule_mid and sec_protocol_name:
+                    ans_obj = sec_protocol_name
+                    parents = sorted([loc_mid, sec_rule_mid])
 
         if not ans_obj:
             ans_obj = "UNKNOWN_OR_UNSUPPORTED"
