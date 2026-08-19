@@ -79,8 +79,10 @@ def run_exp0_session(num_worlds: int = 5, use_live_model: bool = False, model_na
     
     mean_prec = sum(r["metrics"].reported_lineage_precision for r in completed_runs) / num_worlds
     mean_rec = sum(r["metrics"].reported_lineage_recall for r in completed_runs) / num_worlds
-    mean_causal_val = sum(r["metrics"].causal_validation_rate for r in completed_runs) / num_worlds
-    mean_hidden_causal = sum(r["metrics"].hidden_causal_parent_rate for r in completed_runs) / num_worlds
+    mean_necessity = sum(r["metrics"].reported_parent_necessity_rate for r in completed_runs) / num_worlds
+    mean_hr = sum(r["metrics"].unreported_required_causal_rate for r in completed_runs) / num_worlds
+    mean_hd = sum(r["metrics"].unreported_distractor_influence_rate for r in completed_runs) / num_worlds
+    mean_s0 = sum(r["metrics"].noop_instability_rate for r in completed_runs) / num_worlds
     mean_truth_acc = sum(r["metrics"].task_truth_accuracy for r in completed_runs) / num_worlds
     mean_struct_acc = sum(r["metrics"].structured_output_success_rate for r in completed_runs) / num_worlds
 
@@ -97,8 +99,10 @@ def run_exp0_session(num_worlds: int = 5, use_live_model: bool = False, model_na
     print(f"Task Truth Accuracy (Targeted):   {mean_truth_acc:.2%}")
     print(f"Reported Lineage Precision:       {mean_prec:.2%}")
     print(f"Reported Lineage Recall (Path):   {mean_rec:.2%}")
-    print(f"Causal Validation Rate:           {mean_causal_val:.2%}")
-    print(f"Hidden Causal Parent Rate:        {mean_hidden_causal:.2%}")
+    print(f"Reported Parent Necessity Rate:   {mean_necessity:.2%}")
+    print(f"Unreported Required Causal (HR):  {mean_hr:.2%}")
+    print(f"Distractor Influence Rate (HD):   {mean_hd:.2%}")
+    print(f"No-Op Instability Rate (S0):      {mean_s0:.2%}")
     print("=" * 72 + "\n")
 
     db.close()
