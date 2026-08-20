@@ -1,15 +1,16 @@
 """Epistemic Immunity Policy Engine for Experiment 1B-C.
 
 Implements delayed-adjudication candidate filtering policies and exact 4-state
-analytic risk signal probability weighting across 7 distinct control and intervention treatments.
+analytic risk signal probability weighting across 7 distinct control and intervention treatments,
+with multi-sample / expected Monte Carlo averaging for stochastic controls.
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Any, Callable, Literal
+from dataclasses import dataclass
 import itertools
 import random
+from typing import Any, Literal
 
 
 PolicyName = Literal[
@@ -21,7 +22,7 @@ PolicyName = Literal[
     "node_only_quarantine",
     "lineage_quarantine",
     "oracle_upper_bound",
-    "uniform_thinning",  # Backwards-compatible alias for signal_conditioned_uniform_thinning
+    "uniform_thinning",
 ]
 
 
@@ -81,7 +82,6 @@ class EpistemicPolicyEngine:
             changed = False
             for n in nodes:
                 if n.node_id not in quarantined:
-                    # If any parent is quarantined, this node is also quarantined
                     if any(pid in quarantined for pid in n.parent_ids):
                         quarantined.add(n.node_id)
                         changed = True
@@ -99,7 +99,7 @@ class EpistemicPolicyEngine:
         seed: int = 42,
         fixed_thinning_budget: int = 3,
     ) -> PolicyEvaluationResult:
-        """Apply a specified quarantine or thinning policy to a candidate pool."""
+        """Apply a specified quarantine or thinning policy to a candidate pool for a single seed."""
         all_ids = {n.node_id for n in nodes}
         node_map = {n.node_id: n for n in nodes}
 
@@ -191,7 +191,7 @@ class EpistemicPolicyEngine:
                     retained_count=len(all_ids),
                     quarantined_count=0,
                 )
-            rng = random.Random(seed + signal_state[0] * 100 + signal_state[1] * 10)
+            rng = random.Random(seed)
             sorted_nodes = sorted(list(all_ids))
             quarantined = set(rng.sample(sorted_nodes, min(m_total, len(sorted_nodes))))
             retained = all_ids - quarantined
@@ -206,7 +206,6 @@ class EpistemicPolicyEngine:
 
         # 7. Generation-Matched Thinning: matched G2 drop count chosen from generation 2 nodes
         if policy == "generation_matched_thinning":
-            # Count how many G2 nodes lineage quarantine removed
             lin_g2_quarantined = {
                 n.node_id for n in nodes
                 if n.node_id in lin_res.quarantined_node_ids and n.generation == 2
@@ -224,7 +223,7 @@ class EpistemicPolicyEngine:
                 )
 
             g2_nodes = sorted([n.node_id for n in nodes if n.generation == 2])
-            rng = random.Random(seed + signal_state[0] * 100 + signal_state[1] * 10)
+            rng = random.Random(seed)
             quarantined = set(rng.sample(g2_nodes, min(m_g2, len(g2_nodes))))
             retained = all_ids - quarantined
             return PolicyEvaluationResult(
@@ -236,9 +235,13 @@ class EpistemicPolicyEngine:
                 quarantined_count=len(quarantined),
             )
 
-        # 8. Random Family Quarantine: matched cluster shape chosen at random
+        # 8. Random Family Quarantine: pure topology-matched cluster removal
         if policy == "random_family_quarantine":
-            if m_total == 0:
+            # Identify distinct structural root families
+            roots = sorted([n.node_id for n in nodes if n.is_root])
+            num_flagged_roots = len(flagged_roots)
+
+            if num_flagged_roots == 0 or len(roots) == 0:
                 return PolicyEvaluationResult(
                     policy=policy,
                     signal_state=signal_state,
@@ -248,24 +251,10 @@ class EpistemicPolicyEngine:
                     quarantined_count=0,
                 )
             
-            families = {}
-            for n in nodes:
-                fid = n.family_id or n.node_id
-                families.setdefault(fid, []).append(n.node_id)
-            
-            rng = random.Random(seed + signal_state[0] * 100 + signal_state[1] * 10)
-            family_keys = sorted(list(families.keys()))
-            chosen_family = rng.choice(family_keys)
-            family_nodes = set(families[chosen_family])
-            
-            if len(family_nodes) > m_total:
-                quarantined = set(sorted(list(family_nodes))[:m_total])
-            elif len(family_nodes) < m_total:
-                remainder = sorted(list(all_ids - family_nodes))
-                quarantined = family_nodes | set(remainder[:m_total - len(family_nodes)])
-            else:
-                quarantined = family_nodes
-
+            rng = random.Random(seed)
+            # Sample exactly num_flagged_roots random roots independently of the signal
+            sampled_roots = set(rng.sample(roots, min(num_flagged_roots, len(roots))))
+            quarantined = cls.find_all_descendants(nodes, sampled_roots)
             retained = all_ids - quarantined
             return PolicyEvaluationResult(
                 policy=policy,
@@ -277,3 +266,54 @@ class EpistemicPolicyEngine:
             )
 
         raise ValueError(f"Unknown policy: {policy}")
+
+    @classmethod
+    def apply_policy_samples(
+        cls,
+        policy: str,
+        nodes: list[PolicyNode],
+        root_signals: dict[str, bool],
+        clean_root_id: str,
+        infected_root_id: str,
+        signal_state: tuple[int, int],
+        base_seed: int = 42,
+        n_samples: int = 50,
+        fixed_thinning_budget: int = 3,
+    ) -> list[PolicyEvaluationResult]:
+        """Generate multiple sample evaluations for stochastic policies, or single for deterministic."""
+        deterministic_policies = {
+            "baseline",
+            "node_only_quarantine",
+            "lineage_quarantine",
+            "oracle_upper_bound",
+        }
+
+        if policy in deterministic_policies:
+            res = cls.apply_policy(
+                policy,
+                nodes,
+                root_signals,
+                clean_root_id,
+                infected_root_id,
+                signal_state,
+                seed=base_seed,
+                fixed_thinning_budget=fixed_thinning_budget,
+            )
+            return [res]
+
+        # For stochastic policies, generate n_samples deterministic pseudo-random draws
+        samples: list[PolicyEvaluationResult] = []
+        for i in range(n_samples):
+            sample_seed = base_seed + (signal_state[0] * 1000) + (signal_state[1] * 100) + (i * 17)
+            res = cls.apply_policy(
+                policy,
+                nodes,
+                root_signals,
+                clean_root_id,
+                infected_root_id,
+                signal_state,
+                seed=sample_seed,
+                fixed_thinning_budget=fixed_thinning_budget,
+            )
+            samples.append(res)
+        return samples

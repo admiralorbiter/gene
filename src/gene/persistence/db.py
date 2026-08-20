@@ -241,6 +241,31 @@ CREATE TABLE IF NOT EXISTS retrieval_sweep_results (
     created_at TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS immunity_policy_results (
+    result_id TEXT PRIMARY KEY,
+    run_id TEXT NOT NULL,
+    sweep_type TEXT NOT NULL,
+    policy TEXT NOT NULL,
+    station_h TEXT NOT NULL,
+    station_i TEXT NOT NULL,
+    role_assignment TEXT NOT NULL,
+    world_seed INTEGER NOT NULL,
+    top_k INTEGER NOT NULL,
+    tpr REAL NOT NULL,
+    fpr REAL NOT NULL,
+    c_h REAL NOT NULL,
+    c_i REAL NOT NULL,
+    separation_s REAL NOT NULL,
+    containment REAL NOT NULL,
+    autoimmunity REAL NOT NULL,
+    drop_budget INTEGER NOT NULL,
+    g2_drop_budget INTEGER NOT NULL,
+    expectation_method TEXT NOT NULL,
+    config_hash TEXT,
+    git_commit TEXT,
+    created_at TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS claims (
     claim_id TEXT PRIMARY KEY,
     node_id TEXT NOT NULL,

@@ -254,25 +254,29 @@ def test_exp1b_c1b_shared_ecology(tmp_path: Path):
 
     db_path = tmp_path / "test_c1b_shared.db"
     results = run_exp1b_c1b_shared_ecology(
-        world_pairs=[("VELORA", "KESTREL")],
         tprs=[0.9],
         fprs=[0.1],
         top_k_list=[6],
+        n_mc_samples=5,
         db_path=str(db_path),
     )
 
     lin = results[6]["lineage_quarantine"][(0.9, 0.1)]
-    uni = results[6]["signal_conditioned_uniform_thinning"][(0.9, 0.1)]
+    blind_uni = results[6]["signal_blind_uniform_thinning"][(0.9, 0.1)]
+    sig_uni = results[6]["signal_conditioned_uniform_thinning"][(0.9, 0.1)]
     gen = results[6]["generation_matched_thinning"][(0.9, 0.1)]
     node = results[6]["node_only_quarantine"][(0.9, 0.1)]
 
-    # Delta_I: lineage achieves strictly greater containment than uniform and generation controls
-    assert uni["c_i"] - lin["c_i"] > 0.0
-    assert gen["c_i"] - lin["c_i"] > 0.0
+    # Signal-blind uniform thinning has zero selective separation under balanced ecologies
+    assert pytest.approx(blind_uni["s"], abs=1e-7) == 0.0
+
+    # Lineage achieves higher separation than node-only, signal-conditioned uniform, and generation controls
     assert lin["s"] > node["s"]
+    assert lin["s"] > sig_uni["s"]
+    assert lin["s"] > gen["s"]
 
     db = Database(db_path)
     with db.conn:
-        sweeps = db.conn.execute("SELECT COUNT(*) as cnt FROM retrieval_sweep_results WHERE sweep_type = 'shared_ecology_sandbox'").fetchone()
+        sweeps = db.conn.execute("SELECT COUNT(*) as cnt FROM immunity_policy_results WHERE sweep_type = 'shared_ecology_hardened'").fetchone()
         assert sweeps["cnt"] == 8  # 8 policies x 1 grid point x 1 top_k
     db.close()
