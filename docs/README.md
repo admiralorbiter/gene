@@ -8,10 +8,10 @@ Welcome to the documentation suite of the **Genealogical Epistemic Network Exper
 
 If you are exploring GENE for the first time, begin with these canonical syntheses:
 
-- **[The GENE Moonshot: The Epistemic Runtime](GENE_MOONSHOT.md)**: The foundational vision document formalizing persistent belief maintenance, the five kernel queries (`WHY`, `WHENCE`, `WHAT_IF`, `THEN_WHAT`, `DID_YOU_ACTUALLY_USE`), seven epistemic invariants, and minimal support set algebra ($S(c), \kappa(c)$).
+- **[The GENE Moonshot: The Epistemic Runtime](GENE_MOONSHOT.md)**: The foundational vision document formalizing persistent belief maintenance, the five kernel queries (`WHY`, `WHENCE`, `WHAT_IF`, `THEN_WHAT`, `DID_YOU_ACTUALLY_USE`), seven candidate epistemic invariants, and minimal support set algebra ($S(c), \kappa(c)$).
 - **[The GENE Story Memo](GENE_STORY_MEMO.md)**: The definitive 8-page scientific narrative walking through the 6 core discoveries: from lineage observability and semantic infection to retrieval epidemiology, delayed quarantine, and structural proofreading.
 - **[System Architecture & Formalisms](ARCHITECTURE.md)**: Mathematical foundations, state vector definitions, dual-oracle evaluation mechanics, the transmission equation ($R \approx b \cdot X_{\text{path}} \cdot \tau \cdot W$), and 2026 literature positioning.
-- **[Exploration Round 2 Review & Phase 11 Synthesis](explorations/ROUND_2_PORTFOLIO_REVIEW.md)**: Synthesis of the Round 2 portfolio (Multi-Justification, Hardened Monoculture, Dynamic Memory Repair, and Model Calibration).
+- **[Exploration Round 2 Portfolio Batch Review](explorations/ROUND_2_PORTFOLIO_REVIEW.md)**: Synthesis of the Round 2 portfolio (Multi-Justification, Hardened Monoculture, Dynamic Memory Repair, and Model Calibration).
 - **[Exploration Round 1 Review & Metascience Lessons](explorations/ROUND_1_PORTFOLIO_REVIEW.md)**: First exploratory batch review and [meta-scientific lessons](explorations/LESSONS_FROM_ROUND_1.md) on the measurement confound paradox.
 - **[Active Development Plan](DEVELOPMENT_PLAN.md)**: Milestone tracking and frozen Phase 0–10.5 records.
 - **[Architectural Decisions Log](DECISIONS.md)**: Frozen design constraints, database schema decisions, and rationale.

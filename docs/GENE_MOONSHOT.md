@@ -109,8 +109,8 @@ $$\text{Truth} \ne \text{Derivability} \ne \text{Causal Influence} \ne \text{Anc
 
 - **Truth:** Canonical ground truth about the state of the world ($T^*$).
 - **Derivability:** Logical validity under some set of visible premises ($D_{\text{ctx}}$), regardless of whether those premises are true.
-- **Causal Influence:** Whether a token or memory physically altered the neural generator's output distribution ($C_{\text{parent}}$), regardless of whether it was cited.
-- **Ancestry:** The historical directed graph of exposures and parent events ($G_{\text{exposure}}$).
+- **Causal Influence:** Counterfactually changing observed behavior under a defined intervention ($C_{\text{parent}}$).
+- **Ancestry:** The historical lineage relation tracing exposure, reported citation, and causal ancestry across generations.
 - **Justification:** Whether a belief currently possesses at least one valid, un-retracted combination of supporting premises ($S(c)$) that entitles the system to maintain it as the world changes.
 
 A belief can be false but locally derivable. A claim can descend from a tainted ancestor yet remain independently justified. A model can cite a premise it did not causally use. A repeated memory can look multiply confirmed while sharing a single epistemic root.
