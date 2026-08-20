@@ -1,11 +1,11 @@
-"""Epistemic Intermediate Representation (EpistemicIR v2.2).
+"""Epistemic Intermediate Representation (EpistemicIR v2.3).
 
 Provides:
 1. Complete exact state hashing (H_state) including parentage and citations.
 2. Typed equivalence class hashing (H_perm, H_rep, H_alpha).
 3. First-class provenance status (known_single, recombinant, unknown_untracked, asserted_unverified).
-4. Truthful subselected state validation.
-5. Deterministic proof-rule structural correspondence validator.
+4. First-order variable unification & minimality in validate_ir_consistency().
+5. Truthful subselected state validation.
 """
 
 from __future__ import annotations
@@ -13,6 +13,7 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import re
 from enum import Enum
 from typing import Any, Literal
 from pydantic import BaseModel, Field
@@ -54,8 +55,10 @@ class PremiseNode(BaseModel):
 
 
 class RuleAntecedent(BaseModel):
-    """A typed structural antecedent atom in a deductive rule."""
+    """A typed structural antecedent atom in a deductive rule with variable bindings."""
     predicate: str
+    subject_var: str = "P"
+    entity_var: str = "S"
     subject_role: str | None = None
     target_value: str | None = None
 
@@ -64,7 +67,8 @@ class RuleSpec(BaseModel):
     """A formal deductive rule governing epistemic derivation."""
     rule_id: str
     antecedents: list[RuleAntecedent] = Field(default_factory=list)
-    consequent_predicate: str
+    consequent_predicate: str = "station_operates_protocol"
+    consequent_entity_var: str = "S"
     consequent_protocol: str = "PROTO_X7"
     rendered_text: str = ""
 
@@ -181,6 +185,30 @@ class EpistemicState(BaseModel):
         }
         return hashlib.sha256(json.dumps(data, sort_keys=True).encode("utf-8")).hexdigest()
 
+    def compute_alpha_equiv_hash(self) -> str:
+        """H_alpha: Invariant under formal alpha-renaming of roles (derived topologically from sorted rules)."""
+        # Order roles topologically by their appearance in sorted rules
+        ordered_roles = []
+        for r_id, r in sorted(self.rules.items()):
+            for ant in r.antecedents:
+                if ant.subject_role and ant.subject_role not in ordered_roles:
+                    ordered_roles.append(ant.subject_role)
+
+        role_map = {r: f"ROLE_SLOT_{idx+1}" for idx, r in enumerate(ordered_roles)}
+
+        abstract_claims = []
+        for p in self.get_active_premises().values():
+            abstract_claim = p.semantic_claim_id
+            for r, slot in role_map.items():
+                abstract_claim = abstract_claim.replace(r, slot)
+            abstract_claims.append(abstract_claim)
+
+        data = {
+            "abstract_claims": sorted(list(set(abstract_claims))),
+            "surviving_paths_count": len(self.get_surviving_support_environments()),
+        }
+        return hashlib.sha256(json.dumps(data, sort_keys=True).encode("utf-8")).hexdigest()
+
     def subselect_occurrences(self, occurrence_ids: list[str]) -> EpistemicState:
         """Create a truthful subselected EpistemicState containing strictly the chosen occurrences."""
         sub = copy.deepcopy(self)
@@ -196,7 +224,7 @@ def validate_ir_consistency(
     query: QueryContract | None = None,
     allow_partial_substate: bool = False,
 ) -> list[str]:
-    """Validate internal proof-rule consistency, premise identities, and query alignment."""
+    """Validate internal proof-rule consistency, variable/entity unification, and minimality."""
     errors = []
 
     # 1. Premise validation
@@ -215,7 +243,7 @@ def validate_ir_consistency(
         if not r.consequent_predicate:
             errors.append(f"Rule {r_id} has empty consequent_predicate")
 
-    # 3. Support Environment Proof-Rule Correspondence
+    # 3. Support Environment Proof-Rule Correspondence & First-Order Variable Unification
     active_claim_ids = state.get_active_semantic_claim_ids()
 
     for env in state.support_environments:
@@ -230,6 +258,10 @@ def validate_ir_consistency(
         if allow_partial_substate and not all(cid in active_claim_ids for cid in req_cids):
             continue
 
+        # Minimality Check: Number of required premises must strictly equal number of antecedents
+        if len(req_cids) != len(rule.antecedents):
+            errors.append(f"SupportEnvironment {env.path_id} violates minimality: {len(req_cids)} claims required for {len(rule.antecedents)} antecedents")
+
         # Check required claims exist in state
         env_premises = []
         for cid in req_cids:
@@ -239,20 +271,54 @@ def validate_ir_consistency(
             else:
                 env_premises.append(matching[0])
 
-        # Proof Checking: Verify that env_premises actually satisfy rule.antecedents
-        if len(env_premises) == len(req_cids):
-            for ant in rule.antecedents:
-                matched_ant = False
-                for p in env_premises:
-                    if p.predicate == ant.predicate:
-                        if ant.predicate == "has_role" and p.role == ant.subject_role:
-                            matched_ant = True
-                            break
-                        elif ant.predicate == "reports_to" and p.target_value == ant.target_value:
-                            matched_ant = True
-                            break
-                if not matched_ant:
-                    errors.append(f"SupportEnvironment {env.path_id} does not satisfy Rule {rule.rule_id} antecedent ({ant.predicate}, {ant.subject_role or ant.target_value})")
+        if len(env_premises) == len(req_cids) == len(rule.antecedents):
+            # First-Order Variable Unification across antecedents
+            var_bindings: dict[str, str] = {}
+            matched_antecedents = set()
+
+            for p in env_premises:
+                # Find matching antecedent
+                found_match = False
+                for idx, ant in enumerate(rule.antecedents):
+                    if idx in matched_antecedents:
+                        continue
+                    if p.predicate != ant.predicate:
+                        continue
+                    if ant.predicate == "has_role" and p.role != ant.subject_role:
+                        continue
+                    if ant.predicate == "reports_to" and p.target_value != ant.target_value:
+                        continue
+
+                    # Unify subject variable (e.g. P)
+                    if ant.subject_var in var_bindings:
+                        if var_bindings[ant.subject_var] != p.subject:
+                            errors.append(f"SupportEnvironment {env.path_id} variable unification error: {ant.subject_var} bound to both '{var_bindings[ant.subject_var]}' and '{p.subject}'")
+                    else:
+                        var_bindings[ant.subject_var] = p.subject
+
+                    # Unify entity variable (e.g. S)
+                    if ant.entity_var in var_bindings:
+                        if var_bindings[ant.entity_var] != p.entity:
+                            errors.append(f"SupportEnvironment {env.path_id} variable unification error: {ant.entity_var} bound to both '{var_bindings[ant.entity_var]}' and '{p.entity}'")
+                    else:
+                        var_bindings[ant.entity_var] = p.entity
+
+                    matched_antecedents.add(idx)
+                    found_match = True
+                    break
+
+                if not found_match:
+                    errors.append(f"Premise {p.occurrence_id} in {env.path_id} does not match any available antecedent of Rule {rule.rule_id}")
+
+            # Check all antecedents matched
+            if len(matched_antecedents) != len(rule.antecedents):
+                errors.append(f"SupportEnvironment {env.path_id} failed to satisfy all antecedents of Rule {rule.rule_id}")
+
+            # Query target alignment check
+            if query is not None and rule.consequent_entity_var in var_bindings:
+                bound_entity = var_bindings[rule.consequent_entity_var]
+                if bound_entity != query.target_station:
+                    errors.append(f"SupportEnvironment {env.path_id} bound entity '{bound_entity}' does not match query target station '{query.target_station}'")
 
     # 4. Query alignment validation
     if query is not None:

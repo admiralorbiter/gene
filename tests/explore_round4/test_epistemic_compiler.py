@@ -148,7 +148,7 @@ def test_ir_proof_rule_structural_correspondence_validator():
         "claim_velora_nerin_reports_s1",
     ]
     corrupt_errors = validate_ir_consistency(corrupt_state, query)
-    assert any("does not satisfy Rule rule_1 antecedent" in e for e in corrupt_errors)
+    assert any("failed to satisfy all antecedents" in e or "does not match any available antecedent" in e for e in corrupt_errors)
 
 
 def test_state_hash_parentage_and_citations_sensitivity():

@@ -1,7 +1,7 @@
-"""Epistemic Context Compiler (v2.2).
+"""Epistemic Context Compiler (v2.3).
 
 Compiles an EpistemicState into a CompiledContext with complete pass-level provenance,
-state vs equivalence hashing, and explicit provenance conservation enforcement.
+state vs typed equivalence hashing, and full-pass provenance conservation.
 """
 
 from __future__ import annotations
@@ -13,6 +13,7 @@ from gene.experiments.epistemic_ir import (
     EpistemicState,
     PremiseNode,
     PrivilegeLevel,
+    ProvenanceStatus,
     QueryContract,
     RuleSpec,
 )
@@ -36,7 +37,9 @@ class CompiledContext(BaseModel):
     equivalence_class_id: str
 
     def verify_provenance_conservation(self) -> bool:
-        """Verify the conservation invariant: source = emitted (+) merged_non_primaries (+) dropped."""
+        """Verify the conservation invariant across ALL input occurrences:
+        source = emitted (+) merged_non_primaries (+) dropped.
+        """
         emitted_set = set(self.emitted_occurrence_ids)
         merged_non_primaries = set()
         for primary, group in self.merged_occurrence_groups.items():
@@ -48,7 +51,7 @@ class CompiledContext(BaseModel):
         all_accounted = emitted_set | merged_non_primaries | dropped_set
         source_set = set(self.source_occurrence_ids)
 
-        # Check exact partition
+        # Check exact partition: pairwise disjoint and fully covering
         has_no_overlap = len(emitted_set & merged_non_primaries) == 0 and len(emitted_set & dropped_set) == 0 and len(merged_non_primaries & dropped_set) == 0
         covers_all = (all_accounted == source_set)
         return has_no_overlap and covers_all
@@ -70,8 +73,25 @@ class EpistemicContextCompiler:
         """Execute the compilation pipeline and return a CompiledContext."""
         state_h = state.compute_state_hash()
         equiv_h = state.compute_permutation_equiv_hash()
-        active_premises = state.get_active_premises()
-        source_occ_ids = sorted(list(active_premises.keys()))
+        
+        # Track ALL input occurrences before any filtering
+        all_input_occ_ids = sorted(list(state.premises.keys()))
+        
+        # Pass 1: Validity Filter
+        dropped_by_validity = []
+        validity_drop_reasons = {}
+        active_premises = {}
+        for occ_id, p in state.premises.items():
+            if not p.is_valid:
+                dropped_by_validity.append(occ_id)
+                validity_drop_reasons[occ_id] = "dropped_by_validity_filter:is_valid_false"
+            elif any(r in state.invalidated_roots for r in p.root_ids):
+                dropped_by_validity.append(occ_id)
+                inv_roots = [r for r in p.root_ids if r in state.invalidated_roots]
+                validity_drop_reasons[occ_id] = f"dropped_by_validity_filter:invalidated_root_{'+'.join(inv_roots)}"
+            else:
+                active_premises[occ_id] = p
+
         surviving_envs = state.get_surviving_support_environments()
 
         # Validate occurrence_order if provided
@@ -81,19 +101,35 @@ class EpistemicContextCompiler:
             ordered_occ_ids = sorted(list(active_premises.keys()))
 
         if self.pipeline == PrivilegeLevel.RAW_SERIALIZATION:
-            ctx = self._compile_raw_serialization(state, query, ordered_occ_ids, active_premises, source_occ_ids, surviving_envs, state_h, equiv_h, equivalence_class_id)
+            ctx = self._compile_raw_serialization(
+                state, query, ordered_occ_ids, active_premises, all_input_occ_ids,
+                dropped_by_validity, validity_drop_reasons, surviving_envs, state_h, equiv_h, equivalence_class_id
+            )
         elif self.pipeline == PrivilegeLevel.TOPOLOGY_AWARE_GROUPING:
-            ctx = self._compile_topology_aware(state, query, active_premises, source_occ_ids, surviving_envs, state_h, equiv_h, equivalence_class_id)
+            ctx = self._compile_topology_aware(
+                state, query, active_premises, all_input_occ_ids,
+                dropped_by_validity, validity_drop_reasons, surviving_envs, state_h, equiv_h, equivalence_class_id
+            )
         elif self.pipeline == PrivilegeLevel.GENEALOGICAL_NORMALIZATION:
-            ctx = self._compile_genealogical_normalization(state, query, ordered_occ_ids, active_premises, source_occ_ids, surviving_envs, state_h, equiv_h, equivalence_class_id)
+            ctx = self._compile_genealogical_normalization(
+                state, query, ordered_occ_ids, active_premises, all_input_occ_ids,
+                dropped_by_validity, validity_drop_reasons, surviving_envs, state_h, equiv_h, equivalence_class_id
+            )
         elif self.pipeline == PrivilegeLevel.PROOF_CARRYING_CERTIFICATE:
-            ctx = self._compile_proof_carrying(state, query, active_premises, source_occ_ids, surviving_envs, state_h, equiv_h, equivalence_class_id)
+            ctx = self._compile_proof_carrying(
+                state, query, active_premises, all_input_occ_ids,
+                dropped_by_validity, validity_drop_reasons, surviving_envs, state_h, equiv_h, equivalence_class_id
+            )
         else:
             raise ValueError(f"Unknown compiler pipeline: {self.pipeline}")
 
-        # Enforce conservation invariant
+        # Enforce full-pass conservation invariant
         if not ctx.verify_provenance_conservation():
-            raise ValueError(f"Compiler pass violated provenance conservation: source={source_occ_ids}, emitted={ctx.emitted_occurrence_ids}, merged={ctx.merged_occurrence_groups}, dropped={ctx.dropped_occurrence_ids}")
+            raise ValueError(
+                f"Compiler pass violated provenance conservation: "
+                f"source={all_input_occ_ids}, emitted={ctx.emitted_occurrence_ids}, "
+                f"merged={ctx.merged_occurrence_groups}, dropped={ctx.dropped_occurrence_ids}"
+            )
 
         return ctx
 
@@ -103,7 +139,9 @@ class EpistemicContextCompiler:
         query: QueryContract,
         ordered_occ_ids: list[str],
         active_premises: dict[str, PremiseNode],
-        source_occ_ids: list[str],
+        all_input_occ_ids: list[str],
+        dropped_by_validity: list[str],
+        validity_drop_reasons: dict[str, str],
         surviving_envs: list[Any],
         state_h: str,
         equiv_h: str,
@@ -130,14 +168,14 @@ class EpistemicContextCompiler:
             prompt="\n".join(lines),
             state_hash=state_h,
             equiv_hash=equiv_h,
-            source_occurrence_ids=source_occ_ids,
+            source_occurrence_ids=all_input_occ_ids,
             emitted_occurrence_ids=ordered_occ_ids,
             included_semantic_claim_ids=sorted(list(included_claims)),
             represented_root_ids=sorted(list(represented_roots)),
             surviving_support_environment_ids=[e.path_id for e in surviving_envs],
             merged_occurrence_groups={},
-            dropped_occurrence_ids=[],
-            drop_or_merge_reasons={},
+            dropped_occurrence_ids=dropped_by_validity,
+            drop_or_merge_reasons=validity_drop_reasons,
             compiler_passes=passes,
             privilege_level=PrivilegeLevel.RAW_SERIALIZATION,
             equivalence_class_id=eq_id,
@@ -148,7 +186,9 @@ class EpistemicContextCompiler:
         state: EpistemicState,
         query: QueryContract,
         active_premises: dict[str, PremiseNode],
-        source_occ_ids: list[str],
+        all_input_occ_ids: list[str],
+        dropped_by_validity: list[str],
+        validity_drop_reasons: dict[str, str],
         surviving_envs: list[Any],
         state_h: str,
         equiv_h: str,
@@ -163,8 +203,8 @@ class EpistemicContextCompiler:
         included_occs = []
         included_claims = set()
         represented_roots = set()
-        dropped_occs = []
-        drop_reasons = {}
+        dropped_occs = list(dropped_by_validity)
+        drop_reasons = dict(validity_drop_reasons)
 
         if not surviving_envs:
             lines.append("No complete, valid derivation pathways exist in active memory.")
@@ -187,8 +227,8 @@ class EpistemicContextCompiler:
                         included_claims.add(primary.semantic_claim_id)
                         represented_roots.update(primary.root_ids)
 
-            # Any occurrence not in included_occs is dropped
-            for occ_id in source_occ_ids:
+            # Any active occurrence not in included_occs was dropped by path selection
+            for occ_id in active_premises.keys():
                 if occ_id not in included_occs:
                     dropped_occs.append(occ_id)
                     drop_reasons[occ_id] = "not_selected_for_surviving_pathway"
@@ -200,7 +240,7 @@ class EpistemicContextCompiler:
             prompt="\n".join(lines),
             state_hash=state_h,
             equiv_hash=equiv_h,
-            source_occurrence_ids=source_occ_ids,
+            source_occurrence_ids=all_input_occ_ids,
             emitted_occurrence_ids=included_occs,
             included_semantic_claim_ids=sorted(list(included_claims)),
             represented_root_ids=sorted(list(represented_roots)),
@@ -219,7 +259,9 @@ class EpistemicContextCompiler:
         query: QueryContract,
         ordered_occ_ids: list[str],
         active_premises: dict[str, PremiseNode],
-        source_occ_ids: list[str],
+        all_input_occ_ids: list[str],
+        dropped_by_validity: list[str],
+        validity_drop_reasons: dict[str, str],
         surviving_envs: list[Any],
         state_h: str,
         equiv_h: str,
@@ -232,19 +274,25 @@ class EpistemicContextCompiler:
 
         lines.append("\nGENEALOGICALLY DEDUPLICATED ROOTS:")
         
-        dedup_groups: dict[tuple[tuple[str, ...], str], list[PremiseNode]] = {}
+        # Deduplication rule: occurrences with UNKNOWN_UNTRACKED are NEVER merged
+        dedup_groups: dict[tuple[tuple[str, ...], str, str], list[PremiseNode]] = {}
         for occ_id in ordered_occ_ids:
             p = active_premises[occ_id]
-            key = (tuple(sorted(p.root_ids)), p.semantic_claim_id)
+            if p.provenance_status == ProvenanceStatus.UNKNOWN_UNTRACKED:
+                # Unique group key per occurrence so they never merge falsely
+                key = (tuple(), p.semantic_claim_id, p.occurrence_id)
+            else:
+                key = (tuple(sorted(p.root_ids)), p.semantic_claim_id, "")
             dedup_groups.setdefault(key, []).append(p)
 
         included_occs = []
         included_claims = set()
         represented_roots = set()
         merged_groups = {}
-        drop_reasons = {}
+        dropped_occs = list(dropped_by_validity)
+        drop_reasons = dict(validity_drop_reasons)
 
-        for (roots_tuple, claim_id), occ_list in sorted(dedup_groups.items(), key=lambda x: (x[0][0], x[0][1])):
+        for (roots_tuple, claim_id, unique_tag), occ_list in sorted(dedup_groups.items(), key=lambda x: (x[0][0], x[0][1], x[0][2])):
             primary = occ_list[0]
             count = len(occ_list)
             root_label = "+".join(roots_tuple) if roots_tuple else "ambient"
@@ -264,13 +312,13 @@ class EpistemicContextCompiler:
             prompt="\n".join(lines + [f"\nQUESTION: {query.query_question}", f"Return strictly JSON matching this schema: {query.output_schema_json}"]),
             state_hash=state_h,
             equiv_hash=equiv_h,
-            source_occurrence_ids=source_occ_ids,
+            source_occurrence_ids=all_input_occ_ids,
             emitted_occurrence_ids=included_occs,
             included_semantic_claim_ids=sorted(list(included_claims)),
             represented_root_ids=sorted(list(represented_roots)),
             surviving_support_environment_ids=[e.path_id for e in surviving_envs],
             merged_occurrence_groups=merged_groups,
-            dropped_occurrence_ids=[],
+            dropped_occurrence_ids=dropped_occs,
             drop_or_merge_reasons=drop_reasons,
             compiler_passes=passes,
             privilege_level=PrivilegeLevel.GENEALOGICAL_NORMALIZATION,
@@ -282,7 +330,9 @@ class EpistemicContextCompiler:
         state: EpistemicState,
         query: QueryContract,
         active_premises: dict[str, PremiseNode],
-        source_occ_ids: list[str],
+        all_input_occ_ids: list[str],
+        dropped_by_validity: list[str],
+        validity_drop_reasons: dict[str, str],
         surviving_envs: list[Any],
         state_h: str,
         equiv_h: str,
@@ -321,14 +371,14 @@ class EpistemicContextCompiler:
             prompt="\n".join(lines),
             state_hash=state_h,
             equiv_hash=equiv_h,
-            source_occurrence_ids=source_occ_ids,
+            source_occurrence_ids=all_input_occ_ids,
             emitted_occurrence_ids=included_occs,
             included_semantic_claim_ids=sorted(list(included_claims)),
             represented_root_ids=sorted(list(distinct_roots)),
             surviving_support_environment_ids=[e.path_id for e in surviving_envs],
             merged_occurrence_groups={},
-            dropped_occurrence_ids=[],
-            drop_or_merge_reasons={},
+            dropped_occurrence_ids=dropped_by_validity,
+            drop_or_merge_reasons=validity_drop_reasons,
             compiler_passes=passes,
             privilege_level=PrivilegeLevel.PROOF_CARRYING_CERTIFICATE,
             equivalence_class_id=eq_id,
