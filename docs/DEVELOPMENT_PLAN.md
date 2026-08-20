@@ -45,24 +45,44 @@ The plan is strictly gated:
 
 ---
 
-# Current Phase: Phase 10 — Experiment 1B-C (Delayed Adjudication & Lineage Immunity Sandbox)
+### Phase 10 — Experiment 1B-C0 & 1B-C1b (Selective Epistemic Immunity Sandbox) (Completed & Frozen)
+- **1B-C0 (Policy Calibration Engine)**: Exact 4-state analytical verification of 8 policies across continuous $(\text{TPR}, \text{FPR})$ risk space.
+- **1B-C1b (Shared-Ecology Sandbox & Full Control Envelope)**:
+  - 12 fully balanced, role-swapped ecologies across all 6 station pairs.
+  - Demonstrated strict empirical null selectivity ($S \equiv 0.000$) for all stochastic lineage-blind controls ($N_{\text{mc}} = 100$).
+  - Proved complete descendant laundering under node-only quarantine ($C_I \equiv 1.000$).
+  - Full budget sweep ($m \in \{0..14\}$) establishing the convexified theoretical control frontier $C_I^*(c) = c$.
+  - Proved the Golden Identity: $\Delta_I(c) = \text{TPR} - \text{FPR} = S$, demonstrating a $+80.0\%$ matched-coverage containment advantage ($\Delta_I = +0.800$ at 90/10) over the lineage-blind theoretical diagonal.
 
-## 10.1 Conceptual & Epistemic Constraints
-- **Lineage Propagates Distrust, Not Truth**: Because clean and infected graph topologies are isomorphic, a policy seeing only structural metadata cannot determine truth without an oracle.
-- **External Risk Signal**: An imperfect binary risk signal arrives at root memories ($S \in \{0, 1\}$) with controlled sensitivity ($\text{TPR} \in \{0.5, 0.75, 0.9, 1.0\}$) and specificity ($\text{FPR} \in \{0.0, 0.05, 0.10, 0.20, 0.40\}$).
-- **Oracle Isolation**: The policy never receives canonical $T^*$. The experimental harness uses $T^*$ solely to synthesize the detector with pre-registered $(\text{TPR}, \text{FPR})$.
-- **Delayed Adjudication Timeline**: $G_0 \to G_1 \to G_2$ propagation has already occurred. The risk signal arrives at $G_0$, and the system evaluates future $G_3$ reproduction path availability ($C_H = X_{\text{path},H}^{\text{post}}, C_I = X_{\text{path},I}^{\text{post}}$).
+---
 
-## 10.2 Staged Implementation Sequence (Zero Live Compute First)
-1. **Experiment 1B-C0 (Policy Engine Golden Calibration)**:
-   - Analytical verification of 6 policies (`baseline`, `uniform_thinning`, `random_family_quarantine`, `node_only_quarantine`, `lineage_quarantine`, `oracle_upper_bound`) across 4 discrete root-signal states $(S_H, S_I)$ weighted by exact joint probabilities.
-   - Verify algebraic identities (e.g. $\text{TPR}=\text{FPR} \implies S = 0$, $\text{TPR}=1, \text{FPR}=0 \implies C_H=1, C_I=0$).
-2. **Experiment 1B-C1 (Delayed-Adjudication Retrieval Sandbox, $G_2 \to G_3$)**:
-   - Evaluate post-adjudication retrieval on frozen $G_0 \to G_2$ trees across 6 paired boundary worlds (seeds 7000..7005).
-   - Measure $C_H$, $C_I$, Containment ($1 - C_I$), Epistemic Autoimmunity ($1 - C_H$), and Separation ($S = C_H - C_I$).
-   - Identify whether a non-trivial region exists where lineage quarantine achieves a Pareto improvement over node-only and topology-matched controls without excessive healthy path loss.
-3. **Gated Tiny Live Follow-Up**:
-   - If and only if the deterministic sandbox shows a clear Pareto frontier, execute a minimal live mechanism check (2–3 informative detector points) on `gemma3:12b`.
+# Current Phase: Phase 10.5 — Experiment 1B-C2 (Live Behavioral Immunity Verification)
+
+## 10.5.1 Scientific Objective
+Test whether retrieval-level path availability translates directly into behavioral LLM expression in a shared memory pool:
+$$\text{Does } C_I^{\text{retrieval}} = 0 \implies C_I^{\text{behavior}} = 0 \text{ under live neural reasoning?}$$
+
+## 10.5.2 Design & Protocol Constraints (Minimal ~20-Call Gated Assay)
+1. **Zero Redundant Probability Grid Evaluations**:
+   - The LLM never observes detector probabilities $(\text{TPR}, \text{FPR})$; it only observes the concrete retained prompt context.
+2. **Two Role-Swapped Ecologies**:
+   - Ecology 1: Pair `(VELORA, KESTREL)` — Forward: Clean $H=\text{VELORA}$, Infected $I=\text{KESTREL}$
+   - Ecology 2: Pair `(VELORA, KESTREL)` — Swapped: Clean $H=\text{KESTREL}$, Infected $I=\text{VELORA}$
+3. **Five Concrete Post-Policy Contexts**:
+   - **Context 1 (`baseline`)**: Full candidate pool retained ($H_2$ and $I_2$ complete).
+   - **Context 2 (`node_only`)**: Flagged root removed, but $G_2$ descendant present.
+   - **Context 3 (`lineage_quarantine`)**: Flagged root + descendants removed ($G_2$ absent).
+   - **Context 4 (`autoimmunity_false_alarm`)**: Healthy root falsely flagged + lineage removed ($H_2$ absent).
+   - **Context 5 (`generation_matched_control`)**: Random $G_2$ node removed without lineage guidance.
+4. **The $G_3$ Multi-Hop Inference Task**:
+   - The model must execute a rule inference combining a $G_2$ transit route with a facility grid premise:
+     `If station has transit_route ROUTE_X and facility_grid GRID_Y -> terminal_auth AUTH_Z`
+   - **Predictions**:
+     - Complete $G_3$ support path $\implies$ active terminal authorization phenotype (e.g. `AUTH_Q7`).
+     - Broken $G_3$ support path $\implies$ `UNKNOWN` abstention.
+5. **Analytical Reweighting**:
+   - Empirically observed discrete model behaviors are analytically reweighted across the continuous $(\text{TPR}, \text{FPR})$ plane.
+
 
 ---
 

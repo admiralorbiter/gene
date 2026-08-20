@@ -56,7 +56,7 @@ report_md = """# Experiment 1B-C1b: Hardened Shared-Ecology Retrieval Sandbox & 
 ## 1. Executive Summary & Core Theoretical Findings
 
 Experiment 1B-C1b formalizes the central mechanism of selective epistemic immunity in shared memory networks:
-> **Genealogy does not tell the system what is true. It preserves enough derivation history that, once an imperfect external risk signal arrives at an ancestor, that distrust judgment can reach downstream descendants that would otherwise have laundered away their origin.**
+> **Selective-Immunity Principle:** In the tested delayed-adjudication ecology, ancestry tracking does not provide truth information itself. It preserves the association between an externally supplied risk judgment and the descendants of the judged ancestor, preventing that judgment from being lost or laundered away through derivation.
 
 Because clean and mutated lineages are topologically isomorphic and canonical truth $T^*$ is strictly unavailable to the policy, lineage tracking is **a mechanism for propagating trust or distrust, not an intrinsic truth detector**.
 
@@ -65,7 +65,7 @@ Because clean and mutated lineages are topologically isomorphic and canonical tr
 1. **Complete Descendant Laundering under Node-Only Filtering ($C_I \\equiv 1.000$)**:
    - When an external risk signal flags infected root $I_0$, deleting only that root leaves downstream $G_1$ and $G_2$ memories intact in the shared store.
    - For subsequent $G_3$ reproduction tasks requiring $G_2$ support premises, the infected lineage remains **100% available ($C_I = 1.000$) with zero containment ($1 - C_I = 0.000$)** across all detector qualities ($\\text{TPR} \\in [0.50, 1.00]$).
-   - **Conclusion**: Root-only quarantine provides **no post-adjudication containment in the tested descendant-mediated topology**.
+   - **Conclusion**: Root-only quarantine provides **no post-adjudication containment in the tested topology, where future reproduction depends on descendants rather than the adjudicated root**.
 
 2. **Empirical Null Separation for All Stochastic Lineage-Blind Controls ($S \\equiv 0.000$)**:
    - Under full bidirectional role swapping ($H=A, I=B$ and $H=B, I=A$) with $N_{\\text{mc}} = 100$, all lineage-blind controls converge strictly to null selectivity:
@@ -75,15 +75,14 @@ Because clean and mutated lineages are topologically isomorphic and canonical tr
      - `generation_matched_thinning`: $C_H = 0.540, C_I = 0.540 \\implies S \\equiv 0.000$.
    - **Conclusion**: Neither detector-triggered budget allocation nor knowledge of generation creates selectivity without ancestor-specific identity. Merely deleting a whole family-shaped cluster destroys healthy and infected pathways at identical rates unless aligned with the flagged founder.
 
-3. **True Nondominated Control Envelope & Matched-Coverage Containment Gain $\\Delta_I(C_H)$**:
-   - We evaluate the control frontier by sweeping intervention drop budgets $m \\in \\{0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14\\}$, allowing the controls every reasonable opportunity to choose their optimal intervention strength:
-     $$C_{I, \\text{ctrl}}^*(c) = \\min_{\\theta \\in \\Theta_{\\text{ctrl}}: C_{H, \\text{ctrl}}(\\theta) \\ge c} C_{I, \\text{ctrl}}(\\theta)$$
-     $$\\Delta_I(c) = C_{I, \\text{ctrl}}^*(c) - C_{I, \\text{lineage}}(c)$$
-   - At $\\text{TPR}=0.90, \\text{FPR}=0.10$ ($C_H = 0.900$):
-     - Lineage Quarantine leaks: $C_I = 0.100$ (90.0% containment).
-     - Optimal control achieving $C_H \\ge 0.900$ is uniform thinning at $m=1$ ($C_{H, \\text{ctrl}} = 0.905, C_{I, \\text{ctrl}}^* = 0.905$).
-     - **True Matched-Coverage Containment Gain:** $\\mathbf{\\Delta_I(0.900) = 0.905 - 0.100 = +0.805}$ (+80.5% containment gain).
-   - Across the entire nondominated control curve, $\\Delta_I(c) \\in [+0.552, +1.000]$ strictly holds everywhere.
+3. **Dual Frontier Analysis (Discrete Controls vs Convexified Theoretical Frontier)**:
+   - **Best Tested Discrete Control** at $C_H \\ge 0.90$: `uniform_thinning_m1` achieves $C_H = 0.905, C_I = 0.905$, yielding $\\Delta_I = 0.905 - 0.100 = \\mathbf{+0.805}$ (+80.5% containment gain).
+   - **Convexified Theoretical Control Frontier** ($C_I^*(c) = c$): Because all lineage-blind controls sit on the null diagonal $C_I = C_H$, randomized mixtures of intervention strengths trace the exact diagonal $C_I^*(c) = c$.
+   - Against this theoretical diagonal, the canonical matched-coverage containment gain at $\\text{TPR}=0.90, \\text{FPR}=0.10$ ($C_H = 0.900$) is:
+     $$\\Delta_I(0.900) = 0.900 - 0.100 = \\mathbf{+0.800} \\text{ (+80.0% containment gain)}$$
+   - **The Golden Identity of Epistemic Immunity**:
+     $$\\Delta_I = (1 - \\text{FPR}) - (1 - \\text{TPR}) = \\text{TPR} - \\text{FPR} = S$$
+     Genealogy does not magically improve the detector's intrinsic discrimination; **it converts detector discrimination directly into descendant-level retrieval discrimination without allowing derivation to erase or launder the signal**.
 
 4. **Characterization of Epistemic Autoimmunity ($1 - C_H = \\text{FPR}$)**:
    - False positive signals at $H_0$ propagate through the healthy lineage, deactivating valid ancestral facts:
@@ -113,24 +112,25 @@ Because clean and mutated lineages are topologically isomorphic and canonical tr
 
 ---
 
-## 3. True Nondominated Control Envelope Table ($k=6$)
+## 3. Dual Control Envelope Table ($k=6$)
 
-$$\\Delta_I(c) = \\min_{\\theta \\in \\Theta_{\\text{ctrl}}: C_{H, \\text{ctrl}}(\\theta) \\ge c} C_{I, \\text{ctrl}}(\\theta) - C_{I, \\text{lineage}}(c)$$
+$$\\Delta_I^{\\text{discrete}}(c) = \\min_{\\theta \\in \\Theta_{\\text{ctrl}}: C_{H, \\text{ctrl}}(\\theta) \\ge c} C_{I, \\text{ctrl}}(\\theta) - C_{I, \\text{lineage}}(c)$$
+$$\\Delta_I^{\\text{convex}}(c) = c - C_{I, \\text{lineage}}(c) = \\text{TPR} - \\text{FPR} = S$$
 
-| Detector Setting | Lineage Healthy $C_H$ | Lineage Leak $C_I$ | Min Control Leak $C_I^*$ | Best Eligible Control Configuration | True Containment Gain $\\Delta_I$ |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| $\\text{TPR}=0.75, \\text{FPR}=0.00$ | 1.000 | 0.250 | 1.000 | `baseline` ($m=0$) | **+0.750** |
-| $\\text{TPR}=0.75, \\text{FPR}=0.05$ | 0.950 | 0.250 | 1.000 | `baseline` ($m=0$) | **+0.750** |
-| $\\text{TPR}=0.75, \\text{FPR}=0.10$ | 0.900 | 0.250 | 0.905 | `uniform_thinning_m1` ($m=1$) | **+0.655** |
-| $\\text{TPR}=0.75, \\text{FPR}=0.20$ | 0.800 | 0.250 | 0.802 | `uniform_thinning_m2` ($m=2$) | **+0.552** |
-| $\\text{TPR}=0.90, \\text{FPR}=0.00$ | 1.000 | 0.100 | 1.000 | `baseline` ($m=0$) | **+0.900** |
-| $\\text{TPR}=0.90, \\text{FPR}=0.05$ | 0.950 | 0.100 | 1.000 | `baseline` ($m=0$) | **+0.900** |
-| $\\text{TPR}=0.90, \\text{FPR}=0.10$ | 0.900 | 0.100 | 0.905 | `uniform_thinning_m1` ($m=1$) | **+0.805** |
-| $\\text{TPR}=0.90, \\text{FPR}=0.20$ | 0.800 | 0.100 | 0.802 | `uniform_thinning_m2` ($m=2$) | **+0.702** |
-| $\\text{TPR}=1.00, \\text{FPR}=0.00$ | 1.000 | 0.000 | 1.000 | `baseline` ($m=0$) | **+1.000** |
-| $\\text{TPR}=1.00, \\text{FPR}=0.05$ | 0.950 | 0.000 | 1.000 | `baseline` ($m=0$) | **+1.000** |
-| $\\text{TPR}=1.00, \\text{FPR}=0.10$ | 0.900 | 0.000 | 0.905 | `uniform_thinning_m1` ($m=1$) | **+0.905** |
-| $\\text{TPR}=1.00, \\text{FPR}=0.20$ | 0.800 | 0.000 | 0.802 | `uniform_thinning_m2` ($m=2$) | **+0.802** |
+| Detector Setting | Lineage Healthy $C_H$ | Lineage Leak $C_I$ | Min Discrete Control $C_I^*$ | Best Tested Control Config | Discrete Gain $\\Delta_I^{\\text{disc}}$ | Convexified Gain $\\Delta_I^{\\text{conv}}$ |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| $\\text{TPR}=0.75, \\text{FPR}=0.00$ | 1.000 | 0.250 | 1.000 | `baseline` ($m=0$) | **+0.750** | **+0.750** |
+| $\\text{TPR}=0.75, \\text{FPR}=0.05$ | 0.950 | 0.250 | 1.000 | `baseline` ($m=0$) | **+0.750** | **+0.700** |
+| $\\text{TPR}=0.75, \\text{FPR}=0.10$ | 0.900 | 0.250 | 0.905 | `uniform_thinning_m1` ($m=1$) | **+0.655** | **+0.650** |
+| $\\text{TPR}=0.75, \\text{FPR}=0.20$ | 0.800 | 0.250 | 0.802 | `uniform_thinning_m2` ($m=2$) | **+0.552** | **+0.550** |
+| $\\text{TPR}=0.90, \\text{FPR}=0.00$ | 1.000 | 0.100 | 1.000 | `baseline` ($m=0$) | **+0.900** | **+0.900** |
+| $\\text{TPR}=0.90, \\text{FPR}=0.05$ | 0.950 | 0.100 | 1.000 | `baseline` ($m=0$) | **+0.900** | **+0.850** |
+| $\\text{TPR}=0.90, \\text{FPR}=0.10$ | 0.900 | 0.100 | 0.905 | `uniform_thinning_m1` ($m=1$) | **+0.805** | **+0.800** |
+| $\\text{TPR}=0.90, \\text{FPR}=0.20$ | 0.800 | 0.100 | 0.802 | `uniform_thinning_m2` ($m=2$) | **+0.702** | **+0.700** |
+| $\\text{TPR}=1.00, \\text{FPR}=0.00$ | 1.000 | 0.000 | 1.000 | `baseline` ($m=0$) | **+1.000** | **+1.000** |
+| $\\text{TPR}=1.00, \\text{FPR}=0.05$ | 0.950 | 0.000 | 1.000 | `baseline` ($m=0$) | **+1.000** | **+0.950** |
+| $\\text{TPR}=1.00, \\text{FPR}=0.10$ | 0.900 | 0.000 | 0.905 | `uniform_thinning_m1` ($m=1$) | **+0.905** | **+0.900** |
+| $\\text{TPR}=1.00, \\text{FPR}=0.20$ | 0.800 | 0.000 | 0.802 | `uniform_thinning_m2` ($m=2$) | **+0.802** | **+0.800** |
 
 ---
 
@@ -185,7 +185,7 @@ report_md += """
 
 ---
 
-## 7. Gated Live Mechanism Check Strategy
+## 7. Gated Live Mechanism Check Strategy (Experiment 1B-C2)
 
 1. **Protocol Principle**:
    Live model compute on `gemma3:12b` will **not** evaluate separate $(\\text{TPR}, \\text{FPR})$ grid points, as the model never observes detector probabilities.
@@ -196,7 +196,13 @@ report_md += """
    - **Context 3 (Infected Flagged + Lineage)**: Root + descendants removed (Predicted: `UNKNOWN` abstention).
    - **Context 4 (Healthy False Alarm + Lineage)**: Healthy lineage removed (Predicted: `UNKNOWN` abstention).
    - **Context 5 (Generation-Matched Control Context)**: Random $G_2$ node removed.
-3. **Outcome Reweighting**:
+3. **The G3 Reasoning Task**:
+   An actual multi-hop rule inference task:
+   `If station has transit_route ROUTE_X and facility_grid GRID_Y -> terminal_auth AUTH_Z`
+   Predictions:
+   - Complete $G_3$ support path $\\implies$ concrete active phenotype (e.g. `AUTH_Q7`).
+   - Broken $G_3$ support path $\\implies$ `UNKNOWN` abstention.
+4. **Outcome Reweighting**:
    The observed deterministic model outcomes from these concrete contexts will be analytically reweighted across the entire $(\\text{TPR}, \\text{FPR})$ risk plane.
 """
 
