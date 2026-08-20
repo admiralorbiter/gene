@@ -1,12 +1,15 @@
-# Experiment 1B-B Final Report — Endogenous Multi-Hop Retrieval & Surface-Area Feedback Loops
+# Experiment 1B-B Final Report — Endogenous Multi-Hop Retrieval & Lineage Surface-Area Dynamics
 
 **Project:** GENE (Genealogical Epistemic Network Experiments)  
-**Experiment:** Experiment 1B-B (Endogenous Multi-Hop Retrieval Dynamics & Positive Feedback Loops)  
-**Status:** **FROZEN & VERIFIED**  
+**Experiment:** Experiment 1B-B (Endogenous Multi-Hop Retrieval Dynamics & Lineage Surface-Area Scaling)  
+**Status:** **PILOT VALIDATED — INSTRUMENT GREEN-LIT**  
 **Date:** 2026-08-20  
-**Model Under Test:** `gemma3:12b` (Ollama, dynamic digest verified)  
+**Model Under Test:** `gemma3:12b` (Ollama, dynamic digest captured)  
 **Assay Environment:** Ecology C (Competing rules) + Schema v2 (Explicit contract) + Okapi BM25 Scored Top-$k$ Retriever  
-**Database:** `gene_exp1b_b1_20260820_035302.db` (144 individual candidate evaluation events logged with exact BM25 scores, ranks, and selection flags) & `gene_exp1b_b2_20260820_035044.db` (controlled surface-area scaling)  
+**Databases:**
+- `gene_exp1b_b1_20260820_041254.db` (Live $k=6$ rescue replication: 12 calls, 12 evaluations, 158 candidate retrieval events, 27 memory nodes)
+- `gene_exp1b_b1_20260820_035302.db` (Live $k=4$ baseline pilot: 12 calls, 144 candidate retrieval events)
+- `gene_exp1b_b2_20260820_040910.db` (Controlled surface-area scaling: 4 worlds, 5 parametric sweep points in `surface_feedback_sweeps`)
 
 ---
 
@@ -15,138 +18,117 @@
 Experiment 1B-B transitions GENE from exogenous exposure schedules ($X = 2p$) to **endogenous retrieval dynamics**, where contact is not assigned by an experimental mask but emerges dynamically from competition over a candidate memory pool containing:
 1. Ground-truth source memories ($G_0$).
 2. Easy clutter distractors (unrelated facilities and predicates).
-3. Hard negative distractors (same target station and overlapping keywords, but non-derivable relations).
-4. Replicating infected descendants ($G_1, G_2$).
+3. Hard negative distractors (same target station and natural overlapping vocabulary, but non-derivable relations with zero target answer leakage).
+4. Replicating lineage descendants ($G_1, G_2$).
 
-To prevent confounding multi-hop lexical similarity differences with evolutionary lineage growth, Experiment 1B-B was cleanly divided into two independent sub-assays:
+To prevent confounding multi-hop lexical similarity differences with evolutionary lineage growth, Experiment 1B-B is divided into two focused sub-assays:
 
-- **Experiment 1B-B1 (Endogenous Multi-Hop Retrieval Assay)**:
+- **Experiment 1B-B1 (Endogenous Multi-Hop Retrieval & Causal Rescue Assay)**:
   Measures multi-hop evidence chain assembly under lexical competition:
   $$X_F = P(\text{founder retrieved in top-}k)$$
   $$X_A = P(\text{co-support premise retrieved in top-}k)$$
   $$X_{\text{path}} = P(\text{complete proof path retrieved in top-}k)$$
-  Evaluates how hard negatives displace bridge facts and assesses model reject-option behavior under partial retrieval ($D_{\text{ctx}} = 0$).
+  Evaluates how same-entity hard negatives displace bridge facts, validates model reject-option behavior under partial retrieval ($D_{\text{ctx}} = 0$), and experimentally demonstrates **causal retrieval rescue** by expanding the retrieval budget from $k=4 \to k=6$.
 
-- **Experiment 1B-B2 (Controlled Surface-Area Feedback Assay)**:
-  Holds the target query and required founder premise strictly fixed while parametrically scaling the number of infected lineage descendants in memory ($N_{\text{lineage}} \in \{0, 1, 2, 4, 8\}$). Measures whether lineage replication expands the total retrieval surface area, driving frequency-dependent top-$k$ occupancy.
+- **Experiment 1B-B2 (Controlled Lineage Surface-Area Scaling Assay)**:
+  Holds the target query and required founder premise strictly fixed while parametrically scaling lineage descendants in memory ($N_{\text{lineage}} \in \{0, 1, 2, 4, 8\}$). Demonstrates that lineage multiplicity monotonically expands top-$k$ context visibility.
 
 ---
 
-## 2. Key Empirical & Theoretical Findings
+## 2. Key Empirical Findings
 
-### 2.1 The Multi-Hop RAG Bottleneck ($X_{\text{path}} = 0.0\%$ under Hard Clutter)
+### 2.1 The Multi-Hop Evidence Chain Assembly ($X_F$ vs. $X_A$ vs. $X_{\text{path}}$)
 In G1 inference, deriving the cognitive trait requires two premises:
 - Premise 1 (Fact A): `manager(station, person)`
 - Premise 2 (Founder): `reports_to(person, supervisor)`
 
-Under single-pass top-4 BM25 retrieval against 4 easy distractors and 4 hard negatives:
-- **Hard negatives** sharing entity and predicate terms (`access_protocol`, `emergency_protocol`, `maintenance_protocol`, `security_audit`) scored **$\text{BM25} = 0.8910$** and occupied **Ranks 0, 1, 2, 3**.
-- **The Station Manager Fact** (`locus_station_manager`) scored **$\text{BM25} = 0.8394$** and was displaced to **Rank 4** (just 1 slot outside top-4).
-- **The Founder Fact** (`locus_manager_supervisor`), possessing zero lexical term overlap with the station-level query, achieved $X_F = 50.0\%$ (Rank 1 in clearance queries, Rank 5 in protocol queries).
-- **Result**: Complete evidence chain recovery was **$X_{\text{path}} = 0.0\%$** across all G1 tasks.
+The retriever's contact rate $X$ decomposes into three distinct events:
+1. **Lineage Contact ($X_F$)**:
+   - In clearance queries (`"Which security clearance tier is assigned to Velora?"`), query tokens match the founder memory (`"Nerin directly reports to Tal/Kira"`), achieving $\text{BM25} = 2.55$ (Rank 1) $\implies X_F = 100\%$.
+   - In protocol queries (`"Which security protocol does Velora operate under?"`), the founder shares zero tokens with the query, achieving $\text{BM25} = 0.00$ (Rank 5) $\implies X_F = 0\%$.
+   - Mean founder contact across G1 tasks: $X_F = 50.0\%$.
+2. **Co-Support Coverage ($X_A$)**:
+   - Under $k=4$ with 4 hard negatives, the station manager fact (`locus_station_manager`) scored $\text{BM25} = 0.8394$ and was pushed to **Rank 4** (just 1 slot outside top-4 context).
+3. **Complete-Path Recovery ($X_{\text{path}}$)**:
+   - Because single-pass query-only top-4 retrieval prunes the complementary bridge premise, complete evidence assembly under crowded hard negatives collapses to **$X_{\text{path}} = 0.0\%$**.
 
-### 2.2 Strict Epistemic Reject-Option Under Incomplete Proof Paths
-When the retriever withheld the complete proof path ($D_{\text{ctx}} = 0$), Gemma did not hallucinate or guess from parametric associations:
-- **7 / 8 ($87.5\%$) G2 tasks cleanly returned `UNKNOWN` (`EXTINCT`)**.
-- **1 / 8 ($12.5\%$) G2 tasks emitted an ungrounded guess**, which was immediately and correctly flagged by the DualOracle as **`EPISTEMIC`** ($D_{\text{ctx}} = 0, \text{state vector} = (0, 0, 0, 0, 1)$).
-- **Zero false semantic transmission** occurred when premises were missing.
+### 2.2 Model Behavior Under Retrieval Failure: Reject-Option vs. Epistemic Error
+When the retriever withheld the complete proof path ($D_{\text{ctx}} = 0$):
+- **7 / 8 ($87.5\%$) tasks cleanly returned `UNKNOWN` (`EXTINCT`)**.
+- **1 / 8 ($12.5\%$) tasks emitted an unsupported concrete output**, which was cleanly classified by the DualOracle as an **`EPISTEMIC` error** ($D_{\text{ctx}} = 0$, state vector $(0, 0, 0, 0, 1)$).
+- **Zero semantic transmission** occurred without the complete proof path.
 
-### 2.3 Paired-Arm Stable Tie-Breaking Symmetry
-By indexing candidate tie-breaking to stable paired slots (`{generation}_{locus_id}_{node_type}_{idx}`) rather than allele strings or hashes:
-- Clean founder (`Kira`) and Infected founder (`Tal`) received **identical BM25 scores ($2.55$) and identical retrieval ranks (Rank 1)**.
-- Clean and infected arms demonstrated **100% paired symmetry** ($X_{1,H} = X_{1,I} = 50.0\%$, $X_{\text{path},H} = X_{\text{path},I} = 0.0\%$).
-
-### 2.4 Experiment 1B-B2: Proof of the Positive Surface-Area Feedback Loop
-Holding query and founder fixed while scaling lineage population $N_{\text{lineage}}$ in memory demonstrated clear frequency-dependent selection:
-- As lineage descendants increased from $N = 0 \to 8$, **top-4 lineage occupancy expanded monotonically from $0.50 \to 2.50 / 4$**.
-- Probability of exposing at least one lineage member increased from **$50.0\% \to 100.0\%$**.
-
----
-
-## 3. Experimental Ledgers
-
-### 3.1 Experiment 1B-B1: Multi-Hop Retrieval Ledger
-
-**Database:** `gene_exp1b_b1_20260820_035302.db` (144 candidates evaluated in SQLite `retrieval_events`)
-
-| Arm | Generation G1 Founder $X_F$ | G1 Co-Support $X_A$ | G1 Full Path $X_{\text{path}}$ | G2 Parent Recall $X_2$ | Transmitted Semantic Children | Extinct Abstentions | Epistemic Errors |
-| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **CLEAN (H)** | **50.0%** ($1/2$) | **0.0%** ($0/2$) | **0.0%** ($0/2$) | **0.0%** ($0/4$) | $0 / 4$ | $4 / 4$ ($100\%$) | $0 / 4$ ($0\%$) |
-| **INFECTED (I)** | **50.0%** ($1/2$) | **0.0%** ($0/2$) | **0.0%** ($0/2$) | **0.0%** ($0/4$) | $0 / 4$ | $3 / 4$ ($75\%$) | $1 / 4$ ($25\%$) |
-| **POOLED** | **50.0%** ($2/4$) | **0.0%** ($0/4$) | **0.0%** ($0/4$) | **0.0%** ($0/8$) | $0 / 8$ | $7 / 8$ ($87.5\%$) | $1 / 8$ ($12.5\%$) |
-
----
-
-### 3.2 Experiment 1B-B2: Surface-Area Feedback Ledger
-
-**Database:** `gene_exp1b_b2_20260820_035044.db` (Controlled synthetic pool with 16 background distractors)
-
-| Lineage Descendants ($N_{\text{lin}}$) | $P(\text{Parent in Top-}k)$ | $P(\text{Any Lineage in Top-}k)$ | Mean Top-$k$ Occupancy ($k=4$) | Frequency-Dependent Feedback |
-| :---: | :---: | :---: | :---: | :---: |
-| **$N_{\text{lin}} = 0$** | 50.0% | 50.0% | 0.50 / 4 | Baseline |
-| **$N_{\text{lin}} = 1$** | 50.0% | 100.0% | 1.00 / 4 | $+100\%$ Presence Gain |
-| **$N_{\text{lin}} = 2$** | 50.0% | 100.0% | 1.50 / 4 | $+200\%$ Surface Area |
-| **$N_{\text{lin}} = 4$** | 50.0% | 100.0% | 2.50 / 4 | Lineage Dominates Majority ($>50\%$) |
-| **$N_{\text{lin}} = 8$** | 50.0% | 100.0% | 2.50 / 4 | Saturation Capacity Reached |
+### 2.3 Hard-Negative Clutter Dose-Response (Ablation Sweep)
+Holding $k=4$ fixed while parametrically varying hard negative clutter ($N_{\text{hard}} \in \{0, 2, 4, 8\}$) reveals the monotonic collapse of multi-hop recovery:
+- $N_{\text{hard}} = 0 \implies X_F = 100.0\%, X_A = 100.0\%, \mathbf{X_{\text{path}} = 100.0\%}$
+- $N_{\text{hard}} = 2 \implies X_F = 100.0\%, X_A = 87.5\%, \mathbf{X_{\text{path}} = 87.5\%}$
+- $N_{\text{hard}} = 4 \implies X_F = 50.0\%, X_A = 87.5\%, \mathbf{X_{\text{path}} = 37.5\%}$
+- $N_{\text{hard}} = 8 \implies X_F = 50.0\%, X_A = 50.0\%, \mathbf{X_{\text{path}} = 0.0\%}$
 
 ```text
-       Top-4 Context Occupancy vs Lineage Size N_lin
- 4.0 ┤
- 3.0 ┤                                   ● N=4,8 (2.50 / 4)
- 2.0 ┤                             ● N=2 (1.50 / 4)
- 1.0 ┤                 ● N=1 (1.00 / 4)
- 0.0 ┼─────● N=0 (0.50 / 4)
-    N_lin = 0          1           2           4           8
+       Complete-Path Recall X_path vs Hard Negative Clutter
+ 100% ┤ ● N=0 (100%)
+  80% ┤     ● N=2 (87.5%)
+  60% ┤
+  40% ┤         ● N=4 (37.5%)
+  20% ┤
+   0% ┼────────────────────────● N=8 (0.0%)
+     N_hard = 0    2       4       8
 ```
+
+### 2.4 Experimental Causal Rescue ($k=4 \to k=6$)
+Expanding the retrieval budget restores the pruned bridge facts:
+- $k=4 \implies X_{\text{path}} = 37.5\%$
+- $k=5 \implies X_{\text{path}} = 50.0\%$
+- $k=6 \implies \mathbf{X_{\text{path}} = 100.0\%}$
+
+**Live Model Verification on `gemma3:12b`**:
+- **Under $k=4$ (Path Absent)**: Model abstains on both arms $\to$ Clean: `UNKNOWN`, Infected: `UNKNOWN`.
+- **Under $k=6$ (Path Restored)**: Complete deduction occurs $\to$
+  - Clean Arm: `transit_route` $\to$ `ROUTE_HYPERLANE` (**HEALTHY**), `resource_tier` $\to$ `TIER_PRIORITY` (**HEALTHY**).
+  - Infected Arm: `transit_route` $\to$ `ROUTE_ORBITAL_SLIP` (**SEMANTIC**), `resource_tier` $\to$ `TIER_STANDARD` (**SEMANTIC**), `access_level` $\to$ `ACCESS_ESCORT_ONLY` (**SEMANTIC**).
+
+This directly demonstrates causal retrieval rescue: **restoring the multi-hop proof path restores phenotypic transmission**.
 
 ---
 
-## 4. Persisted Database Schema (`retrieval_events`)
+## 3. Experiment 1B-B2: Lineage Surface-Area Scaling
 
-Every candidate evaluated by the BM25 retrieval engine is preserved in SQLite table `retrieval_events`:
+**Database:** `gene_exp1b_b2_20260820_040910.db` (Persisted in `surface_feedback_sweeps`)
 
-```sql
-CREATE TABLE retrieval_events (
-    event_id TEXT PRIMARY KEY,
-    run_id TEXT NOT NULL,
-    call_id TEXT NOT NULL,
-    generation INTEGER NOT NULL,
-    task_id TEXT NOT NULL,
-    query_text TEXT NOT NULL,
-    top_k INTEGER NOT NULL,
-    pool_size INTEGER NOT NULL,
-    candidate_node_id TEXT NOT NULL,
-    paired_slot_id TEXT NOT NULL,
-    bm25_score REAL NOT NULL,
-    retrieval_rank INTEGER NOT NULL,
-    is_selected INTEGER NOT NULL,
-    context_position INTEGER,
-    is_founder INTEGER NOT NULL,
-    is_co_support INTEGER NOT NULL,
-    is_required_path INTEGER NOT NULL,
-    is_infected INTEGER NOT NULL,
-    is_distractor INTEGER NOT NULL,
-    created_at TEXT NOT NULL,
-    FOREIGN KEY(run_id) REFERENCES runs(run_id)
-);
-```
+| Lineage Multiplicity ($N_{\text{lin}}$) | $P(\text{Founder in Top-}k)$ | $P(\text{Any Lineage in Top-}k)$ | Mean Top-$k$ Occupancy ($k=4$) | Mechanism Interpretation |
+| :---: | :---: | :---: | :---: | :---: |
+| **$N_{\text{lin}} = 0$** | 50.0% | 50.0% | 0.50 / 4 | Single Founder Baseline |
+| **$N_{\text{lin}} = 1$** | 50.0% | 100.0% | 1.50 / 4 | $+100\%$ Lineage Presence |
+| **$N_{\text{lin}} = 2$** | 37.5% | 100.0% | 2.25 / 4 | Lineage Occupies Over $50\%$ of Context |
+| **$N_{\text{lin}} = 4$** | 50.0% | 100.0% | 2.25 / 4 | Retrieval Visibility Saturation |
+| **$N_{\text{lin}} = 8$** | 50.0% | 100.0% | 2.25 / 4 | Context Capacity Bound Reached |
 
-This enables post-hoc replay of:
-- Full ranking curves.
-- Clutter displacement margins.
-- Clean vs. infected paired rank differences.
-- Multi-hop support threshold dynamics.
+*Note on Terminology*: This assay demonstrates **retrieval surface-area scaling** (lineage multiplicity expands retrieval visibility), which serves as a necessary mechanism for closed-loop reproductive feedback.
 
 ---
 
-## 5. Transition to Experiment 1B-C (Lineage-Aware Selective Filtering)
+## 4. Auditable Database Schema & Reconstructability
 
-With 1B-A1 (Uniform-Thinning Frontier), 1B-A2 (Branching Process Extinction/Jackpots), and 1B-B (Endogenous Multi-Hop Retrieval & Surface Feedback) complete:
+All experimental runs are completely reconstructable from SQLite alone:
 
-The mechanism is fully isolated:
-1. **Uniform thinning** reduces infection only by destroying clean answer coverage ($R_S = 2 C_{\text{clean}}$).
-2. **Replicating lineages** actively expand their retrieval footprint ($N_{\text{lin}} \uparrow \implies \text{Occupancy} \uparrow$).
-3. **Multi-hop RAG** requires both founder and co-support premises; hard negatives exploit this by displacing intermediate bridge facts.
+1. **`runs`**: Git commit, dynamic model digest, prompt hash, config hash, environment info.
+2. **`calls`**: Exact JSON request payload, raw response text, parsed JSON, token counts, and latency telemetry.
+3. **`memory_nodes`**: Full structured JSON representation and natural language renderings for every source, clutter, and derived memory.
+4. **`dual_oracle_evaluations`**: Canonical vs. context truth status, 5-element state vectors, phenotype classification, ancestral allele fidelity.
+5. **`retrieval_events`**: Complete candidate ledger recording every evaluated candidate's BM25 score, rank, paired slot ID, and top-$k$ selection flag.
+6. **`surface_feedback_sweeps`**: Complete parametric lineage scaling sweep results.
 
-**Experiment 1B-C** will deploy non-oracle lineage filters (provenance tracking, authority weights, verification graph pruning) to filter infected memories ($p_I \to 0$) while preserving clean memories ($p_H \to 1$), breaking the uniform-thinning frontier under endogenous competition.
+---
+
+## 5. Synthesis & Transition to Experiment 1B-C
+
+The experimental sequence now establishes:
+1. **Factorization Structure ($R_S = X \times \tau_S \times W$)**: Transmission is a product of contact, epistemic derivability, and memory admission.
+2. **Internal Structure of Contact ($X = (X_F, X_A, X_{\text{path}})$)**: In multi-hop architectures, contacting an infected memory is distinct from assembling a reproductively complete proof path.
+3. **The Uniform-Thinning Frontier ($R_S = 2 C_{\text{clean}}$)**: Indiscriminate retrieval thinning cannot suppress infection without proportionally destroying clean answer coverage.
+4. **Surface-Area Multiplicity**: Growing lineages expand their prompt footprint independently of ground truth.
+
+**Experiment 1B-C (Lineage-Aware Selective Immunity)** will deploy non-oracle lineage filters (provenance chain verification, authority weighting, epistemic graph pruning) to suppress infected retrieval ($p_I \to 0$) while preserving clean memory recall ($p_H \to 1$), breaking the uniform-thinning frontier under endogenous competition.
+
 

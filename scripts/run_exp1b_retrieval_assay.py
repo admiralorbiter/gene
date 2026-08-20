@@ -1,8 +1,8 @@
-"""Experiment 1B-B: Endogenous Multi-Hop Retrieval & Surface-Area Feedback Assay Runner.
+"""Experiment 1B-B: Endogenous Multi-Hop Retrieval & Surface-Area Scaling Assay Runner.
 
 Assays:
-- 1B-B1: Endogenous Multi-Hop Retrieval (X_F, X_A, X_path under easy vs hard clutter).
-- 1B-B2: Controlled Surface-Area Feedback (scaling lineage population N_lineage in {0, 1, 2, 4, 8}).
+- 1B-B1: Endogenous Multi-Hop Retrieval (X_F, X_A, X_path, k-rescue sweeps, hard-negative ablation).
+- 1B-B2: Controlled Lineage Surface-Area Scaling (retrieval visibility vs lineage multiplicity N_lineage in {0, 1, 2, 4, 8}).
 """
 
 from __future__ import annotations
@@ -34,15 +34,15 @@ from gene.worlds.schema import Fact, Task, World, compute_fact_id
 
 def generate_clutter_distractors(
     station: str,
-    easy_count: int = 8,
-    hard_count: int = 8,
+    easy_count: int = 4,
+    hard_count: int = 4,
     seed: int = 42,
 ) -> tuple[list[Fact], list[Fact]]:
-    """Generate easy clutter (unrelated facilities) and hard negatives (same station, lexically overlapping)."""
+    """Generate easy clutter (unrelated facilities) and hard negatives (same station, genuine lexical overlap, zero target answer leakage)."""
     easy_facts: list[Fact] = []
     facilities = ["OUTPOST_ALPHA", "SECTOR_9", "STATION_NEXUS", "BASE_AURORA", "DEPOT_ZETA", "RELAY_7"]
-    predicates = ["containment_tier", "power_grid_frequency", "beacon_channel", "inspection_cycle", "cooling_subsystem", "docking_bay"]
-    values = ["TIER_A", "FREQ_500", "CH_99", "CYCLE_MONTHLY", "COOLING_CRYOGENIC", "BAY_PRIMARY", "TIER_B", "FREQ_250", "CYCLE_ANNUAL"]
+    predicates = ["containment status", "power grid frequency", "beacon channel", "inspection cycle", "cooling subsystem", "docking bay"]
+    values = ["nominal alpha", "five hundred hertz", "channel ninety nine", "monthly inspection", "cryogenic active", "bay primary"]
 
     for i in range(easy_count):
         fac = facilities[(seed + i) % len(facilities)]
@@ -60,15 +60,16 @@ def generate_clutter_distractors(
         )
 
     hard_facts: list[Fact] = []
+    # Natural multi-token predicates and values with ZERO target output tokens
     hard_predicates = [
-        "emergency_protocol", "security_audit", "maintenance_protocol",
-        "access_protocol", "communication_channel", "transit_corridor",
-        "clearance_tier", "inspection_frequency"
+        "emergency security protocol", "annual security audit", "routine maintenance protocol",
+        "access control policy", "communication beacon channel", "internal transit corridor",
+        "facility clearance classification", "general inspection schedule"
     ]
     hard_values = [
-        "PROTO_ALPHA", "AUDIT_BIESTABLISHED", "PROTO_BETA",
-        "ACCESS_PERMITTED", "CHANNEL_PRIMARY", "CORRIDOR_SOUTH",
-        "CLEARANCE_OMEGA", "FREQUENCY_DAILY"
+        "standard operational baseline", "verified quarterly", "routine internal cycle",
+        "nominal archive status", "frequency channel nine", "corridor sector zero",
+        "restricted personnel only", "directive sixty six"
     ]
 
     for j in range(hard_count):
@@ -123,8 +124,8 @@ def log_retrieval_events(
 def run_exp1b_b1_assay(
     worlds_count: int = 4,
     top_k: int = 4,
-    easy_clutter: int = 8,
-    hard_clutter: int = 8,
+    easy_clutter: int = 4,
+    hard_clutter: int = 4,
     prompt_version: str = "v2",
     model_name: str = "gemma3:12b",
     mutated_supervisor: str = "TAL",
@@ -175,7 +176,6 @@ def run_exp1b_b1_assay(
         mut_sup = bundle.mutated_supervisor
         clean_sup = bundle.target_supervisor
 
-        # Clutter facts
         easy_facts, hard_facts = generate_clutter_distractors(station, easy_clutter, hard_clutter, seed)
 
         for arm in ["clean", "infected"]:
@@ -232,6 +232,11 @@ def run_exp1b_b1_assay(
                     structured_json=f.model_dump(),
                 )
                 memory_pool.append(node)
+                with db.conn:
+                    db.conn.execute("""
+                        INSERT OR REPLACE INTO memory_nodes (node_id, run_id, world_id, generation, node_type, natural_text, structured_json, locus_id, allele_id, is_active, parent_generation, created_at)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """, (node_id, run_id, current_world.world_id, 0, "source", node.natural_text, json.dumps(f.model_dump()), f.locus_id, f.fact_id, 1, None, datetime.now(timezone.utc).isoformat()))
 
             for c_f in easy_facts + hard_facts:
                 c_node_id = f"node_{run_id}_{c_f.locus_id}"
@@ -247,6 +252,11 @@ def run_exp1b_b1_assay(
                     structured_json=c_f.model_dump(),
                 )
                 memory_pool.append(node)
+                with db.conn:
+                    db.conn.execute("""
+                        INSERT OR REPLACE INTO memory_nodes (node_id, run_id, world_id, generation, node_type, natural_text, structured_json, locus_id, allele_id, is_active, parent_generation, created_at)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """, (c_node_id, run_id, current_world.world_id, 0, "source", node.natural_text, json.dumps(c_f.model_dump()), c_f.locus_id, c_f.fact_id, 1, None, datetime.now(timezone.utc).isoformat()))
 
             # ---------------------------------------------------------
             # G1 Execution
@@ -276,7 +286,6 @@ def run_exp1b_b1_assay(
                 call_id = f"call_{run_id}_g1_{task.target_fact.predicate}"
                 log_retrieval_events(db, run_id, call_id, 1, task.task_id, query, top_k, ret_res)
 
-                # Construct Context Facts strictly from retrieved structured facts
                 ctx_facts: list[Fact] = []
                 for cand in ret_res.selected_memories:
                     if cand.structured_fact:
@@ -324,13 +333,47 @@ def run_exp1b_b1_assay(
                     seed=42,
                     format=template.format_schema,
                 )
+                start_time = time.time()
                 res = client.chat(spec)
+                latency_ms = int((time.time() - start_time) * 1000)
+
                 eval_res = dual_oracle_g1.evaluate_response(
                     raw_text=res.raw_response_text,
                     parsed_json=res.parsed_json,
                     task=task,
                     has_infected_ancestry=is_infected_arm and ret_res.founder_retrieved,
                 )
+
+                # Persist call to SQLite
+                with db.conn:
+                    db.conn.execute("""
+                        INSERT OR REPLACE INTO calls (
+                            call_id, run_id, generation, task_id, request_json, response_text,
+                            response_json, prompt_tokens, completion_tokens, latency_ms,
+                            load_duration_ms, prompt_eval_duration_ms, eval_duration_ms, created_at
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """, (
+                        call_id, run_id, 1, task.task_id, json.dumps(spec.to_request_payload()),
+                        res.raw_response_text, json.dumps(res.parsed_json),
+                        res.prompt_tokens, res.completion_tokens,
+                        res.latency_ms if res.latency_ms > 0 else latency_ms,
+                        res.load_duration_ms, res.prompt_eval_duration_ms, res.eval_duration_ms,
+                        datetime.now(timezone.utc).isoformat()
+                    ))
+                    eval_id_g1 = f"eval_{call_id}"
+                    db.conn.execute("""
+                        INSERT OR REPLACE INTO dual_oracle_evaluations (
+                            evaluation_id, call_id, node_id, generation, task_id, target_subject, target_predicate, derived_object, canonical_truth_status,
+                            local_derivability_status, A_correct, E_correct, K_consistent, phenotype,
+                            state_vector_json, ancestral_allele_fidelity, created_at
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """, (
+                        eval_id_g1, call_id, None, 1, task.task_id, task.target_fact.subject, task.target_fact.predicate, eval_res.normalized_object,
+                        eval_res.canonical_truth_status, eval_res.context_truth_status,
+                        1 if eval_res.A_correct else 0, 1 if eval_res.E_correct else 0,
+                        1 if eval_res.K_consistent else 0, eval_res.phenotype, json.dumps(eval_res.state_vector),
+                        eval_res.ancestral_allele_fidelity, datetime.now(timezone.utc).isoformat()
+                    ))
 
                 locus_id = f"locus_{task.target_fact.predicate}"
                 allele_id = compute_fact_id(station, task.target_fact.predicate, eval_res.normalized_object)
@@ -358,6 +401,12 @@ def run_exp1b_b1_assay(
                         structured_json=derived_fact.model_dump(),
                     )
                     memory_pool.append(child_node)
+                    with db.conn:
+                        db.conn.execute("""
+                            INSERT OR REPLACE INTO memory_nodes (node_id, run_id, world_id, generation, node_type, natural_text, structured_json, locus_id, allele_id, is_active, parent_generation, created_at)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """, (node_id, run_id, current_world.world_id, 1, "derived", derived_text, json.dumps(derived_fact.model_dump()), locus_id, allele_id, 1, 0, datetime.now(timezone.utc).isoformat()))
+
                     if is_infected_arm and eval_res.phenotype == "semantic":
                         infected_node_ids.add(node_id)
                     g1_admitted_claims[task.target_fact.predicate] = child_node
@@ -442,13 +491,48 @@ def run_exp1b_b1_assay(
                     seed=42,
                     format=template.format_schema,
                 )
+                start_time = time.time()
                 res = client.chat(spec)
+                latency_ms = int((time.time() - start_time) * 1000)
+
                 eval_res = dual_oracle_g2.evaluate_response(
                     raw_text=res.raw_response_text,
                     parsed_json=res.parsed_json,
                     task=g2_task,
                     has_infected_ancestry=is_infected_arm and ret_res.founder_retrieved,
                 )
+
+                # Persist call & evaluation
+                with db.conn:
+                    db.conn.execute("""
+                        INSERT OR REPLACE INTO calls (
+                            call_id, run_id, generation, task_id, request_json, response_text,
+                            response_json, prompt_tokens, completion_tokens, latency_ms,
+                            load_duration_ms, prompt_eval_duration_ms, eval_duration_ms, created_at
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """, (
+                        call_id, run_id, 2, g2_task.task_id, json.dumps(spec.to_request_payload()),
+                        res.raw_response_text, json.dumps(res.parsed_json),
+                        res.prompt_tokens, res.completion_tokens,
+                        res.latency_ms if res.latency_ms > 0 else latency_ms,
+                        res.load_duration_ms, res.prompt_eval_duration_ms, res.eval_duration_ms,
+                        datetime.now(timezone.utc).isoformat()
+                    ))
+                    eval_id_g2 = f"eval_{call_id}"
+                    db.conn.execute("""
+                        INSERT OR REPLACE INTO dual_oracle_evaluations (
+                            evaluation_id, call_id, node_id, generation, task_id, target_subject, target_predicate, derived_object, canonical_truth_status,
+                            local_derivability_status, A_correct, E_correct, K_consistent, phenotype,
+                            state_vector_json, ancestral_allele_fidelity, created_at
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """, (
+                        eval_id_g2, call_id, None, 2, g2_task.task_id, station, target_pred, eval_res.normalized_object,
+                        eval_res.canonical_truth_status, eval_res.context_truth_status,
+                        1 if eval_res.A_correct else 0, 1 if eval_res.E_correct else 0,
+                        1 if eval_res.K_consistent else 0, eval_res.phenotype, json.dumps(eval_res.state_vector),
+                        eval_res.ancestral_allele_fidelity, datetime.now(timezone.utc).isoformat()
+                    ))
+
                 print(f"  [{arm.upper()} G2] {target_pred} (Parent Exposed: {ret_res.founder_retrieved}): {eval_res.normalized_object} | D_ctx={eval_res.context_derivability} | Phenotype: {eval_res.phenotype.upper()}", flush=True)
 
     # -------------------------------------------------------------
@@ -468,6 +552,157 @@ def run_exp1b_b1_assay(
     db.close()
 
 
+def run_exp1b_b1_k_sweep(
+    worlds_count: int = 4,
+    k_values: list[int] | None = None,
+    easy_clutter: int = 4,
+    hard_clutter: int = 4,
+    mutated_supervisor: str = "TAL",
+):
+    """Run deterministic zero-cost top-k retrieval rescue sweep (k in 4, 5, 6, 7, 8)."""
+    ks = k_values or [4, 5, 6, 7, 8]
+    retriever = BM25ScoredRetriever()
+
+    print("=" * 135)
+    print("      EXPERIMENT 1B-B1: TOP-k RETRIEVAL RESCUE SWEEP (ZERO LLM COST)")
+    print(f"      (Worlds: {worlds_count} | k-values: {ks} | Distractors: {easy_clutter} Easy, {hard_clutter} Hard)")
+    print("=" * 135)
+
+    results: dict[int, dict[str, float]] = {}
+
+    for k in ks:
+        total_g1 = 0
+        founder_hits = 0
+        cosup_hits = 0
+        path_hits = 0
+
+        for world_idx in range(worlds_count):
+            seed = 5000 + world_idx
+            bundle = generate_exp1_branching_world(world_seed=seed, rotation_idx=world_idx, mutated_supervisor=mutated_supervisor)
+            station = bundle.station
+            founder_fact = bundle.mutated_founder_fact
+            easy_facts, hard_facts = generate_clutter_distractors(station, easy_clutter, hard_clutter, seed)
+
+            memory_pool = []
+            co_sup_ids = set()
+            founder_id = ""
+            for f in bundle.mutated_world.facts:
+                nid = f"node_{f.locus_id}_{f.fact_id[:8]}"
+                if f.fact_id == founder_fact.fact_id:
+                    founder_id = nid
+                if f.predicate == "manager":
+                    co_sup_ids.add(nid)
+                memory_pool.append(MemoryNode(
+                    node_id=nid, run_id="sweep", world_id="w", generation=0,
+                    locus_id=f.locus_id, node_type="source",
+                    natural_text=NaturalLanguageRenderer.render_fact(f), structured_json=f.model_dump()
+                ))
+
+            for c_f in easy_facts + hard_facts:
+                memory_pool.append(MemoryNode(
+                    node_id=f"node_dist_{c_f.locus_id}", run_id="sweep", world_id="w", generation=0,
+                    locus_id=c_f.locus_id, node_type="source",
+                    natural_text=NaturalLanguageRenderer.render_fact(c_f), structured_json=c_f.model_dump()
+                ))
+
+            for task in bundle.g1_tasks:
+                total_g1 += 1
+                res = retriever.rank(query=task.prompt, candidate_nodes=memory_pool, top_k=k, founder_node_id=founder_id, co_support_node_ids=co_sup_ids)
+                if res.founder_retrieved:
+                    founder_hits += 1
+                if res.co_support_retrieved:
+                    cosup_hits += 1
+                if res.path_retrieved:
+                    path_hits += 1
+
+        results[k] = {
+            "x_f": founder_hits / total_g1,
+            "x_a": cosup_hits / total_g1,
+            "x_path": path_hits / total_g1,
+        }
+
+    print(f"{'Top-k Context Budget':<25} | {'Founder Recall X_F':<25} | {'Co-Support Recall X_A':<25} | {'Complete Path X_path':<25}")
+    print("-" * 135)
+    for k, d in results.items():
+        print(f"k = {k:<21} | {d['x_f']*100:5.1f}%                   | {d['x_a']*100:5.1f}%                      | {d['x_path']*100:5.1f}%")
+    print("=" * 135 + "\n")
+
+
+def run_exp1b_b1_hard_ablation(
+    worlds_count: int = 4,
+    top_k: int = 4,
+    hard_values: list[int] | None = None,
+    mutated_supervisor: str = "TAL",
+):
+    """Run hard-negative clutter dose-response ablation sweep (N_hard in 0, 2, 4, 8)."""
+    hards = hard_values or [0, 2, 4, 8]
+    retriever = BM25ScoredRetriever()
+
+    print("=" * 135)
+    print("      EXPERIMENT 1B-B1: HARD-NEGATIVE CLUTTER ABLATION SWEEP (ZERO LLM COST)")
+    print(f"      (Worlds: {worlds_count} | Fixed Top-k: {top_k} | N_hard: {hards})")
+    print("=" * 135)
+
+    results: dict[int, dict[str, float]] = {}
+
+    for nh in hards:
+        total_g1 = 0
+        founder_hits = 0
+        cosup_hits = 0
+        path_hits = 0
+
+        for world_idx in range(worlds_count):
+            seed = 6000 + world_idx
+            bundle = generate_exp1_branching_world(world_seed=seed, rotation_idx=world_idx, mutated_supervisor=mutated_supervisor)
+            station = bundle.station
+            founder_fact = bundle.mutated_founder_fact
+            easy_facts, hard_facts = generate_clutter_distractors(station, easy_count=4, hard_count=nh, seed=seed)
+
+            memory_pool = []
+            co_sup_ids = set()
+            founder_id = ""
+            for f in bundle.mutated_world.facts:
+                nid = f"node_{f.locus_id}_{f.fact_id[:8]}"
+                if f.fact_id == founder_fact.fact_id:
+                    founder_id = nid
+                if f.predicate == "manager":
+                    co_sup_ids.add(nid)
+                memory_pool.append(MemoryNode(
+                    node_id=nid, run_id="sweep", world_id="w", generation=0,
+                    locus_id=f.locus_id, node_type="source",
+                    natural_text=NaturalLanguageRenderer.render_fact(f), structured_json=f.model_dump()
+                ))
+
+            for c_f in easy_facts + hard_facts:
+                memory_pool.append(MemoryNode(
+                    node_id=f"node_dist_{c_f.locus_id}", run_id="sweep", world_id="w", generation=0,
+                    locus_id=c_f.locus_id, node_type="source",
+                    natural_text=NaturalLanguageRenderer.render_fact(c_f), structured_json=c_f.model_dump()
+                ))
+
+            for task in bundle.g1_tasks:
+                total_g1 += 1
+                res = retriever.rank(query=task.prompt, candidate_nodes=memory_pool, top_k=top_k, founder_node_id=founder_id, co_support_node_ids=co_sup_ids)
+                if res.founder_retrieved:
+                    founder_hits += 1
+                if res.co_support_retrieved:
+                    cosup_hits += 1
+                if res.path_retrieved:
+                    path_hits += 1
+
+        results[nh] = {
+            "x_f": founder_hits / total_g1,
+            "x_a": cosup_hits / total_g1,
+            "x_path": path_hits / total_g1,
+        }
+
+    print(f"{'Hard Negatives (N_hard)':<25} | {'Founder Recall X_F':<25} | {'Co-Support Recall X_A':<25} | {'Complete Path X_path':<25}")
+    print("-" * 135)
+    for nh, d in results.items():
+        print(f"N_hard = {nh:<16} | {d['x_f']*100:5.1f}%                   | {d['x_a']*100:5.1f}%                      | {d['x_path']*100:5.1f}%")
+    print("=" * 135 + "\n")
+
+
 def run_exp1b_b2_surface_feedback_assay(
     worlds_count: int = 4,
     top_k: int = 4,
@@ -478,14 +713,14 @@ def run_exp1b_b2_surface_feedback_assay(
     use_fake: bool = False,
     db_path: str | None = None,
 ):
-    """Execute Experiment 1B-B2: Controlled Surface-Area Feedback Assay (manipulating N_lineage)."""
+    """Execute Experiment 1B-B2: Controlled Lineage Surface-Area Scaling Assay."""
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
     db_file = db_path or f"gene_exp1b_b2_{timestamp}.db"
     db = Database(db_file)
     retriever = BM25ScoredRetriever()
 
     print("=" * 135)
-    print("      EXPERIMENT 1B-B2: CONTROLLED RETRIEVAL-SURFACE FEEDBACK ASSAY")
+    print("      EXPERIMENT 1B-B2: CONTROLLED LINEAGE SURFACE-AREA SCALING ASSAY")
     print(f"      (Worlds: {worlds_count} | Top-k: {top_k} | Distractor Pool: {clutter_count})")
     print(f"      (Database: {db_file})")
     print("=" * 135)
@@ -552,13 +787,13 @@ def run_exp1b_b2_surface_feedback_assay(
                 structured_json=founder_fact.model_dump(),
             )
 
-            # Synthesize N_lineage infected descendants sharing station context
+            # Synthesize N_lineage descendants
             lineage_nodes: list[MemoryNode] = []
             for i in range(n_lin):
                 lin_f = Fact(
                     subject=station,
-                    predicate=f"lineage_trait_{i}",
-                    object=f"VAL_{i}",
+                    predicate=f"lineage trait {i}",
+                    object=f"record {i}",
                     truth_value=True,
                     source_type="derived",
                     locus_id=f"locus_lin_{i}",
@@ -571,7 +806,7 @@ def run_exp1b_b2_surface_feedback_assay(
                         generation=1,
                         locus_id=f"locus_lin_{i}",
                         node_type="derived",
-                        natural_text=f"Station {station} lineage_trait_{i} VAL_{i}.",
+                        natural_text=f"Station {station} lineage trait {i} is record {i}.",
                         structured_json=lin_f.model_dump(),
                     )
                 )
@@ -606,10 +841,22 @@ def run_exp1b_b2_surface_feedback_assay(
             "mean_top_k_occupancy": avg_occ,
         }
 
+        # Persist to SQLite surface_feedback_sweeps
+        with db.conn:
+            db.conn.execute("""
+                INSERT OR REPLACE INTO surface_feedback_sweeps (
+                    sweep_id, run_id, world_id, n_lineage, top_k, pool_size,
+                    p_parent_in_top_k, p_any_lineage_in_top_k, mean_top_k_occupancy, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                f"sweep_n{n_lin}_k{top_k}", "exp1b_b2", "pooled_4w", n_lin, top_k,
+                len(candidate_pool), p_parent, p_any, avg_occ, datetime.now(timezone.utc).isoformat()
+            ))
+
     print("\n" + "=" * 135)
-    print("      EXPERIMENT 1B-B2: SURFACE-AREA FEEDBACK RESULTS")
+    print("      EXPERIMENT 1B-B2: SURFACE-AREA SCALING RESULTS")
     print("=" * 135)
-    print(f"{'Lineage Descendants (N_lin)':<28} | {'P(Parent in Top-k)':<20} | {'P(Any Lineage in Top-k)':<25} | {'Mean Top-k Occupancy (k=4)':<25}")
+    print(f"{'Lineage Multiplicity (N_lin)':<28} | {'P(Founder in Top-k)':<20} | {'P(Any Lineage in Top-k)':<25} | {'Mean Top-k Occupancy (k=4)':<25}")
     print("-" * 135)
     for n_lin, data in summary_results.items():
         print(f"N_lineage = {n_lin:<17} | {data['p_parent']*100:5.1f}%              | {data['p_any_lineage']*100:5.1f}%                   | {data['mean_top_k_occupancy']:.2f} / {top_k}")
@@ -619,11 +866,11 @@ def run_exp1b_b2_surface_feedback_assay(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run Experiment 1B-B Retrieval Assays")
-    parser.add_argument("--assay", type=str, default="1b-b1", choices=["1b-b1", "1b-b2"], help="Assay to run")
+    parser.add_argument("--assay", type=str, default="1b-b1", choices=["1b-b1", "1b-b2", "sweep-k", "sweep-hard"], help="Assay to run")
     parser.add_argument("--worlds", type=int, default=4, help="Number of worlds")
     parser.add_argument("--top-k", type=int, default=4, help="Top-k retrieval budget")
-    parser.add_argument("--easy-clutter", type=int, default=8, help="Easy clutter distractors")
-    parser.add_argument("--hard-clutter", type=int, default=8, help="Hard negative distractors")
+    parser.add_argument("--easy-clutter", type=int, default=4, help="Easy clutter distractors")
+    parser.add_argument("--hard-clutter", type=int, default=4, help="Hard negative distractors")
     parser.add_argument("--version", type=str, default="v2", choices=["v1", "v2"], help="Prompt schema version")
     parser.add_argument("--model", type=str, default="gemma3:12b", help="Model name")
     parser.add_argument("--fake", action="store_true", help="Use deterministic Fake client")
@@ -652,6 +899,19 @@ if __name__ == "__main__":
             model_name=args.model,
             use_fake=args.fake,
             db_path=args.db,
+        )
+    elif args.assay == "sweep-k":
+        run_exp1b_b1_k_sweep(
+            worlds_count=args.worlds,
+            k_values=[4, 5, 6, 7, 8],
+            easy_clutter=args.easy_clutter,
+            hard_clutter=args.hard_clutter,
+        )
+    elif args.assay == "sweep-hard":
+        run_exp1b_b1_hard_ablation(
+            worlds_count=args.worlds,
+            top_k=args.top_k,
+            hard_values=[0, 2, 4, 8],
         )
 
 

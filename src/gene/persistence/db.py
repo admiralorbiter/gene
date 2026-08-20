@@ -200,6 +200,19 @@ CREATE TABLE IF NOT EXISTS retrieval_events (
     FOREIGN KEY(run_id) REFERENCES runs(run_id)
 );
 
+CREATE TABLE IF NOT EXISTS surface_feedback_sweeps (
+    sweep_id TEXT PRIMARY KEY,
+    run_id TEXT NOT NULL,
+    world_id TEXT NOT NULL,
+    n_lineage INTEGER NOT NULL,
+    top_k INTEGER NOT NULL,
+    pool_size INTEGER NOT NULL,
+    p_parent_in_top_k REAL NOT NULL,
+    p_any_lineage_in_top_k REAL NOT NULL,
+    mean_top_k_occupancy REAL NOT NULL,
+    created_at TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS claims (
     claim_id TEXT PRIMARY KEY,
     node_id TEXT NOT NULL,
