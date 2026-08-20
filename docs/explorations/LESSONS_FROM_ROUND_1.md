@@ -33,17 +33,35 @@ There is a striking recursion between GENE's scientific domain and its software 
 
 ---
 
-## 3. The New Exploration Rule: The Unified Exploration Harness
+## 3. The Architecture for Future Explorations: Kernel, Adapter, Multiverse
 
-For all future exploratory batches (Round 2+), we establish the following development law:
+To prevent wrapper drift without imposing a brittle measurement monoculture, future exploration rounds adopt a **Three-Layer Architecture**:
 
-> **Parallelize the experiment; do not parallelize the measuring instrument.**
+```
+                       GENE THREE-LAYER EXPLORATION ARCHITECTURE
+                       
+    ┌────────────────────────────────────────────────────────────────────────┐
+    │ 1. INVARIANT MEASUREMENT KERNEL (ExplorationHarness)                   │
+    │    - Full CallSpec SHA-256 digest hashing                              │
+    │    - Automatic Ollama model SHA-256 digest resolution                  │
+    │    - Append-only immutable SQLite records (runs, calls, evaluations)   │
+    │    - Pre-execution lexical leak audit (fail-closed on schema leaks)    │
+    └───────────────────────────────────┬────────────────────────────────────┘
+                                        │
+    ┌───────────────────────────────────▼────────────────────────────────────┐
+    │ 2. CALIBRATED MODEL ADAPTER                                            │
+    │    - Minimal response-format adaptation required per model family      │
+    │    - Validates JSON schema adherence before phenotypic testing         │
+    └───────────────────────────────────┬────────────────────────────────────┘
+                                        │
+    ┌───────────────────────────────────▼────────────────────────────────────┐
+    │ 3. MEASUREMENT MULTIVERSE                                              │
+    │    - Deliberately varies presentation order, entity labels, syntax     │
+    │    - Tests whether conclusions are robust or prompt-fragile            │
+    └────────────────────────────────────────────────────────────────────────┘
+```
 
-Exploratory branches are encouraged to propose new worlds, topologies, prompts, and hypotheses. However, **no exploratory script may write its own ad-hoc persistence schema, bypass model digest resolution, or omit CallSpec logging.**
-
-Every live call in future exploratory batches must pass through a single, shared `ExplorationHarness` (`src/gene/experiments/exploration_harness.py`) that automatically enforces:
-- Strict `CallSpec` hashing and persistence.
-- Automatic Ollama model SHA-256 digest discovery and logging.
-- Standardized SQLite table schema (`exploration_runs`, `exploration_calls`, `exploration_evaluations`).
-- Machine-checked `DualOracle` evaluation logging.
-- Automatic detection of prompt schema answer leakage (e.g. asserting that schema templates contain no ground-truth IDs or answers).
+### The Three Operational Rules for Round 2+:
+1. **Centralize Provenance, Multiverse-Test the Interface:** Standardize the audit trail and persistence kernel, but deliberately vary representations to guard against measurement monoculture.
+2. **Pre-Execution Stage-1 Design Review:** Conduct a 5-minute adversarial audit of prompt schemas, evaluator returns, and baseline controls *before* spending live model calls.
+3. **Mandatory Exploration Harness:** Every exploratory live call must execute through `src/gene/experiments/exploration_harness.py`.
