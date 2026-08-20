@@ -258,9 +258,9 @@ def run_exp1b_c2_live_assay(
                     )
                     resp = client.chat(spec)
                     raw_json = resp.raw_response_text
-                    latency_ms = int((time.time() - start_time) * 1000)
-                    prompt_tokens = resp.prompt_eval_count
-                    eval_tokens = resp.eval_count
+                    latency_ms = int(resp.latency_ms) if resp.latency_ms else int((time.time() - start_time) * 1000)
+                    prompt_tokens = resp.prompt_tokens
+                    eval_tokens = resp.completion_tokens
 
                 # Parse JSON
                 try:
