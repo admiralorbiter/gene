@@ -1,17 +1,33 @@
 # Experiment Card — Track C: Epistemic Context Compiler Conformance Benchmark
 
-## 1. Core Hypothesis & Systems Mission
-- **Core Systems Hypothesis:** An Epistemic Context Compiler translating explicit Intermediate Representations (`EpistemicIR`) into structured neural contexts can significantly reduce serialization sensitivity, eliminate presentation-order fragility, and prevent ancestry laundering without modifying the underlying frozen LLM weights.
-- **The Conformance Objective:** The compiler is evaluated not on arbitrary prompt optimization ("which prompt gets higher accuracy?"), but on **conformance invariance** ("does the compiled prompt preserve the machine-readable semantics of the epistemic state?").
+## 1. Core Systems Hypothesis & Privilege Audit
+- **Systems Hypothesis:** An Epistemic Context Compiler translating explicit Intermediate Representations (`EpistemicState`) into structured neural contexts can eliminate permutation spread, preserve root counts, and prevent authority amplification without retraining frozen models.
+- **Privilege-Audited Pipeline Spectrum:** Rather than treating backends as opaque prompt variations, we evaluate a structured privilege spectrum:
 
-## 2. Compiler Backends Evaluated
-1. **`raw_flat`**: Naive list concatenation of active retrieved memories.
-2. **`canonical_support_blocks`**: Groups premises by formal derivation pathways ($S_F$).
-3. **`lineage_deduplicated`**: Resolves multi-copy descendant documents ($N_{\text{vis}}=4, N_{\text{root}}=1$) into a single consolidated ancestral root before serialization.
-4. **`support_certificate`**: Generates a verified derivation audit certificate prepended to the evidence base.
+```
+                            COMPILER PRIVILEGE MATRIX
+                            
+┌────────────────────────────┬──────────────┬──────────────┬──────────────┬──────────────────┐
+│ Pipeline                   │ Changes Order│ Drops/Merges │ Uses S_F     │ Emits Judgment   │
+├────────────────────────────┼──────────────┼──────────────┼──────────────┼──────────────────┤
+│ RAW_SERIALIZATION          │ No           │ No           │ No           │ No               │
+│ TOPOLOGY_AWARE_GROUPING    │ Yes          │ No           │ Yes          │ No               │
+│ GENEALOGICAL_NORMALIZATION │ Yes          │ Yes (Dedup)  │ Yes          │ No               │
+│ PROOF_CARRYING_CERTIFICATE │ Yes          │ No           │ Yes          │ Yes (Entitlement)│
+└────────────────────────────┴──────────────┴──────────────┴──────────────┴──────────────────┘
+```
 
-## 3. Conformance Benchmark Metrics
-- **Worst-Case Accuracy Across Permutations:** Minimum accuracy achieved over all test orderings.
-- **Serialization Disagreement Rate:** Pairwise inconsistency between semantically equivalent prompt serializations.
-- **Unsupported Concrete Output Rate:** Rate of emitting concrete answers when $S_F(c) = \emptyset$.
-- **Laundering Invariance:** Retention of $N=1$ root count under 4-copy paraphrase reproduction.
+## 2. Multi-Dimensional Conformance Vector $\mathcal{K} = (K_A, K_S, K_L, K_I)$
+We evaluate compiler performance across four orthogonal conformance dimensions:
+1. **$K_A$ (Answer Conformance):** Does the model's output match the formal entitlement status of the underlying epistemic state?
+2. **$K_S$ (Support Conformance):** Does the reported evidence path correspond to a valid $S_F$ minimal proof?
+3. **$K_L$ (Lineage Conformance):** Under 4-copy paraphrase reproduction ($N_{\text{vis}}=4, N_{\text{root}}=1$), does the compiler prevent root count inflation ($\widehat{N}=1$ vs $\widehat{N}=4$)?
+4. **$K_I$ (Invariance Conformance):** Does model behavior remain invariant across semantically equivalent premise orderings?
+
+## 3. Experimental Evaluation Matrix
+We test 4 Compiler Pipelines $\times$ 4 Test Ecologies (Entitled Canonical, Single-Path Pruned, 4-Copy Paraphrase, Unentitled Null) $\times$ 2 Stations = **32 calls**.
+
+## 4. Measurable Endpoints & Analysis
+- **Vector Conformance Score:** Joint satisfaction rate of $\mathcal{K} = (K_A \land K_S \land K_L \land K_I)$.
+- **Lineage Inflation Suppression:** Comparison of perceived root counts under `RAW_SERIALIZATION` vs `GENEALOGICAL_NORMALIZATION`.
+- **Unsupported Concrete Rate:** Frequency of hallucinating a concrete protocol when $S_F(c) = \emptyset$.
