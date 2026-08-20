@@ -2,14 +2,15 @@
 
 Evaluates delayed-adjudication post-lineage retrieval competition where Healthy
 Lineage H and Infected Lineage I coexist in the same shared memory pool and compete
-for top-k retrieval budget across 8 policies over 12 fully balanced, role-swapped
-ecologies with zero live LLM compute.
+for top-k retrieval budget across 8 core policies and full control budget sweeps over
+12 fully balanced, role-swapped ecologies with zero live LLM compute.
 """
 
 from __future__ import annotations
 
 import argparse
 from datetime import datetime, timezone
+import hashlib
 import itertools
 import json
 import math
@@ -319,7 +320,8 @@ def run_exp1b_c1b_shared_ecology(
             "world_seed": pair_seed,
         })
 
-    policies = [
+    # Core policies evaluated across the grid
+    core_policies = [
         "baseline",
         "signal_blind_uniform_thinning",
         "signal_conditioned_uniform_thinning",
@@ -330,10 +332,17 @@ def run_exp1b_c1b_shared_ecology(
         "oracle_upper_bound",
     ]
 
+    # Additional budget sweep policies for uniform thinning control
+    budget_sweep_m = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14]
+    budget_policies = [f"uniform_thinning_m{m}" for m in budget_sweep_m]
+
+    all_eval_policies = core_policies + budget_policies
+
     print("=" * 155)
-    print("      EXPERIMENT 1B-C1b: HARDENED SHARED-ECOLOGY SANDBOX & MULTI-CONTROL AUDIT")
-    print(f"      (Ecologies: {len(ecologies)} [6 pairs x 2 role swaps] | Policies: {len(policies)} | Monte Carlo N_mc: {n_mc_samples})")
-    print(f"      (Grid: {len(tpr_grid)} TPRs x {len(fpr_grid)} FPRs | k in {k_vals} | Database: {db_file} | Commit: {git_commit})")
+    print("      EXPERIMENT 1B-C1b: HARDENED SHARED-ECOLOGY SANDBOX & FULL CONTROL ENVELOPE")
+    print(f"      (Ecologies: {len(ecologies)} [6 pairs x 2 role swaps] | Policies: {len(core_policies)} core + {len(budget_policies)} budget sweeps)")
+    print(f"      (Grid: {len(tpr_grid)} TPRs x {len(fpr_grid)} FPRs | k in {k_vals} | MC Samples: N_mc={n_mc_samples})")
+    print(f"      (Database: {db_file} | Commit: {git_commit} | Mode: 12-ECOLOGY ROLE-BALANCED EXACT WEIGHTING)")
     print("=" * 155)
 
     # Initialize results structures
@@ -344,7 +353,7 @@ def run_exp1b_c1b_shared_ecology(
                 for tpr in tpr_grid
                 for fpr in fpr_grid
             }
-            for p in policies
+            for p in all_eval_policies
         }
         for k in k_vals
     }
@@ -369,11 +378,19 @@ def run_exp1b_c1b_shared_ecology(
 
         # 4 Discrete signal states: (S_H, S_I) in {0, 1}^2
         state_outcomes: dict[int, dict[str, dict[tuple[int, int], tuple[float, float]]]] = {
-            k: {p: {} for p in policies} for k in k_vals
+            k: {p: {} for p in all_eval_policies} for k in k_vals
         }
 
         for k in k_vals:
-            for policy in policies:
+            for policy in all_eval_policies:
+                # Parse budget sweep policies
+                if policy.startswith("uniform_thinning_m"):
+                    base_pol = "signal_blind_uniform_thinning"
+                    m_budget = int(policy.replace("uniform_thinning_m", ""))
+                else:
+                    base_pol = policy
+                    m_budget = 3
+
                 for s_h in [0, 1]:
                     for s_i in [0, 1]:
                         state = (s_h, s_i)
@@ -384,7 +401,7 @@ def run_exp1b_c1b_shared_ecology(
 
                         # Generate Monte Carlo samples for stochastic policies or single for deterministic
                         samples = EpistemicPolicyEngine.apply_policy_samples(
-                            policy=policy,
+                            policy=base_pol,
                             nodes=shared_pool,
                             root_signals=root_signals,
                             clean_root_id=clean_root_id,
@@ -392,7 +409,7 @@ def run_exp1b_c1b_shared_ecology(
                             signal_state=state,
                             base_seed=seed,
                             n_samples=n_mc_samples,
-                            fixed_thinning_budget=3,
+                            fixed_thinning_budget=m_budget,
                         )
 
                         sample_h_scores = []
@@ -425,14 +442,13 @@ def run_exp1b_c1b_shared_ecology(
                             i_ok = 1.0 if (i_g2_target_id in retrieved_ids_i and i_grid_target_id in retrieved_ids_i) else 0.0
                             sample_i_scores.append(i_ok)
 
-                        # Expected availability under this state
                         exp_h = sum(sample_h_scores) / len(sample_h_scores)
                         exp_i = sum(sample_i_scores) / len(sample_i_scores)
                         state_outcomes[k][policy][state] = (exp_h, exp_i)
 
         # Analytically weight across the (TPR, FPR) grid
         for k in k_vals:
-            for policy in policies:
+            for policy in all_eval_policies:
                 for tpr in tpr_grid:
                     for fpr in fpr_grid:
                         weights = get_analytic_state_weights(tpr, fpr)
@@ -446,9 +462,9 @@ def run_exp1b_c1b_shared_ecology(
                         frontier_results[k][policy][(tpr, fpr)]["c_h"] += w_ch / len(ecologies)
                         frontier_results[k][policy][(tpr, fpr)]["c_i"] += w_ci / len(ecologies)
 
-    # Compute S, containment, autoimmunity and persist to SQLite immunity_policy_results table
+    # Compute metrics and persist to SQLite immunity_policy_results
     for k in k_vals:
-        for policy in policies:
+        for policy in all_eval_policies:
             for tpr in tpr_grid:
                 for fpr in fpr_grid:
                     res = frontier_results[k][policy][(tpr, fpr)]
@@ -456,8 +472,31 @@ def run_exp1b_c1b_shared_ecology(
                     res["autoimmunity"] = 1.0 - res["c_h"]
                     res["containment"] = 1.0 - res["c_i"]
 
-                    drop_b = 3 if policy == "signal_blind_uniform_thinning" else 5
-                    g2_b = 2 if policy in ("generation_matched_thinning", "lineage_quarantine") else 0
+                    # Compute expected drop budget E[m]
+                    if policy.startswith("uniform_thinning_m"):
+                        exp_m = int(policy.replace("uniform_thinning_m", ""))
+                        g2_b = 0
+                    elif policy == "signal_blind_uniform_thinning":
+                        exp_m = 3
+                        g2_b = 0
+                    elif policy == "node_only_quarantine":
+                        exp_m = int(round(fpr + tpr))
+                        g2_b = 0
+                    elif policy in ("signal_conditioned_uniform_thinning", "lineage_quarantine", "random_family_quarantine"):
+                        exp_m = int(round(5 * (fpr + tpr)))
+                        g2_b = int(round(2 * (fpr + tpr)))
+                    elif policy == "generation_matched_thinning":
+                        exp_m = int(round(2 * (fpr + tpr)))
+                        g2_b = exp_m
+                    elif policy == "oracle_upper_bound":
+                        exp_m = 5
+                        g2_b = 2
+                    else:
+                        exp_m = 0
+                        g2_b = 0
+
+                    cfg_raw = f"{policy}_{k}_{tpr}_{fpr}_{exp_m}_{n_mc_samples}"
+                    cfg_hash = hashlib.sha256(cfg_raw.encode("utf-8")).hexdigest()[:16]
 
                     with db.conn:
                         db.conn.execute("""
@@ -470,7 +509,7 @@ def run_exp1b_c1b_shared_ecology(
                         """, (
                             f"c1b_k{k}_{policy}_tpr{int(tpr*100)}_fpr{int(fpr*100)}",
                             f"run_c1b_k{k}_{policy}",
-                            "shared_ecology_hardened",
+                            "shared_ecology_hardened_full_envelope",
                             policy,
                             "aggregate_12_ecologies",
                             "aggregate_12_ecologies",
@@ -484,10 +523,10 @@ def run_exp1b_c1b_shared_ecology(
                             res["s"],
                             res["containment"],
                             res["autoimmunity"],
-                            drop_b,
+                            exp_m,
                             g2_b,
                             f"monte_carlo_n{n_mc_samples}",
-                            f"tpr={tpr}_fpr={fpr}",
+                            cfg_hash,
                             git_commit,
                             datetime.now(timezone.utc).isoformat(),
                         ))
@@ -500,7 +539,7 @@ def run_exp1b_c1b_shared_ecology(
     print(f"{'Policy':<36} | {'TPR':<5} | {'FPR':<5} | {'C_H (Healthy)':<15} | {'C_I (Infected)':<15} | {'Containment (1-CI)':<18} | {'Autoimmunity (1-CH)':<20} | {'Separation (S)':<14}")
     print("-" * 155)
 
-    for policy in policies:
+    for policy in core_policies:
         for tpr in tpr_grid:
             for fpr in fpr_grid:
                 if (tpr, fpr) in frontier_results[k_display][policy]:
@@ -511,25 +550,18 @@ def run_exp1b_c1b_shared_ecology(
                     )
         print("-" * 155)
 
-    # Calculate True Matched-Coverage Pareto Envelope
-    # For each lineage point (c_h, c_i), find minimum control c_i satisfying control_c_h >= c_h
+    # Calculate True Matched-Coverage Pareto Envelope across ALL non-lineage controls and all budget sweeps
     print("\n" + "=" * 155)
-    print("      TRUE MATCHED-COVERAGE PARETO ENVELOPE: Delta_I(C_H) = min(C_I^ctrl | C_H^ctrl >= C_H^lin) - C_I^lin")
+    print("      TRUE NONDOMINATED CONTROL ENVELOPE: Delta_I(C_H) = min(C_I^ctrl | C_H^ctrl >= C_H^lin) - C_I^lin")
     print("=" * 155)
-    print(f"{'Detector Setting':<18} | {'Lineage C_H':<13} | {'Lineage C_I':<13} | {'Min Ctrl C_I':<14} | {'Best Control Policy':<32} | {'Delta_I Gain':<14}")
+    print(f"{'Detector Setting':<18} | {'Lineage C_H':<13} | {'Lineage C_I':<13} | {'Min Ctrl C_I':<14} | {'Best Control Configuration':<40} | {'Delta_I Gain':<14}")
     print("-" * 155)
 
-    # Collect all control points across all detector settings
+    # Collect all non-lineage control configurations
     control_points: list[dict[str, Any]] = []
-    control_policies = [
-        "signal_blind_uniform_thinning",
-        "signal_conditioned_uniform_thinning",
-        "generation_matched_thinning",
-        "random_family_quarantine",
-        "node_only_quarantine",
-    ]
+    all_control_policies = [p for p in all_eval_policies if p not in ("lineage_quarantine", "oracle_upper_bound")]
 
-    for p in control_policies:
+    for p in all_control_policies:
         for tpr in tpr_grid:
             for fpr in fpr_grid:
                 pt = frontier_results[k_display][p][(tpr, fpr)]
@@ -548,13 +580,13 @@ def run_exp1b_c1b_shared_ecology(
                 c_h_target = lin_pt["c_h"]
                 c_i_lin = lin_pt["c_i"]
 
-                # Eligible control points with coverage at least c_h_target
+                # Find eligible control configurations satisfying C_H >= c_h_target
                 eligible_ctrls = [cp for cp in control_points if cp["c_h"] >= c_h_target - 1e-4]
 
                 if eligible_ctrls:
                     best_ctrl = min(eligible_ctrls, key=lambda cp: cp["c_i"])
                     min_ctrl_ci = best_ctrl["c_i"]
-                    best_ctrl_desc = f"{best_ctrl['policy']} ({best_ctrl['tpr']:.2f}/{best_ctrl['fpr']:.2f})"
+                    best_ctrl_desc = f"{best_ctrl['policy']} (TPR={best_ctrl['tpr']:.2f}, FPR={best_ctrl['fpr']:.2f})"
                     delta_i = min_ctrl_ci - c_i_lin
                 else:
                     min_ctrl_ci = float("nan")
@@ -563,7 +595,7 @@ def run_exp1b_c1b_shared_ecology(
 
                 print(
                     f"TPR={tpr:.2f}, FPR={fpr:.2f} | {c_h_target:<13.3f} | {c_i_lin:<13.3f} | "
-                    f"{min_ctrl_ci:<14.3f} | {best_ctrl_desc:<32} | {delta_i:<+14.3f}"
+                    f"{min_ctrl_ci:<14.3f} | {best_ctrl_desc:<40} | {delta_i:<+14.3f}"
                 )
     print("-" * 155)
 

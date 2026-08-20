@@ -518,3 +518,26 @@ Potential policies:
 - germline/somatic promotion.
 
 Do not implement these until baseline lineage behavior is validated.
+
+---
+
+# 16. Methodological Principles & Backlog
+
+### 16.1 Frozen Methodological Principles
+
+1. **Causal-Role Equivariance**:
+   Whenever treatment and control identities can be reversed (e.g. Station A = Healthy, Station B = Infected), always evaluate both forward ($A \to B$) and swapped ($B \to A$) configurations. Any true causal effect must follow the causal role rather than the lexical or token identity.
+2. **Representation is Not Lineage Identity**:
+   Causal descent is established interventionally and derivationally through the ancestry graph, not by lexical similarity, embedding cosine distance, or coordinate persistence. Lineage identity is a causal relation, not a similarity relation.
+3. **Readout Validation Principle**:
+   Failure of a reporting interface is not evidence that the underlying information state is absent unless the readout channel itself has been independently validated. An interface failure must never be conflated with an information-state failure.
+
+### 16.2 Inactive Methodology Backlog (Do Not Build Yet)
+
+1. **Reported-Lineage Identifier Equivariance Diagnostic**:
+   Hold semantic evidence constant, remap model-facing parent labels/order (e.g. `mem_17 -> KAVO`, `mem_22 -> RILEN` vs `mem_17 -> ZURI`, `mem_22 -> TELO`), unmap responses, and quantify $E_{\text{ID}} = 1 - \text{agreement}$ across arbitrary labelings.
+2. **Transformation-Depth Assay**:
+   Measure how many semantic transformations a lineage can undergo before ancestral decoding or causal attribution becomes unreliable ($F_g = \prod_{i=1}^g f_i$).
+3. **Interventional vs Structural Parenthood Under Complex Transformations**:
+   Define parenthood interventionally rather than logging-structurally when summaries or multi-hop tools merge disparate parent nodes.
+

@@ -277,6 +277,6 @@ def test_exp1b_c1b_shared_ecology(tmp_path: Path):
 
     db = Database(db_path)
     with db.conn:
-        sweeps = db.conn.execute("SELECT COUNT(*) as cnt FROM immunity_policy_results WHERE sweep_type = 'shared_ecology_hardened'").fetchone()
-        assert sweeps["cnt"] == 8  # 8 policies x 1 grid point x 1 top_k
+        sweeps = db.conn.execute("SELECT COUNT(*) as cnt FROM immunity_policy_results WHERE sweep_type = 'shared_ecology_hardened_full_envelope'").fetchone()
+        assert sweeps["cnt"] == 20  # 8 core + 12 budget sweep policies x 1 grid point x 1 top_k
     db.close()
