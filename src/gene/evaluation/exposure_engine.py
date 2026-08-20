@@ -110,15 +110,22 @@ class ExposureDoseSummary(BaseModel):
     total_opportunities: int
     exposed_opportunities: int
     unexposed_opportunities: int
-    infected_children_generated: int
-    infected_children_written: int
+    
+    # Generated & Written Infected Children (Separating Transmitted from De-Novo)
+    infected_children_generated: int = 0  # Transmitted infected generated on exposed opportunities
+    transmitted_infected_generated: int = 0
+    transmitted_infected_written: int = 0
+    denovo_infected_written: int = 0
+    infected_children_written: int = 0    # Total infected written (transmitted + de-novo)
     
     # Factorized Physical Parameters
     contact_rate_X: float
     epistemic_transmissibility_tau_S: float | None = None
-    write_admission_W_hat: float | None = None
+    write_admission_W_hat: float | None = None  # W_hat = transmitted_written / transmitted_generated (strictly <= 1.0)
     write_admission_W_policy: float = 1.0
-    reproduction_number_R_S: float
+    reproduction_number_R_S: float              # Primary lineage transmission reproduction number R_trans
+    reproduction_number_R_trans: float = 0.0
+    reproduction_number_R_total_corruption: float = 0.0
     
     # Clean Arm Coverage Metrics (Reject-Option Framework)
     clean_opportunities: int
@@ -127,9 +134,11 @@ class ExposureDoseSummary(BaseModel):
     clean_coverage_C: float | None = None
     clean_utility_U: float | None = None  # Alias for backward compatibility
     
-    # Spontaneous / De-Novo Mutation on Unexposed Opportunities
+    # Spontaneous / De-Novo Mutation & Unsupported Concrete Rates on Unexposed Opportunities
     unexposed_false_children_emitted: int = 0
+    unexposed_concrete_children_emitted: int = 0
     mu_de_novo: float = 0.0
+    mu_unsupported_concrete: float = 0.0
     
     # Fidelity
     ancestral_fidelity_F2: float | None = None
@@ -219,21 +228,32 @@ class ExposureEngine:
         exp_opps = len([o for o in inf_opps if o.is_exposed])
         unexp_opps = tot_opps - exp_opps
         
-        # Generated infected children from exposed opportunities
-        gen_inf = len([o for o in inf_opps if o.is_exposed and o.is_generated and o.child_phenotype in ("semantic", "epistemic", "control")])
-        # Written infected children
-        wri_inf = len([o for o in inf_opps if o.is_written and o.child_phenotype in ("semantic", "epistemic", "control")])
+        # Transmitted infected children (strictly from EXPOSED opportunities)
+        gen_inf_trans = len([o for o in inf_opps if o.is_exposed and o.is_generated and o.child_phenotype in ("semantic", "epistemic", "control")])
+        wri_inf_trans = len([o for o in inf_opps if o.is_exposed and o.is_written and o.child_phenotype in ("semantic", "epistemic", "control")])
+        
+        # De-novo infected children (from UNEXPOSED opportunities)
+        wri_inf_denovo = len([o for o in inf_opps if not o.is_exposed and o.is_written and o.child_phenotype in ("semantic", "epistemic", "control")])
+        total_wri_inf = wri_inf_trans + wri_inf_denovo
 
         # Spontaneous / De-Novo mutations on unexposed opportunities:
-        # emitted concrete claims when unexposed (i.e. failed to abstain)
-        unexp_false = len([o for o in inf_opps if not o.is_exposed and o.is_generated and o.child_phenotype in ("semantic", "epistemic", "control")])
+        # false concrete claims when unexposed (i.e. failed to abstain)
+        unexp_false = len([o for o in inf_opps if not o.is_exposed and o.is_generated and o.child_phenotype in ("semantic", "epistemic", "control", "de_novo_error")])
         mu_de_novo = (unexp_false / unexp_opps) if unexp_opps > 0 else 0.0
+
+        # Unsupported concrete outputs on unexposed opportunities:
+        # ANY concrete output when evidence withheld (whether false or lucky guess)
+        unexp_concrete = len([o for o in inf_opps if not o.is_exposed and (o.is_generated or o.child_phenotype != "extinct")])
+        mu_unsupported_concrete = (unexp_concrete / unexp_opps) if unexp_opps > 0 else 0.0
 
         # Physical parameter calculations
         contact_x = exp_opps / num_parents if num_parents > 0 else 0.0
-        tau_s = gen_inf / exp_opps if exp_opps > 0 else None
-        w_hat = wri_inf / gen_inf if gen_inf > 0 else None
-        r_s = wri_inf / num_parents if num_parents > 0 else 0.0
+        tau_s = (gen_inf_trans / exp_opps) if exp_opps > 0 else None
+        w_hat = (wri_inf_trans / gen_inf_trans) if gen_inf_trans > 0 else None
+        
+        r_trans = (wri_inf_trans / num_parents) if num_parents > 0 else 0.0
+        r_total_corruption = (total_wri_inf / num_parents) if num_parents > 0 else 0.0
+        r_s = r_trans  # Primary lineage transmission reproduction number
 
         # Fidelity across exposed G2 infected children
         fidelities = [o.ancestral_allele_fidelity for o in inf_opps if o.is_exposed and o.ancestral_allele_fidelity is not None]
@@ -254,19 +274,26 @@ class ExposureEngine:
             total_opportunities=tot_opps,
             exposed_opportunities=exp_opps,
             unexposed_opportunities=unexp_opps,
-            infected_children_generated=gen_inf,
-            infected_children_written=wri_inf,
+            infected_children_generated=gen_inf_trans,
+            transmitted_infected_generated=gen_inf_trans,
+            transmitted_infected_written=wri_inf_trans,
+            denovo_infected_written=wri_inf_denovo,
+            infected_children_written=total_wri_inf,
             contact_rate_X=contact_x,
             epistemic_transmissibility_tau_S=tau_s,
             write_admission_W_hat=w_hat,
             write_admission_W_policy=1.0,
             reproduction_number_R_S=r_s,
+            reproduction_number_R_trans=r_trans,
+            reproduction_number_R_total_corruption=r_total_corruption,
             clean_opportunities=tot_clean,
             clean_correct_derived=clean_correct,
             clean_abstained_when_masked=clean_abstained_masked,
             clean_coverage_C=c_clean,
             clean_utility_U=c_clean,
             unexposed_false_children_emitted=unexp_false,
+            unexposed_concrete_children_emitted=unexp_concrete,
             mu_de_novo=mu_de_novo,
+            mu_unsupported_concrete=mu_unsupported_concrete,
             ancestral_fidelity_F2=f2,
         )

@@ -453,30 +453,31 @@ def run_exp1b_exposure_assay(
     # -------------------------------------------------------------
     # Final Dose-Response Summary Report
     # -------------------------------------------------------------
-    print("\n" + "=" * 115, flush=True)
+    print("\n" + "=" * 145, flush=True)
     print(f"         EXPERIMENT 1B-A1: BALANCED EXPOSURE DOSE-RESPONSE SUMMARY REPORT", flush=True)
-    print("=" * 115, flush=True)
-    print(f"{'Dose (p)':<10} | {'Contact X':<10} | {'tau_S':<8} | {'Write W_hat':<12} | {'R_S':<8} | {'Clean Cov C':<14} | {'mu_de_novo':<12} | {'Fidelity F2':<12} | {'Epidemic State'}", flush=True)
-    print("-" * 115, flush=True)
+    print("=" * 145, flush=True)
+    print(f"{'Dose (p)':<10} | {'Contact X':<10} | {'tau_S':<8} | {'Write W_hat':<12} | {'R_trans':<8} | {'R_total':<8} | {'Clean Cov C':<14} | {'mu_de_novo':<12} | {'mu_unsupp':<12} | {'Fidelity F2':<12} | {'Epidemic State'}", flush=True)
+    print("-" * 145, flush=True)
 
     for p in grid:
         s = exposure_engine.compute_summary(exposure_p=p)
         tau_str = f"{s.epistemic_transmissibility_tau_S:.2f}" if s.epistemic_transmissibility_tau_S is not None else "N/A"
         w_str = f"{s.write_admission_W_hat:.2f}" if s.write_admission_W_hat is not None else "N/A"
         c_str = f"{s.clean_coverage_C*100:.1f}% ({s.clean_correct_derived}/{s.clean_opportunities})" if s.clean_coverage_C is not None else "N/A"
-        mu_str = f"{s.mu_de_novo*100:.1f}% ({s.unexposed_false_children_emitted}/{s.unexposed_opportunities})" if s.unexposed_opportunities > 0 else "0.0%"
+        mu_denovo_str = f"{s.mu_de_novo*100:.1f}% ({s.unexposed_false_children_emitted}/{s.unexposed_opportunities})" if s.unexposed_opportunities > 0 else "0.0%"
+        mu_unsupp_str = f"{s.mu_unsupported_concrete*100:.1f}% ({s.unexposed_concrete_children_emitted}/{s.unexposed_opportunities})" if s.unexposed_opportunities > 0 else "0.0%"
         f2_str = f"{s.ancestral_fidelity_F2:.2f}" if s.ancestral_fidelity_F2 is not None else "N/A"
         
-        if s.reproduction_number_R_S > 1.0:
+        if s.reproduction_number_R_trans > 1.0:
             rep_str = "SUPERCRITICAL (R > 1) [Amplification]"
-        elif abs(s.reproduction_number_R_S - 1.0) < 1e-4:
+        elif abs(s.reproduction_number_R_trans - 1.0) < 1e-4:
             rep_str = "CRITICAL (R = 1) [Replacement Equilibrium]"
         else:
             rep_str = "SUBCRITICAL (R < 1) [Lineage Decay]"
         
-        print(f"p = {p:<6.2f} | X = {s.contact_rate_X:<6.2f} | {tau_str:<8} | {w_str:<12} | {s.reproduction_number_R_S:<8.2f} | {c_str:<14} | {mu_str:<12} | {f2_str:<12} | {rep_str}", flush=True)
+        print(f"p = {p:<6.2f} | X = {s.contact_rate_X:<6.2f} | {tau_str:<8} | {w_str:<12} | {s.reproduction_number_R_trans:<8.2f} | {s.reproduction_number_R_total_corruption:<8.2f} | {c_str:<14} | {mu_denovo_str:<12} | {mu_unsupp_str:<12} | {f2_str:<12} | {rep_str}", flush=True)
 
-    print("=" * 115 + "\n", flush=True)
+    print("=" * 145 + "\n", flush=True)
     db.close()
 
 

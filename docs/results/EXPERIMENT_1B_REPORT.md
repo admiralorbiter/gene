@@ -24,13 +24,13 @@ By varying retrieval contact probability $p \in \{0.0, 0.25, 0.50, 0.75, 1.0\}$ 
 
 ### Key Empirical Findings
 1. **Factorization Invariance ($\hat{\tau}_S = 1.00$ Everywhere Estimable)**:
-   Across all exposure conditions ($p > 0$), conditional epistemic transmissibility was **strictly invariant at $\hat{\tau}_S = 1.00$** ($40 / 40$ pooled exposed opportunities generated locally derivable infected children: $4/4$ at $p=0.25$, $8/8$ at $p=0.50$, $12/12$ at $p=0.75$, $16/16$ at $p=1.00$). Transmission scaled strictly as a linear contact process: $R_S(p) = X(p) = 2p$.
+   Across all exposure conditions ($p > 0$), conditional epistemic transmissibility was **strictly invariant at $\hat{\tau}_S = 1.00$** ($40 / 40$ pooled exposed opportunities generated locally derivable infected children: $4/4$ at $p=0.25$, $8/8$ at $p=0.50$, $12/12$ at $p=0.75$, $16/16$ at $p=1.00$). Transmission scaled strictly as a linear contact process: $R_{\text{trans}}(p) = X(p) \times \hat{\tau}_S \times \hat{W} = 2p$.
 2. **Empirical Replacement Boundary ($p_c = 0.50$)**:
-   The architecture-implied critical boundary at $p = 0.50$ was experimentally recovered ($X = 1.00 \implies R_S = 1.00$). Under Galton–Watson i.i.d. branching assumptions, $p < 0.50$ defines a sub-replacement one-step regime ($R_S < 1.0$), while $p > 0.50$ defines a supercritical regime ($R_S > 1.0$).
-3. **The Uniform-Thinning Frontier ($R_S = 2 C_{\text{clean}}$)**:
+   The architecture-implied critical boundary at $p = 0.50$ was experimentally recovered ($X = 1.00 \implies R_{\text{trans}} = 1.00$). Under Galton–Watson i.i.d. branching assumptions, $p < 0.50$ defines a sub-replacement one-step regime ($R_{\text{trans}} < 1.0$), while $p > 0.50$ defines a supercritical regime ($R_{\text{trans}} > 1.0$).
+3. **The Uniform-Thinning Frontier ($R_{\text{trans}} = 2 C_{\text{clean}}$)**:
    Indiscriminately thinning memory access reduces clean answer coverage proportionally: $C_{\text{clean}}(p) = p$. Under reject-option classification, unexposed clean tasks cleanly abstained ($100\%$ epistemic safety), but answer availability dropped linearly.
-4. **Zero Spontaneous / De-Novo Mutations ($\mu_{\text{de\_novo}} = 0.00$)**:
-   Across all 40 unexposed opportunities ($16$ at $p=0.0$, $12$ at $p=0.25$, $8$ at $p=0.50$, $4$ at $p=0.75$), **zero false concrete claims were emitted without prompt exposure** ($\mu_{\text{de\_novo}} = 0 / 40 = 0.0\%$). Every unexposed task cleanly abstained (`UNKNOWN`) with state vector $(0, 0, 1, 1, 1)$, proving that downstream contamination was $100\%$ causal and lineage-transmitted.
+4. **Zero Spontaneous / De-Novo Mutations & Zero Unsupported Output ($\mu_{\text{de\_novo}} = 0.00$, $\mu_{\text{unsupp}} = 0.00$)**:
+   Across all 40 unexposed opportunities ($16$ at $p=0.0$, $12$ at $p=0.25$, $8$ at $p=0.50$, $4$ at $p=0.75$), **zero false concrete claims were emitted without prompt exposure** ($\mu_{\text{de\_novo}} = 0 / 40 = 0.0\%$) and **zero ungrounded concrete outputs of any kind were generated** ($\mu_{\text{unsupp}} = 0 / 40 = 0.0\%$). Every unexposed task cleanly abstained (`UNKNOWN`) with state vector $(0, 0, 1, 1, 1)$, proving that downstream contamination was $100\%$ causal and lineage-transmitted ($R_{\text{total-corruption}} = R_{\text{trans}} = 2p$).
 5. **Ancestral Allele Fidelity ($\hat{F}_2 = 1.00$)**:
    Whenever contact occurred, ancestral symbol identity was preserved across two generational transformations without observable drift ($\hat{F}_2 = 40/40 = 1.00$).
 
@@ -40,14 +40,14 @@ By varying retrieval contact probability $p \in \{0.0, 0.25, 0.50, 0.75, 1.0\}$ 
 
 **Database:** `gene_exp1b_exposure_v2_20260820_022505.db` (240 invocations = 120 matched pairs)
 
-| Dose ($p$) | Contact Rate $X(p)$ | Transmissibility $\hat{\tau}_S$ | Admission $\hat{W}_{\text{hat}}$ | Reproduction $R_S(p)$ | Clean Coverage $C_{\text{clean}}(p)$ | De-Novo Rate $\mu_{\text{de\_novo}}$ | Fidelity $\hat{F}_2$ | Epidemic Regime |
-| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **$p = 0.00$** | $X = 0.00$ | N/A | N/A ($W_{\text{pol}}=1.0$) | **$0.00$** | **$0.0\%$** ($0/16$) | **$0.0\%$** ($0/16$) | N/A | **Sub-replacement** ($R_S < 1$) |
-| **$p = 0.25$** | $X = 0.50$ | **$1.00$** ($4/4$) | **$1.00$** ($4/4$) | **$0.50$** | **$25.0\%$** ($4/16$) | **$0.0\%$** ($0/12$) | **$1.00$** | **Sub-replacement** ($R_S < 1$) |
-| **$p = 0.50$** | $X = 1.00$ | **$1.00$** ($8/8$) | **$1.00$** ($8/8$) | **$1.00$** | **$50.0\%$** ($8/16$) | **$0.0\%$** ($0/8$) | **$1.00$** | **Critical Mean** ($R_S = 1$) |
-| **$p = 0.75$** | $X = 1.50$ | **$1.00$** ($12/12$) | **$1.00$** ($12/12$) | **$1.50$** | **$75.0\%$** ($12/16$) | **$0.0\%$** ($0/4$) | **$1.00$** | **Supercritical** ($R_S > 1$) |
-| **$p = 1.00$** | $X = 2.00$ | **$1.00$** ($16/16$) | **$1.00$** ($16/16$) | **$2.00$** | **$100.0\%$** ($16/16$) | **$0.0\%$** ($0/0$) | **$1.00$** | **Supercritical** ($R_S > 1$) |
-| **POOLED** | — | **$1.00$** ($40/40$) | **$1.00$** ($40/40$) | — | — | **$0.0\%$** ($0/40$) | **$1.00$** ($40/40$) | — |
+| Dose ($p$) | Contact Rate $X(p)$ | Transmissibility $\hat{\tau}_S$ | Admission $\hat{W}_{\text{hat}}$ | $R_{\text{trans}}(p)$ | $R_{\text{total}}(p)$ | Clean Coverage $C_{\text{clean}}(p)$ | De-Novo $\mu_{\text{de\_novo}}$ | Unsupp $\mu_{\text{unsupp}}$ | Fidelity $\hat{F}_2$ | Epidemic Regime |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **$p = 0.00$** | $X = 0.00$ | N/A | N/A ($W_{\text{pol}}=1.0$) | **$0.00$** | **$0.00$** | **$0.0\%$** ($0/16$) | **$0.0\%$** ($0/16$) | **$0.0\%$** ($0/16$) | N/A | **Sub-replacement** ($R < 1$) |
+| **$p = 0.25$** | $X = 0.50$ | **$1.00$** ($4/4$) | **$1.00$** ($4/4$) | **$0.50$** | **$0.50$** | **$25.0\%$** ($4/16$) | **$0.0\%$** ($0/12$) | **$0.0\%$** ($0/12$) | **$1.00$** | **Sub-replacement** ($R < 1$) |
+| **$p = 0.50$** | $X = 1.00$ | **$1.00$** ($8/8$) | **$1.00$** ($8/8$) | **$1.00$** | **$1.00$** | **$50.0\%$** ($8/16$) | **$0.0\%$** ($0/8$) | **$0.0\%$** ($0/8$) | **$1.00$** | **Critical Mean** ($R = 1$) |
+| **$p = 0.75$** | $X = 1.50$ | **$1.00$** ($12/12$) | **$1.00$** ($12/12$) | **$1.50$** | **$1.50$** | **$75.0\%$** ($12/16$) | **$0.0\%$** ($0/4$) | **$0.0\%$** ($0/4$) | **$1.00$** | **Supercritical** ($R > 1$) |
+| **$p = 1.00$** | $X = 2.00$ | **$1.00$** ($16/16$) | **$1.00$** ($16/16$) | **$2.00$** | **$2.00$** | **$100.0\%$** ($16/16$) | **$0.0\%$** ($0/0$) | **$0.0\%$** ($0/0$) | **$1.00$** | **Supercritical** ($R > 1$) |
+| **POOLED** | — | **$1.00$** ($40/40$) | **$1.00$** ($40/40$) | — | — | — | **$0.0\%$** ($0/40$) | **$0.0\%$** ($0/40$) | **$1.00$** ($40/40$) | — |
 
 ---
 
