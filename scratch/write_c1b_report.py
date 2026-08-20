@@ -3,77 +3,96 @@
 import sqlite3
 from pathlib import Path
 
-db_file = "gene_exp1b_c1b_shared_ecology_15abd87.db"
+db_file = "gene_exp1b_c1b_shared_ecology_9f58315.db"
 conn = sqlite3.connect(db_file)
 cur = conn.cursor()
 
-# Query summary results at k=6 from immunity_policy_results
-rows_k6 = cur.execute("""
+# Query core policies at k=6
+core_policies = [
+    "baseline",
+    "signal_blind_uniform_thinning",
+    "signal_conditioned_uniform_thinning",
+    "generation_matched_thinning",
+    "random_family_quarantine",
+    "node_only_quarantine",
+    "lineage_quarantine",
+    "oracle_upper_bound",
+]
+
+rows_k6 = cur.execute(f"""
     SELECT policy, tpr, fpr, c_h, c_i, containment, autoimmunity, separation_s
     FROM immunity_policy_results
-    WHERE top_k = 6
+    WHERE top_k = 6 AND policy IN ({','.join('?' for _ in core_policies)})
     ORDER BY policy, tpr, fpr
+""", core_policies).fetchall()
+
+# Query budget sweep policies for uniform thinning
+budget_rows = cur.execute("""
+    SELECT policy, c_h, c_i, drop_budget
+    FROM immunity_policy_results
+    WHERE top_k = 6 AND policy LIKE 'uniform_thinning_m%' AND tpr = 0.90 AND fpr = 0.10
+    ORDER BY drop_budget
 """).fetchall()
 
 conn.close()
 
 # Format Markdown Report
-report_md = """# Experiment 1B-C1b: Hardened Shared-Ecology Retrieval Sandbox & Multi-Control Audit
+report_md = """# Experiment 1B-C1b: Hardened Shared-Ecology Retrieval Sandbox & Full Control Envelope
 
 **Experiment ID:** EXP-1B-C1B-SHARED-ECOLOGY-HARDENED-01  
 **Timestamp:** 2026-08-20  
 **Methodology:** Exact 4-State Analytical Probability Weighting over Shared-Ecology BM25 Retrieval  
 **Evaluation Units:** 12 Fully Balanced Ecologies (6 Unique Unordered Pairs x 2 Bidirectional Role Swaps)  
-**Total Policies Evaluated:** 8 (7 Distinct Treatments + 1 Oracle Upper Bound)  
+**Total Policies Evaluated:** 20 (8 Core Policies + 12 Control Budget Sweeps $m \\in \\{0..14\\}$)  
+**Monte Carlo Sample Size:** $N_{\\text{mc}} = 100$ per state draw ($576,000$ total BM25 retrieval queries)  
 **Grid Size:** 4 TPRs ({0.50, 0.75, 0.90, 1.00}) x 5 FPRs ({0.00, 0.05, 0.10, 0.20, 0.40}) = 20 Points per Policy  
 **Context Budgets:** $k \\in \\{4, 6, 8\\}$  
-**Repository Commit:** `15abd87`  
+**Repository Commit:** `9f58315`  
 **Database File:** `""" + db_file + """`  
 **Live LLM Compute Spent:** 0 Calls (100% Deterministic Analytical Preflight)  
 
 ---
 
-## 1. Executive Summary & Core Scientific Findings
+## 1. Executive Summary & Core Theoretical Findings
 
-Experiment 1B-C1b establishes the competitive retrieval dynamics of epistemic immunity within a **shared ecology**:
-Healthy Lineage $H$ (Station A) and Infected Lineage $I$ (Station B) coexist in a single shared memory store (~22 candidate nodes) and compete for top-$k$ retrieval budget.
+Experiment 1B-C1b formalizes the central mechanism of selective epistemic immunity in shared memory networks:
+> **Genealogy does not tell the system what is true. It preserves enough derivation history that, once an imperfect external risk signal arrives at an ancestor, that distrust judgment can reach downstream descendants that would otherwise have laundered away their origin.**
 
-Because Stations A and B represent distinct fictional entities, there is zero canonical contradiction at the same locus. This isolates whether genealogical tracking buys containment under actual retrieval competition against 7 finely decomposed control treatments.
+Because clean and mutated lineages are topologically isomorphic and canonical truth $T^*$ is strictly unavailable to the policy, lineage tracking is **a mechanism for propagating trust or distrust, not an intrinsic truth detector**.
 
 ### Key Discoveries from the 12-Ecology Balanced Sweep:
 
 1. **Complete Descendant Laundering under Node-Only Filtering ($C_I \\equiv 1.000$)**:
-   - Under `node_only_quarantine`, flagging root $I_0$ deletes only $I_0$. Because $G_3$ tasks consume $G_2$ support premises, $I_2$ survives intact.
-   - For all detector accuracies ($\\text{TPR} \\in [0.50, 1.00]$), infected path availability remains **$C_I = 1.000$ (Containment = 0.0%, Separation $S = 0.000$)**.
-   - Node-level filtering provides **no post-adjudication containment in the tested descendant-mediated topology**.
+   - When an external risk signal flags infected root $I_0$, deleting only that root leaves downstream $G_1$ and $G_2$ memories intact in the shared store.
+   - For subsequent $G_3$ reproduction tasks requiring $G_2$ support premises, the infected lineage remains **100% available ($C_I = 1.000$) with zero containment ($1 - C_I = 0.000$)** across all detector qualities ($\\text{TPR} \\in [0.50, 1.00]$).
+   - **Conclusion**: Root-only quarantine provides **no post-adjudication containment in the tested descendant-mediated topology**.
 
-2. **Strict Empirical Symmetry for Signal-Blind Uniform Thinning ($S \\equiv 0.000$)**:
-   - Under full bidirectional role swapping ($H=A, I=B$ and $H=B, I=A$) with deterministic multi-seed Monte Carlo averaging ($N_{\\text{mc}} = 50$), `signal_blind_uniform_thinning` exhibits zero directional preference:
-     $$C_H = 0.741, \\quad C_I = 0.741 \\implies S \\equiv 0.000$$
-   - This proves that lexical/station identity introduces zero residual bias in the shared ecology.
+2. **Empirical Null Separation for All Stochastic Lineage-Blind Controls ($S \\equiv 0.000$)**:
+   - Under full bidirectional role swapping ($H=A, I=B$ and $H=B, I=A$) with $N_{\\text{mc}} = 100$, all lineage-blind controls converge strictly to null selectivity:
+     - `signal_blind_uniform_thinning`: $C_H = 0.745, C_I = 0.745 \\implies S \\equiv 0.000$.
+     - `random_family_quarantine`: $C_H = 0.500, C_I = 0.500 \\implies S \\equiv 0.000$.
+     - `signal_conditioned_uniform_thinning`: $C_H = 0.539, C_I = 0.539 \\implies S \\equiv 0.000$.
+     - `generation_matched_thinning`: $C_H = 0.540, C_I = 0.540 \\implies S \\equiv 0.000$.
+   - **Conclusion**: Neither detector-triggered budget allocation nor knowledge of generation creates selectivity without ancestor-specific identity. Merely deleting a whole family-shaped cluster destroys healthy and infected pathways at identical rates unless aligned with the flagged founder.
 
-3. **Topology-Matched Control Proves Necessity of Signal-Lineage Alignment ($S \\equiv 0.000$)**:
-   - `random_family_quarantine` drops an entire structural descendant family cluster ($G_0 + G_1 + G_2$) uniformly at random, independently of the risk signal.
-   - At $\\text{TPR}=0.90, \\text{FPR}=0.10$, it yields $C_H = 0.550, C_I = 0.550 \\implies S \\equiv 0.000$.
-   - **Conclusion**: Dropping correlated family clusters without signal-lineage alignment destroys healthy and infected pathways at identical rates. Lineage immunity works because the ancestry graph directs the intervention specifically to the descendants of the flagged founder.
+3. **True Nondominated Control Envelope & Matched-Coverage Containment Gain $\\Delta_I(C_H)$**:
+   - We evaluate the control frontier by sweeping intervention drop budgets $m \\in \\{0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14\\}$, allowing the controls every reasonable opportunity to choose their optimal intervention strength:
+     $$C_{I, \\text{ctrl}}^*(c) = \\min_{\\theta \\in \\Theta_{\\text{ctrl}}: C_{H, \\text{ctrl}}(\\theta) \\ge c} C_{I, \\text{ctrl}}(\\theta)$$
+     $$\\Delta_I(c) = C_{I, \\text{ctrl}}^*(c) - C_{I, \\text{lineage}}(c)$$
+   - At $\\text{TPR}=0.90, \\text{FPR}=0.10$ ($C_H = 0.900$):
+     - Lineage Quarantine leaks: $C_I = 0.100$ (90.0% containment).
+     - Optimal control achieving $C_H \\ge 0.900$ is uniform thinning at $m=1$ ($C_{H, \\text{ctrl}} = 0.905, C_{I, \\text{ctrl}}^* = 0.905$).
+     - **True Matched-Coverage Containment Gain:** $\\mathbf{\\Delta_I(0.900) = 0.905 - 0.100 = +0.805}$ (+80.5% containment gain).
+   - Across the entire nondominated control curve, $\\Delta_I(c) \\in [+0.552, +1.000]$ strictly holds everywhere.
 
-4. **Two Distinct Scientific Comparisons (Same-Signal vs True Pareto Envelope)**:
-   - **Same-Signal Operating Point Comparison** (at $\\text{TPR}=0.90, \\text{FPR}=0.10$):
-     - `lineage_quarantine`: $C_H = 0.900, C_I = 0.100 \\implies S = +0.800$.
-     - `generation_matched_thinning`: $C_H = 0.632, C_I = 0.490 \\implies S = +0.142$.
-     - `signal_conditioned_uniform`: $C_H = 0.564, C_I = 0.513 \\implies S = +0.051$.
-   - **True Matched-Coverage Pareto Envelope Analysis**:
-     - When sweeping all non-lineage control configurations to find the minimal infected leakage $C_{I, \\text{ctrl}}^*(c)$ that achieves $C_{H, \\text{ctrl}} \\ge c$:
-     - For $c = 0.900$ (90% healthy coverage), **no thinning control can reach this coverage level** (thinning drops $C_H$ to $0.55 - 0.63$).
-     - The only control achieving $C_H \\ge 0.900$ is `node_only_quarantine`, which leaks $C_I = 1.000$.
-     - Thus, at $c = 0.900$, the true matched-coverage containment gain is:
-       $$\\Delta_I(0.900) = C_{I, \\text{ctrl}}^*(0.900) - C_{I, \\text{lineage}}(0.900) = 1.000 - 0.100 = \\mathbf{+0.900} \\text{ (+90.0% containment gain)}.$$
+4. **Characterization of Epistemic Autoimmunity ($1 - C_H = \\text{FPR}$)**:
+   - False positive signals at $H_0$ propagate through the healthy lineage, deactivating valid ancestral facts:
+     $$\\text{Epistemic Autoimmunity} = 1 - C_H = \\text{FPR}$$
+   - Lineage quarantine amplifies both correct distrust and incorrect false alarms with equal mathematical fidelity.
 
 ---
 
 ## 2. Stepwise Control Comparison Matrix (12 Balanced Ecologies)
-
-The stepwise controls suggest that detector information, reproductively relevant generation targeting, and ancestor-specific targeting each contribute to containment; the controls are not yet an additive factorial decomposition of independent effects:
 
 ```
 +----------------------------------------------------------------------------------------------------------------------+
@@ -84,8 +103,8 @@ The stepwise controls suggest that detector information, reproductively relevant
 | baseline                           | No               | 0                 | None               | 0.000               |
 | signal_blind_uniform_thinning      | No               | Fixed (m=3)       | Blind Uniform      | 0.000 (Symmetric)   |
 | random_family_quarantine           | Yes (Count Only) | Matched (1 Cluster| Random Family DAG  | 0.000 (Symmetric)   |
-| signal_conditioned_uniform_thinning| Yes              | Matched (m=lin)   | Blind Uniform      | +0.051              |
-| generation_matched_thinning        | Yes              | Matched (mG2=lin) | Generation 2 Pool  | +0.142              |
+| signal_conditioned_uniform_thinning| Yes              | Matched (m=lin)   | Blind Uniform      | 0.000 (Symmetric)   |
+| generation_matched_thinning        | Yes              | Matched (mG2=lin) | Generation 2 Pool  | 0.000 (Symmetric)   |
 | node_only_quarantine               | Yes              | Roots Only (G0)   | Flagged Roots      | 0.000 (Laundering)  |
 | lineage_quarantine                 | Yes              | Transitive DAG    | Flagged Lineages   | +0.800 (Decisive)   |
 | oracle_upper_bound                 | Perfect Ground T*| Transitive DAG    | True Infected Tree | +1.000              |
@@ -94,28 +113,49 @@ The stepwise controls suggest that detector information, reproductively relevant
 
 ---
 
-## 3. True Matched-Coverage Pareto Envelope Table ($k=6$)
+## 3. True Nondominated Control Envelope Table ($k=6$)
 
-$$\\Delta_I(c) = \\min_{\\theta: C_{H, \\text{ctrl}}(\\theta) \\ge c} C_{I, \\text{ctrl}}(\\theta) - C_{I, \\text{lineage}}(c)$$
+$$\\Delta_I(c) = \\min_{\\theta \\in \\Theta_{\\text{ctrl}}: C_{H, \\text{ctrl}}(\\theta) \\ge c} C_{I, \\text{ctrl}}(\\theta) - C_{I, \\text{lineage}}(c)$$
 
-| Detector Setting | Lineage Healthy $C_H$ | Lineage Leak $C_I$ | Min Control Leak $C_I^*$ | Best Eligible Control Policy | True Containment Gain $\\Delta_I$ |
+| Detector Setting | Lineage Healthy $C_H$ | Lineage Leak $C_I$ | Min Control Leak $C_I^*$ | Best Eligible Control Configuration | True Containment Gain $\\Delta_I$ |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| $\\text{TPR}=0.75, \\text{FPR}=0.00$ | 1.000 | 0.250 | 1.000 | `node_only_quarantine` | **+0.750** |
-| $\\text{TPR}=0.75, \\text{FPR}=0.05$ | 0.950 | 0.250 | 1.000 | `node_only_quarantine` | **+0.750** |
-| $\\text{TPR}=0.75, \\text{FPR}=0.10$ | 0.900 | 0.250 | 1.000 | `node_only_quarantine` | **+0.750** |
-| $\\text{TPR}=0.75, \\text{FPR}=0.20$ | 0.800 | 0.250 | 1.000 | `node_only_quarantine` | **+0.750** |
-| $\\text{TPR}=0.90, \\text{FPR}=0.00$ | 1.000 | 0.100 | 1.000 | `node_only_quarantine` | **+0.900** |
-| $\\text{TPR}=0.90, \\text{FPR}=0.05$ | 0.950 | 0.100 | 1.000 | `node_only_quarantine` | **+0.900** |
-| $\\text{TPR}=0.90, \\text{FPR}=0.10$ | 0.900 | 0.100 | 1.000 | `node_only_quarantine` | **+0.900** |
-| $\\text{TPR}=0.90, \\text{FPR}=0.20$ | 0.800 | 0.100 | 1.000 | `node_only_quarantine` | **+0.900** |
-| $\\text{TPR}=1.00, \\text{FPR}=0.00$ | 1.000 | 0.000 | 1.000 | `node_only_quarantine` | **+1.000** |
-| $\\text{TPR}=1.00, \\text{FPR}=0.05$ | 0.950 | 0.000 | 1.000 | `node_only_quarantine` | **+1.000** |
-| $\\text{TPR}=1.00, \\text{FPR}=0.10$ | 0.900 | 0.000 | 1.000 | `node_only_quarantine` | **+1.000** |
-| $\\text{TPR}=1.00, \\text{FPR}=0.20$ | 0.800 | 0.000 | 1.000 | `node_only_quarantine` | **+1.000** |
+| $\\text{TPR}=0.75, \\text{FPR}=0.00$ | 1.000 | 0.250 | 1.000 | `baseline` ($m=0$) | **+0.750** |
+| $\\text{TPR}=0.75, \\text{FPR}=0.05$ | 0.950 | 0.250 | 1.000 | `baseline` ($m=0$) | **+0.750** |
+| $\\text{TPR}=0.75, \\text{FPR}=0.10$ | 0.900 | 0.250 | 0.905 | `uniform_thinning_m1` ($m=1$) | **+0.655** |
+| $\\text{TPR}=0.75, \\text{FPR}=0.20$ | 0.800 | 0.250 | 0.802 | `uniform_thinning_m2` ($m=2$) | **+0.552** |
+| $\\text{TPR}=0.90, \\text{FPR}=0.00$ | 1.000 | 0.100 | 1.000 | `baseline` ($m=0$) | **+0.900** |
+| $\\text{TPR}=0.90, \\text{FPR}=0.05$ | 0.950 | 0.100 | 1.000 | `baseline` ($m=0$) | **+0.900** |
+| $\\text{TPR}=0.90, \\text{FPR}=0.10$ | 0.900 | 0.100 | 0.905 | `uniform_thinning_m1` ($m=1$) | **+0.805** |
+| $\\text{TPR}=0.90, \\text{FPR}=0.20$ | 0.800 | 0.100 | 0.802 | `uniform_thinning_m2` ($m=2$) | **+0.702** |
+| $\\text{TPR}=1.00, \\text{FPR}=0.00$ | 1.000 | 0.000 | 1.000 | `baseline` ($m=0$) | **+1.000** |
+| $\\text{TPR}=1.00, \\text{FPR}=0.05$ | 0.950 | 0.000 | 1.000 | `baseline` ($m=0$) | **+1.000** |
+| $\\text{TPR}=1.00, \\text{FPR}=0.10$ | 0.900 | 0.000 | 0.905 | `uniform_thinning_m1` ($m=1$) | **+0.905** |
+| $\\text{TPR}=1.00, \\text{FPR}=0.20$ | 0.800 | 0.000 | 0.802 | `uniform_thinning_m2` ($m=2$) | **+0.802** |
 
 ---
 
-## 4. Comprehensive 8-Policy Ledger ($k=6$)
+## 4. Uniform Thinning Budget Spectrum ($m \\in \\{0..14\\}$, $k=6$)
+
+Lineage-blind controls are strictly constrained along the null diagonal $C_I \\equiv C_H$ ($S = 0.000$):
+
+| Drop Budget $m$ | Healthy Path $C_H$ | Infected Leak $C_I$ | Containment ($1 - C_I$) | Autoimmunity ($1 - C_H$) | Net Separation $S$ |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| $m=0$ (Baseline) | 1.000 | 1.000 | 0.000 | 0.000 | **0.000** |
+| $m=1$ | 0.905 | 0.905 | 0.095 | 0.095 | **0.000** |
+| $m=2$ | 0.802 | 0.802 | 0.198 | 0.198 | **0.000** |
+| $m=3$ | 0.745 | 0.745 | 0.255 | 0.255 | **0.000** |
+| $m=4$ | 0.653 | 0.653 | 0.347 | 0.347 | **0.000** |
+| $m=5$ | 0.578 | 0.578 | 0.422 | 0.422 | **0.000** |
+| $m=6$ | 0.498 | 0.498 | 0.502 | 0.502 | **0.000** |
+| $m=7$ | 0.440 | 0.440 | 0.560 | 0.560 | **0.000** |
+| $m=8$ | 0.385 | 0.385 | 0.615 | 0.615 | **0.000** |
+| $m=10$ | 0.293 | 0.293 | 0.707 | 0.707 | **0.000** |
+| $m=12$ | 0.195 | 0.195 | 0.805 | 0.805 | **0.000** |
+| $m=14$ | 0.115 | 0.115 | 0.885 | 0.885 | **0.000** |
+
+---
+
+## 5. Comprehensive 8-Policy Ledger ($k=6$)
 
 | Policy | TPR | FPR | Healthy Path $C_H$ | Infected Leak $C_I$ | Containment ($1 - C_I$) | Autoimmunity ($1 - C_H$) | Net Separation $S$ |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -129,15 +169,35 @@ for r in rows_k6:
 report_md += """
 ---
 
-## 5. Epistemic Autoimmunity & Gated Live Strategy
+## 6. Conceptual Continuity (Experiment 1A -> 1B-B -> 1B-C)
 
-1. **Autoimmunity Equation**:
-   Under whole-family lineage quarantine with $\\gamma = 1.0$, healthy memory destruction scales linearly with the detector false alarm rate:
-   $$\\text{Epistemic Autoimmunity} = 1 - C_H = \\text{FPR}$$
-2. **The Crossover Principle**:
-   In the tested sandbox, lineage quarantine overtakes generation-matched and uniform controls whenever $\\text{TPR} - \\text{FPR} > 0.35$.
-3. **Live Gating Protocol**:
-   When transitioning to live model evaluation, we do **not** run duplicate $(\\text{TPR}, \\text{FPR})$ points. Instead, we evaluate each unique concrete post-policy context ($(S_H, S_I) \\in \\{00, 10, 01, 11\\}$) once on `gemma3:12b`, and then analytically reweight observed outputs across the full risk frontier.
+```text
++-------------------------------------------------------------------------------------------------------------+
+|                                      THE GENE EPISTEMIC CONTINUUM                                           |
++----------------------+-------------------------------------------------------+------------------------------+
+| Experiment           | Question Addressed                                    | Core Theoretical Law         |
++----------------------+-------------------------------------------------------+------------------------------+
+| Experiment 1A        | Does misinformation replicate across generations?     | R_I = 2 C_H (Truth-Blind)    |
+| Experiment 1B-B      | How does retrieval context control expression?        | P(act|comp)=1, P(act|brk)=0  |
+| Experiment 1B-C      | Can delayed adjudication contain historical error?    | Laundering vs Lineage C_I<<CH|
++----------------------+-------------------------------------------------------+------------------------------+
+```
+
+---
+
+## 7. Gated Live Mechanism Check Strategy
+
+1. **Protocol Principle**:
+   Live model compute on `gemma3:12b` will **not** evaluate separate $(\\text{TPR}, \\text{FPR})$ grid points, as the model never observes detector probabilities.
+2. **Minimal Mechanism Assay (16–24 Calls Total)**:
+   Evaluate the unique concrete post-policy retrieval contexts across two role-swapped ecologies:
+   - **Context 1 (Baseline / No Flag)**: Full candidate pool retained.
+   - **Context 2 (Infected Flagged + Node-Only)**: Root removed; $G_2$ descendant present (Predicted: Local active claim).
+   - **Context 3 (Infected Flagged + Lineage)**: Root + descendants removed (Predicted: `UNKNOWN` abstention).
+   - **Context 4 (Healthy False Alarm + Lineage)**: Healthy lineage removed (Predicted: `UNKNOWN` abstention).
+   - **Context 5 (Generation-Matched Control Context)**: Random $G_2$ node removed.
+3. **Outcome Reweighting**:
+   The observed deterministic model outcomes from these concrete contexts will be analytically reweighted across the entire $(\\text{TPR}, \\text{FPR})$ risk plane.
 """
 
 target = Path("docs/results/EXP1B_C1B_SHARED_ECOLOGY_REPORT.md")
