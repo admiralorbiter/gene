@@ -74,7 +74,7 @@ def run_exp1b_b1c_matched_expression_assay(
 
     ollama_version = client.get_version() if hasattr(client, "get_version") else "unknown"
     env_info = get_environment_info()
-    prompt_hash = template.template_hash
+    prompt_hash = template.prompt_hash()
 
     print("=" * 145)
     print("      EXPERIMENT 1B-B1c: MATCHED PATH SUFFICIENCY & EXPRESSION ASSAY (16 CALLS)")
