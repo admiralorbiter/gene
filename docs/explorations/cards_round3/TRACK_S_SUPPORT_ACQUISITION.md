@@ -1,8 +1,8 @@
 # Experiment Card — Track S: Support Acquisition from Observable Traces
 
-## 1. Core Hypothesis & Scientific Rationale
+## 1. Core Hypothesis & Scope
 - **Core Hypothesis:** Minimal support environments $S_F(c)$ can be derived mechanically from observable runtime execution traces (occurrence nodes, rule templates, exposure edges) distinguishing conjunctive (AND) and alternative (OR) derivation environments without manual researcher declaration.
-- **Round 3 Scope:** **Deterministic Formalism Only (0 Live Calls).** We validate the mechanical Trace-to-Support compiler across disjunctive proof trees and compare its formal output $S_F(c)$ with Track H's empirical causal coalitions $S_C(c)$.
+- **Round 3 Scope:** **Validated Support-Structure Compiler Prototype (Deterministic Only, 0 Live Calls).** We validate the mechanical Trace-to-Support compiler across disjunctive proof trees and compare its formal output $S_F(c)$ with Track H's empirical causal coalitions $S_C(c)$. Automated semantic claim unification (merging independent occurrences $C_1$ and $C_2$ into disjunctive environments for semantic claim $C$) is reserved for post-Round-3 runtime development.
 
 ## 2. Methodology & Mechanical Support Derivation
 1. **Trace Ingestion:**

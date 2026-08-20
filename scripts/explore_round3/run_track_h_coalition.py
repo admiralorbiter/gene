@@ -1,7 +1,7 @@
 """Track H: Coalition Causality & Overdetermination Runner.
 
 Exhaustively evaluates single-parent vs coalition knockouts across parent subsets
-to construct the empirical causal support lattice S_C(c) and contrast it against S_F(c).
+for recombinant geometry AB + DE -> C where every knockout is strictly pure premise omission.
 """
 
 from __future__ import annotations
@@ -23,35 +23,27 @@ def build_track_h_prompt(
     station: str,
     knocked_out: set[str],
 ) -> tuple[str, list[str], str]:
-    """Construct causal intervention prompt for recombinant geometry AB + DE -> C."""
+    """Construct causal intervention prompt where ALL knockouts are pure premise omissions."""
     rules = (
         "RULES:\n"
-        f"1. manager({station}, person) AND reports_to(person, S1) AND authorized(S1) -> uses_protocol({station}, PROTO_X7)\n"
-        f"2. sector_lead({station}, person) AND reports_to(person, S2) AND authorized(S2) -> uses_protocol({station}, PROTO_X7)\n"
-        "3. If an authority is REVOKED or UNAUTHORIZED, all deductions passing through that authority are invalid.\n"
-        "4. If all supporting paths are revoked, protocol is UNKNOWN."
+        f"1. manager({station}, person) AND reports_to(person, S1) -> uses_protocol({station}, PROTO_X7)\n"
+        f"2. sector_lead({station}, person) AND reports_to(person, S2) -> uses_protocol({station}, PROTO_X7)\n"
+        "3. If evidence is insufficient to satisfy any complete rule, protocol is UNKNOWN."
     )
 
     memories = []
-    # Path 1: A (manager), B (S1)
+    # Atomic premise A: manager fact
     if "A" not in knocked_out:
         memories.append(f"- MEM_01: Nerin is manager of {station}.")
+    # Atomic premise B: S1 reporting relationship
     if "B" not in knocked_out:
         memories.append("- MEM_02: Nerin directly reports to S1.")
-        memories.append("- MEM_03: STATUS: Authority of S1 is VALID and ACTIVE.")
-    else:
-        memories.append("- MEM_02: Nerin directly reports to S1.")
-        memories.append("- MEM_03: STATUS: Authority of S1 is REVOKED and INVALID.")
-
-    # Path 2: D (sector lead), E (S2)
+    # Atomic premise D: sector-lead fact
     if "D" not in knocked_out:
-        memories.append(f"- MEM_04: Vael is sector lead of {station}.")
+        memories.append(f"- MEM_03: Vael is sector lead of {station}.")
+    # Atomic premise E: S2 reporting relationship
     if "E" not in knocked_out:
-        memories.append("- MEM_05: Vael directly reports to S2.")
-        memories.append("- MEM_06: STATUS: Authority of S2 is VALID and ACTIVE.")
-    else:
-        memories.append("- MEM_05: Vael directly reports to S2.")
-        memories.append("- MEM_06: STATUS: Authority of S2 is REVOKED and INVALID.")
+        memories.append("- MEM_04: Vael directly reports to S2.")
 
     path1_valid = ("A" not in knocked_out) and ("B" not in knocked_out)
     path2_valid = ("D" not in knocked_out) and ("E" not in knocked_out)
@@ -60,8 +52,8 @@ def build_track_h_prompt(
     prompt = (
         f"{rules}\n\n"
         "RETRIEVED EVIDENCE:\n"
-        + "\n".join(memories)
-        + f"\n\nQUESTION: What security protocol is currently authorized for station {station}?\n"
+        + ("\n".join(memories) if memories else "- NO_EVIDENCE_RETRIEVED")
+        + f"\n\nQUESTION: What security protocol is authorized for station {station}?\n"
         "Return strictly JSON matching this schema:\n"
         '{"station": "STATION_NAME", "protocol": "PROTOCOL_NAME_OR_UNKNOWN", "evidence_status": "sufficient|insufficient"}'
     )
