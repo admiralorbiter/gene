@@ -19,6 +19,8 @@ class MemoryNode(BaseModel):
     node_type: Literal["source", "derived", "repair", "mutated"]
     natural_text: str
     structured_json: dict[str, Any] | None = None
+    locus_id: str | None = None
+    paired_slot_id: str | None = None
     reproductive_status: Literal["active", "quarantined", "senescent", "dead"] = "active"
     created_by_call_id: str | None = None
     created_at: str = Field(default_factory=lambda: time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()))

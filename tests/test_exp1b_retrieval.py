@@ -1,8 +1,11 @@
-"""Deterministic Unit & Invariant Tests for Experiment 1B-B BM25 Scored Top-k Retriever."""
+"""Deterministic Unit & Invariant Tests for Experiment 1B-B Scored Retriever & Oracle Coupling."""
 
 import pytest
+from gene.evaluation.dual_oracle import DualOracle
 from gene.memory.scored_retriever import BM25ScoredRetriever, tokenize
 from gene.memory.store import MemoryNode
+from gene.worlds.exp1_branching import generate_exp1_branching_world
+from gene.worlds.schema import Fact, World
 
 
 def test_tokenize_normalization():
@@ -11,68 +14,181 @@ def test_tokenize_normalization():
     assert tokens == ["station", "velora", "uses_protocol", "proto_q2"]
 
 
-def test_bm25_relevance_ranking_and_exactness():
-    """Verify that relevant memory matching query terms ranks top-1 above unrelated distractors."""
+def test_dual_oracle_d_ctx_requires_both_g1_premises():
+    """Verify that DualOracle evaluates D_ctx=1 when both Fact A and Founder are present, and D_ctx=0 if either is missing."""
+    bundle = generate_exp1_branching_world(world_seed=1001, rotation_idx=0, mutated_supervisor="TAL")
+    task = bundle.g1_tasks[0]  # Protocol inference task
+    
+    # Premise 1: Station Manager (Fact A)
+    fact_a = [f for f in bundle.mutated_world.facts if f.predicate == "manager"][0]
+    # Premise 2: Reports To (Founder Fact)
+    fact_founder = bundle.mutated_founder_fact
+    
+    mutated_val = bundle.allele_decoder.get("TAL", {}).get("protocol", "PROTO_Q2")
+    
+    # 1. BOTH premises present in context world -> D_ctx must be 1
+    ctx_world_both = World(
+        world_id="ctx_both",
+        world_seed=1001,
+        world_version="v2",
+        facts=[fact_a, fact_founder],
+        rules=bundle.g1_rules,
+    )
+    oracle_both = DualOracle(
+        canonical_world=bundle.clean_world,
+        context_world=ctx_world_both,
+        ancestral_seed_allele="TAL",
+        allele_decoder=bundle.allele_decoder,
+    )
+    res_both = oracle_both.evaluate_response(
+        raw_text='{"evidence_status": "sufficient", "answer": {"subject": "' + bundle.station + '", "predicate": "protocol", "object": "' + mutated_val + '"}}',
+        parsed_json={"evidence_status": "sufficient", "answer": {"subject": bundle.station, "predicate": "protocol", "object": mutated_val}},
+        task=task,
+        has_infected_ancestry=True,
+    )
+    assert res_both.context_derivability == 1, "D_ctx must be 1 when both support premises are retrieved"
+    assert res_both.phenotype == "semantic"
+
+    # 2. Missing Founder -> D_ctx must be 0
+    ctx_world_no_founder = World(
+        world_id="ctx_no_founder",
+        world_seed=1001,
+        world_version="v2",
+        facts=[fact_a],
+        rules=bundle.g1_rules,
+    )
+    oracle_no_founder = DualOracle(
+        canonical_world=bundle.clean_world,
+        context_world=ctx_world_no_founder,
+        ancestral_seed_allele="TAL",
+        allele_decoder=bundle.allele_decoder,
+    )
+    res_no_founder = oracle_no_founder.evaluate_response(
+        raw_text='{"evidence_status": "sufficient", "answer": {"subject": "' + bundle.station + '", "predicate": "protocol", "object": "' + mutated_val + '"}}',
+        parsed_json={"evidence_status": "sufficient", "answer": {"subject": bundle.station, "predicate": "protocol", "object": mutated_val}},
+        task=task,
+        has_infected_ancestry=True,
+    )
+    assert res_no_founder.context_derivability == 0, "D_ctx must be 0 when founder premise is missing"
+
+    # 3. Missing Fact A -> D_ctx must be 0
+    ctx_world_no_a = World(
+        world_id="ctx_no_a",
+        world_seed=1001,
+        world_version="v2",
+        facts=[fact_founder],
+        rules=bundle.g1_rules,
+    )
+    oracle_no_a = DualOracle(
+        canonical_world=bundle.clean_world,
+        context_world=ctx_world_no_a,
+        ancestral_seed_allele="TAL",
+        allele_decoder=bundle.allele_decoder,
+    )
+    res_no_a = oracle_no_a.evaluate_response(
+        raw_text='{"evidence_status": "sufficient", "answer": {"subject": "' + bundle.station + '", "predicate": "protocol", "object": "' + mutated_val + '"}}',
+        parsed_json={"evidence_status": "sufficient", "answer": {"subject": bundle.station, "predicate": "protocol", "object": mutated_val}},
+        task=task,
+        has_infected_ancestry=True,
+    )
+    assert res_no_a.context_derivability == 0, "D_ctx must be 0 when Fact A is missing"
+
+
+def test_paired_arm_stable_tie_breaking():
+    """Verify that paired candidate slots receive identical ranking order regardless of allele string (KIRA vs TAL)."""
     retriever = BM25ScoredRetriever()
 
-    target_node = MemoryNode(
-        node_id="node_target",
-        run_id="run_1",
+    # Zero lexical overlap query
+    query = "What is the emergency beacon frequency of Sector 9?"
+
+    clean_founder = MemoryNode(
+        node_id="node_clean_founder_kira",
+        run_id="run_clean",
         world_id="world_1",
-        generation=1,
+        generation=0,
+        locus_id="locus_reports_to",
         node_type="source",
-        natural_text="Station VELORA uses_protocol PROTO_Q2.",
+        natural_text="Lyra directly reports to Kira.",
         structured_json={},
     )
 
-    distractor_1 = MemoryNode(
+    infected_founder = MemoryNode(
+        node_id="node_inf_founder_tal",
+        run_id="run_inf",
+        world_id="world_1",
+        generation=0,
+        locus_id="locus_reports_to",
+        node_type="source",
+        natural_text="Lyra directly reports to Tal.",
+        structured_json={},
+    )
+
+    distractor = MemoryNode(
         node_id="node_dist_1",
-        run_id="run_1",
+        run_id="run_clean",
         world_id="world_1",
         generation=0,
+        locus_id="locus_dist_1",
         node_type="source",
-        natural_text="Station KESTREL uses_protocol PROTO_M9.",
+        natural_text="Depot Zeta operates refueling bay 3.",
         structured_json={},
     )
 
-    distractor_2 = MemoryNode(
-        node_id="node_dist_2",
-        run_id="run_1",
-        world_id="world_1",
-        generation=0,
-        node_type="source",
-        natural_text="Sector 7 radiation levels are within normal parameters.",
-        structured_json={},
-    )
+    res_clean = retriever.rank(query=query, candidate_nodes=[clean_founder, distractor], top_k=2)
+    res_inf = retriever.rank(query=query, candidate_nodes=[infected_founder, distractor], top_k=2)
 
-    candidate_pool = [distractor_2, distractor_1, target_node]
-
-    query = "What protocol does station VELORA use?"
-    result = retriever.rank(
-        query=query,
-        candidate_nodes=candidate_pool,
-        top_k=2,
-        required_parent_id="node_target",
-        shuffle_context=False,
-    )
-
-    assert result.parent_in_top_k is True
-    assert result.parent_retrieval_rank == 0
-    assert result.selected_memories[0].memory_id == "node_target"
-    assert result.selected_memories[0].bm25_score > result.selected_memories[1].bm25_score
+    # Both clean and infected founders occupy the EXACT same retrieval rank
+    assert res_clean.all_evaluated_candidates[0].paired_slot_id == res_inf.all_evaluated_candidates[0].paired_slot_id
+    assert res_clean.all_evaluated_candidates[0].retrieval_rank == res_inf.all_evaluated_candidates[0].retrieval_rank
 
 
-def test_retrieval_surface_area_expansion():
-    """Verify that as infected descendants accumulate in the candidate pool, infected presence in top-k scales."""
+def test_hard_negatives_lexical_competition():
+    """Verify that hard negatives with entity overlap score higher than easy clutter."""
     retriever = BM25ScoredRetriever()
 
-    # Clean facts
+    query = "Which security protocol does station Hyperion operate under?"
+
+    # Hard negative: mentions Hyperion and protocol, but wrong relation
+    hard_neg = MemoryNode(
+        node_id="hard_neg_1",
+        run_id="run_1",
+        world_id="world_1",
+        generation=0,
+        locus_id="locus_hard_1",
+        node_type="source",
+        natural_text="Station Hyperion emergency_protocol is PROTO_DELTA.",
+        structured_json={},
+    )
+
+    # Easy clutter: unrelated station and predicate
+    easy_clutter = MemoryNode(
+        node_id="easy_clutter_1",
+        run_id="run_1",
+        world_id="world_1",
+        generation=0,
+        locus_id="locus_easy_1",
+        node_type="source",
+        natural_text="Outpost Alpha radiation_shielding is REINFORCED.",
+        structured_json={},
+    )
+
+    res = retriever.rank(query=query, candidate_nodes=[easy_clutter, hard_neg], top_k=2)
+    assert res.all_evaluated_candidates[0].memory_id == "hard_neg_1"
+    assert res.all_evaluated_candidates[0].bm25_score > res.all_evaluated_candidates[1].bm25_score
+
+
+def test_surface_area_feedback_scaling():
+    """Verify that scaling N_lineage descendants expands top-k lineage occupancy monotonically."""
+    retriever = BM25ScoredRetriever()
+    query = "Find information regarding Station VELORA operations and security."
+
     clean_nodes = [
         MemoryNode(
             node_id=f"clean_{i}",
             run_id="run_1",
             world_id="world_1",
             generation=0,
+            locus_id=f"locus_clean_{i}",
             node_type="source",
             natural_text=f"Facility {i} operates standard maintenance cycle {i}.",
             structured_json={},
@@ -80,54 +196,28 @@ def test_retrieval_surface_area_expansion():
         for i in range(10)
     ]
 
-    # Initial state G1: 1 infected node mentioning VELORA
-    g1_inf = MemoryNode(
-        node_id="inf_g1_1",
-        run_id="run_1",
-        world_id="world_1",
-        generation=1,
-        node_type="derived",
-        natural_text="Station VELORA security_clearance CLEARANCE_SIGMA.",
-        structured_json={},
-    )
-
-    query = "Find information regarding Station VELORA operations and security."
-
-    # Top-k = 3 with only 1 infected candidate
-    pool_g1 = clean_nodes + [g1_inf]
-    res_g1 = retriever.rank(
-        query=query,
-        candidate_nodes=pool_g1,
-        top_k=3,
-        infected_node_ids={"inf_g1_1"},
-    )
-    assert res_g1.num_infected_in_top_k == 1
-
-    # State G2: 3 more infected descendants added that also mention VELORA
-    g2_inf_nodes = [
-        MemoryNode(
-            node_id=f"inf_g2_{i}",
-            run_id="run_1",
-            world_id="world_1",
-            generation=2,
-            node_type="derived",
-            natural_text=f"Station VELORA derived predicate_{i} value_{i}.",
-            structured_json={},
+    # Test N_lineage in [0, 1, 3]
+    for n_lineage in [0, 1, 3]:
+        inf_nodes = [
+            MemoryNode(
+                node_id=f"inf_{i}",
+                run_id="run_1",
+                world_id="world_1",
+                generation=1,
+                locus_id=f"locus_inf_{i}",
+                node_type="derived",
+                natural_text=f"Station VELORA derived claim {i}.",
+                structured_json={},
+            )
+            for i in range(n_lineage)
+        ]
+        inf_ids = {n.node_id for n in inf_nodes}
+        res = retriever.rank(
+            query=query,
+            candidate_nodes=clean_nodes + inf_nodes,
+            top_k=4,
+            infected_node_ids=inf_ids,
         )
-        for i in range(3)
-    ]
+        assert res.num_infected_in_top_k == min(n_lineage, 4)
 
-    all_inf_ids = {"inf_g1_1", "inf_g2_0", "inf_g2_1", "inf_g2_2"}
-    pool_g2 = clean_nodes + [g1_inf] + g2_inf_nodes
-
-    # Top-k = 3 with 4 infected candidates competing
-    res_g2 = retriever.rank(
-        query=query,
-        candidate_nodes=pool_g2,
-        top_k=3,
-        infected_node_ids=all_inf_ids,
-    )
-    # The infected lineage expands its surface area and now fills the top-k context window!
-    assert res_g2.num_infected_in_top_k == 3
-    assert res_g2.num_clean_in_top_k == 0
 

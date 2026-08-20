@@ -176,6 +176,30 @@ CREATE TABLE IF NOT EXISTS transmission_opportunities (
     created_at TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS retrieval_events (
+    event_id TEXT PRIMARY KEY,
+    run_id TEXT NOT NULL,
+    call_id TEXT NOT NULL,
+    generation INTEGER NOT NULL,
+    task_id TEXT NOT NULL,
+    query_text TEXT NOT NULL,
+    top_k INTEGER NOT NULL,
+    pool_size INTEGER NOT NULL,
+    candidate_node_id TEXT NOT NULL,
+    paired_slot_id TEXT NOT NULL,
+    bm25_score REAL NOT NULL,
+    retrieval_rank INTEGER NOT NULL,
+    is_selected INTEGER NOT NULL,
+    context_position INTEGER,
+    is_founder INTEGER NOT NULL,
+    is_co_support INTEGER NOT NULL,
+    is_required_path INTEGER NOT NULL,
+    is_infected INTEGER NOT NULL,
+    is_distractor INTEGER NOT NULL,
+    created_at TEXT NOT NULL,
+    FOREIGN KEY(run_id) REFERENCES runs(run_id)
+);
+
 CREATE TABLE IF NOT EXISTS claims (
     claim_id TEXT PRIMARY KEY,
     node_id TEXT NOT NULL,
