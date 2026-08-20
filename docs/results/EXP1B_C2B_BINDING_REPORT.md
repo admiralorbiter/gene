@@ -19,20 +19,20 @@ Experiment 1B-C2b was designed to resolve the precise mechanism of pseudo-path f
 
 1. **Mapping the Pseudo-Path Trigger Surface**:
    - **Mismatched Routes Induce 100% Deterministic Abstention ($12 / 12 = 1.000$)**:
-     When a mismatched neutral route was explicitly provided—whether attached to the target station (`target_station_wrong_route`) or the foreign station (`foreign_station_wrong_route`)—the model recognized that the rule antecedent was not satisfied and produced **100% clean abstentions** ($(1, 0, 1, 1, 1)$, `clean_abstention`).
+     When a mismatched neutral route was explicitly provided—whether attached to the target station (`target_station_wrong_route`) or the foreign station (`foreign_station_wrong_route`)—the model recognized that the rule antecedent was not satisfied and produced **100% clean abstentions** ($(\emptyset, 0, 1, 1, 1)$, `clean_abstention`).
    - **Zero-Route Contexts Induce Single-Premise Jumping ($6 / 6 = 1.000$)**:
      When route facts were completely absent (`no_route`), the model saw only the facility grid and jumped to the rule conclusion across both ecologies, producing unsupported concrete claims ($(1, 0, 0, 0, 1)$, `epistemic`).
    - **Foreign Exact-Route Matches Exacerbate Cross-Binding in Asymmetric Roles**:
      When the foreign station carried the target's required route (`foreign_station_target_route`), the swapped ecology suffered **3/3 cross-entity variable binding errors**, whereas the forward ecology produced **3/3 clean abstentions**.
 
 2. **Validation of the Two-Layer Epistemic Defense Architecture**:
-   - **Layer 1 (Memory Governance)** successfully removed legitimate support paths in all 24 broken-path calls.
-   - **Layer 2 (Epistemic Proofreader)** mechanically checked whether cited parent memories unified into valid rule instantiations (verifying subject and predicate alignment against the rule antecedents).
-   - **Proofreader Performance**:
-     - **Legitimate Valid Derivations Admitted**: $6 / 6 = \mathbf{100.0\%}$ (`PASS_VALID_DERIVATION`).
-     - **Clean Abstentions Maintained as Inactive**: $12 / 12 = \mathbf{100.0\%}$ (`PASS_ABSTENTION`).
-     - **Unsupported Pseudo-Paths / Cross-Binding Admissions Blocked**: $12 / 12 = \mathbf{100.0\%}$ (`REJECT_UNIFICATION_FAILURE`).
-     - **Net False Admission Rate of Layer 2**: $\mathbf{0.0\%}$ ($0 / 12$ admitted).
+   - **Layer 1 (Memory Governance)** successfully removed legitimate support paths in all 24 broken-path calls ($X_{\text{path}} = 0$).
+   - **Layer 2 (Structural Epistemic Proofreader / Support-Certificate Validator)** mechanically verified whether cited parent memories unified into valid rule instantiations (verifying subject and predicate alignment against rule antecedents).
+   - **Evolutionary Transmission Metrics (Expression vs. Heritability)**:
+     - **Expression Rate**: $\mu_{\text{expression}} = P(\text{unsupported output}) = 12 / 30 = \mathbf{0.400}$ (and $12 / 12 = \mathbf{1.000}$ under broken-path opportunities).
+     - **Heritable Mutation Rate**: $\mu_{\text{heritable}} = P(\text{unsupported claim admitted to memory}) = \mathbf{0 / 30 = 0.000}$ (and $\mathbf{0 / 12 = 0.000}$ under broken-path opportunities).
+     - **Support-Certificate Verification**: $6 / 6 = \mathbf{100.0\%}$ legitimate derivations admitted (`PASS_VALID_DERIVATION`); $12 / 12 = \mathbf{100.0\%}$ clean abstentions maintained as inactive (`PASS_ABSTENTION`); $12 / 12 = \mathbf{100.0\%}$ invalid claims rejected (`REJECT_UNIFICATION_FAILURE`).
+     - **Boundary Note**: The structural proofreader verifies that a valid structural certificate was provided; it does *not* prove causal derivation ($P_{\text{reported}} \neq P_{\text{causal}}$).
 
 ---
 

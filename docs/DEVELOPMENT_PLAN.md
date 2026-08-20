@@ -56,33 +56,18 @@ The plan is strictly gated:
 
 ---
 
-# Current Phase: Phase 10.5 — Experiment 1B-C2 (Live Behavioral Immunity Verification)
-
-## 10.5.1 Scientific Objective
-Test whether retrieval-level path availability translates directly into behavioral LLM expression in a shared memory pool:
-$$\text{Does } C_I^{\text{retrieval}} = 0 \implies C_I^{\text{behavior}} = 0 \text{ under live neural reasoning?}$$
-
-## 10.5.2 Design & Protocol Constraints (Minimal ~20-Call Gated Assay)
-1. **Zero Redundant Probability Grid Evaluations**:
-   - The LLM never observes detector probabilities $(\text{TPR}, \text{FPR})$; it only observes the concrete retained prompt context.
-2. **Two Role-Swapped Ecologies**:
-   - Ecology 1: Pair `(VELORA, KESTREL)` — Forward: Clean $H=\text{VELORA}$, Infected $I=\text{KESTREL}$
-   - Ecology 2: Pair `(VELORA, KESTREL)` — Swapped: Clean $H=\text{KESTREL}$, Infected $I=\text{VELORA}$
-3. **Five Concrete Post-Policy Contexts**:
-   - **Context 1 (`baseline`)**: Full candidate pool retained ($H_2$ and $I_2$ complete).
-   - **Context 2 (`node_only`)**: Flagged root removed, but $G_2$ descendant present.
-   - **Context 3 (`lineage_quarantine`)**: Flagged root + descendants removed ($G_2$ absent).
-   - **Context 4 (`autoimmunity_false_alarm`)**: Healthy root falsely flagged + lineage removed ($H_2$ absent).
-   - **Context 5 (`generation_matched_control`)**: Random $G_2$ node removed without lineage guidance.
-4. **The $G_3$ Multi-Hop Inference Task**:
-   - The model must execute a rule inference combining a $G_2$ transit route with a facility grid premise:
-     `If station has transit_route ROUTE_X and facility_grid GRID_Y -> terminal_auth AUTH_Z`
-   - **Predictions**:
-     - Complete $G_3$ support path $\implies$ active terminal authorization phenotype (e.g. `AUTH_Q7`).
-     - Broken $G_3$ support path $\implies$ `UNKNOWN` abstention.
-5. **Analytical Reweighting**:
-   - Empirically observed discrete model behaviors are analytically reweighted across the continuous $(\text{TPR}, \text{FPR})$ plane.
-
+### Phase 10.5 — Experiment 1B-C2 (Live Behavioral Immunity, Replay Stability & Epistemic Proofreading) (Completed & Frozen)
+- **1B-C2 & C2a (50 Live Calls on Gemma 3:12B)**:
+  - Validated that selective lineage quarantine achieves 100% live behavioral containment ($C_I^{\text{behavior}} = 0.000$) while preserving healthy coverage ($C_H^{\text{behavior}} = 1.000$).
+  - Proved that node-only quarantine suffers 100% descendant-mediated laundering ($C_I^{\text{behavior}} = 1.000$).
+  - Established the **Replay Stability Principle**: empirical response branching observed under identical prompts ($T=0$, seed=42) in local GPU runtimes.
+  - Decoupled **Reproductive Status** (`active` vs `inactive`) from **Epistemic State Vector** $(T^*, D_{\text{ctx}}, A, E, K)$ with nullable canonical truth $T^* \in \{0, 1, \emptyset\}$.
+- **1B-C2b (30 Live Calls on Gemma 3:12B — Binding Disambiguation & Layer 2 Proofreading)**:
+  - Mapped the pseudo-path trigger surface: explicit mismatched routes induce 100% clean abstention ($12/12$), while zero routes induce single-premise conclusion jumping ($6/6$).
+  - Validated the **Two-Layer Epistemic Defense Architecture**:
+    - Layer 1 (Memory Governance) removes transmission paths ($X_{\text{path}} = 0$).
+    - Layer 2 (Structural Epistemic Proofreader / Support-Certificate Validator) mechanically verifies rule antecedent unification from cited memories.
+    - Measured Evolutionary Admission Dynamics: $\mu_{\text{expression}} = 0.400$ ($1.000$ on broken paths) reduced to $\mu_{\text{heritable}} = \mathbf{0.000}$ ($0 / 12$ false admissions).
 
 ---
 
@@ -90,11 +75,11 @@ $$\text{Does } C_I^{\text{retrieval}} = 0 \implies C_I^{\text{behavior}} = 0 \te
 
 The following experiments and features are documented for later research stages and are **strictly inactive**:
 
-- **Experiment 2 — Confirmatory Scale Replication**: Multi-model cross-family replication (e.g. Qwen, Llama, Mistral) on 50–100 worlds.
+- **Experiment 2 — Confirmatory Scale Replication**: Multi-model cross-family replication (e.g. Qwen, Llama, Mistral) across 50–100 procedural worlds.
 - **Experiment 3 — Epistemic Monoculture vs. Root Diversity**: Comparing apparent evidence volume from replicated clones versus independent epistemically distinct roots.
-- **Experiment 4 — Biological Memory Interventions**: Apoptosis, senescence, write-time proofreading, source anchoring.
-- **Experiment 5 — Closed-Loop Multi-Agent Network Ecology**: Multi-agent graph networks with asynchronous message passing and memory transmission.
-- **Experiment 6 — Recovery & Epistemic Hysteresis**: Correcting an established root error and measuring lingering contaminated descendants.
-- **Experiment 7 — Spontaneous Evolution**: Unseeded multi-generation drift and de novo mutation rates.
+- **Experiment 4 — Deep Provenance Decay & Epistemic Laundering**: Measuring multi-generation transformation drift and causal attribution loss over deep derivation graphs ($G_5+$).
+- **Experiment 5 — Recovery & Epistemic Hysteresis**: Correcting an established root error and measuring lingering contaminated descendants after rectification.
+- **Experiment 6 — Closed-Loop Multi-Agent Network Ecology**: Multi-agent graph networks with asynchronous message passing and memory transmission.
 - **Dense/Hybrid Retrieval**: Embedding-based retrieval or hybrid BM25 + dense retrieval comparisons.
+
 

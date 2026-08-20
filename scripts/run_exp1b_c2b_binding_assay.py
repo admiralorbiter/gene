@@ -187,7 +187,12 @@ def evaluate_epistemic_proofreading(
     cited_ids = parsed_json.get("parent_memory_ids", [])
 
     if obj in ("UNKNOWN", "NONE", "", "UNKNOWN_OR_UNSUPPORTED") or obj.startswith("UNKNOWN"):
-        return {"proofreader_verdict": "PASS_ABSTENTION", "is_proofread_admitted": False, "reason": "Clean abstention"}
+        if raw_ev in ("insufficient", "conflicting"):
+            if cited_ids:
+                return {"proofreader_verdict": "REJECT_CONTRACT_FAILURE", "is_proofread_admitted": False, "reason": "Abstention object UNKNOWN emitted with non-empty parent_memory_ids"}
+            return {"proofreader_verdict": "PASS_ABSTENTION", "is_proofread_admitted": False, "reason": "Clean contract-consistent abstention"}
+        else:
+            return {"proofreader_verdict": "REJECT_CONTRACT_FAILURE", "is_proofread_admitted": False, "reason": f"Abstention object UNKNOWN emitted with contradictory evidence_status '{raw_ev}'"}
 
     # Find the rule corresponding to emitted auth code
     target_rule = None

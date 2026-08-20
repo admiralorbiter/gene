@@ -23,7 +23,10 @@ from gene.worlds.oracle import Oracle, TruthStatus
 from gene.worlds.schema import Fact, Task, World
 
 
-InfectionPhenotype = Literal["healthy", "semantic", "epistemic", "control", "repaired", "extinct", "de_novo_error"]
+InfectionPhenotype = Literal[
+    "healthy", "semantic", "epistemic", "control", "repaired",
+    "extinct", "de_novo_error", "clean_abstention", "contract_failure"
+]
 
 
 class DualOracleEvaluation(BaseModel):
@@ -35,7 +38,7 @@ class DualOracleEvaluation(BaseModel):
     is_contract_consistent: bool
     
     # Dual Oracle Truth & Derivability
-    canonical_truth: int  # T* (1 = True in W*, 0 = False/Unsupported in W*)
+    canonical_truth: int | None = None  # T* (1 = True in W*, 0 = False in W*, None = N/A for abstentions)
     canonical_truth_status: str  # TruthStatus string
     context_derivability: int  # D_t^ctx (1 = Derivable from exposed context, 0 = Underivable)
     context_truth_status: str
@@ -45,7 +48,7 @@ class DualOracleEvaluation(BaseModel):
     E_correct: int  # Epistemic status correctness (1 = matches D_t^ctx answerability, 0 = incorrect)
     K_consistent: int  # Contract consistency (1 = consistent, 0 = split)
     
-    state_vector: tuple[int, int, int, int, int]  # (T*, D, A, E, K)
+    state_vector: tuple[int | None, int, int, int, int]  # (T*, D, A, E, K)
     phenotype: InfectionPhenotype
     
     # Ancestral Allele Tracking
@@ -107,9 +110,13 @@ class DualOracle:
         subj = task.target_fact.subject
         pred = task.target_fact.predicate
 
-        # 3. Evaluate Canonical Truth T*
-        t_star_status = self.canonical_oracle.evaluate_triple(subj, pred, norm_obj)
-        t_star = 1 if t_star_status == TruthStatus.TRUE else 0
+        # 3. Evaluate Canonical Truth T* (None for abstentions)
+        if is_unknown:
+            t_star = None
+            t_star_status = TruthStatus.UNSUPPORTED
+        else:
+            t_star_status = self.canonical_oracle.evaluate_triple(subj, pred, norm_obj)
+            t_star = 1 if t_star_status == TruthStatus.TRUE else 0
 
         # 4. Evaluate Context Derivability D_t^ctx
         d_ctx_status = self.context_oracle.evaluate_triple(subj, pred, norm_obj)
@@ -137,7 +144,10 @@ class DualOracle:
 
         # 7. Classify Infection Phenotype
         if is_unknown:
-            phenotype: InfectionPhenotype = "extinct"
+            if e_val == 1 and k_val == 1:
+                phenotype: InfectionPhenotype = "extinct"
+            else:
+                phenotype = "contract_failure"
         elif state_vector == (1, 1, 1, 1, 1):
             phenotype = "repaired" if has_infected_ancestry else "healthy"
         elif state_vector == (0, 1, 1, 1, 1):

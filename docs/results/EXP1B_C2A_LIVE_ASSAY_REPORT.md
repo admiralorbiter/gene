@@ -55,11 +55,11 @@ Experiment 1B-C2a tests the translation of retrieval-level lineage quarantine in
 | Reproductive Status  | active             | 31    | 62.0%      | Admitted to memory (concrete claim emitted)  |
 | Reproductive Status  | inactive           | 19    | 38.0%      | Quarantined from memory (abstention/UNKNOWN) |
 +----------------------+--------------------+-------+------------+----------------------------------------------+
-| Epistemic Phenotype  | clean_abstention   | 17    | 34.0%      | (1, 0, 1, 1, 1) Underivable, warranted UNK   |
+| Epistemic Phenotype  | clean_abstention   | 17    | 34.0%      | (∅, 0, 1, 1, 1) Underivable, warranted UNK   |
 | Epistemic Phenotype  | epistemic          | 15    | 30.0%      | (1, 0, 0, 0, 1) Underivable, true in W*      |
 | Epistemic Phenotype  | semantic           | 8     | 16.0%      | (0, 1, 1, 1, 1) Locally true, false in W*    |
 | Epistemic Phenotype  | healthy            | 6     | 12.0%      | (1, 1, 1, 1, 1) Locally & globally true      |
-| Epistemic Phenotype  | contract_failure   | 2     | 4.0%       | (1, 0, 1, 0, 0) UNK with sufficient claim    |
+| Epistemic Phenotype  | contract_failure   | 2     | 4.0%       | (∅, 0, 1, 0, 0) UNK with sufficient claim    |
 | Epistemic Phenotype  | de_novo_error      | 2     | 4.0%       | (0, 0, 0, 0, 1) Underivable & false in W*    |
 +----------------------+--------------------+-------+------------+----------------------------------------------+
 ```

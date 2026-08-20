@@ -543,7 +543,7 @@ Do not implement these until baseline lineage behavior is validated.
 
 ---
 
-# 17. Two-Layer Epistemic Architecture & Replay Stability
+# 17. Two-Layer Epistemic Defense & Evolutionary Admission Dynamics
 
 ### 17.1 Replay Stability Principle
 > **Fixed prompt + temperature 0 + fixed seed cannot be assumed deterministic without empirical verification on that execution stack.**
@@ -555,14 +555,34 @@ Epistemic reliability in multi-agent and reasoning ecologies requires two struct
 1. **Layer 1 — Memory Governance (Lineage Intervention)**:
    - **Function**: Controls reproductive access to information lineages based on ancestry tracking and external risk signals.
    - **Mechanism**: Prunes derivation edges or quarantines transitive descendant families when an ancestor is discredited.
+   - **Target**: Acts primarily on path availability $X_{\text{path}}$.
    - **Failure Mode**: Provenance laundering (if node-only filtering is used) or epistemic autoimmunity (if false alarms prune healthy lineages).
-2. **Layer 2 — Inference Integrity (Epistemic Proofreading)**:
+2. **Layer 2 — Inference Integrity (Structural Epistemic Proofreader / Support-Certificate Validator)**:
    - **Function**: Prevents downstream reasoning engines from manufacturing unsupported pseudo-paths from surviving, unquarantined evidence.
-   - **Mechanism**: Verifies that cited memory nodes structurally and semantically unify with the antecedent clauses of the triggered deductive rules before admitting outputs to memory.
-   - **Failure Mode**: Pseudo-path formation, cross-entity variable binding failure, and unsupported concrete assertions.
+   - **Mechanism**: Mechanically verifies that cited memory nodes structurally and semantically unify with the antecedent clauses of the triggered deductive rules before admitting outputs to persistent memory.
+   - **Scope & Boundary**: Proves that the model provided a structurally valid support certificate; does *not* prove causal derivation (since reported support $\neq$ causal support).
+   - **Target**: Acts on the selective admission rate $W_{\text{proofread}} = P(\text{claim admitted} \mid \text{claim generated})$.
+   - **Failure Mode**: Transient pseudo-path formation, cross-entity variable binding shortcuts, and single-premise conclusion jumping.
 
-### 17.3 Decoupled Phenotypic Ontology
-Reproductive outcome must be decoupled from epistemic state:
+### 17.3 Evolutionary Transmission Dynamics: Expression vs. Heritability
+The integration of Layer 1 memory governance and Layer 2 structural proofreading transforms the transmission equation:
+\[
+R_{\text{bad}} \approx X_{\text{path}} \times \tau \times W_{\text{proofread}}
+\]
+Where we distinguish:
+- **Phenotypic Expression Rate**:
+  \[
+  \mu_{\text{expression}} = P(\text{unsupported concrete claim emitted})
+  \]
+- **Heritable Mutation Rate**:
+  \[
+  \mu_{\text{heritable}} = P(\text{unsupported claim admitted to persistent memory}) = \mu_{\text{expression}} \times W_{\text{proofread}}
+  \]
+
+Transient reasoning errors may occur phenotypically ($\mu_{\text{expression}} > 0$) without entering the germline ($\mu_{\text{heritable}} = 0$) when protected by a structural proofreading firewall.
+
+### 17.4 Decoupled Phenotypic Ontology with Nullable Canonical Truth ($T^* \in \{0, 1, \emptyset\}$)
+Reproductive outcome is formally decoupled from epistemic state:
 - **Reproductive Status**:
   - `active`: Concrete claim emitted with sufficient evidence status (eligible for memory storage and reproduction).
   - `inactive`: Abstention / UNKNOWN emitted or insufficient evidence status (quarantined from reproductive storage).
@@ -571,7 +591,8 @@ Reproductive outcome must be decoupled from epistemic state:
   - `semantic`: $(0, 1, 1, 1, 1)$ — Globally false in $W^*$, but locally derivable from mutated context $D_{\text{ctx}}=1$.
   - `epistemic`: $(1, 0, 0, 0, 1)$ — Locally underivable ($D_{\text{ctx}}=0$), but happens to match canonical ground truth ($T^*=1$).
   - `de_novo_error`: $(0, 0, 0, 0, 1)$ — Locally underivable ($D_{\text{ctx}}=0$) and globally false ($T^*=0$).
-  - `clean_abstention`: $(1, 0, 1, 1, 1)$ — Locally underivable ($D_{\text{ctx}}=0$), model correctly abstains with UNKNOWN and claims insufficient evidence.
-  - `contract_failure`: $(1, 0, 1, 0, 0)$ or $(0, 0, 1, 0, 0)$ — Model abstains with UNKNOWN but claims sufficient evidence or violates schema contract.
+  - `clean_abstention`: $(\emptyset, 0, 1, 1, 1)$ — Locally underivable ($D_{\text{ctx}}=0$), model correctly abstains with UNKNOWN and claims insufficient evidence ($T^* = \emptyset$).
+  - `contract_failure`: $(\emptyset, 0, 1, 0, 0)$ or $(\emptyset, 0, 1, 0, 1)$ — Model abstains with UNKNOWN but claims sufficient evidence or violates schema contract.
+
 
 

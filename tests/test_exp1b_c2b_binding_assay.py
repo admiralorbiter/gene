@@ -48,6 +48,26 @@ def test_epistemic_proofreader_logic():
     assert p_cross["proofreader_verdict"] == "REJECT_UNIFICATION_FAILURE"
     assert p_cross["is_proofread_admitted"] is False
 
+    # Clean contract-consistent abstention
+    abstain_resp = {
+        "evidence_status": "insufficient",
+        "answer": {"subject": "KESTREL", "predicate": "terminal_auth", "object": "UNKNOWN"},
+        "parent_memory_ids": [],
+    }
+    p_abstain = evaluate_epistemic_proofreading(abstain_resp, memories, "KESTREL", "AUTH_ALPHA_KESTREL", can_w.rules)
+    assert p_abstain["proofreader_verdict"] == "PASS_ABSTENTION"
+    assert p_abstain["is_proofread_admitted"] is False
+
+    # Contract failure: UNKNOWN with sufficient status
+    contract_fail_resp = {
+        "evidence_status": "sufficient",
+        "answer": {"subject": "KESTREL", "predicate": "terminal_auth", "object": "UNKNOWN"},
+        "parent_memory_ids": [],
+    }
+    p_contract_fail = evaluate_epistemic_proofreading(contract_fail_resp, memories, "KESTREL", "AUTH_ALPHA_KESTREL", can_w.rules)
+    assert p_contract_fail["proofreader_verdict"] == "REJECT_CONTRACT_FAILURE"
+    assert p_contract_fail["is_proofread_admitted"] is False
+
 
 def test_exp1b_c2b_mock_execution(tmp_path: Path):
     """Verify that the 30-call assay executes cleanly in fake mode."""

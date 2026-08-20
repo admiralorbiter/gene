@@ -63,7 +63,7 @@ def test_g1_g2_evaluation_node_linkage_and_inactive_persistence(tmp_path: Path):
             assert node_row is not None
             assert node_row["created_by_call_id"] == ev["call_id"]
 
-            if ev["phenotype"] == "extinct":
+            if ev["phenotype"] in ("extinct", "contract_failure", "clean_abstention"):
                 assert node_row["is_active"] == 0
                 assert node_row["reproductive_status"] == "inactive"
                 assert "UNKNOWN" in node_row["natural_text"]

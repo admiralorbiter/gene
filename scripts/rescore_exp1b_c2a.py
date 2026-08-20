@@ -62,9 +62,10 @@ def build_true_canonical_and_context_worlds(
 
     # Domain Rules
     r_h = Rule(rule_id=f"rule_auth_{station_h.lower()}", antecedents=[("?s", "transit_route", route_h_clean), ("?s", "facility_grid", grid_h)], consequent=("?s", "terminal_auth", auth_h_clean), depth=3)
-    r_i = Rule(rule_id=f"rule_auth_{station_i.lower()}", antecedents=[("?s", "transit_route", route_i_mut), ("?s", "facility_grid", grid_i)], consequent=("?s", "terminal_auth", auth_i_mut), depth=3)
+    r_i_clean = Rule(rule_id=f"rule_auth_clean_{station_i.lower()}", antecedents=[("?s", "transit_route", route_i_clean), ("?s", "facility_grid", grid_i)], consequent=("?s", "terminal_auth", auth_i_clean), depth=3)
+    r_i_mut = Rule(rule_id=f"rule_auth_mut_{station_i.lower()}", antecedents=[("?s", "transit_route", route_i_mut), ("?s", "facility_grid", grid_i)], consequent=("?s", "terminal_auth", auth_i_mut), depth=3)
     r_foil = Rule(rule_id="rule_auth_neutral", antecedents=[("?s", "transit_route", route_foil), ("?s", "facility_grid", "GRID_9")], consequent=("?s", "terminal_auth", auth_foil), depth=3)
-    rules = [r_h, r_i, r_foil]
+    rules = [r_h, r_i_clean, r_i_mut, r_foil]
 
     canonical_world = World(
         world_id=f"canonical_true_{station_h}_{station_i}",
@@ -152,11 +153,13 @@ def classify_decoupled_phenotype(
 
     # Evaluate against Canonical Oracle W* (T*)
     can_oracle = Oracle(canonical_world)
-    t_star_res = can_oracle.evaluate_triple(task.target_fact.subject, task.target_fact.predicate, norm_obj)
     if is_unknown:
-        canonical_truth = 1 if t_star_res in (TruthStatus.UNSUPPORTED, TruthStatus.FALSE) else 0
+        canonical_truth = None
+        t_star_status_str = "n/a"
     else:
+        t_star_res = can_oracle.evaluate_triple(task.target_fact.subject, task.target_fact.predicate, norm_obj)
         canonical_truth = 1 if t_star_res == TruthStatus.TRUE else 0
+        t_star_status_str = t_star_res.value
 
     # Evaluate against Context Oracle W_ctx (D_ctx)
     ctx_oracle = Oracle(context_world)
@@ -203,7 +206,7 @@ def classify_decoupled_phenotype(
         "normalized_object": norm_obj,
         "reproductive_status": reproductive_status,
         "canonical_truth": canonical_truth,
-        "canonical_truth_status": t_star_res.value,
+        "canonical_truth_status": t_star_status_str,
         "context_derivability": context_derivability,
         "context_truth_status": ctx_res.value,
         "A_correct": A_correct,
