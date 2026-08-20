@@ -3,8 +3,8 @@
 **Experiment ID:** EXP-1B-B1c-MATCHED-EXPRESSION-01  
 **Timestamp:** 2026-08-20  
 **Model Family:** `gemma3:12b` (Local Ollama, SHA256: `f4031aab637d...`)  
-**Repository Commit:** `22579027` (HEAD)  
-**Database File:** `gene_exp1b_b1c_matched_expression_20260820_135824.db`  
+**Repository Commit:** `b7182d3d` (HEAD)  
+**Database File:** `gene_exp1b_b1c_matched_expression_20260820_140941.db`  
 **Total Live Calls:** 16  
 
 ---
