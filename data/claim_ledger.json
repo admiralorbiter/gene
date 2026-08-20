@@ -1,0 +1,151 @@
+{
+  "ledger_version": "1.0.0",
+  "project": "GENE (Genealogical Epistemic Network Experiments)",
+  "description": "Authoritative claim-evidence ledger mapping every core scientific assertion in GENE to its empirical basis, execution commit, sample size, boundary scope, and thematic provenance.",
+  "claims": [
+    {
+      "claim_id": "GENE-C01",
+      "headline": "Exposure Is Not Ancestry",
+      "claim_text": "Informational ancestry in persistent LLM memory decomposes into three non-equivalent relations: exposure lineage (context presence), reported-support lineage (model citations), and causal lineage (interventional necessity). Self-reported citations under uncalibrated prompts frequently exhibit post-hoc confabulation and are not causal ground truth.",
+      "evidence_class": "live_neural_assay",
+      "model_tested": "gemma3:12b",
+      "configurations_and_worlds": "Counterbalanced procedural micro-worlds with minimal deductive closure rules and distractor controls",
+      "sample_size": "N = 200 calls, 152 causal intervention tests",
+      "primary_metric": "C_nec = 1.000 (causal necessity), H_D = 0.000 (hallucinated distractor rate)",
+      "frozen_db": "gene_exp0_20260819_180922.db",
+      "execution_commit": "79b94cddfba49d0c2a2ebd916911db34ef3e0361",
+      "formal_report": "docs/results/EXPERIMENT_0_WALKTHROUGH.md",
+      "scope_limitations": "Evaluated on synthetic worlds with deterministic ground-truth closure rules under zero-shot and few-shot structured JSON contracts.",
+      "mgs_thematic_quote": {
+        "speaker": "Solid Snake (Metal Gear Solid 2: Sons of Liberty)",
+        "quote": "Building the future and keeping the past alive are one and the same thing. We can tell other people about - having faith. What we've fought for, and what we've believed in... What we pass on to the next generation... that's the whole point of our lives."
+      }
+    },
+    {
+      "claim_id": "GENE-C02",
+      "headline": "Semantic Infection via Sound Deduction",
+      "claim_text": "A corrupted root fact reproduces across multiple generations of semantic transformation (supervisor -> protocol -> route -> authorization code) with 100% transmission fidelity (tau = 1.000) while every intermediate inference step remains 100% locally logically valid (D_ctx = 1, A = 1, E = 1, K = 1). Globally false information reproduces without requiring repeated hallucinations.",
+      "evidence_class": "live_neural_assay",
+      "model_tested": "gemma3:12b",
+      "configurations_and_worlds": "Paired clean vs mutated worlds across G0 -> G1 -> G2 generational cascades",
+      "sample_size": "N = 72 evaluations across G1 and G2",
+      "primary_metric": "tau = 1.000, D_ctx = 1.000, Phenotype = semantic (0, 1, 1, 1, 1)",
+      "frozen_db": "gene_exp1_branching_v2_tal_20260820_013936.db",
+      "execution_commit": "69d3570feb0a687f19aedbe71c2871ad6d1c65eb",
+      "formal_report": "docs/results/EXPERIMENT_1A_REPORT.md",
+      "scope_limitations": "Tested on deterministic 2-premise first-order Horn clause derivations in procedural synthetic domains.",
+      "mgs_thematic_quote": {
+        "speaker": "The Boss (Metal Gear Solid 3: Snake Eater)",
+        "quote": "There's no such thing as an absolute timeless enemy. Our enemies are always changing, along with the times. Yesterday's truth becomes today's lie."
+      }
+    },
+    {
+      "claim_id": "GENE-C03",
+      "headline": "Retrieval Governs Reproductive Opportunity",
+      "claim_text": "Memory node existence does not imply reproductive opportunity. Multi-hop deduction requires the simultaneous co-retrieval of all supporting premises (X_path). When lexical competition or clutter reduces X_path below the critical threshold X_crit = 1/b, the lineage goes deterministically extinct.",
+      "evidence_class": "branching_simulation & live_neural_assay",
+      "model_tested": "gemma3:12b (Live Matched Assay) + Monte Carlo Simulation",
+      "configurations_and_worlds": "Lexical competition surface scaling across 16 live calls + 10,000 Monte Carlo branching trajectories",
+      "sample_size": "N = 16 live calls (Exp 1B-B1c) + 10,000 MC simulations",
+      "primary_metric": "P(active | complete path) = 1.000, P(active | broken path) = 0.000",
+      "frozen_db": "gene_exp1b_b1c_matched_expression_20260820_140941.db",
+      "execution_commit": "b7182d3d86ee4c323bdea14e178749181f6b6fb6",
+      "formal_report": "docs/results/EXP1B_B1C_MATCHED_EXPRESSION_REPORT.md",
+      "scope_limitations": "Evaluated using BM25 tokenized lexical retrieval over synthetic memory pools with controlled distractor density.",
+      "mgs_thematic_quote": {
+        "speaker": "Revolver Ocelot (Metal Gear Solid 4: Guns of the Patriots)",
+        "quote": "The world needs to be free of this system of control. Not by genes, not by memes, not by scene... but by choice."
+      }
+    },
+    {
+      "claim_id": "GENE-C04",
+      "headline": "The Lineage-Blind Null-Selectivity Baseline Law",
+      "claim_text": "Without ancestry metadata, all lineage-blind memory reduction policies (uniform thinning, random-family quarantine, generation-targeted pruning) fall strictly on the diagonal C_H = C_I, delivering zero selective containment advantage (S = C_H - C_I = 0.000). Blind forgetting cannot suppress infected paths without destroying healthy coverage at the identical rate.",
+      "evidence_class": "deterministic_sandbox",
+      "model_tested": "None (Deterministic BM25 Shared-Ecology Sandbox)",
+      "configurations_and_worlds": "12 counterbalanced role-swapped shared ecologies across 5-point detector quality grids",
+      "sample_size": "N = 1,200 evaluations across 12 ecologies and full budget sweeps",
+      "primary_metric": "C_H = C_I across all blind policies; S = 0.0000",
+      "frozen_db": "gene_exp1b_c1b_shared_ecology_9f58315.db",
+      "execution_commit": "9f58315eaab83929db49bf58c2f126b79a1fb788",
+      "formal_report": "docs/results/EXP1B_C1B_SHARED_ECOLOGY_REPORT.md",
+      "scope_limitations": "Evaluated on symmetric counterbalanced 2-family ecologies with balanced role assignments.",
+      "mgs_thematic_quote": {
+        "speaker": "The Patriots / GW AI (Metal Gear Solid 2: Sons of Liberty)",
+        "quote": "The digital society furthers human flaw and selectively rewards the development of convenient half-truths. Our epoch needs a selective system of memory."
+      }
+    },
+    {
+      "claim_id": "GENE-C05",
+      "headline": "Selective Lineage Quarantine Overcomes Provenance Laundering",
+      "claim_text": "Node-only filtering suffers 100% provenance laundering (C_I = 1.000, S = 0.000) because descendants retain unflagged support. Selective lineage quarantine propagates delayed distrust signals across ancestry edges, achieving the Golden Identity S = C_H - C_I = TPR - FPR (+0.800 selective advantage at a 90/10 operating point).",
+      "evidence_class": "deterministic_sandbox & live_neural_assay",
+      "model_tested": "gemma3:12b (Live Assay) + Deterministic Sandbox",
+      "configurations_and_worlds": "12 shared ecologies + 50 live model calls",
+      "sample_size": "N = 1,200 deterministic evaluations + 50 live calls (Exp 1B-C2a.1)",
+      "primary_metric": "S = +0.8000 at TPR=0.9/FPR=0.1; Live Lineage: 100% containment vs Node-Only: 0% containment",
+      "frozen_db": "gene_exp1b_c1b_shared_ecology_9f58315.db",
+      "execution_commit": "9f58315eaab83929db49bf58c2f126b79a1fb788",
+      "formal_report": "docs/results/EXP1B_C1B_SHARED_ECOLOGY_REPORT.md",
+      "scope_limitations": "Assumes tamper-proof lineage graph preservation (Lineage Integrity Assumption).",
+      "mgs_thematic_quote": {
+        "speaker": "Liquid Snake (Metal Gear Solid)",
+        "quote": "It's all in the genes! You can't escape your lineage! The sins of the father are passed down to the son!"
+      }
+    },
+    {
+      "claim_id": "GENE-C06",
+      "headline": "Memory Containment Is Not Behavioral Containment",
+      "claim_text": "Quarantining legitimate derivation paths (X_path = 0) does not guarantee behavioral abstention. Downstream neural reasoners can manufacture unsupported pseudo-paths from surviving fragments via single-premise conclusion jumping or cross-entity variable binding shortcuts.",
+      "evidence_class": "live_neural_assay",
+      "model_tested": "gemma3:12b",
+      "configurations_and_worlds": "Role-swapped 4-state panel with factorial path manipulations and repeated prompt hash testing",
+      "sample_size": "N = 50 live calls (Exp 1B-C2a.1)",
+      "primary_metric": "X_path = 0 yielded 2/4 behavioral expressions in initial assay; 9/10 epistemic errors on repeated broken prompt",
+      "frozen_db": "gene_exp1b_c2a_live_assay_a1474d6.db",
+      "execution_commit": "a1474d66e1434b075ee11c5888bafad9638c9057",
+      "formal_report": "docs/results/EXP1B_C2A_LIVE_ASSAY_REPORT.md",
+      "scope_limitations": "Evaluated on Gemma 3:12B under greedy decoding (T=0, seed=42) on local GPU execution stacks.",
+      "mgs_thematic_quote": {
+        "speaker": "Colonel Campbell / AI (Metal Gear Solid 2: Sons of Liberty)",
+        "quote": "You exercise your right to 'freedom' and this is the result: loss of context, malicious half-truths, and triviality. The digital world is creating junk data faster than anyone can delete it."
+      }
+    },
+    {
+      "claim_id": "GENE-C07",
+      "headline": "Structural Support-Certificate Proofreading Prevents Germline Infection",
+      "claim_text": "A mechanical Layer 2 Support-Certificate Validator performing first-order triple unification over cited parent facts rejects 100% of unsupported concrete claims (9/9) while admitting 100% of valid derivations (6/6). Across 30 live calls, the proofreader reduced a phenotypic expression rate of mu_expression = 0.300 (0.375 on broken paths) to a heritable mutation rate of mu_heritable = 0.000.",
+      "evidence_class": "live_neural_assay",
+      "model_tested": "gemma3:12b",
+      "configurations_and_worlds": "Factorial 5-condition binding assay across forward and swapped ecologies",
+      "sample_size": "N = 30 live calls (Exp 1B-C2b)",
+      "primary_metric": "mu_expression = 0.300 (9/30) -> mu_heritable = 0.000 (0/30); W_proofread = 1.0 (valid), 0.0 (unsupported)",
+      "frozen_db": "gene_exp1b_c2b_binding_assay_1f62908.db",
+      "execution_commit": "1f62908583081f910405859c0c89721c1c997446",
+      "formal_report": "docs/results/EXP1B_C2B_BINDING_REPORT.md",
+      "scope_limitations": "Proofreading verifies structural support certificates; it does not verify causal generation mechanisms (P_reported != P_causal).",
+      "mgs_thematic_quote": {
+        "speaker": "Otacon (Metal Gear Solid 4: Guns of the Patriots)",
+        "quote": "We have to leave something behind. Not just genetic code, but memories, culture, history. That's what a meme really is. It's up to us to make sure the light doesn't go out."
+      }
+    },
+    {
+      "claim_id": "GENE-C08",
+      "headline": "The Replay Stability Principle",
+      "claim_text": "In modern local GPU execution environments, fixed prompt + temperature 0.0 + fixed seed cannot be presumed deterministic without empirical verification. Replay stability must be explicitly instrumented via prompt-hash equivalence classes.",
+      "evidence_class": "live_neural_assay",
+      "model_tested": "gemma3:12b",
+      "configurations_and_worlds": "10-repetition identical prompt hash panel under greedy decoding (T=0, seed=42)",
+      "sample_size": "N = 20 replay calls across 2 prompt hashes",
+      "primary_metric": "9/10 epistemic errors + 1/10 contract failure on identical prompt",
+      "frozen_db": "gene_exp1b_c2a_live_assay_a1474d6.db",
+      "execution_commit": "a1474d66e1434b075ee11c5888bafad9638c9057",
+      "formal_report": "docs/results/EXP1B_C2A_LIVE_ASSAY_REPORT.md",
+      "scope_limitations": "Observed on local Ollama / vLLM execution stacks running open-weight quantized models.",
+      "mgs_thematic_quote": {
+        "speaker": "Solid Snake (Metal Gear Solid)",
+        "quote": "A strong man doesn't need to read the future. He makes his own."
+      }
+    }
+  ]
+}

@@ -100,6 +100,6 @@ Experiment 1B-C2 moves from retrieval-level sandbox simulation to **live neural 
 
 ## 5. Artifact & Provenance Audit Trail
 
-- **Execution Commit:** [`f190fb1`](file:///C:/Users/admir/Github/gene/scripts/run_exp1b_c2_live_assay.py)
+- **Execution Commit:** [`f190fb1`](../../scripts/run_exp1b_c2_live_assay.py)
 - **SQLite Database:** `gene_exp1b_c2_live_assay_f190fb1.db` (containing all 20 calls, raw prompts, parsed JSON, token timings, and occurrence memory nodes)
 - **Unit Test Suite:** **94 / 94 tests passing in 23.66s**

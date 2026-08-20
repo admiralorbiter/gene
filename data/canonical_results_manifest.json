@@ -1,7 +1,47 @@
 {
   "manifest_version": "1.0.0",
   "project": "GENE (Genealogical Epistemic Network Experiments)",
+  "generated_at": "2026-08-20T12:00:00Z",
   "canonical_experiments": {
+    "exp0": {
+      "experiment": "Experiment 0 (Lineage Observability & Causal Assay)",
+      "database": "gene_exp0_20260819_180922.db",
+      "commit": "79b94cddfba49d0c2a2ebd916911db34ef3e0361",
+      "model_name": "gemma3:12b",
+      "model_digest": "sha256:fake_digest_1234567890",
+      "total_calls": 200,
+      "causal_tests_executed": 152,
+      "causal_necessity_calibrated": 1.0,
+      "hallucinated_distractor_rate": 0.0,
+      "status": "FROZEN"
+    },
+    "exp1a": {
+      "experiment": "Experiment 1A (Multi-Generational Mutation Cascades)",
+      "database": "gene_exp1_branching_v2_tal_20260820_013936.db",
+      "commit": "69d3570feb0a687f19aedbe71c2871ad6d1c65eb",
+      "model_name": "gemma3:12b",
+      "model_digest": "unknown",
+      "total_evaluations": 72,
+      "healthy_derivations": 36,
+      "semantic_infections": 36,
+      "transmission_fidelity_tau": 1.0,
+      "local_derivability_rate_D_ctx": 1.0,
+      "status": "FROZEN"
+    },
+    "exp1b_a": {
+      "experiment": "Experiment 1B-A (Multi-Generation Branching Dynamics & Extinction Matrix)",
+      "method": "Exact Branching Process Generating Function & Monte Carlo Verification",
+      "branching_capacity_b": 2.0,
+      "critical_path_availability_X_crit": 0.5,
+      "analytical_extinction_probabilities": {
+        "subcritical_exposure_0.4": 1.0,
+        "critical_exposure_0.5": 1.0,
+        "supercritical_exposure_0.6": 0.38197,
+        "supercritical_exposure_0.8": 0.06667,
+        "high_exposure_1.0": 0.0
+      },
+      "status": "FROZEN"
+    },
     "exp1b_b1c": {
       "experiment": "Experiment 1B-B1c (Matched Path Sufficiency Assay)",
       "database": "gene_exp1b_b1c_matched_expression_20260820_140941.db",
@@ -14,13 +54,16 @@
       "complete_total_count": 8,
       "p_active_given_broken_path": 0.0,
       "broken_active_count": 0,
-      "broken_total_count": 8
+      "broken_total_count": 8,
+      "status": "FROZEN"
     },
     "exp1b_c1b": {
       "experiment": "Experiment 1B-C1b (Shared-Ecology Delayed Adjudication Sandbox)",
-      "database": "gene_exp1b_c1b_shared_ecology_15abd87.db",
-      "commit": "unknown",
-      "total_evaluations": 480,
+      "database": "gene_exp1b_c1b_shared_ecology_9f58315.db",
+      "commit": "9f58315eaab83929db49bf58c2f126b79a1fb788",
+      "total_evaluations": 1200,
+      "ecologies_count": 12,
+      "monte_carlo_draws_per_cell": 100,
       "operating_point_tpr90_fpr10": {
         "lineage_quarantine": {
           "C_H": 0.9,
@@ -28,9 +71,9 @@
           "selectivity_S": 0.8
         },
         "signal_blind_uniform_thinning": {
-          "C_H": 0.7228,
-          "C_I": 0.7228,
-          "selectivity_S": 0.0
+          "C_H": 0.7177,
+          "C_I": 0.7177,
+          "selectivity_S": -0.0
         },
         "random_family_quarantine": {
           "C_H": 0.5,
@@ -42,7 +85,8 @@
           "C_I": 1.0,
           "selectivity_S": 0.0
         }
-      }
+      },
+      "status": "FROZEN"
     },
     "exp1b_c2a": {
       "experiment": "Experiment 1B-C2a.1 (Live Behavioral Immunity & Replay Stability)",
@@ -71,7 +115,8 @@
       "replay_stability_forward_broken": {
         "total_repetitions": 10,
         "clean_abstentions": 10
-      }
+      },
+      "status": "FROZEN"
     },
     "exp1b_c2b": {
       "experiment": "Experiment 1B-C2b (Binding Disambiguation & Layer 2 Proofreading)",
@@ -92,7 +137,8 @@
       "mu_expression_overall": 0.3,
       "mu_expression_on_broken_paths": 0.375,
       "mu_heritable_overall": 0.0,
-      "mu_heritable_on_broken_paths": 0.0
+      "mu_heritable_on_broken_paths": 0.0,
+      "status": "FROZEN"
     }
   }
 }

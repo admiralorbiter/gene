@@ -112,6 +112,6 @@ Experiment 1B-C2b was designed to resolve the precise mechanism of pseudo-path f
 
 ## 5. Audit & Provenance Trail
 
-- **Execution Commit:** [`1f62908`](file:///C:/Users/admir/Github/gene/scripts/run_exp1b_c2b_binding_assay.py)
+- **Execution Commit:** [`1f62908`](../../scripts/run_exp1b_c2b_binding_assay.py)
 - **Database:** `gene_exp1b_c2b_binding_assay_1f62908.db` (30 calls, 10 completed runs, full proofreader audit table)
 - **Unit Tests:** **97 / 97 tests passing in 23.05s**

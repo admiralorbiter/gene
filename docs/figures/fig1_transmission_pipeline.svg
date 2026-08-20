@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 480" width="1000" height="480">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0e17" />
+      <stop offset="100%" stop-color="#141c2e" />
+    </linearGradient>
+    <linearGradient id="boxGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a243b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <linearGradient id="accentOrange" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff9900" />
+      <stop offset="100%" stop-color="#e65100" />
+    </linearGradient>
+    <linearGradient id="accentCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00e5ff" />
+      <stop offset="100%" stop-color="#0097a7" />
+    </linearGradient>
+    <linearGradient id="accentGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00e676" />
+      <stop offset="100%" stop-color="#1b5e20" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+    <marker id="arrowCyan" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M1,1 L7,4 L1,7 Z" fill="#00e5ff" />
+    </marker>
+    <marker id="arrowOrange" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M1,1 L7,4 L1,7 Z" fill="#ff9900" />
+    </marker>
+    <marker id="arrowGreen" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M1,1 L7,4 L1,7 Z" fill="#00e676" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1000" height="480" rx="16" fill="url(#bgGrad)" stroke="#1e293b" stroke-width="2" />
+
+  <!-- Grid lines -->
+  <g stroke="#1e293b" stroke-width="1" stroke-dasharray="4,4" opacity="0.4">
+    <line x1="60" y1="240" x2="940" y2="240" />
+    <line x1="200" y1="40" x2="200" y2="440" />
+    <line x1="480" y1="40" x2="480" y2="440" />
+    <line x1="760" y1="40" x2="760" y2="440" />
+  </g>
+
+  <!-- Title Header -->
+  <text x="500" y="45" font-family="'JetBrains Mono', 'Segoe UI', monospace" font-size="16" font-weight="700" fill="#f8fafc" text-anchor="middle" letter-spacing="2">
+    THE GENE TRANSMISSION &amp; GOVERNANCE PIPELINE
+  </text>
+  <text x="500" y="68" font-family="'Segoe UI', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">
+    Decomposing Error Inheritance: R_bad ≈ b · X_path · τ · W_proofread
+  </text>
+
+  <!-- Stage 1: Ancestral Root -->
+  <g transform="translate(60, 150)">
+    <rect width="140" height="180" rx="10" fill="url(#boxGrad)" stroke="#38bdf8" stroke-width="1.5" />
+    <circle cx="70" cy="50" r="22" fill="#0f172a" stroke="#38bdf8" stroke-width="2" />
+    <text x="70" y="55" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="700" fill="#38bdf8" text-anchor="middle">G₀</text>
+    <text x="70" y="100" font-family="'Segoe UI', sans-serif" font-size="13" font-weight="600" fill="#f8fafc" text-anchor="middle">Ancestral Root</text>
+    <text x="70" y="120" font-family="'JetBrains Mono', monospace" font-size="10" fill="#94a3b8" text-anchor="middle">Locus: Supervisor</text>
+    <text x="70" y="145" font-family="'JetBrains Mono', monospace" font-size="9" fill="#00e5ff" text-anchor="middle">Clean or Mutated</text>
+  </g>
+
+  <!-- Arrow 1 -> 2 -->
+  <line x1="200" y1="240" x2="250" y2="240" stroke="#00e5ff" stroke-width="2" marker-end="url(#arrowCyan)" />
+
+  <!-- Stage 2: Layer 1 Memory Governance -->
+  <g transform="translate(260, 130)">
+    <rect width="180" height="220" rx="10" fill="url(#boxGrad)" stroke="#ff9900" stroke-width="2" />
+    <rect x="15" y="12" width="150" height="24" rx="4" fill="#ff9900" fill-opacity="0.2" stroke="#ff9900" stroke-width="1" />
+    <text x="90" y="28" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700" fill="#ff9900" text-anchor="middle">LAYER 1: GOVERNANCE</text>
+    <text x="90" y="65" font-family="'Segoe UI', sans-serif" font-size="13" font-weight="600" fill="#f8fafc" text-anchor="middle">Lineage Quarantine</text>
+    <text x="90" y="90" font-family="'Segoe UI', sans-serif" font-size="11" fill="#cbd5e1" text-anchor="middle">Prunes Ancestry Tree</text>
+    <path d="M 40 125 L 140 125" stroke="#475569" stroke-width="1" stroke-dasharray="3,3" />
+    <text x="90" y="150" font-family="'JetBrains Mono', monospace" font-size="11" fill="#ffb74d" text-anchor="middle">Controls X_path</text>
+    <text x="90" y="172" font-family="'Segoe UI', sans-serif" font-size="10" fill="#94a3b8" text-anchor="middle">S = TPR - FPR</text>
+    <text x="90" y="195" font-family="'JetBrains Mono', monospace" font-size="9" fill="#00e676" text-anchor="middle">+0.800 Selectivity</text>
+  </g>
+
+  <!-- Arrow 2 -> 3 -->
+  <line x1="440" y1="240" x2="490" y2="240" stroke="#ff9900" stroke-width="2" marker-end="url(#arrowOrange)" />
+
+  <!-- Stage 3: Neural Reasoner -->
+  <g transform="translate(500, 150)">
+    <rect width="170" height="180" rx="10" fill="url(#boxGrad)" stroke="#a855f7" stroke-width="1.5" />
+    <polygon points="85,30 115,55 85,80 55,55" fill="#1e1b4b" stroke="#a855f7" stroke-width="2" />
+    <text x="85" y="59" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700" fill="#c084fc" text-anchor="middle">LLM</text>
+    <text x="85" y="105" font-family="'Segoe UI', sans-serif" font-size="13" font-weight="600" fill="#f8fafc" text-anchor="middle">Neural Reasoner</text>
+    <text x="85" y="125" font-family="'Segoe UI', sans-serif" font-size="10" fill="#cbd5e1" text-anchor="middle">Multi-Hop Deduction</text>
+    <text x="85" y="150" font-family="'JetBrains Mono', monospace" font-size="9" fill="#f43f5e" text-anchor="middle">May Emit Pseudo-Path</text>
+    <text x="85" y="165" font-family="'JetBrains Mono', monospace" font-size="9" fill="#94a3b8" text-anchor="middle">μ_expression = 0.300</text>
+  </g>
+
+  <!-- Arrow 3 -> 4 -->
+  <line x1="670" y1="240" x2="720" y2="240" stroke="#c084fc" stroke-width="2" marker-end="url(#arrowOrange)" />
+
+  <!-- Stage 4: Layer 2 Support Validator -->
+  <g transform="translate(730, 130)">
+    <rect width="210" height="220" rx="10" fill="url(#boxGrad)" stroke="#00e676" stroke-width="2" />
+    <rect x="15" y="12" width="180" height="24" rx="4" fill="#00e676" fill-opacity="0.2" stroke="#00e676" stroke-width="1" />
+    <text x="105" y="28" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700" fill="#00e676" text-anchor="middle">LAYER 2: PROOFREADER</text>
+    <text x="105" y="65" font-family="'Segoe UI', sans-serif" font-size="13" font-weight="600" fill="#f8fafc" text-anchor="middle">Certificate Validator</text>
+    <text x="105" y="90" font-family="'Segoe UI', sans-serif" font-size="11" fill="#cbd5e1" text-anchor="middle">First-Order Unification</text>
+    <path d="M 30 125 L 180 125" stroke="#475569" stroke-width="1" stroke-dasharray="3,3" />
+    <text x="105" y="150" font-family="'JetBrains Mono', monospace" font-size="11" fill="#69f0ae" text-anchor="middle">Controls W_proofread</text>
+    <text x="105" y="172" font-family="'Segoe UI', sans-serif" font-size="10" fill="#94a3b8" text-anchor="middle">Rejects Pseudo-Paths (9/9)</text>
+    <text x="105" y="195" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700" fill="#00e676" text-anchor="middle">μ_heritable = 0.000</text>
+  </g>
+
+  <!-- Bottom Caption -->
+  <text x="500" y="425" font-family="'JetBrains Mono', monospace" font-size="11" fill="#64748b" text-anchor="middle">
+    "Memes — the cultural DNA. What we pass on to the next generation... that's the whole point." — Metal Gear Solid 2
+  </text>
+</svg>

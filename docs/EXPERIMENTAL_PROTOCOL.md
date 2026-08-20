@@ -3,7 +3,7 @@
 > [!NOTE]
 > **STATUS: HISTORICAL FROZEN FOUNDATIONAL PROTOCOL**  
 > This protocol documents the early architecture through Experiment 0 / 1A. All subsequent research phases (Phase 8 through Phase 10.5) have been completed and frozen into canonical reports and schemas.  
-> See [`docs/ARCHITECTURE.md`](file:///C:/Users/admir/Github/gene/docs/ARCHITECTURE.md), [`docs/DEVELOPMENT_PLAN.md`](file:///C:/Users/admir/Github/gene/docs/DEVELOPMENT_PLAN.md), and [`docs/results/`](file:///C:/Users/admir/Github/gene/docs/results/) for current execution status.
+> See [`docs/ARCHITECTURE.md`](../docs/ARCHITECTURE.md), [`docs/DEVELOPMENT_PLAN.md`](../docs/DEVELOPMENT_PLAN.md), and [`docs/results/`](../docs/results/) for current execution status.
 
 ---
 

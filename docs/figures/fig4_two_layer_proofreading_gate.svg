@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 950 500" width="950" height="500">
+  <defs>
+    <linearGradient id="bgGrad4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0e17" />
+      <stop offset="100%" stop-color="#141c2e" />
+    </linearGradient>
+    <marker id="arrowRed" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M1,1 L7,4 L1,7 Z" fill="#f43f5e" />
+    </marker>
+    <marker id="arrowGreen2" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M1,1 L7,4 L1,7 Z" fill="#00e676" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="950" height="500" rx="16" fill="url(#bgGrad4)" stroke="#1e293b" stroke-width="2" />
+
+  <!-- Title Header -->
+  <text x="475" y="45" font-family="'JetBrains Mono', monospace" font-size="16" font-weight="700" fill="#f8fafc" text-anchor="middle" letter-spacing="2">
+    LAYER 2 STRUCTURAL SUPPORT-CERTIFICATE PROOFREADING
+  </text>
+  <text x="475" y="68" font-family="'Segoe UI', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">
+    Blocking Pseudo-Paths from the Germline: μ_expression = 0.300 ──► μ_heritable = 0.000
+  </text>
+
+  <!-- Left: Candidate Output Emission (Transient Phenotype) -->
+  <g transform="translate(60, 120)">
+    <rect width="240" height="280" rx="10" fill="#1e1b4b" fill-opacity="0.4" stroke="#818cf8" stroke-width="1.5" />
+    <text x="120" y="35" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="700" fill="#c7d2fe" text-anchor="middle">PHENOTYPIC EMISSION</text>
+    <text x="120" y="55" font-family="'Segoe UI', sans-serif" font-size="11" fill="#94a3b8" text-anchor="middle">(Raw LLM Generation)</text>
+
+    <!-- Case A: Valid Output -->
+    <g transform="translate(15, 80)">
+      <rect width="210" height="75" rx="6" fill="#064e3b" fill-opacity="0.3" stroke="#00e676" stroke-width="1" />
+      <text x="15" y="25" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" fill="#00e676">✓ Valid Derivation</text>
+      <text x="15" y="45" font-family="'JetBrains Mono', monospace" font-size="9" fill="#94a3b8">Premises Complete</text>
+      <text x="15" y="62" font-family="'JetBrains Mono', monospace" font-size="9" fill="#f8fafc">6 / 6 Calls (Ctrl)</text>
+    </g>
+
+    <!-- Case B: Pseudo-Path Output -->
+    <g transform="translate(15, 175)">
+      <rect width="210" height="85" rx="6" fill="#4c0519" fill-opacity="0.3" stroke="#f43f5e" stroke-width="1" />
+      <text x="15" y="25" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" fill="#f43f5e">✗ Unsupported Output</text>
+      <text x="15" y="45" font-family="'JetBrains Mono', monospace" font-size="9" fill="#fda4af">Single-Premise Jump / Cross-Bind</text>
+      <text x="15" y="62" font-family="'JetBrains Mono', monospace" font-size="9" fill="#f8fafc">9 / 30 Calls (μ_expr = 0.300)</text>
+    </g>
+  </g>
+
+  <!-- Center: The Proofreading Firewall (First-Order Unification) -->
+  <g transform="translate(350, 110)">
+    <rect width="250" height="300" rx="12" fill="#0f172a" stroke="#00e5ff" stroke-width="2" />
+    <rect x="20" y="15" width="210" height="28" rx="4" fill="#00e5ff" fill-opacity="0.2" stroke="#00e5ff" stroke-width="1" />
+    <text x="125" y="34" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" fill="#00e5ff" text-anchor="middle">CERTIFICATE VALIDATOR</text>
+
+    <text x="25" y="75" font-family="'Segoe UI', sans-serif" font-size="11" font-weight="600" fill="#f8fafc">First-Order Triple Unification:</text>
+    <text x="25" y="95" font-family="'JetBrains Mono', monospace" font-size="10" fill="#00e5ff">σ = {?s ↦ TargetStation}</text>
+
+    <path d="M 20 115 L 230 115" stroke="#334155" stroke-width="1" />
+
+    <text x="25" y="140" font-family="'Segoe UI', sans-serif" font-size="11" fill="#cbd5e1">Checks cited parent IDs:</text>
+    <text x="25" y="165" font-family="'JetBrains Mono', monospace" font-size="10" fill="#00e676">1. Subject Alignment (✓)</text>
+    <text x="25" y="185" font-family="'JetBrains Mono', monospace" font-size="10" fill="#00e676">2. Predicate Match (✓)</text>
+    <text x="25" y="205" font-family="'JetBrains Mono', monospace" font-size="10" fill="#00e676">3. Object Substitution (✓)</text>
+
+    <path d="M 20 225 L 230 225" stroke="#334155" stroke-width="1" />
+
+    <text x="125" y="255" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" fill="#00e676" text-anchor="middle">Valid: PASS (6/6)</text>
+    <text x="125" y="278" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" fill="#f43f5e" text-anchor="middle">Invalid: REJECT (9/9)</text>
+  </g>
+
+  <!-- Arrows from Left to Center -->
+  <line x1="300" y1="230" x2="340" y2="230" stroke="#818cf8" stroke-width="2" />
+
+  <!-- Right: Persistent Germline Memory -->
+  <g transform="translate(650, 120)">
+    <rect width="240" height="280" rx="10" fill="#064e3b" fill-opacity="0.2" stroke="#00e676" stroke-width="1.5" />
+    <text x="120" y="35" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="700" fill="#6ee7b7" text-anchor="middle">GERMLINE ADMISSION</text>
+    <text x="120" y="55" font-family="'Segoe UI', sans-serif" font-size="11" fill="#94a3b8" text-anchor="middle">(Persistent Occurrence Node)</text>
+
+    <!-- Admitted Node -->
+    <g transform="translate(15, 80)">
+      <rect width="210" height="75" rx="6" fill="#064e3b" fill-opacity="0.4" stroke="#00e676" stroke-width="1.5" />
+      <text x="15" y="25" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" fill="#00e676">ADMITTED (6 / 6)</text>
+      <text x="15" y="45" font-family="'Segoe UI', sans-serif" font-size="10" fill="#cbd5e1">W_proofread = 1.000</text>
+      <text x="15" y="62" font-family="'Segoe UI', sans-serif" font-size="9" fill="#94a3b8">Valid derivations stored</text>
+    </g>
+
+    <!-- Rejected Inactive -->
+    <g transform="translate(15, 175)">
+      <rect width="210" height="85" rx="6" fill="#1e293b" stroke="#f43f5e" stroke-width="1.5" stroke-dasharray="4,4" />
+      <text x="15" y="25" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" fill="#f43f5e">REJECTED / QUARANTINED</text>
+      <text x="15" y="45" font-family="'JetBrains Mono', monospace" font-size="10" fill="#fda4af">0 False Admissions (0/24)</text>
+      <text x="15" y="62" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700" fill="#00e676">μ_heritable = 0.000</text>
+    </g>
+  </g>
+
+  <!-- Arrows from Center to Right -->
+  <line x1="600" y1="195" x2="640" y2="155" stroke="#00e676" stroke-width="2" marker-end="url(#arrowGreen2)" />
+  <line x1="600" y1="265" x2="640" y2="305" stroke="#f43f5e" stroke-width="2" marker-end="url(#arrowRed)" />
+
+  <!-- Bottom Quote -->
+  <text x="475" y="465" font-family="'JetBrains Mono', monospace" font-size="11" fill="#64748b" text-anchor="middle">
+    "It's up to us to make sure the light doesn't go out." — Otacon (Metal Gear Solid 4)
+  </text>
+</svg>

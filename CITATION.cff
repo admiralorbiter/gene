@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use GENE or cite its experimental findings on memory inheritance and lineage governance, please cite as follows:"
+title: "GENE: Genealogical Epistemic Network Experiments"
+abstract: "An experimental testbed and theoretical framework for studying the inheritance, retrieval dynamics, lineage-based delayed immunity, and structural proofreading of persistent LLM memory systems."
+version: 0.9.0
+date-released: 2026-08-20
+license: Apache-2.0
+repository-code: "https://github.com/admiralorbiter/gene"
+authors:
+  - name: "The GENE Research Collective"
+keywords:
+  - "persistent memory"
+  - "llm reasoning"
+  - "lineage tracking"
+  - "epistemic networks"
+  - "memory governance"
+  - "provenance laundering"
+  - "structural proofreading"

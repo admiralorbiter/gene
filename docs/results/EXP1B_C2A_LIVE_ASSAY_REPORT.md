@@ -122,6 +122,6 @@ Experiment 1B-C2a formally establishes the necessity of a **two-layer epistemic 
 
 ## 6. Audit & Provenance Trail
 
-- **Execution Commit:** [`a1474d6`](file:///C:/Users/admir/Github/gene/scripts/run_exp1b_c2_live_assay.py)
+- **Execution Commit:** [`a1474d6`](../../scripts/run_exp1b_c2_live_assay.py)
 - **Database:** `gene_exp1b_c2a_live_assay_a1474d6.db` (Tables: `calls`, `runs`, `dual_oracle_evaluations_v2`)
 - **Unit Tests:** **94 / 94 tests passing in 20.66s**

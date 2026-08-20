@@ -3,8 +3,8 @@
 
 **Document Version:** 1.0 (Canonical Post-Phase 10.5 Release)  
 **Status:** Canonical Scientific Narrative  
-**Authoritative Manifest:** [`data/canonical_results_manifest.json`](file:///C:/Users/admir/Github/gene/data/canonical_results_manifest.json)  
-**Core Reference Implementation:** [`src/gene/`](file:///C:/Users/admir/Github/gene/src/gene/)  
+**Authoritative Manifest:** [`data/canonical_results_manifest.json`](../data/canonical_results_manifest.json)  
+**Core Reference Implementation:** [`src/gene/`](../src/gene/)  
 
 ---
 

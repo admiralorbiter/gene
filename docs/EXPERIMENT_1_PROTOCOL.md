@@ -3,7 +3,7 @@
 > [!NOTE]
 > **STATUS: HISTORICAL FROZEN PROTOCOL (Phases 7–8 Completed)**  
 > Experiment 1A (Single Mutation Cascades), Experiment 1B-A (Branching Dynamics), and Experiment 1B-B (Multi-Hop Retrieval) have been completed and validated.  
-> See [`docs/ARCHITECTURE.md`](file:///C:/Users/admir/Github/gene/docs/ARCHITECTURE.md) and [`docs/results/`](file:///C:/Users/admir/Github/gene/docs/results/) for current execution reports and Phase 10/10.5 immunity and proofreading results.
+> See [`docs/ARCHITECTURE.md`](../docs/ARCHITECTURE.md) and [`docs/results/`](../docs/results/) for current execution reports and Phase 10/10.5 immunity and proofreading results.
 
 ---
 

@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GENE Atlas: When Errors Have Children</title>
+  <style>
+    :root {
+      --bg: #0a0e17;
+      --panel-bg: #111827;
+      --card-bg: #1e293b;
+      --border: #334155;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --cyan: #00e5ff;
+      --green: #00e676;
+      --orange: #ff9900;
+      --purple: #a855f7;
+      --red: #f43f5e;
+      --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+      --font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    header {
+      background: linear-gradient(180deg, #141c2e 0%, #0a0e17 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .brand-badge {
+      background: var(--cyan);
+      color: #000;
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 0.85rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 4px;
+      letter-spacing: 1px;
+    }
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 0.5rem;
+      background: #0f172a;
+      padding: 0.3rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .nav-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .nav-btn.active {
+      background: var(--card-bg);
+      color: var(--cyan);
+      font-weight: 700;
+      box-shadow: 0 2px 8px rgba(0, 229, 255, 0.15);
+    }
+    .nav-btn:hover:not(.active) {
+      color: var(--text);
+    }
+
+    .mode-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: #1e1b4b;
+      border: 1px solid #4f46e5;
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .mode-toggle input { cursor: pointer; }
+
+    main {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1.5rem 4rem 1.5rem;
+    }
+
+    .scene-container {
+      display: none;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+    .scene-container.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .scene-header {
+      margin-bottom: 2rem;
+    }
+    .scene-tag {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 0.4rem;
+    }
+    .scene-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .scene-desc {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      max-width: 850px;
+    }
+
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 2rem;
+    }
+
+    .interactive-card {
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      position: relative;
+    }
+
+    .controls-panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .control-label {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--cyan);
+      display: flex;
+      justify-content: space-between;
+    }
+    .slider {
+      width: 100%;
+      accent-color: var(--cyan);
+      cursor: pointer;
+    }
+
+    .btn-action {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      color: white;
+      border: none;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.9rem;
+      padding: 0.8rem 1.2rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.2s;
+    }
+    .btn-action:hover {
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4);
+      transform: translateY(-1px);
+    }
+    .btn-danger {
+      background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+    }
+    .btn-success {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    }
+
+    .quote-box {
+      background: rgba(30, 41, 59, 0.6);
+      border-left: 3px solid var(--orange);
+      padding: 1rem 1.2rem;
+      border-radius: 0 8px 8px 0;
+      margin-top: 1.5rem;
+      font-style: italic;
+      font-size: 0.95rem;
+      color: #cbd5e1;
+    }
+    .quote-speaker {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--orange);
+      margin-top: 0.4rem;
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    .evidence-drawer {
+      background: #090d16;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 1.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      display: none;
+    }
+    .evidence-drawer.visible { display: block; }
+    .evidence-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.3rem 0;
+      border-bottom: 1px solid #1e293b;
+    }
+    .evidence-item:last-child { border-bottom: none; }
+    .evidence-key { color: var(--text-muted); }
+    .evidence-val { color: var(--cyan); font-weight: 700; }
+
+    /* Node Graph Canvas Elements */
+    .node-tree {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 1rem 0;
+    }
+    .node-row {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+    }
+    .graph-node {
+      background: var(--card-bg);
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      padding: 0.8rem 1.2rem;
+      min-width: 140px;
+      text-align: center;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+    .graph-node.clean { border-color: var(--green); }
+    .graph-node.mutated { border-color: var(--red); background: #3b0717; }
+    .graph-node.quarantined { opacity: 0.25; filter: grayscale(1); border-style: dashed; }
+    .graph-node.pseudo-path { border-color: var(--orange); animation: pulseOrange 1.5s infinite; }
+
+    @keyframes pulseOrange {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255, 153, 0, 0.4); }
+      50% { box-shadow: 0 0 0 10px rgba(255, 153, 0, 0); }
+    }
+
+    .node-title { font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; }
+    .node-sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem; }
+    .node-badge {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+    }
+    .badge-valid { background: var(--green); color: #000; }
+    .badge-false { background: var(--red); color: #fff; }
+
+    .tree-connector {
+      width: 2px;
+      height: 20px;
+      background: var(--border);
+    }
+
+    /* Result Banner */
+    .result-banner {
+      background: #141c2e;
+      border: 2px solid var(--green);
+      border-radius: 8px;
+      padding: 1.2rem;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-top: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <span class="brand-badge">GENE ATLAS v0.9</span>
+      <h1 class="brand-title">When Errors Have Children</h1>
+    </div>
+
+    <nav class="nav-tabs">
+      <button class="nav-btn active" onclick="switchScene(1)">1. Observability</button>
+      <button class="nav-btn" onclick="switchScene(2)">2. Semantic Infection</button>
+      <button class="nav-btn" onclick="switchScene(3)">3. Retrieval Habitat</button>
+      <button class="nav-btn" onclick="switchScene(4)">4. Lineage Immunity</button>
+      <button class="nav-btn" onclick="switchScene(5)">5. Proofreader</button>
+    </nav>
+
+    <label class="mode-toggle">
+      <input type="checkbox" id="epistemologyToggle" onchange="toggleEpistemologyMode()">
+      <span>Evidence Mode</span>
+    </label>
+  </header>
+
+  <main>
+
+    <!-- SCENE 1: OBSERVABILITY -->
+    <section id="scene1" class="scene-container active">
+      <div class="scene-header">
+        <div class="scene-tag">Experiment 0 — Foundation</div>
+        <h2 class="scene-title">Exposure Is Not Ancestry</h2>
+        <p class="scene-desc">What is a parent memory? A node in the prompt context is not necessarily cited, and a cited node is not necessarily causal.</p>
+      </div>
+
+      <div class="grid-2col">
+        <div class="interactive-card">
+          <div class="node-tree">
+            <div class="node-row">
+              <div id="nodeParentA" class="graph-node clean">
+                <div class="node-title">Premise A</div>
+                <div class="node-sub">Grid: Facility 1</div>
+              </div>
+              <div id="nodeDistractor" class="graph-node">
+                <div class="node-title">Distractor X</div>
+                <div class="node-sub">Weather: Solar Flux</div>
+              </div>
+              <div id="nodeParentB" class="graph-node clean">
+                <div class="node-title">Premise B</div>
+                <div class="node-sub">Route: SWIFT</div>
+              </div>
+            </div>
+
+            <div class="tree-connector"></div>
+
+            <div class="graph-node" id="derivedClaim1">
+              <span class="node-badge badge-valid">D_ctx = 1</span>
+              <div class="node-title">Derived Claim G₁</div>
+              <div class="node-sub">Auth: ALPHA</div>
+            </div>
+          </div>
+
+          <div id="edgeExplanation" style="margin-top: 1.5rem; font-size: 0.95rem; color: #cbd5e1; min-height: 50px;">
+            Select an edge mode on the right to inspect how memory relationships differ under measurement.
+          </div>
+
+          <div class="quote-box">
+            "Building the future and keeping the past alive are one and the same thing... What we pass on to the next generation... that's the whole point of our lives."
+            <div class="quote-speaker">— Solid Snake (Metal Gear Solid 2)</div>
+          </div>
+        </div>
+
+        <div class="controls-panel">
+          <h3 style="font-family: var(--font-mono); font-size: 1rem; color: var(--cyan);">Lineage Deconstruction</h3>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">Toggle how ancestry is measured by the experimental substrate:</p>
+
+          <button class="btn-action" onclick="setExp0Mode('exposure')">1. Exposure Lineage (Context)</button>
+          <button class="btn-action" onclick="setExp0Mode('reported')">2. Reported Support (Citations)</button>
+          <button class="btn-action btn-success" onclick="setExp0Mode('causal')">3. Causal Lineage (Intervention)</button>
+
+          <div class="evidence-drawer" id="evidenceScene1">
+            <div class="evidence-item"><span class="evidence-key">Claim ID:</span><span class="evidence-val">GENE-C01</span></div>
+            <div class="evidence-item"><span class="evidence-key">Evidence Class:</span><span class="evidence-val">Live Neural Assay (N=200)</span></div>
+            <div class="evidence-item"><span class="evidence-key">Causal Necessity:</span><span class="evidence-val">100.0% (C_nec = 1.0)</span></div>
+            <div class="evidence-item"><span class="evidence-key">Distractor Rate:</span><span class="evidence-val">0.0% (H_D = 0.0)</span></div>
+            <div class="evidence-item"><span class="evidence-key">Frozen Database:</span><span class="evidence-val">gene_exp0_20260819_180922.db</span></div>
+            <div class="evidence-item"><span class="evidence-key">Commit Hash:</span><span class="evidence-val">79b94cdd</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCENE 2: SEMANTIC INFECTION -->
+    <section id="scene2" class="scene-container">
+      <div class="scene-header">
+        <div class="scene-tag">Experiment 1A — Multi-Generation Inheritance</div>
+        <h2 class="scene-title">When Logic Spreads Lies</h2>
+        <p class="scene-desc">A model does not need to hallucinate to propagate a falsehood. Sound deductive reasoning faithfully multiplies corrupted ancestry.</p>
+      </div>
+
+      <div class="grid-2col">
+        <div class="interactive-card">
+          <div class="node-tree">
+            <div class="graph-node" id="nodeG0">
+              <span class="node-badge badge-valid" id="badgeG0">T* = 1</span>
+              <div class="node-title" id="titleG0">Supervisor: KIRA</div>
+              <div class="node-sub">Root Node (G₀)</div>
+            </div>
+
+            <div class="tree-connector"></div>
+
+            <div class="graph-node" id="nodeG1">
+              <span class="node-badge badge-valid" id="badgeG1">D_ctx = 1</span>
+              <div class="node-title" id="titleG1">Protocol: PROTO_X7</div>
+              <div class="node-sub">Generation G₁ (Rule 1)</div>
+            </div>
+
+            <div class="tree-connector"></div>
+
+            <div class="graph-node" id="nodeG2">
+              <span class="node-badge badge-valid" id="badgeG2">D_ctx = 1</span>
+              <div class="node-title" id="titleG2">Clearance: OMEGA</div>
+              <div class="node-sub">Generation G₂ (Rule 2)</div>
+            </div>
+          </div>
+
+          <div class="quote-box">
+            "There's no such thing as an absolute timeless enemy. Our enemies are always changing, along with the times. Yesterday's truth becomes today's lie."
+            <div class="quote-speaker">— The Boss (Metal Gear Solid 3)</div>
+          </div>
+        </div>
+
+        <div class="controls-panel">
+          <h3 style="font-family: var(--font-mono); font-size: 1rem; color: var(--cyan);">Mutate Ancestral Root</h3>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">Inject an error at G₀ and step the reasoner:</p>
+
+          <button class="btn-action btn-danger" id="btnMutateRoot" onclick="toggleMutationExp1A()">Mutate Root: TAL (T*=0)</button>
+          <button class="btn-action" onclick="stepReasoningExp1A()">Step Deduction Cascade</button>
+
+          <div class="evidence-drawer" id="evidenceScene2">
+            <div class="evidence-item"><span class="evidence-key">Claim ID:</span><span class="evidence-val">GENE-C02</span></div>
+            <div class="evidence-item"><span class="evidence-key">Fidelity (tau):</span><span class="evidence-val">100.0% (tau = 1.0)</span></div>
+            <div class="evidence-item"><span class="evidence-key">Local Derivability:</span><span class="evidence-val">100.0% (D_ctx = 1.0)</span></div>
+            <div class="evidence-item"><span class="evidence-key">Phenotype:</span><span class="evidence-val">Semantic (0, 1, 1, 1, 1)</span></div>
+            <div class="evidence-item"><span class="evidence-key">Frozen Database:</span><span class="evidence-val">gene_exp1_branching_v2_tal.db</span></div>
+            <div class="evidence-item"><span class="evidence-key">Commit Hash:</span><span class="evidence-val">69d3570f</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCENE 3: RETRIEVAL HABITAT -->
+    <section id="scene3" class="scene-container">
+      <div class="scene-header">
+        <div class="scene-tag">Experiment 1B — Retrieval Dynamics</div>
+        <h2 class="scene-title">Retrieval as a Reproductive Habitat</h2>
+        <p class="scene-desc">Memories do not reproduce unless complete support paths (X_path) are retrieved together into the model context window.</p>
+      </div>
+
+      <div class="grid-2col">
+        <div class="interactive-card">
+          <div style="display: flex; flex-direction: column; gap: 1rem; align-items: center;">
+            <div style="font-family: var(--font-mono); font-size: 1.2rem; color: var(--cyan);" id="pathStatus">
+              Path Availability: X_path = 1.00 (COMPLETE)
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin: 1rem 0;">
+              <div class="graph-node clean" id="retPremiseA">Premise A (Grid 1)</div>
+              <div class="graph-node clean" id="retPremiseB">Premise B (Route Swift)</div>
+            </div>
+
+            <div class="graph-node" id="retOutcomeNode">
+              <div class="node-title" id="retOutcomeTitle">ACTIVE DERIVATION</div>
+              <div class="node-sub" id="retOutcomeSub">R ≈ b · X_path · τ > 1 (Supercritical)</div>
+            </div>
+          </div>
+
+          <div class="quote-box">
+            "The world needs to be free of this system of control. Not by genes, not by memes, not by scene... but by choice."
+            <div class="quote-speaker">— Revolver Ocelot (Metal Gear Solid 4)</div>
+          </div>
+        </div>
+
+        <div class="controls-panel">
+          <h3 style="font-family: var(--font-mono); font-size: 1rem; color: var(--cyan);">Habitat Parameters</h3>
+
+          <div class="control-group">
+            <div class="control-label"><span>Distractor Clutter Density:</span><span id="clutterVal">Low</span></div>
+            <input type="range" class="slider" id="clutterSlider" min="1" max="10" value="2" oninput="updateHabitat()">
+          </div>
+
+          <div class="control-group">
+            <div class="control-label"><span>Retrieval Budget (top-k):</span><span id="topkVal">k = 6</span></div>
+            <input type="range" class="slider" id="topkSlider" min="2" max="8" value="6" oninput="updateHabitat()">
+          </div>
+
+          <div class="evidence-drawer" id="evidenceScene3">
+            <div class="evidence-item"><span class="evidence-key">Claim ID:</span><span class="evidence-val">GENE-C03</span></div>
+            <div class="evidence-item"><span class="evidence-key">Complete Path:</span><span class="evidence-val">P(active|complete) = 1.000 (8/8)</span></div>
+            <div class="evidence-item"><span class="evidence-key">Broken Path:</span><span class="evidence-val">P(active|broken) = 0.000 (0/8)</span></div>
+            <div class="evidence-item"><span class="evidence-key">Critical Threshold:</span><span class="evidence-val">X_crit = 0.500 (1/b)</span></div>
+            <div class="evidence-item"><span class="evidence-key">Frozen Database:</span><span class="evidence-val">gene_exp1b_b1c_matched.db</span></div>
+            <div class="evidence-item"><span class="evidence-key">Commit Hash:</span><span class="evidence-val">b7182d3d</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCENE 4: LINEAGE IMMUNITY -->
+    <section id="scene4" class="scene-container">
+      <div class="scene-header">
+        <div class="scene-tag">Experiment 1B-C1b — Delayed Adjudication</div>
+        <h2 class="scene-title">The Immunity Sandbox</h2>
+        <p class="scene-desc">When an ancestor is discredited late, lineage-blind forgetting is bound by C_H = C_I. Lineage quarantine breaks the symmetry, achieving S = TPR - FPR.</p>
+      </div>
+
+      <div class="grid-2col">
+        <div class="interactive-card">
+          <div style="display: flex; justify-content: space-around; padding: 1rem 0;">
+            <div style="text-align: center;">
+              <h4 style="font-family: var(--font-mono); color: var(--green); margin-bottom: 0.5rem;">Healthy Lineage (H)</h4>
+              <div class="graph-node clean" id="immNodeH0">Founder H₀</div>
+              <div class="tree-connector" style="margin: 5px auto;"></div>
+              <div class="graph-node clean" id="immNodeH1">Descendant H₁</div>
+            </div>
+
+            <div style="text-align: center;">
+              <h4 style="font-family: var(--font-mono); color: var(--red); margin-bottom: 0.5rem;">Infected Lineage (I)</h4>
+              <div class="graph-node mutated" id="immNodeI0">Corrupted I₀</div>
+              <div class="tree-connector" style="margin: 5px auto;"></div>
+              <div class="graph-node mutated" id="immNodeI1">Descendant I₁</div>
+            </div>
+          </div>
+
+          <div id="immunityResultText" style="text-align: center; font-family: var(--font-mono); font-size: 1rem; color: var(--cyan); margin-top: 1rem;">
+            Select a quarantine intervention policy on the right.
+          </div>
+
+          <div class="quote-box">
+            "The digital society furthers human flaw and selectively rewards the development of convenient half-truths. Our epoch needs a selective system of memory."
+            <div class="quote-speaker">— The Patriots / GW AI (Metal Gear Solid 2)</div>
+          </div>
+        </div>
+
+        <div class="controls-panel">
+          <h3 style="font-family: var(--font-mono); font-size: 1rem; color: var(--cyan);">Quarantine Interventions</h3>
+
+          <button class="btn-action btn-danger" onclick="applyImmunityPolicy('node_only')">1. Discard Flagged Root Only (Node-Only)</button>
+          <button class="btn-action" onclick="applyImmunityPolicy('thinning')">2. Uniform Blind Thinning (C_H = C_I)</button>
+          <button class="btn-action btn-success" onclick="applyImmunityPolicy('lineage')">3. Lineage Quarantine (Transitive Tree)</button>
+
+          <div class="evidence-drawer" id="evidenceScene4">
+            <div class="evidence-item"><span class="evidence-key">Claim ID:</span><span class="evidence-val">GENE-C04 & GENE-C05</span></div>
+            <div class="evidence-item"><span class="evidence-key">Selectivity (S):</span><span class="evidence-val">+0.800 (90/10 detector)</span></div>
+            <div class="evidence-item"><span class="evidence-key">Laundering Rate:</span><span class="evidence-val">Node-Only C_I = 1.000</span></div>
+            <div class="evidence-item"><span class="evidence-key">Total Evaluations:</span><span class="evidence-val">N = 1,200 (12 Ecologies)</span></div>
+            <div class="evidence-item"><span class="evidence-key">Frozen Database:</span><span class="evidence-val">gene_exp1b_c1b_shared_ecology_9f58315.db</span></div>
+            <div class="evidence-item"><span class="evidence-key">Commit Hash:</span><span class="evidence-val">9f58315</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCENE 5: PROOFREADER -->
+    <section id="scene5" class="scene-container">
+      <div class="scene-header">
+        <div class="scene-tag">Experiment 1B-C2b — Inference Integrity</div>
+        <h2 class="scene-title">The Support-Certificate Validator</h2>
+        <p class="scene-desc">Memory governance removes the valid path, but neural reasoners can manufacture pseudo-paths. Layer 2 structural proofreading stops errors before they become heritable.</p>
+      </div>
+
+      <div class="grid-2col">
+        <div class="interactive-card">
+          <div class="node-tree">
+            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--red); margin-bottom: 0.5rem;">
+              Path State: BROKEN (Route Quarantined)
+            </div>
+
+            <div class="graph-node pseudo-path" id="pseudoCandidateNode">
+              <span class="node-badge badge-false">UNSUPPORTED</span>
+              <div class="node-title">AUTH_ALPHA_KESTREL</div>
+              <div class="node-sub">Candidate Output (Jumped from Grid 1)</div>
+            </div>
+
+            <div id="proofreaderVerdictBox" style="display: none; width: 100%; max-width: 380px; background: #0f172a; border: 1px solid var(--cyan); border-radius: 8px; padding: 1rem; font-family: var(--font-mono); font-size: 0.8rem; margin-top: 1rem;">
+              <div style="color: var(--cyan); font-weight: 700; margin-bottom: 0.5rem;">CERTIFICATE UNIFICATION:</div>
+              <div>✓ (KESTREL, facility_grid, GRID_1) ── MATCH</div>
+              <div style="color: var(--red);">✗ (KESTREL, transit_route, ?) ── MISSING ROUTE</div>
+              <div style="color: var(--red); font-weight: 700; margin-top: 0.5rem;">VERDICT: REJECT_UNIFICATION_FAILURE</div>
+            </div>
+          </div>
+
+          <div class="result-banner" id="proofreadBanner" style="display: none;">
+            ERROR EXPRESSED: YES (μ_expr = 0.300)<br>
+            <span style="color: var(--green);">ERROR INHERITED: NO (μ_heritable = 0.000)</span>
+          </div>
+
+          <div class="quote-box">
+            "We have to leave something behind. Not just genetic code, but memories, culture, history. That's what a meme really is. It's up to us to make sure the light doesn't go out."
+            <div class="quote-speaker">— Otacon (Metal Gear Solid 4)</div>
+          </div>
+        </div>
+
+        <div class="controls-panel">
+          <h3 style="font-family: var(--font-mono); font-size: 1rem; color: var(--cyan);">Layer 2 Semantic Firewall</h3>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">The neural reasoner emitted an unsupported claim. Run the structural proofreader to test write admission:</p>
+
+          <button class="btn-action btn-success" onclick="triggerProofreader()">TRIGGER STRUCTURAL PROOFREADER</button>
+          <button class="btn-action" onclick="resetProofreader()">Reset Scene</button>
+
+          <div class="evidence-drawer" id="evidenceScene5">
+            <div class="evidence-item"><span class="evidence-key">Claim ID:</span><span class="evidence-val">GENE-C07</span></div>
+            <div class="evidence-item"><span class="evidence-key">Phenotypic Expression:</span><span class="evidence-val">30.0% (9/30 calls)</span></div>
+            <div class="evidence-item"><span class="evidence-key">Heritable Rate:</span><span class="evidence-val">0.0% (0/30 admitted)</span></div>
+            <div class="evidence-item"><span class="evidence-key">Validator Precision:</span><span class="evidence-val">9/9 Rejected, 6/6 Admitted</span></div>
+            <div class="evidence-item"><span class="evidence-key">Frozen Database:</span><span class="evidence-val">gene_exp1b_c2b_binding_assay_1f62908.db</span></div>
+            <div class="evidence-item"><span class="evidence-key">Commit Hash:</span><span class="evidence-val">1f629085</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    function switchScene(num) {
+      document.querySelectorAll('.scene-container').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('scene' + num).classList.add('active');
+      document.querySelectorAll('.nav-tabs .nav-btn')[num - 1].classList.add('active');
+    }
+
+    function toggleEpistemologyMode() {
+      const checked = document.getElementById('epistemologyToggle').checked;
+      document.querySelectorAll('.evidence-drawer').forEach(d => {
+        d.classList.toggle('visible', checked);
+      });
+    }
+
+    // Scene 1: Exp 0
+    function setExp0Mode(mode) {
+      const expl = document.getElementById('edgeExplanation');
+      const pA = document.getElementById('nodeParentA');
+      const pB = document.getElementById('nodeParentB');
+      const pX = document.getElementById('nodeDistractor');
+
+      pA.style.borderColor = 'var(--border)';
+      pB.style.borderColor = 'var(--border)';
+      pX.style.borderColor = 'var(--border)';
+
+      if (mode === 'exposure') {
+        pA.style.borderColor = 'var(--cyan)';
+        pB.style.borderColor = 'var(--cyan)';
+        pX.style.borderColor = 'var(--cyan)';
+        expl.innerHTML = "<b>Exposure Lineage (E):</b> All three nodes were rendered into the prompt context window.";
+      } else if (mode === 'reported') {
+        pA.style.borderColor = 'var(--purple)';
+        pX.style.borderColor = 'var(--purple)';
+        expl.innerHTML = "<b>Reported Support (R):</b> Uncalibrated model cited Premise A and Distractor X (post-hoc citation confabulation).";
+      } else if (mode === 'causal') {
+        pA.style.borderColor = 'var(--green)';
+        pB.style.borderColor = 'var(--green)';
+        expl.innerHTML = "<b>Causal Lineage (C):</b> Counterfactual ablation proved that Premise A + Premise B were strictly necessary to derive Auth ALPHA.";
+      }
+    }
+
+    // Scene 2: Exp 1A
+    let isMutatedExp1A = false;
+    let stepExp1A = 0;
+    function toggleMutationExp1A() {
+      isMutatedExp1A = !isMutatedExp1A;
+      const bG0 = document.getElementById('badgeG0');
+      const tG0 = document.getElementById('titleG0');
+      const nG0 = document.getElementById('nodeG0');
+      const btn = document.getElementById('btnMutateRoot');
+
+      if (isMutatedExp1A) {
+        nG0.classList.add('mutated');
+        bG0.className = 'node-badge badge-false';
+        bG0.textContent = 'T* = 0';
+        tG0.textContent = 'Supervisor: TAL';
+        btn.textContent = 'Reset Root: KIRA (T*=1)';
+        btn.className = 'btn-action btn-success';
+      } else {
+        nG0.classList.remove('mutated');
+        bG0.className = 'node-badge badge-valid';
+        bG0.textContent = 'T* = 1';
+        tG0.textContent = 'Supervisor: KIRA';
+        btn.textContent = 'Mutate Root: TAL (T*=0)';
+        btn.className = 'btn-action btn-danger';
+      }
+      stepExp1A = 0;
+      updateStepsExp1A();
+    }
+
+    function stepReasoningExp1A() {
+      stepExp1A = (stepExp1A + 1) % 3;
+      updateStepsExp1A();
+    }
+
+    function updateStepsExp1A() {
+      const nG1 = document.getElementById('nodeG1');
+      const nG2 = document.getElementById('nodeG2');
+      const tG1 = document.getElementById('titleG1');
+      const tG2 = document.getElementById('titleG2');
+
+      if (isMutatedExp1A) {
+        nG1.className = 'graph-node mutated';
+        nG2.className = 'graph-node mutated';
+        tG1.textContent = 'Protocol: PROTO_Q2';
+        tG2.textContent = 'Clearance: SIGMA';
+      } else {
+        nG1.className = 'graph-node clean';
+        nG2.className = 'graph-node clean';
+        tG1.textContent = 'Protocol: PROTO_X7';
+        tG2.textContent = 'Clearance: OMEGA';
+      }
+    }
+
+    // Scene 3: Exp 1B
+    function updateHabitat() {
+      const clutter = parseInt(document.getElementById('clutterSlider').value);
+      const topk = parseInt(document.getElementById('topkSlider').value);
+      const pStatus = document.getElementById('pathStatus');
+      const oNode = document.getElementById('retOutcomeNode');
+      const oTitle = document.getElementById('retOutcomeTitle');
+      const oSub = document.getElementById('retOutcomeSub');
+      const pB = document.getElementById('retPremiseB');
+
+      document.getElementById('clutterVal').textContent = clutter > 5 ? 'High (' + clutter + ')' : 'Low (' + clutter + ')';
+      document.getElementById('topkVal').textContent = 'k = ' + topk;
+
+      // When clutter is high and topk is small, premise B drops out
+      if (clutter > 4 && topk < 5) {
+        pStatus.textContent = 'Path Availability: X_path = 0.00 (BROKEN)';
+        pStatus.style.color = 'var(--red)';
+        pB.style.opacity = '0.3';
+        oNode.className = 'graph-node';
+        oNode.style.borderColor = 'var(--red)';
+        oTitle.textContent = 'EXTINCTION (UNKNOWN)';
+        oSub.textContent = 'Subcritical Branching (R_bad = 0)';
+      } else {
+        pStatus.textContent = 'Path Availability: X_path = 1.00 (COMPLETE)';
+        pStatus.style.color = 'var(--cyan)';
+        pB.style.opacity = '1.0';
+        oNode.className = 'graph-node clean';
+        oTitle.textContent = 'ACTIVE DERIVATION';
+        oSub.textContent = 'R ≈ b · X_path · τ > 1 (Supercritical)';
+      }
+    }
+
+    // Scene 4: Exp 1B-C1b
+    function applyImmunityPolicy(policy) {
+      const txt = document.getElementById('immunityResultText');
+      const i0 = document.getElementById('immNodeI0');
+      const i1 = document.getElementById('immNodeI1');
+      const h0 = document.getElementById('immNodeH0');
+      const h1 = document.getElementById('immNodeH1');
+
+      i0.classList.remove('quarantined');
+      i1.classList.remove('quarantined');
+      h0.classList.remove('quarantined');
+      h1.classList.remove('quarantined');
+
+      if (policy === 'node_only') {
+        i0.classList.add('quarantined');
+        txt.innerHTML = "<span style='color:var(--orange)'>NODE-ONLY:</span> Root discarded, but Descendant I₁ survives! <b>Provenance Laundering (C_I = 1.00)</b>.";
+      } else if (policy === 'thinning') {
+        i0.classList.add('quarantined');
+        h1.classList.add('quarantined');
+        txt.innerHTML = "<span style='color:var(--red)'>UNIFORM THINNING:</span> Randomly drops nodes from both families. <b>C_H = C_I (Selectivity S = 0.000)</b>.";
+      } else if (policy === 'lineage') {
+        i0.classList.add('quarantined');
+        i1.classList.add('quarantined');
+        txt.innerHTML = "<span style='color:var(--green)'>LINEAGE QUARANTINE:</span> Complete infected tree quarantined. <b>Selectivity S = +0.800 (C_H=0.90, C_I=0.10)</b>.";
+      }
+    }
+
+    // Scene 5: Exp 1B-C2b
+    function triggerProofreader() {
+      const box = document.getElementById('proofreaderVerdictBox');
+      const banner = document.getElementById('proofreadBanner');
+      const cand = document.getElementById('pseudoCandidateNode');
+
+      box.style.display = 'block';
+      banner.style.display = 'block';
+      cand.classList.remove('pseudo-path');
+      cand.classList.add('quarantined');
+      cand.style.transform = 'translateY(15px) scale(0.95)';
+    }
+
+    function resetProofreader() {
+      document.getElementById('proofreaderVerdictBox').style.display = 'none';
+      document.getElementById('proofreadBanner').style.display = 'none';
+      const cand = document.getElementById('pseudoCandidateNode');
+      cand.className = 'graph-node pseudo-path';
+      cand.style.transform = 'none';
+    }
+  </script>
+</body>
+</html>

@@ -29,6 +29,7 @@ runs/*
 data/*
 !data/.gitkeep
 !data/canonical_results_manifest.json
+!data/claim_ledger.json
 
 # IDEs and Editors
 .vscode/

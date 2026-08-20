@@ -69,20 +69,24 @@ $$\text{Ancestry} \longrightarrow \text{Retrieval Exposure} \longrightarrow \tex
 | **Phase 8** | Experiment 1B-A / B1 | Allele Fidelity, Multi-Hop Retrieval Dynamics ($X_{\text{path}}$), & Causal Rescue | **FROZEN** | `f6d6cbe` |
 | **Phase 9 / 9.5** | Preflight & Matched Expression | Shape Map, Persistence Hardening, & 16-Call Live Matched Assay | **FROZEN** | `b7182d3` |
 | **Phase 10** | Experiment 1B-C0 / C1b | Analytic Calibration & 12-Ecology Delayed Adjudication Sandbox | **FROZEN** | `15abd87` |
-| **Phase 10.5** | Experiment 1B-C2 / C2a / C2b | Live Behavioral Immunity, Replay Stability, & Support-Certificate Validator | **FROZEN** | [`1f62908`](file:///C:/Users/admir/Github/gene/scripts/run_exp1b_c2b_binding_assay.py) / [`acd6660`](file:///C:/Users/admir/Github/gene/docs/ARCHITECTURE.md) |
+| **Phase 10.5** | Experiment 1B-C2 / C2a / C2b | Live Behavioral Immunity, Replay Stability, & Support-Certificate Validator | **FROZEN** | [`1f62908`](scripts/run_exp1b_c2b_binding_assay.py) / [`acd6660`](docs/ARCHITECTURE.md) |
 
 ---
 
 ## Primary Documentation & Results Artifacts
 
-- **Authoritative Metrics Manifest:** [`data/canonical_results_manifest.json`](file:///C:/Users/admir/Github/gene/data/canonical_results_manifest.json) (Machine-generated from frozen SQLite databases)
-- **Canonical Scientific Narrative:** [`docs/GENE_STORY_MEMO.md`](file:///C:/Users/admir/Github/gene/docs/GENE_STORY_MEMO.md)
-- **System Architecture & Formalisms:** [`docs/ARCHITECTURE.md`](file:///C:/Users/admir/Github/gene/docs/ARCHITECTURE.md)
+- **Authoritative Metrics Manifest:** [`data/canonical_results_manifest.json`](data/canonical_results_manifest.json) (Machine-generated from frozen SQLite databases)
+- **Claim & Evidence Ledger:** [`data/claim_ledger.json`](data/claim_ledger.json) (Exact empirical provenance of all scientific claims)
+- **Canonical Scientific Narrative:** [`docs/GENE_STORY_MEMO.md`](docs/GENE_STORY_MEMO.md)
+- **System Architecture & Formalisms:** [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+- **Interactive Research Exhibit:** [`docs/atlas/index.html`](docs/atlas/index.html)
 - **Phase Reports:**
-  - [Exp 0 Assay Report](file:///C:/Users/admir/Github/gene/docs/results/EXP0_FINAL_AUDIT_REPORT.md)
-  - [Exp 1B-C1b Shared Ecology Report](file:///C:/Users/admir/Github/gene/docs/results/EXP1B_C1B_SHARED_ECOLOGY_REPORT.md)
-  - [Exp 1B-C2a Live Behavioral Report](file:///C:/Users/admir/Github/gene/docs/results/EXP1B_C2A_LIVE_ASSAY_REPORT.md)
-  - [Exp 1B-C2b Binding & Proofreading Report](file:///C:/Users/admir/Github/gene/docs/results/EXP1B_C2B_BINDING_REPORT.md)
+  - [Exp 0 Assay Report](docs/results/EXPERIMENT_0_WALKTHROUGH.md)
+  - [Exp 1A Report](docs/results/EXPERIMENT_1A_REPORT.md)
+  - [Exp 1B-B1c Matched Expression Report](docs/results/EXP1B_B1C_MATCHED_EXPRESSION_REPORT.md)
+  - [Exp 1B-C1b Shared Ecology Report](docs/results/EXP1B_C1B_SHARED_ECOLOGY_REPORT.md)
+  - [Exp 1B-C2a Live Behavioral Report](docs/results/EXP1B_C2A_LIVE_ASSAY_REPORT.md)
+  - [Exp 1B-C2b Binding & Proofreading Report](docs/results/EXP1B_C2B_BINDING_REPORT.md)
 
 ---
 

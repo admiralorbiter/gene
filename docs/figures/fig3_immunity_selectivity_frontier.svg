@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" width="900" height="520">
+  <defs>
+    <linearGradient id="bgGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0e17" />
+      <stop offset="100%" stop-color="#141c2e" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="520" rx="16" fill="url(#bgGrad3)" stroke="#1e293b" stroke-width="2" />
+
+  <!-- Title Header -->
+  <text x="450" y="45" font-family="'JetBrains Mono', monospace" font-size="16" font-weight="700" fill="#f8fafc" text-anchor="middle" letter-spacing="2">
+    THE IMMUNITY SELECTIVITY FRONTIER: C_H vs. C_I
+  </text>
+  <text x="450" y="68" font-family="'Segoe UI', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">
+    Breaking the Null-Selectivity Diagonal (C_H = C_I) via Lineage-Aware Delayed Quarantine
+  </text>
+
+  <!-- Chart Area -->
+  <g transform="translate(180, 100)">
+    <!-- Axes Box -->
+    <rect width="360" height="340" fill="#0f172a" stroke="#334155" stroke-width="1.5" />
+
+    <!-- Grid lines -->
+    <line x1="0" y1="170" x2="360" y2="170" stroke="#1e293b" stroke-width="1" stroke-dasharray="4,4" />
+    <line x1="180" y1="0" x2="180" y2="340" stroke="#1e293b" stroke-width="1" stroke-dasharray="4,4" />
+
+    <!-- The Diagonal: C_H = C_I (Lineage-Blind Control Frontier) -->
+    <!-- (0, 340) to (360, 0) -->
+    <line x1="0" y1="340" x2="360" y2="0" stroke="#f43f5e" stroke-width="2.5" stroke-dasharray="6,4" />
+
+    <!-- Operating Point: Lineage Quarantine (TPR=0.9, FPR=0.1) -> C_I = 0.1 (x=36), C_H = 0.9 (y=34) -->
+    <!-- In our coords: x = C_I * 360 = 36, y = 340 - (C_H * 340) = 34 -->
+    <!-- Selectivity Advantage Vector -->
+    <line x1="36" y1="306" x2="36" y2="34" stroke="#00e676" stroke-width="3" stroke-dasharray="4,4" />
+    
+    <!-- Node-Only Point: C_I = 1.0, C_H = 1.0 -> (360, 0) -->
+    <circle cx="360" cy="0" r="7" fill="#f59e0b" stroke="#ffffff" stroke-width="2" />
+    <text x="345" y="25" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700" fill="#f59e0b" text-anchor="end">Node-Only (Laundering)</text>
+
+    <!-- Blind Thinning Point: C_I = 0.72, C_H = 0.72 -> x = 259, y = 95 -->
+    <circle cx="259" cy="95" r="6" fill="#f43f5e" />
+    <text x="275" y="92" font-family="'JetBrains Mono', monospace" font-size="10" fill="#fda4af">Uniform Thinning</text>
+
+    <!-- Random Family Point: C_I = 0.5, C_H = 0.5 -> x = 180, y = 170 -->
+    <circle cx="180" cy="170" r="6" fill="#f43f5e" />
+    <text x="195" y="168" font-family="'JetBrains Mono', monospace" font-size="10" fill="#fda4af">Random Family</text>
+
+    <!-- Lineage Quarantine Point -->
+    <circle cx="36" cy="34" r="8" fill="#00e676" stroke="#ffffff" stroke-width="2" />
+    <text x="50" y="38" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="700" fill="#00e676">Lineage Quarantine</text>
+    <text x="50" y="54" font-family="'JetBrains Mono', monospace" font-size="10" fill="#69f0ae">C_H=0.90, C_I=0.10 (S=+0.80)</text>
+
+    <!-- Axis Labels -->
+    <text x="180" y="375" font-family="'Segoe UI', sans-serif" font-size="12" font-weight="600" fill="#94a3b8" text-anchor="middle">
+      Infected Path Availability (C_I) ──►
+    </text>
+    <text x="-170" y="-45" font-family="'Segoe UI', sans-serif" font-size="12" font-weight="600" fill="#94a3b8" text-anchor="middle" transform="rotate(-90)">
+      ◄── Healthy Path Availability (C_H)
+    </text>
+
+    <!-- Axis Ticks -->
+    <text x="0" y="355" font-family="'JetBrains Mono', monospace" font-size="10" fill="#64748b" text-anchor="middle">0.0</text>
+    <text x="180" y="355" font-family="'JetBrains Mono', monospace" font-size="10" fill="#64748b" text-anchor="middle">0.5</text>
+    <text x="360" y="355" font-family="'JetBrains Mono', monospace" font-size="10" fill="#64748b" text-anchor="middle">1.0</text>
+
+    <text x="-15" y="344" font-family="'JetBrains Mono', monospace" font-size="10" fill="#64748b" text-anchor="end">0.0</text>
+    <text x="-15" y="174" font-family="'JetBrains Mono', monospace" font-size="10" fill="#64748b" text-anchor="end">0.5</text>
+    <text x="-15" y="5" font-family="'JetBrains Mono', monospace" font-size="10" fill="#64748b" text-anchor="end">1.0</text>
+  </g>
+
+  <!-- Legend & Findings Box (Right Side) -->
+  <g transform="translate(580, 110)">
+    <rect width="280" height="320" rx="8" fill="#1e293b" fill-opacity="0.5" stroke="#334155" stroke-width="1.5" />
+    <text x="20" y="30" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="700" fill="#00e5ff">THE GOLDEN IDENTITY</text>
+    <text x="20" y="55" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="700" fill="#00e676">S = C_H - C_I = TPR - FPR</text>
+
+    <path d="M 20 75 L 260 75" stroke="#334155" stroke-width="1" />
+
+    <text x="20" y="100" font-family="'Segoe UI', sans-serif" font-size="11" font-weight="600" fill="#f8fafc">1. Blind Forgetting Baseline Law:</text>
+    <text x="20" y="120" font-family="'Segoe UI', sans-serif" font-size="11" fill="#94a3b8">C_H ≡ C_I on all blind policies.</text>
+    <text x="20" y="135" font-family="'Segoe UI', sans-serif" font-size="11" fill="#94a3b8">Selectivity S ≡ 0.000 (No advantage).</text>
+
+    <text x="20" y="170" font-family="'Segoe UI', sans-serif" font-size="11" font-weight="600" fill="#f8fafc">2. Node-Only Laundering:</text>
+    <text x="20" y="190" font-family="'Segoe UI', sans-serif" font-size="11" fill="#94a3b8">C_I = 1.000. Flagged root removed,</text>
+    <text x="20" y="205" font-family="'Segoe UI', sans-serif" font-size="11" fill="#94a3b8">descendants survive in memory.</text>
+
+    <text x="20" y="240" font-family="'Segoe UI', sans-serif" font-size="11" font-weight="600" fill="#f8fafc">3. Lineage Quarantine Advantage:</text>
+    <text x="20" y="260" font-family="'Segoe UI', sans-serif" font-size="11" fill="#00e676">+0.800 selective gain at 90/10.</text>
+    <text x="20" y="275" font-family="'Segoe UI', sans-serif" font-size="11" fill="#94a3b8">Genealogy preserves trust addresses.</text>
+  </g>
+
+  <!-- Bottom Quote -->
+  <text x="450" y="495" font-family="'JetBrains Mono', monospace" font-size="11" fill="#64748b" text-anchor="middle">
+    "Our epoch needs a selective system of memory." — The Patriots (Metal Gear Solid 2)
+  </text>
+</svg>
