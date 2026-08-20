@@ -1,6 +1,7 @@
 """Track R Runner: Role Equivariance & Semantic Shortcut Dissection (24 Calls).
 
 Evaluates 3 representation conditions (Canonical, Role-Swapped, Opaque) across 8 lattice points on KESTREL.
+Uses production CallSpec and immutable SQLite persistence.
 """
 
 from __future__ import annotations
@@ -9,7 +10,7 @@ import hashlib
 import json
 import sqlite3
 from typing import Any
-from gene.ollama_client import OllamaClient
+from gene.ollama_client import CallSpec, OllamaClient
 from gene.experiments.epistemic_ir import (
     EpistemicState,
     PremiseNode,
@@ -23,11 +24,15 @@ from gene.experiments.epistemic_renderer import EpistemicRenderer
 from gene.experiments.transformations import RoleEquivarianceTransform
 from gene.experiments.context_compiler import EpistemicContextCompiler
 from gene.experiments.evaluators_round4 import (
-    ConformanceEvaluation,
+    CallRecord,
+    EvaluationRecord,
+    FROZEN_ROUND4_SYSTEM_PROMPT,
+    TrackRMetrics,
     evaluate_conformance_k_a,
+    evaluate_track_r_panel,
     init_round4_db,
     parse_round4_model_output,
-    persist_round4_evaluation,
+    persist_round4_call_and_evaluation,
 )
 
 
@@ -124,8 +129,8 @@ def build_kestrel_track_r_base() -> tuple[EpistemicState, QueryContract]:
     return state, query
 
 
-def run_track_r(client: Any, db_path: str, max_calls: int | None = None) -> list[ConformanceEvaluation]:
-    """Execute Track R experimental design."""
+def run_track_r(client: Any, db_path: str, max_calls: int | None = None) -> tuple[list[EvaluationRecord], TrackRMetrics]:
+    """Execute Track R experimental design with CallSpec and immutable persistence."""
     init_round4_db(db_path)
     base_state, base_query = build_kestrel_track_r_base()
 
@@ -151,6 +156,7 @@ def run_track_r(client: Any, db_path: str, max_calls: int | None = None) -> list
     ]
 
     evaluations = []
+    condition_preds: dict[str, dict[str, str]] = {"cond_canonical": {}, "cond_swapped": {}, "cond_opaque": {}}
     compiler = EpistemicContextCompiler(pipeline=PrivilegeLevel.RAW_SERIALIZATION)
     call_idx = 0
 
@@ -163,30 +169,60 @@ def run_track_r(client: Any, db_path: str, max_calls: int | None = None) -> list
             ctx = compiler.compile(sub_state, query_cand, occurrence_order=occ_subset, equivalence_class_id=cond_id)
 
             call_id = f"call_r_{cond_id}_{pt_label}"
-            resp_text = client.chat(messages=[{"role": "user", "content": ctx.prompt}], model="gemma3:12b")
-            parsed = parse_round4_model_output(resp_text)
+            spec = CallSpec(
+                model_name="gemma3:12b",
+                system_prompt=FROZEN_ROUND4_SYSTEM_PROMPT,
+                user_prompt=ctx.prompt,
+                temperature=0.0,
+                seed=42,
+                format="json",
+            )
+
+            result = client.chat(spec)
+            parsed = parse_round4_model_output(result.raw_response_text)
+            condition_preds[cond_id][pt_label] = parsed.protocol
 
             k_a = evaluate_conformance_k_a(parsed.protocol, expected_proto)
-            
-            # K_role: 1 if non-shortcut UNKNOWN or valid derivation preserved
-            k_role = 1 if (parsed.protocol == expected_proto) else 0
 
-            eval_record = ConformanceEvaluation(
+            call_spec_sha = hashlib.sha256(spec.model_dump_json().encode("utf-8")).hexdigest()
+            call_rec = CallRecord(
+                call_id=call_id,
+                track="track_r",
+                call_spec_sha256=call_spec_sha,
+                model_name=result.model_name,
+                model_digest=result.model_digest,
+                system_prompt=spec.system_prompt,
+                user_prompt=spec.user_prompt,
+                temperature=spec.temperature,
+                seed=spec.seed,
+                format=spec.format if isinstance(spec.format, str) else "json",
+                raw_response_text=result.raw_response_text,
+                latency_ms=result.latency_ms,
+            )
+
+            eval_rec = EvaluationRecord(
                 call_id=call_id,
                 track="track_r",
                 condition_id=f"{cond_id}_{pt_label}",
                 station="KESTREL",
                 expected_protocol=expected_proto,
                 predicted_protocol=parsed.protocol,
+                reported_support_path=parsed.reported_support_path,
+                independence_status=parsed.independence_status,
+                perceived_independent_roots=parsed.perceived_independent_roots,
                 k_a=k_a,
-                k_role=k_role,
                 prompt_hash=hashlib.sha256(ctx.prompt.encode("utf-8")).hexdigest(),
                 state_hash=ctx.state_hash,
                 compiler_pipeline="RAW_SERIALIZATION",
-                raw_output=resp_text,
             )
-            persist_round4_evaluation(db_path, eval_record)
-            evaluations.append(eval_record)
+
+            persist_round4_call_and_evaluation(db_path, call_rec, eval_rec)
+            evaluations.append(eval_rec)
             call_idx += 1
 
-    return evaluations
+    panel_metrics = evaluate_track_r_panel(
+        condition_preds["cond_canonical"],
+        condition_preds["cond_swapped"],
+        condition_preds["cond_opaque"],
+    )
+    return evaluations, panel_metrics

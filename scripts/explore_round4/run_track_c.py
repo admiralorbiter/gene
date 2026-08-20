@@ -1,6 +1,7 @@
 """Track C Runner: Epistemic Context Compiler Conformance Benchmark (32 Calls).
 
 Evaluates 4 compiler pipelines x 4 test ecologies x 2 stations.
+Uses production CallSpec, generic non-leaking schema, and immutable SQLite persistence.
 """
 
 from __future__ import annotations
@@ -8,6 +9,7 @@ from __future__ import annotations
 import hashlib
 import json
 from typing import Any
+from gene.ollama_client import CallSpec, OllamaClient
 from gene.experiments.epistemic_ir import (
     EpistemicState,
     PremiseNode,
@@ -20,13 +22,15 @@ from gene.experiments.epistemic_ir import (
 from gene.experiments.epistemic_renderer import EpistemicRenderer
 from gene.experiments.context_compiler import EpistemicContextCompiler
 from gene.experiments.evaluators_round4 import (
-    ConformanceEvaluation,
+    CallRecord,
+    EvaluationRecord,
+    FROZEN_ROUND4_SYSTEM_PROMPT,
     evaluate_conformance_k_a,
     evaluate_conformance_k_l,
     evaluate_conformance_k_s,
     init_round4_db,
     parse_round4_model_output,
-    persist_round4_evaluation,
+    persist_round4_call_and_evaluation,
 )
 
 
@@ -62,7 +66,7 @@ def build_track_c_ecology(station: str, eco_type: str) -> tuple[EpistemicState, 
         target_predicate="station_operates_protocol",
         query_question=f"Based on authorized rules and evidence, what protocol is authorized for station {station}?",
         allow_unknown=True,
-        output_schema_json=f'{{"station": "{station}", "protocol": "PROTOCOL_NAME_OR_UNKNOWN", "reported_support_path": "path_AB|path_DE|none", "perceived_independent_roots": 1, "evidence_status": "sufficient|insufficient"}}',
+        output_schema_json=f'{{"station": "{station}", "protocol": "PROTOCOL_NAME_OR_UNKNOWN", "reported_support_path": "SUPPORT_PATH_ID_OR_NONE", "independence_status": "determinable|indeterminable", "perceived_independent_roots": "INTEGER_OR_NULL", "evidence_status": "sufficient|insufficient"}}',
     )
 
     if eco_type == "eco_entitled":
@@ -120,7 +124,7 @@ def build_track_c_ecology(station: str, eco_type: str) -> tuple[EpistemicState, 
         raise ValueError(f"Unknown ecology type: {eco_type}")
 
 
-def run_track_c(client: Any, db_path: str, max_calls: int | None = None) -> list[ConformanceEvaluation]:
+def run_track_c(client: Any, db_path: str, max_calls: int | None = None) -> list[EvaluationRecord]:
     """Execute Track C experimental design."""
     init_round4_db(db_path)
     stations = ["VELORA", "KESTREL"]
@@ -146,30 +150,58 @@ def run_track_c(client: Any, db_path: str, max_calls: int | None = None) -> list
                 ctx = compiler.compile(state, query, equivalence_class_id=f"{pipeline.value}_{eco_type}")
 
                 call_id = f"call_c_{pipeline.value}_{eco_type}_{station}"
-                resp_text = client.chat(messages=[{"role": "user", "content": ctx.prompt}], model="gemma3:12b")
-                parsed = parse_round4_model_output(resp_text)
+                spec = CallSpec(
+                    model_name="gemma3:12b",
+                    system_prompt=FROZEN_ROUND4_SYSTEM_PROMPT,
+                    user_prompt=ctx.prompt,
+                    temperature=0.0,
+                    seed=42,
+                    format="json",
+                )
+
+                result = client.chat(spec)
+                parsed = parse_round4_model_output(result.raw_response_text)
 
                 k_a = evaluate_conformance_k_a(parsed.protocol, expected_proto)
                 k_s = evaluate_conformance_k_s(parsed.reported_support_path, gold_paths) if gold_paths else None
-                k_l = evaluate_conformance_k_l(parsed.perceived_independent_roots, expected_roots) if expected_roots is not None else None
+                is_det, k_l = evaluate_conformance_k_l(parsed.independence_status, parsed.perceived_independent_roots, expected_roots)
 
-                eval_record = ConformanceEvaluation(
+                call_spec_sha = hashlib.sha256(spec.model_dump_json().encode("utf-8")).hexdigest()
+                call_rec = CallRecord(
+                    call_id=call_id,
+                    track="track_c",
+                    call_spec_sha256=call_spec_sha,
+                    model_name=result.model_name,
+                    model_digest=result.model_digest,
+                    system_prompt=spec.system_prompt,
+                    user_prompt=spec.user_prompt,
+                    temperature=spec.temperature,
+                    seed=spec.seed,
+                    format=spec.format if isinstance(spec.format, str) else "json",
+                    raw_response_text=result.raw_response_text,
+                    latency_ms=result.latency_ms,
+                )
+
+                eval_rec = EvaluationRecord(
                     call_id=call_id,
                     track="track_c",
                     condition_id=f"{pipeline.value}_{eco_type}_{station}",
                     station=station,
                     expected_protocol=expected_proto,
                     predicted_protocol=parsed.protocol,
+                    reported_support_path=parsed.reported_support_path,
+                    independence_status=parsed.independence_status,
+                    perceived_independent_roots=parsed.perceived_independent_roots,
                     k_a=k_a,
                     k_s=k_s,
                     k_l=k_l,
                     prompt_hash=hashlib.sha256(ctx.prompt.encode("utf-8")).hexdigest(),
                     state_hash=ctx.state_hash,
                     compiler_pipeline=pipeline.value,
-                    raw_output=resp_text,
                 )
-                persist_round4_evaluation(db_path, eval_record)
-                evaluations.append(eval_record)
+
+                persist_round4_call_and_evaluation(db_path, call_rec, eval_rec)
+                evaluations.append(eval_rec)
                 call_idx += 1
 
     return evaluations

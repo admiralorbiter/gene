@@ -29,9 +29,10 @@ All 7 mechanical and executable preflight gates are fully verified prior to live
 │ 5. Substate Consistency      │ PASS   │ subselect_occurrences() produces truthful substates with recomputed    │
 │                              │        │ surviving paths passing partial-state validation.                      │
 ├──────────────────────────────┼────────┼────────────────────────────────────────────────────────────────────────┤
-│ 6. Executable Endpoints      │ PASS   │ Parsers, evaluators (evaluate_K_A, K_S, K_L, K_role, K_mono, K_I),     │
-│                              │        │ SQLite persistence, and FakeOllamaClient smoke tests verified across   │
-│                              │        │ all 4 runners (N_calls = N_evals = 1).                                 │
+│ 6. Executable Endpoints      │ PASS   │ Production CallSpec/ModelCallResult integration, relational evaluators │
+│                              │        │ (K_I panel entropy/disagreement, K_mono S->E transitions, K_role       │
+│                              │        │ classification), immutable round4_calls/round4_evaluations tables, and │
+│                              │        │ fake smoke tests verified across all 4 runners.                        │
 ├──────────────────────────────┼────────┼────────────────────────────────────────────────────────────────────────┤
 │ 7. Privilege Audit Matrix    │ PASS   │ Explicitly audits passes (validity, dedup, ordering, certificate) for  │
 │                              │        │ RAW, TOPOLOGY_AWARE, GENEALOGICAL_NORM, and PROOF_CARRYING pipelines.  │
@@ -62,6 +63,6 @@ All 7 mechanical and executable preflight gates are fully verified prior to live
 ---
 
 ## 3. Preflight Gating & Canary Strategy
-- **Master Orchestrator:** [`scripts/explore_round4/run_round4_master.py`](file:///C:/Users/admir/Github/gene/scripts/explore_round4/run_round4_master.py)
-- **Canary Protocol:** Before spending the 116 live calls, 4 isolated canary calls (1 per track) will be executed into a disposable canary database (`data/canary_round4.db`) to verify real Gemma 3:12B JSON formatting and schema conformance.
-- **Stage 1 Status:** **100% Passed (146/146 unit tests passing across repo).**
+- **Master Orchestrator:** [`scripts/explore_round4/run_round4_master.py`](../../scripts/explore_round4/run_round4_master.py)
+- **Canary Protocol:** Before spending the 116 live calls, 4 isolated canary calls (1 per track) will be executed into a disposable canary database (`data/canary_round4.db`) using the production `OllamaClient` to verify real Gemma 3:12B JSON formatting and schema conformance.
+- **Stage 1 Status:** **100% Passed (145/145 unit tests passing across repo).**

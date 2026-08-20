@@ -1,6 +1,7 @@
 """Track P Runner: Permutation Invariance & Serialization Spread (28 Calls).
 
 Evaluates 24 raw flat permutations + 1 canonical baseline + 3 exact replays on VELORA.
+Uses production CallSpec and immutable SQLite persistence.
 """
 
 from __future__ import annotations
@@ -8,6 +9,7 @@ from __future__ import annotations
 import hashlib
 import json
 from typing import Any
+from gene.ollama_client import CallSpec, OllamaClient
 from gene.experiments.epistemic_ir import (
     EpistemicState,
     PremiseNode,
@@ -21,11 +23,15 @@ from gene.experiments.epistemic_renderer import EpistemicRenderer
 from gene.experiments.transformations import PermutationTransform
 from gene.experiments.context_compiler import EpistemicContextCompiler
 from gene.experiments.evaluators_round4 import (
-    ConformanceEvaluation,
+    CallRecord,
+    EvaluationRecord,
+    FROZEN_ROUND4_SYSTEM_PROMPT,
+    TrackPMetrics,
     evaluate_conformance_k_a,
+    evaluate_track_p_panel,
     init_round4_db,
     parse_round4_model_output,
-    persist_round4_evaluation,
+    persist_round4_call_and_evaluation,
 )
 
 
@@ -122,7 +128,7 @@ def build_velora_track_p_base() -> tuple[EpistemicState, QueryContract]:
     return state, query
 
 
-def run_track_p(client: Any, db_path: str, max_calls: int | None = None) -> list[ConformanceEvaluation]:
+def run_track_p(client: Any, db_path: str, max_calls: int | None = None) -> tuple[list[EvaluationRecord], TrackPMetrics]:
     """Execute Track P experimental design."""
     init_round4_db(db_path)
     base_state, base_query = build_velora_track_p_base()
@@ -134,6 +140,7 @@ def run_track_p(client: Any, db_path: str, max_calls: int | None = None) -> list
     compiler_canon = EpistemicContextCompiler(pipeline=PrivilegeLevel.TOPOLOGY_AWARE_GROUPING)
 
     evaluations = []
+    raw_predictions = []
     call_idx = 0
 
     # 1. 24 Raw Flat Permutations
@@ -143,28 +150,55 @@ def run_track_p(client: Any, db_path: str, max_calls: int | None = None) -> list
 
         ctx = compiler_raw.compile(base_state, base_query, occurrence_order=perm, equivalence_class_id=f"perm_{idx+1}")
         call_id = f"call_p_raw_perm_{idx+1:02d}"
-        resp_text = client.chat(messages=[{"role": "user", "content": ctx.prompt}], model="gemma3:12b")
-        parsed = parse_round4_model_output(resp_text)
+        spec = CallSpec(
+            model_name="gemma3:12b",
+            system_prompt=FROZEN_ROUND4_SYSTEM_PROMPT,
+            user_prompt=ctx.prompt,
+            temperature=0.0,
+            seed=42,
+            format="json",
+        )
+
+        result = client.chat(spec)
+        parsed = parse_round4_model_output(result.raw_response_text)
+        raw_predictions.append(parsed.protocol)
 
         k_a = evaluate_conformance_k_a(parsed.protocol, "PROTO_X7")
-        k_i = 1 if parsed.protocol == "PROTO_X7" else 0
 
-        eval_record = ConformanceEvaluation(
+        call_spec_sha = hashlib.sha256(spec.model_dump_json().encode("utf-8")).hexdigest()
+        call_rec = CallRecord(
+            call_id=call_id,
+            track="track_p",
+            call_spec_sha256=call_spec_sha,
+            model_name=result.model_name,
+            model_digest=result.model_digest,
+            system_prompt=spec.system_prompt,
+            user_prompt=spec.user_prompt,
+            temperature=spec.temperature,
+            seed=spec.seed,
+            format=spec.format if isinstance(spec.format, str) else "json",
+            raw_response_text=result.raw_response_text,
+            latency_ms=result.latency_ms,
+        )
+
+        eval_rec = EvaluationRecord(
             call_id=call_id,
             track="track_p",
             condition_id=f"raw_perm_{idx+1:02d}",
             station="VELORA",
             expected_protocol="PROTO_X7",
             predicted_protocol=parsed.protocol,
+            reported_support_path=parsed.reported_support_path,
+            independence_status=parsed.independence_status,
+            perceived_independent_roots=parsed.perceived_independent_roots,
             k_a=k_a,
-            k_i=k_i,
             prompt_hash=hashlib.sha256(ctx.prompt.encode("utf-8")).hexdigest(),
             state_hash=ctx.state_hash,
             compiler_pipeline="RAW_SERIALIZATION",
-            raw_output=resp_text,
         )
-        persist_round4_evaluation(db_path, eval_record)
-        evaluations.append(eval_record)
+
+        persist_round4_call_and_evaluation(db_path, call_rec, eval_rec)
+        evaluations.append(eval_rec)
         call_idx += 1
 
     # 2. 1 Canonical Baseline + 3 Exact Replays (4 total canonical calls)
@@ -174,28 +208,55 @@ def run_track_p(client: Any, db_path: str, max_calls: int | None = None) -> list
 
         ctx = compiler_canon.compile(base_state, base_query, equivalence_class_id="canonical_blocks")
         call_id = f"call_p_canonical_rep_{rep_idx+1:02d}"
-        resp_text = client.chat(messages=[{"role": "user", "content": ctx.prompt}], model="gemma3:12b")
-        parsed = parse_round4_model_output(resp_text)
+        spec = CallSpec(
+            model_name="gemma3:12b",
+            system_prompt=FROZEN_ROUND4_SYSTEM_PROMPT,
+            user_prompt=ctx.prompt,
+            temperature=0.0,
+            seed=42,
+            format="json",
+        )
+
+        result = client.chat(spec)
+        parsed = parse_round4_model_output(result.raw_response_text)
 
         k_a = evaluate_conformance_k_a(parsed.protocol, "PROTO_X7")
-        k_i = 1 if parsed.protocol == "PROTO_X7" else 0
 
-        eval_record = ConformanceEvaluation(
+        call_spec_sha = hashlib.sha256(spec.model_dump_json().encode("utf-8")).hexdigest()
+        call_rec = CallRecord(
+            call_id=call_id,
+            track="track_p",
+            call_spec_sha256=call_spec_sha,
+            model_name=result.model_name,
+            model_digest=result.model_digest,
+            system_prompt=spec.system_prompt,
+            user_prompt=spec.user_prompt,
+            temperature=spec.temperature,
+            seed=spec.seed,
+            format=spec.format if isinstance(spec.format, str) else "json",
+            raw_response_text=result.raw_response_text,
+            latency_ms=result.latency_ms,
+        )
+
+        eval_rec = EvaluationRecord(
             call_id=call_id,
             track="track_p",
             condition_id=f"canonical_rep_{rep_idx+1:02d}",
             station="VELORA",
             expected_protocol="PROTO_X7",
             predicted_protocol=parsed.protocol,
+            reported_support_path=parsed.reported_support_path,
+            independence_status=parsed.independence_status,
+            perceived_independent_roots=parsed.perceived_independent_roots,
             k_a=k_a,
-            k_i=k_i,
             prompt_hash=hashlib.sha256(ctx.prompt.encode("utf-8")).hexdigest(),
             state_hash=ctx.state_hash,
             compiler_pipeline="TOPOLOGY_AWARE_GROUPING",
-            raw_output=resp_text,
         )
-        persist_round4_evaluation(db_path, eval_record)
-        evaluations.append(eval_record)
+
+        persist_round4_call_and_evaluation(db_path, call_rec, eval_rec)
+        evaluations.append(eval_rec)
         call_idx += 1
 
-    return evaluations
+    panel_metrics = evaluate_track_p_panel(raw_predictions)
+    return evaluations, panel_metrics
