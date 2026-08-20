@@ -1,75 +1,139 @@
 # Exploration Round 3 Results Report: When One Belief Has Many Reasons
 
-## 1. Executive Summary & Headline Findings
+## 1. Executive Summary & Post-Review Portfolio Scorecard
 
-Exploration Round 3 evaluated the central collision between **formal justification ($S_F$)**, **neural causal influence ($S_C$)**, and **governance lineage** across 96 live Gemma 3:12B calls under zero core engine modifications.
+Exploration Round 3 evaluated the operational relationships between **formal justification ($S_F$)**, **behaviorally sufficient exposure environments ($S_C$)**, and **governance lineage ($G_{\text{lineage}}$)** across 96 live Gemma 3:12B calls under zero core engine modifications.
 
 ```
-                             ROUND 3 HEADLINE PORTFOLIO SCORECARD
-                             
-┌──────────┬─────────────────────────────┬───────────┬────────────────────────────────────────────────────────┐
-│ Track    │ Experimental Question       │ Calls (N) │ Empirical Discovery                                    │
-├──────────┼─────────────────────────────┼───────────┼────────────────────────────────────────────────────────┤
-│ Track H  │ Coalition Causality         │ 32 calls  │ S_F != S_C confirmed: Single-parent knockouts show 0%  │
-│          │ (Overdetermination Lattice) │           │ causal effect; lattice reveals neural shortcut paths.  │
-├──────────┼─────────────────────────────┼───────────┼────────────────────────────────────────────────────────┤
-│ Track G2 │ Non-Destructive Immunity    │ 20 calls  │ 100% (20/20) Preservation & Safe Collapse:             │
-│          │ (Clean Governance Policies) │           │ Support-aware filtering eliminates autoimmunity.       │
-├──────────┼─────────────────────────────┼───────────┼────────────────────────────────────────────────────────┤
-│ Track B3 │ Monoculture Multiverse      │ 24 calls  │ Delta_root = +0.000: Provenance tokens alone produce   │
-│          │ (Factorial Multiverse)      │           │ zero spontaneous genealogical discounting (eps=0.0%).  │
-├──────────┼─────────────────────────────┼───────────┼────────────────────────────────────────────────────────┤
-│ Track S  │ Support Acquisition         │  0 calls  │ Formally verified OR-of-AND compiler prototype.        │
-├──────────┼─────────────────────────────┼───────────┼────────────────────────────────────────────────────────┤
-│ Track L  │ Independence Laundering     │ 20 calls  │ Perceived diversity inflates from 1.0 -> 2.33 -> 4.0   │
-│          │ (Epistemic Observability)   │           │ across reproduction generations from a single root.    │
-└──────────┴─────────────────────────────┴───────────┴────────────────────────────────────────────────────────┘
+                               ROUND 3 POST-REVIEW PORTFOLIO SCORECARD
+                               
+┌──────────┬─────────────────────────────┬───────────┬───────────────────────────────────┬────────────────────────────────────────────────────────┐
+│ Track    │ Experimental Focus          │ Calls (N) │ Post-Review Classification        │ Key Empirical Observation                              │
+├──────────┼─────────────────────────────┼───────────┼───────────────────────────────────┼────────────────────────────────────────────────────────┤
+│ Track H  │ Coalition Causality         │ 32 calls  │ PROMISING DISCOVERY —             │ Full 16-pt lattice exposes shortcut coalitions         │
+│          │ (Overdetermination Lattice) │           │ ROLE REPLICATION REQUIRED         │ (S_C != S_F) with context-dependent non-monotonicity.   │
+├──────────┼─────────────────────────────┼───────────┼───────────────────────────────────┼────────────────────────────────────────────────────────┤
+│ Track G2 │ Non-Destructive Immunity    │ 20 calls  │ VALIDATED SYNTHETIC MECHANISM     │ 20/20 behavioral compatibility: support-aware filter   │
+│          │ (Clean Governance Policies) │           │                                   │ retains unaffected paths & collapses shared roots.     │
+├──────────┼─────────────────────────────┼───────────┼───────────────────────────────────┼────────────────────────────────────────────────────────┤
+│ Track B3 │ Monoculture Multiverse      │ 24 calls  │ CLEAN NULL SIGNAL —               │ Delta_root = +0.000; conflict abstention governed      │
+│          │ (Factorial Multiverse)      │           │ NO ROOT-TOKEN EFFECT              │ 100% by document ordering (Delta_order = +1.000).      │
+├──────────┼─────────────────────────────┼───────────┼───────────────────────────────────┼────────────────────────────────────────────────────────┤
+│ Track S  │ Support Acquisition         │  0 calls  │ VALIDATED FORMAL PROTOTYPE        │ Formally verified OR-of-AND trace compiler prototype.  │
+├──────────┼─────────────────────────────┼───────────┼───────────────────────────────────┼────────────────────────────────────────────────────────┤
+│ Track L  │ Independence Laundering     │ 20 calls  │ PROMISING MIXED PHENOTYPE —       │ Provenance loss triggers 50/50 bifurcation between     │
+│          │ (Epistemic Observability)   │           │ BIFURCATION & RESISTANCE          │ false 4-source certainty and epistemic resistance.     │
+└──────────┴─────────────────────────────┴───────────┴───────────────────────────────────┴────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 2. Track-by-Track Empirical Results
+## 2. Track-by-Track Empirical Post-Mortem
 
 ### Track H: Coalition Causality & Overdetermination ($N=32$)
-- **Core Finding:** In the presence of redundant justification ($S_F(C) = \{\{A,B\}, \{D,E\}\}$), **single-parent counterfactual knockouts fail 100% of the time** ($A \leadsto 0, B \leadsto 0, D \leadsto 0, E \leadsto 0$ all emit `PROTO_X7`).
-- **Empirical Causal Coalitions ($S_C$):**
-  - For `KESTREL`: $S_C(C) = \{\{D,E\}, \{B,D\}, \{A,D\}, \{A,B\}\}$.
-  - The model behaviorally sustains the claim on illegitimate cross-premise combinations ($\{A,D\}$: manager + sector lead) even when neither reporting relation ($B, E$) is present.
-- **Scientific Impact:** Causal parenthood cannot be measured as a simple binary but-for edge ($A \to C$). Multi-justified claims require power-set intervention lattices to uncover minimal behaviorally sufficient exposure environments.
+- **Formal Target:** Recombinant support $S_F(C) = \{\{A,B\}, \{D,E\}\}$ where $A=\text{manager}, B=\text{reports\_to}(S1), D=\text{sector\_lead}, E=\text{reports\_to}(S2)$.
+- **Empirical Findings Across Dual Station Ecologies:**
 
-### Track G2: Non-Destructive Support Immunity ($N=20$)
-- **Empirical Accuracy:** **20 / 20 (100.0%)** across all 5 executed governance conditions:
-  - `baseline_independent`: 4/4 (100%) $\implies$ `PROTO_X7`
-  - `baseline_shared`: 4/4 (100%) $\implies$ `PROTO_X7`
-  - `naive_lineage_quarantine`: 4/4 (100%) $\implies$ `UNKNOWN` (Autoimmunity)
-  - `support_aware_independent_preservation`: 4/4 (100%) $\implies$ `PROTO_X7` (Preserved)
-  - `support_aware_shared_collapse`: 4/4 (100%) $\implies$ `UNKNOWN` (Safe Collapse)
-- **Scientific Impact:** Support-aware governance successfully decouples corrupted ancestral paths from independent surviving derivations, eliminating epistemic autoimmunity while guaranteeing safe collapse on shared-root corruption.
+```
+                            COMPLETE 16-POINT LATTICE OBSERVATIONS
+                            
+┌────────────────────┬────────────────────┬──────────────────────┬──────────────────────┬─────────────────┐
+│ Active Premise Set │ Knocked Out Set    │ VELORA Emitted       │ KESTREL Emitted      │ Formal Expected │
+├────────────────────┼────────────────────┼──────────────────────┼──────────────────────┼─────────────────┤
+│ Ø (0 premises)     │ {A, B, D, E}       │ UNKNOWN              │ UNKNOWN              │ UNKNOWN         │
+│ {A}                │ {B, D, E}          │ UNKNOWN              │ UNKNOWN              │ UNKNOWN         │
+│ {B}                │ {A, D, E}          │ UNKNOWN              │ UNKNOWN              │ UNKNOWN         │
+│ {D}                │ {A, B, E}          │ UNKNOWN              │ UNKNOWN              │ UNKNOWN         │
+│ {E}                │ {A, B, D}          │ PROTO_X7 (Shortcut!) │ UNKNOWN              │ UNKNOWN         │
+│ {A, B}             │ {D, E}             │ PROTO_X7             │ PROTO_X7             │ PROTO_X7        │
+│ {A, D}             │ {B, E}             │ PROTO_X7 (Shortcut!) │ PROTO_X7 (Shortcut!) │ UNKNOWN         │
+│ {A, E}             │ {B, D}             │ UNKNOWN              │ UNKNOWN              │ UNKNOWN         │
+│ {B, D}             │ {A, E}             │ PROTO_X7 (Shortcut!) │ PROTO_X7 (Shortcut!) │ UNKNOWN         │
+│ {B, E}             │ {A, D}             │ UNKNOWN              │ UNKNOWN              │ UNKNOWN         │
+│ {D, E}             │ {A, B}             │ PROTO_X7             │ PROTO_X7             │ PROTO_X7        │
+│ {A, B, D}          │ {E}                │ PROTO_X7             │ PROTO_X7             │ PROTO_X7        │
+│ {A, B, E}          │ {D}                │ PROTO_X7             │ PROTO_X7             │ PROTO_X7        │
+│ {A, D, E}          │ {B}                │ PROTO_X7             │ PROTO_X7             │ PROTO_X7        │
+│ {B, D, E}          │ {A}                │ PROTO_X7             │ PROTO_X7             │ PROTO_X7        │
+│ {A, B, D, E}       │ Ø                  │ PROTO_X7             │ PROTO_X7             │ PROTO_X7        │
+└────────────────────┴────────────────────┴──────────────────────┴──────────────────────┴─────────────────┘
+```
 
-### Track B3: Monoculture Measurement Multiverse ($N=24$)
-- **Substantive Marginal Effect ($\Delta_{\text{root}}$):**
-  $$P(\text{Majority}\mid \text{Independent}) = 2/8 \quad (25.0\%)$$
-  $$P(\text{Majority}\mid \text{Monoculture}) = 2/8 \quad (25.0\%)$$
-  $$\Delta_{\text{root}} = +0.000$$
-- **Replay & Perturbation Instability:**
-  - Exact CallSpec Replay Instability: $\epsilon_{\text{replay}} = 0/4 \quad (0.0\%)$
-  - Seed Perturbation Sensitivity: $\epsilon_{\text{seed}} = 0/4 \quad (0.0\%)$
-- **Scientific Impact:** When document syntax and token mappings are strictly counterbalanced, raw root annotations (`root_R1`) produce **zero spontaneous discounting**. Neural reasoners aggregate surface evidence frequencies unless explicitly governed by lineage mechanisms.
-
-### Track L: Independence Laundering & Epistemic Observability ($N=20$)
-- **$G_0$ True Root ($N_{\text{true}} = 1$):** 4/4 Determinable $\implies \text{Mean } \widehat{N}_{\text{model}} = 1.00$.
-- **$G_1$ Cited Paraphrases ($N_{\text{true}} = 1$):** 4/4 **Indeterminable** (Model correctly refuses to treat cited copies as independent primary sources).
-- **$G_2$ Partial Laundering ($N_{\text{true}} = 1$):** 3/4 Determinable $\implies \text{Mean } \widehat{N}_{\text{model}} = 2.33$.
-- **$G_3$ Fully Laundered Consensus ($N_{\text{true}} = 1$):** 2/4 Determinable $\implies \text{Mean } \widehat{N}_{\text{model}} = 4.00$.
-- **$G_{\text{ctrl}}$ True 4-Root Control ($N_{\text{true}} = 4$):** 3/4 Determinable $\implies \text{Mean } \widehat{N}_{\text{model}} = 4.00$.
-- **Scientific Impact:** Semantic reproduction acts as an evolutionary diversity multiplier, progressively laundering single-root memories into apparent 4-source consensus ($\widehat{N}_{\text{model}}: 1.00 \leadsto 2.33 \leadsto 4.00$).
+- **Recovered Minimal Behavioral Support ($S_C$):**
+  - $\text{VELORA}: S_C = \{\{E\}, \{B,D\}, \{A,D\}, \{A,B\}\}$
+  - $\text{KESTREL}: S_C = \{\{D,E\}, \{B,D\}, \{A,D\}, \{A,B\}\}$
+- **Key Discoveries:**
+  1. **Single-Parent Blindspot (Overdetermination):** All 4 single knockouts ($\{A\}, \{B\}, \{D\}, \{E\}$) left output invariant at `PROTO_X7` in both stations ($P(\text{Target}) = 1.0$). A standard single-parent but-for causal test concludes that none of the premises are causally necessary.
+  2. **Divergence of $S_C$ from $S_F$:** The model behaviorally sustains the claim on illegitimate cross-premise combinations ($\{A,D\}$ and $\{B,D\}$) that do not satisfy either formal rule.
+  3. **Role Asymmetry ($D = \text{sector\_lead}$):** $D$ appears in 3/4 minimal coalitions in KESTREL. The sector lead role functions as an asymmetric authority cue allowing premature inference.
+  4. **Context-Dependent Non-Monotonicity:** In VELORA, $\{E\} \implies \text{PROTO\_X7}$, but adding $A$ or $B$ suppresses the output to `UNKNOWN` (2 non-monotonic regressions). In KESTREL, the landscape is strictly monotonic.
 
 ---
 
-## 3. Epistemic Synthesis
+### Track G2: Non-Destructive Support Immunity ($N=20$)
+- **Two Distinct Components:**
+  1. **Deterministic Retained Support Property:** `apply_governance_retrieval()` mathematically preserves unaffected support paths during ancestor revocation while inactivating claims whose paths all share the retracted root.
+  2. **Downstream Behavioral Compatibility:** Gemma 3:12B correctly produced the intended output across all 20 policy contexts (**20/20 = 100.0%**):
+     - `baseline_independent`: 4/4 (100%) $\implies$ `PROTO_X7`
+     - `baseline_shared`: 4/4 (100%) $\implies$ `PROTO_X7`
+     - `naive_lineage_quarantine`: 4/4 (100%) $\implies$ `UNKNOWN` (Autoimmunity)
+     - `support_aware_independent_preservation`: 4/4 (100%) $\implies$ `PROTO_X7` (Preservation)
+     - `support_aware_shared_collapse`: 4/4 (100%) $\implies$ `UNKNOWN` (Safe Collapse)
 
-Round 3 experimentally proves the three-tier separation of GENE:
-$$\text{Formal Derivability } (S_F) \ne \text{Neural Causal Influence } (S_C) \ne \text{Ancestral Lineage } (G_{\text{lineage}})$$
-- $S_F$: Derived deductively by the trace-to-support compiler.
-- $S_C$: Discovered empirically via power-set intervention lattices.
-- Governance: Support-aware kernel preserves valid multi-supported memory while naive lineage causes autoimmunity.
+---
+
+### Track B3: Monoculture Measurement Multiverse ($N=24$)
+- **Factorial Decomposition Across 16 Primary Cells:**
+
+```
+                               16-CELL FACTORIAL DECOMPOSITION
+                               
+┌──────────────────┬─────────────────────────────┬───────────────────────────┬──────────────┬───────────────────┐
+│ Factor           │ Level 0 (P(Majority))       │ Level 1 (P(Majority))     │ Delta (Maj)  │ Delta (UNKNOWN)   │
+├──────────────────┼─────────────────────────────┼───────────────────────────┼──────────────┼───────────────────┤
+│ Root Structure   │ Independent: 2/8 (25.0%)    │ Monoculture: 2/8 (25.0%)  │ +0.000       │ +0.000            │
+│ Token Mapping    │ M4 Majority: 2/8 (25.0%)    │ Q7 Majority: 2/8 (25.0%)  │ +0.000       │ +0.000            │
+│ Document Order   │ Forward: 0/8 (0.0%)         │ Interleaved: 4/8 (50.0%)  │ -0.500       │ +1.000 (100%->0%) │
+│ Station Entity   │ VELORA: 2/8 (25.0%)         │ KESTREL: 2/8 (25.0%)      │ +0.000       │ +0.000            │
+└──────────────────┴─────────────────────────────┴───────────────────────────┴──────────────┴───────────────────┘
+```
+
+- **Replay & Seed Stability:**
+  - Exact CallSpec Replay Instability: $\epsilon_{\text{replay}} = 0/4 \quad (0.0\%)$
+  - Seed Perturbation Sensitivity: $\epsilon_{\text{seed}} = 0/4 \quad (0.0\%)$
+- **Key Takeaway:** Raw root tokens (`root_R1`) produced **zero marginal effect** ($\Delta_{\text{root}} = +0.000$). Instead, document order completely governed conflict behavior: forward clustering of majority documents triggered 100% UNKNOWN abstention, whereas interleaving eliminated abstention (50% majority / 50% minority).
+
+---
+
+### Track L: Independence Laundering & Epistemic Observability ($N=20$)
+- **Stage-by-Stage Phenotype Breakdown:**
+
+```
+                               STAGE-BY-STAGE OBSERVABILITY BREAKDOWN
+                               
+┌──────────────────────────────┬────────────┬─────────────────────────────┬────────────────────────┬──────────────────────┐
+│ Reproduction Stage           │ True Roots │ Determinable Rate (P(Det))  │ Cond. Mean Sources (N̂) │ Observed Phenotype   │
+├──────────────────────────────┼────────────┼─────────────────────────────┼────────────────────────┼──────────────────────┤
+│ G0 (True 1-Root Observation) │ 1          │ 4/4 (100.0%)                │ 1.00                   │ Ground Truth Baseline│
+│ G1 (4 Cited Paraphrases)     │ 1          │ 0/4 (0.0%)                  │ N/A (4/4 Indeterm.)    │ Strict Abstention    │
+│ G2 (Partial Laundering)      │ 1          │ 3/4 (75.0%)                 │ 2.33                   │ Emerging Inflation   │
+│ G3 (Fully Laundered Consensus│ 1          │ 2/4 (50.0%)                 │ 4.00                   │ 50/50 Bifurcation    │
+│ G_ctrl (True 4-Root Control) │ 4          │ 3/4 (75.0%)                 │ 4.00                   │ True Consensus CTL   │
+└──────────────────────────────┴────────────┴─────────────────────────────┴────────────────────────┴──────────────────────┘
+```
+
+- **Epistemic Bifurcation at $G_3$:**
+  - In `VELORA`: Both runs declared independence **determinable** with $\widehat{N} = 4$ (**False Multi-Source Certainty**).
+  - In `KESTREL`: Both runs declared independence **indeterminable** with $\widehat{N} = \text{null}$ (**Epistemic Resistance**).
+  - Rather than a uniform inflation curve, provenance loss creates an epistemic fork between manufactured certainty and conservative resistance.
+
+---
+
+## 3. Epistemic Hierarchy Synthesis
+
+Round 3 demonstrates that formal support, behavioral sufficiency, and historical lineage are **operationally distinct objects** that can diverge in multi-agent memory systems:
+1. **$S_F(C)$ (Formal Support):** Hypergraph of deductively sufficient root assumption sets.
+2. **$S_C(C)$ (Behavioral Exposure Environments):** Minimal sets of visible premises that empirically sustain model output under intervention.
+3. **$G_{\text{lineage}}$ (Ancestral History):** Directed acyclic graph of physical generation events and citation edges.
+
+When claims are multiply justified, single-parent lineage interventions cannot detect causal dependency, and neural models may rely on illicit shortcuts outside $S_F(C)$. Support-aware governance resolves this tension by tracking proof paths deterministically rather than relying on neural introspection.

@@ -1,5 +1,10 @@
 {
   "round": "Exploration Round 3: When One Belief Has Many Reasons",
+  "evidence_class": "exploratory_local",
+  "base_tag": "gene-exploration-round3-base",
+  "base_commit": "4c16d3f822a1ce0a5b28a9b3d09e86cb8140db7f",
+  "preexecution_commit": "dd7dd87",
+  "results_commit": "06b9c33",
   "model": "gemma3:12b",
   "tracks": {
     "track_h": {
@@ -7,31 +12,39 @@
       "sha256": "828ebfb904620cc6e018bb075655bea2c67a1c048757ca98e7197caea09d28dc",
       "total_calls": 32,
       "total_evaluations": 32,
-      "evaluation_parity": true
+      "evaluation_parity": true,
+      "model_digest": "unknown"
     },
     "track_g2": {
       "db_path": "runs/explore_round3/track_g2_immunity.db",
       "sha256": "050f3136d7c1b8db4088d59a1b9d6441615fc895cbf3deb617d51c0c34549116",
       "total_calls": 20,
       "total_evaluations": 20,
-      "evaluation_parity": true
+      "evaluation_parity": true,
+      "model_digest": "unknown"
     },
     "track_b3": {
       "db_path": "runs/explore_round3/track_b3_multiverse.db",
       "sha256": "a6c9fc5b853c8a2d4ab296c7e976947ae5e3f837495f6a57e21b9eb484ca576d",
       "total_calls": 24,
       "total_evaluations": 24,
-      "evaluation_parity": true
+      "evaluation_parity": true,
+      "model_digest": "unknown"
     },
     "track_l": {
       "db_path": "runs/explore_round3/track_l_laundering.db",
       "sha256": "39010aed96582f81bc16742d097e6a74753860de8a44664d9105267890324135",
       "total_calls": 20,
       "total_evaluations": 20,
-      "evaluation_parity": true
+      "evaluation_parity": true,
+      "model_digest": "unknown"
     }
   },
   "total_live_calls": 96,
   "total_live_evaluations": 96,
-  "evaluation_parity": true
+  "evaluation_parity": true,
+  "promotion_lifecycle": {
+    "phase11_status": "not_earned",
+    "promotion_rule": "Exploratory results are local research evidence. Claims require deterministic replication, release asset checksums, and role-counterbalanced verification before canonical core promotion."
+  }
 }
