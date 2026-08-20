@@ -1,0 +1,675 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Who Is the Parent of a Claim? — GENE Experiment 0</title>
+<meta name="description" content="An interactive visual companion to GENE Experiment 0: lineage observability, causal intervention, epistemic estimation, and response-policy calibration in Gemma 3 12B." />
+<style>
+  :root{
+    --bg:#07090a;
+    --bg2:#0d1112;
+    --panel:#111617;
+    --panel2:#151c1d;
+    --ink:#ecf3ed;
+    --muted:#8d9a94;
+    --line:#26302c;
+    --green:#b8ff5a;
+    --green2:#75d83c;
+    --cyan:#67e8f9;
+    --amber:#ffbf69;
+    --red:#ff6b6b;
+    --purple:#c7a6ff;
+    --paper:#eaf2ec;
+    --shadow:0 20px 70px rgba(0,0,0,.34);
+    --radius:22px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    color:var(--ink);
+    background:
+      radial-gradient(circle at 20% -10%, rgba(103,232,249,.10), transparent 30rem),
+      radial-gradient(circle at 95% 8%, rgba(184,255,90,.08), transparent 34rem),
+      linear-gradient(180deg,#07090a 0%,#090c0d 45%,#07090a 100%);
+    font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    line-height:1.5;
+  }
+  body::before{
+    content:"";
+    position:fixed; inset:0; pointer-events:none; opacity:.15; z-index:-1;
+    background-image:
+      linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+      linear-gradient(90deg,rgba(255,255,255,.035) 1px, transparent 1px);
+    background-size:32px 32px;
+    mask-image:linear-gradient(to bottom, black, transparent 80%);
+  }
+  a{color:var(--cyan)}
+  button{font:inherit}
+  .wrap{width:min(1180px,calc(100% - 34px));margin:auto}
+  .mono{font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace}
+  .eyebrow{
+    text-transform:uppercase;letter-spacing:.18em;font-size:.72rem;color:var(--green);
+    font-family:"SFMono-Regular",Consolas,monospace;font-weight:700
+  }
+  header{padding:90px 0 52px}
+  h1{
+    font-size:clamp(3.1rem,8vw,7.4rem);line-height:.88;margin:18px 0 24px;
+    letter-spacing:-.065em;max-width:1050px;font-weight:820
+  }
+  .lede{font-size:clamp(1.1rem,2.1vw,1.55rem);color:#b8c4be;max-width:790px}
+  .hero-question{
+    margin:34px 0 0;padding:20px 22px;border-left:3px solid var(--green);
+    background:linear-gradient(90deg,rgba(184,255,90,.08),transparent);
+    font-size:1.1rem;max-width:790px
+  }
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:42px}
+  .stat{
+    padding:18px;border:1px solid var(--line);border-radius:16px;background:rgba(17,22,23,.73);
+    box-shadow:0 10px 40px rgba(0,0,0,.15)
+  }
+  .stat strong{display:block;font-size:1.8rem;letter-spacing:-.04em}
+  .stat span{color:var(--muted);font-size:.83rem}
+  section{padding:54px 0}
+  .section-head{display:grid;grid-template-columns:.8fr 1.2fr;gap:40px;align-items:end;margin-bottom:26px}
+  .section-head h2{font-size:clamp(2.15rem,4vw,4rem);line-height:.95;letter-spacing:-.045em;margin:8px 0 0}
+  .section-head p{margin:0;color:#aeb9b3;font-size:1.02rem;max-width:650px}
+  .panel{
+    background:linear-gradient(180deg,rgba(18,24,24,.96),rgba(13,18,18,.96));
+    border:1px solid #26302c;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden
+  }
+  .panel-top{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 18px;
+    border-bottom:1px solid var(--line);background:#0e1313
+  }
+  .panel-label{display:flex;gap:9px;align-items:center;font-family:monospace;font-size:.8rem;color:#9fb0a7}
+  .dot{width:9px;height:9px;border-radius:99px;background:var(--green);box-shadow:0 0 18px rgba(184,255,90,.55)}
+  .controls{display:flex;gap:8px;flex-wrap:wrap}
+  .btn,.seg button{
+    color:#b7c4bd;background:#121818;border:1px solid #2a3430;border-radius:10px;
+    padding:9px 12px;cursor:pointer;transition:.18s ease;font-size:.82rem
+  }
+  .btn:hover,.seg button:hover{border-color:#4e6058;color:#fff;transform:translateY(-1px)}
+  .btn.active,.seg button.active{
+    color:#071006;background:var(--green);border-color:var(--green);font-weight:800
+  }
+  .btn.warn.active{background:var(--amber);border-color:var(--amber);color:#211500}
+  .btn.mut.active{background:var(--cyan);border-color:var(--cyan);color:#041316}
+  .microscope-body{display:grid;grid-template-columns:1.55fr .62fr;min-height:590px}
+  .graph-wrap{padding:14px 10px 0;position:relative;min-width:0}
+  #lineageSvg{width:100%;height:auto;display:block;overflow:visible}
+  .side-readout{border-left:1px solid var(--line);padding:22px;background:rgba(7,10,10,.45)}
+  .readout-title{color:var(--muted);font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px}
+  .claim-box{
+    padding:17px;border:1px solid #34413b;border-radius:14px;background:#0c1110;margin-bottom:14px
+  }
+  .claim-box .value{font-size:1.55rem;font-weight:800;letter-spacing:-.035em;margin-top:4px}
+  .status-row{display:flex;gap:8px;margin:14px 0}
+  .status{
+    width:46px;height:46px;border-radius:12px;display:grid;place-items:center;border:1px solid #334038;
+    font-family:monospace;font-weight:900;font-size:1.15rem
+  }
+  .status.good{background:rgba(184,255,90,.10);color:var(--green);border-color:rgba(184,255,90,.35)}
+  .status.bad{background:rgba(255,107,107,.10);color:var(--red);border-color:rgba(255,107,107,.35)}
+  .small{font-size:.82rem;color:var(--muted)}
+  .mode-note{margin-top:17px;padding-top:16px;border-top:1px solid var(--line);font-size:.86rem;color:#aab6b0}
+  .legend{display:grid;gap:8px;margin-top:20px}
+  .legend-row{display:flex;gap:9px;align-items:center;color:#9faea6;font-size:.79rem}
+  .legend-line{width:28px;height:3px;border-radius:2px}
+  .legend-line.formal{background:var(--cyan)}
+  .legend-line.exposure{background:#728078}
+  .legend-line.reported{background:repeating-linear-gradient(90deg,var(--amber),var(--amber) 5px,transparent 5px,transparent 8px)}
+  .legend-line.causal{background:var(--green)}
+  .node rect{fill:#111818;stroke:#334039;stroke-width:1.3}
+  .node text{fill:var(--ink)}
+  .node .nlabel{font-size:12px;fill:#849289;font-family:monospace;letter-spacing:.06em}
+  .node .nmain{font-size:16px;font-weight:750}
+  .node .nsub{font-size:11px;fill:#87958d}
+  .node.active rect{stroke:var(--green);filter:url(#glow)}
+  .node.mutated rect{stroke:var(--cyan)}
+  .node.removed{opacity:.22}
+  .node.removed rect{stroke:var(--red)}
+  .node.claim rect{fill:#0e1710;stroke:var(--green);stroke-width:2}
+  .node.claim.unknown rect{fill:#151312;stroke:var(--amber)}
+  .edge{fill:none;stroke-width:2.2;opacity:.9;transition:.25s ease}
+  .edge.formal{stroke:var(--cyan)}
+  .edge.exposure{stroke:#718078;stroke-width:1.2;opacity:.55}
+  .edge.reported{stroke:var(--amber);stroke-dasharray:7 7}
+  .edge.causal{stroke:var(--green);stroke-width:3}
+  .edge.hidden{opacity:0}
+  .edge-label{font-family:monospace;font-size:11px;fill:#7d8b83}
+  .modebar{padding:0 12px 14px;display:flex;justify-content:center}
+  .seg{display:inline-flex;background:#0b0f0f;border:1px solid #26302c;border-radius:12px;padding:4px;gap:4px}
+  .seg button{border:0;background:transparent}
+  .intervention-scroll{padding:14px 14px 0;display:flex;gap:7px;overflow:auto}
+  .intervention-scroll::-webkit-scrollbar{height:6px}
+  .intervention-scroll::-webkit-scrollbar-thumb{background:#2e3934;border-radius:9px}
+  .callout{
+    margin-top:18px;padding:15px 17px;border-radius:14px;border:1px solid #25312b;
+    color:#b1bcb6;background:rgba(184,255,90,.035);font-size:.9rem
+  }
+  .callout strong{color:var(--ink)}
+  .factorial{display:grid;grid-template-columns:.73fr 1.27fr;gap:16px}
+  .switcher{padding:22px}
+  .switch-block{padding:16px 0;border-bottom:1px solid var(--line)}
+  .switch-block:first-child{padding-top:0}
+  .switch-block:last-child{border:0}
+  .switch-block h3{font-size:.78rem;color:var(--muted);font-family:monospace;text-transform:uppercase;letter-spacing:.12em;margin:0 0 10px}
+  .toggle-row{display:flex;gap:8px}
+  .fact-result{padding:22px;border-top:1px solid var(--line);margin:0 -22px -22px}
+  .rate{font-size:4rem;line-height:.9;letter-spacing:-.06em;font-weight:850}
+  .rate-caption{color:var(--muted);font-size:.82rem;margin-top:7px}
+  .failure{margin-top:18px;padding:13px 14px;border-left:3px solid var(--amber);background:rgba(255,191,105,.05);font-size:.88rem}
+  .matrix{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px}
+  .cell{
+    padding:20px;border:1px solid #28332e;border-radius:15px;background:#0e1313;cursor:pointer;
+    transition:.18s ease;min-height:165px;position:relative;overflow:hidden
+  }
+  .cell:hover{transform:translateY(-2px);border-color:#46564f}
+  .cell.selected{border-color:var(--green);box-shadow:0 0 0 1px rgba(184,255,90,.2) inset}
+  .cell .cname{font-family:monospace;color:#8b9a91;font-size:.78rem}
+  .cell .pct{font-size:2.7rem;font-weight:850;letter-spacing:-.05em;margin-top:12px}
+  .cell .desc{font-size:.81rem;color:#a9b5ae;margin-top:8px;max-width:90%}
+  .cell .fill{position:absolute;left:0;bottom:0;height:4px;background:var(--green)}
+  .trap-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .trap-card{padding:22px;position:relative}
+  .trap-card h3{margin:0 0 7px;font-size:1.3rem}
+  .rule-list{display:grid;gap:8px;margin:17px 0}
+  .rule-pill{
+    border:1px solid #2a3530;background:#0d1212;padding:11px 12px;border-radius:11px;font-family:monospace;font-size:.83rem
+  }
+  .rule-pill.hot{border-color:var(--amber);box-shadow:0 0 28px rgba(255,191,105,.07)}
+  .barrow{display:grid;grid-template-columns:128px 1fr 48px;gap:10px;align-items:center;margin:10px 0;font-size:.79rem}
+  .bar{height:9px;background:#1c2521;border-radius:99px;overflow:hidden}
+  .bar > span{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--green));border-radius:99px}
+  .flow{display:grid;grid-template-columns:1fr 60px 1fr 60px 1fr;align-items:center;gap:5px;padding:24px}
+  .flowbox{
+    min-height:150px;border:1px solid #2b3832;border-radius:16px;padding:18px;background:#0d1212;
+    position:relative
+  }
+  .flowbox h3{font-size:.78rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin:0 0 14px;font-family:monospace}
+  .flowbox .big{font-size:1.18rem;font-weight:750}
+  .flowbox.good{border-color:rgba(184,255,90,.5)}
+  .flowbox.bad{border-color:rgba(255,107,107,.55)}
+  .arrow{text-align:center;color:#64736b;font-size:2rem}
+  .scenario-tabs{padding:0 24px 22px;display:flex;gap:7px;flex-wrap:wrap}
+  .timeline{position:relative;padding-left:26px;display:grid;gap:18px}
+  .timeline:before{content:"";position:absolute;left:8px;top:6px;bottom:8px;width:1px;background:#324039}
+  .step{position:relative;padding:2px 0 2px 20px}
+  .step:before{
+    content:"";position:absolute;left:-22px;top:6px;width:11px;height:11px;border-radius:50%;
+    background:#0a0d0c;border:2px solid var(--green)
+  }
+  .step .num{font-family:monospace;color:var(--green);font-size:.72rem}
+  .step h3{margin:2px 0 4px;font-size:1.07rem}
+  .step p{margin:0;color:#9faea6;font-size:.88rem;max-width:760px}
+  .takeaway{
+    padding:38px;border:1px solid rgba(184,255,90,.26);border-radius:24px;
+    background:radial-gradient(circle at 10% 20%,rgba(184,255,90,.11),transparent 30%),#0d1211
+  }
+  .takeaway blockquote{
+    margin:0;font-size:clamp(1.7rem,3.3vw,3.3rem);line-height:1.05;letter-spacing:-.04em;font-weight:760;max-width:970px
+  }
+  .takeaway p{color:#9eaaa4;max-width:770px;margin:20px 0 0}
+  footer{padding:58px 0 90px;color:#78857e;font-size:.8rem}
+  .refs{display:grid;grid-template-columns:1fr 1fr;gap:9px 26px;margin-top:16px}
+  .refs a{text-decoration:none;color:#95aaa0}
+  .refs a:hover{color:var(--cyan)}
+  .badge{display:inline-block;padding:3px 7px;border-radius:999px;border:1px solid #34413b;font-family:monospace;font-size:.67rem;color:#98a79f}
+  @media(max-width:860px){
+    .stats{grid-template-columns:1fr 1fr}
+    .section-head,.microscope-body,.factorial,.trap-grid{grid-template-columns:1fr}
+    .side-readout{border-left:0;border-top:1px solid var(--line)}
+    .flow{grid-template-columns:1fr}.arrow{transform:rotate(90deg)}
+    .refs{grid-template-columns:1fr}
+  }
+  @media(max-width:520px){
+    .wrap{width:min(100% - 20px,1180px)}
+    header{padding-top:60px}
+    .stats{grid-template-columns:1fr}
+    .panel-top{align-items:flex-start;flex-direction:column}
+    .matrix{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<header class="wrap">
+  <div class="eyebrow">GENE · Experiment 0 · Interactive companion</div>
+  <h1>Who is the parent<br>of a claim?</h1>
+  <p class="lede">Experiment 0 began with a simple question: if a language model gives an answer, which earlier memory actually gave rise to it? The answer turned out to depend on what we mean by <em>parent</em>—and on the experiment we use to look.</p>
+  <div class="hero-question"><strong>Central result:</strong> exposure, model-reported support, formal derivation, and counterfactual behavioral influence are different relationships. A causal-lineage assay has to separate them.</div>
+  <div class="stats">
+    <div class="stat"><strong>276</strong><span>live Gemma 3 12B calls</span></div>
+    <div class="stat"><strong>4</strong><span>matched factorial conditions</span></div>
+    <div class="stat"><strong>6</strong><span>counterbalanced micro-worlds</span></div>
+    <div class="stat"><strong>66 / 66</strong><span>Cell 4 intervention passes</span></div>
+  </div>
+</header>
+
+<main>
+<section class="wrap" id="microscope">
+  <div class="section-head">
+    <div>
+      <div class="eyebrow">01 · Lineage microscope</div>
+      <h2>Interrogate the family tree.</h2>
+    </div>
+    <p>Start with the calibrated Cell 4 environment: three competing consequences and Schema v2. Switch lineage layers, then mutate or remove a parent. The world is synthetic so the counterfactual outcome is known exactly.</p>
+  </div>
+
+  <div class="panel">
+    <div class="panel-top">
+      <div class="panel-label"><span class="dot"></span> LIVE MODEL OF THE ASSAY · representative canonical world</div>
+      <span class="badge">Ecology C + Schema v2</span>
+    </div>
+
+    <div class="intervention-scroll" id="interventions">
+      <button class="btn active" data-i="baseline">Baseline</button>
+      <button class="btn warn" data-i="koA">Knockout A</button>
+      <button class="btn warn" data-i="koB">Knockout B</button>
+      <button class="btn warn" data-i="koRule">Remove active rule</button>
+      <button class="btn mut" data-i="tal">Kira → Tal</button>
+      <button class="btn mut" data-i="mira">Kira → Mira</button>
+      <button class="btn mut" data-i="soren">Kira → Soren</button>
+      <button class="btn" data-i="rescue">Rescue → Kira</button>
+    </div>
+
+    <div class="microscope-body">
+      <div class="graph-wrap">
+        <svg id="lineageSvg" viewBox="0 0 900 520" role="img" aria-label="Interactive information lineage graph">
+          <defs>
+            <filter id="glow"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            <marker id="arrowCyan" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#67e8f9"/></marker>
+            <marker id="arrowGreen" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#b8ff5a"/></marker>
+            <marker id="arrowAmber" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#ffbf69"/></marker>
+            <marker id="arrowGray" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#718078"/></marker>
+          </defs>
+
+          <path id="eA" class="edge formal" d="M245 150 C330 150 325 252 390 252"/>
+          <path id="eB" class="edge formal" d="M245 310 C330 310 325 252 390 252"/>
+          <path id="eR" class="edge formal" d="M585 252 C655 252 665 252 720 252"/>
+          <path id="eFoil1" class="edge exposure hidden" d="M585 100 C655 100 680 220 720 235"/>
+          <path id="eFoil2" class="edge exposure hidden" d="M585 400 C655 400 680 285 720 270"/>
+
+          <g id="nodeA" class="node active" transform="translate(40,105)">
+            <rect width="205" height="90" rx="14"/>
+            <text x="16" y="24" class="nlabel">MEMORY · FACT A</text>
+            <text x="16" y="50" class="nmain">Velora → manager</text>
+            <text x="16" y="71" class="nsub">Nerin manages Velora</text>
+          </g>
+
+          <g id="nodeB" class="node active" transform="translate(40,265)">
+            <rect width="205" height="90" rx="14"/>
+            <text x="16" y="24" class="nlabel">LOCUS · FACT B</text>
+            <text id="bMain" x="16" y="50" class="nmain">Nerin → Kira</text>
+            <text id="bSub" x="16" y="71" class="nsub">reports_to allele: KIRA</text>
+          </g>
+
+          <g id="nodeFoil1" class="node" transform="translate(390,55)">
+            <rect width="195" height="88" rx="14"/>
+            <text x="15" y="23" class="nlabel">COMPETING RULE</text>
+            <text x="15" y="49" class="nmain">TAL → PROTO_Q2</text>
+            <text x="15" y="69" class="nsub">matched alternative</text>
+          </g>
+
+          <g id="nodeRule" class="node active" transform="translate(390,208)">
+            <rect width="195" height="88" rx="14"/>
+            <text x="15" y="23" class="nlabel">ACTIVE RULE</text>
+            <text id="ruleMain" x="15" y="49" class="nmain">KIRA → PROTO_X7</text>
+            <text x="15" y="69" class="nsub">requires both premises</text>
+          </g>
+
+          <g id="nodeFoil2" class="node" transform="translate(390,355)">
+            <rect width="195" height="88" rx="14"/>
+            <text x="15" y="23" class="nlabel">COMPETING RULE</text>
+            <text x="15" y="49" class="nmain">MIRA → PROTO_M9</text>
+            <text x="15" y="69" class="nsub">matched alternative</text>
+          </g>
+
+          <g id="nodeClaim" class="node claim" transform="translate(720,207)">
+            <rect width="155" height="96" rx="16"/>
+            <text x="16" y="25" class="nlabel">PHENOTYPE</text>
+            <text id="claimMain" x="16" y="56" class="nmain">PROTO_X7</text>
+            <text id="claimSub" x="16" y="77" class="nsub">sufficient</text>
+          </g>
+        </svg>
+        <div class="modebar">
+          <div class="seg" id="modeSeg">
+            <button data-mode="formal" class="active">Formal ancestry</button>
+            <button data-mode="exposure">Exposure</button>
+            <button data-mode="reported">Reported support</button>
+            <button data-mode="causal">Causal test</button>
+          </div>
+        </div>
+      </div>
+
+      <aside class="side-readout">
+        <div class="readout-title">Observed / expected outcome</div>
+        <div class="claim-box">
+          <div class="small mono">MODEL OUTPUT</div>
+          <div class="value mono" id="outputReadout">PROTO_X7</div>
+          <div class="small" id="evidenceReadout">evidence_status: sufficient</div>
+        </div>
+        <div class="readout-title">Diagnostic vector</div>
+        <div class="status-row">
+          <div>
+            <div id="A" class="status good">A✓</div>
+            <div class="small" style="text-align:center;margin-top:4px">answer</div>
+          </div>
+          <div>
+            <div id="E" class="status good">E✓</div>
+            <div class="small" style="text-align:center;margin-top:4px">estimate</div>
+          </div>
+          <div>
+            <div id="K" class="status good">K✓</div>
+            <div class="small" style="text-align:center;margin-top:4px">policy</div>
+          </div>
+        </div>
+        <div class="mode-note" id="modeNote"><strong>Formal ancestry</strong> shows the machine-readable derivation: both premises satisfy the active rule, which entails the claim.</div>
+        <div class="legend">
+          <div class="legend-row"><span class="legend-line formal"></span> formal derivation</div>
+          <div class="legend-row"><span class="legend-line exposure"></span> physically exposed</div>
+          <div class="legend-row"><span class="legend-line reported"></span> model-reported support</div>
+          <div class="legend-row"><span class="legend-line causal"></span> counterfactual influence</div>
+        </div>
+        <div class="callout" id="interventionNote"><strong>Baseline:</strong> full context. In Cell 4 the baseline and every intervention in the frozen battery matched the counterfactual oracle.</div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="section-head">
+    <div>
+      <div class="eyebrow">02 · The factorial playground</div>
+      <h2>Change the assay.<br>Change the failure.</h2>
+    </div>
+    <p>The same six synthetic worlds were run under four matched conditions. Toggle ecology and response contract to see the observed intervention pass rate and the dominant failure mechanism.</p>
+  </div>
+
+  <div class="factorial">
+    <div class="panel switcher">
+      <div class="switch-block">
+        <h3>Information ecology</h3>
+        <div class="toggle-row">
+          <button class="btn" id="ecoS">S · Single</button>
+          <button class="btn active" id="ecoC">C · Competing</button>
+        </div>
+      </div>
+      <div class="switch-block">
+        <h3>Response contract</h3>
+        <div class="toggle-row">
+          <button class="btn" id="schema1">v1 · implicit</button>
+          <button class="btn active" id="schema2">v2 · explicit</button>
+        </div>
+      </div>
+      <div class="fact-result">
+        <div class="eyebrow" id="cellName">CELL 4 · C + v2</div>
+        <div class="rate" id="rate">100.0%</div>
+        <div class="rate-caption" id="rateCaption">66 / 66 intervention tests passed · 72 model calls</div>
+        <div class="failure" id="failure">Full calibration: directional steering, knockout abstention, unmatched abstention, foil invariance, and rescue all matched the formal oracle.</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-top"><div class="panel-label"><span class="dot"></span> HARDENED 2×2 MATRIX</div><span class="badge">276 calls total</span></div>
+      <div class="matrix" id="matrix">
+        <div class="cell" data-cell="Sv1"><div class="cname">CELL 1 · S + v1</div><div class="pct">46.7%</div><div class="desc">Detection-to-action split. The model can recognize missing evidence and still emit the salient answer.</div><div class="fill" style="width:46.7%;background:#ffbf69"></div></div>
+        <div class="cell" data-cell="Sv2"><div class="cname">CELL 2 · S + v2</div><div class="pct">86.7%</div><div class="desc">The contract helps abstention, but single-conclusion salience still causes false sufficiency judgments.</div><div class="fill" style="width:86.7%;background:#67e8f9"></div></div>
+        <div class="cell" data-cell="Cv1"><div class="cname">CELL 3 · C + v1</div><div class="pct">65.2%</div><div class="desc">Directional mutations work, but the loose contract fails to abstain reliably on unsupported states.</div><div class="fill" style="width:65.2%;background:#c7a6ff"></div></div>
+        <div class="cell selected" data-cell="Cv2"><div class="cname">CELL 4 · C + v2</div><div class="pct">100%</div><div class="desc">Competing alternatives + explicit epistemic contract. All 66 frozen intervention tests pass.</div><div class="fill" style="width:100%"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="section-head">
+    <div>
+      <div class="eyebrow">03 · The conclusion-token trap</div>
+      <h2>The benchmark can leak the answer.</h2>
+    </div>
+    <p>Ecology S looked simpler, but the sole rule also contained the sole plausible conclusion token. The model could preserve an answer after a premise disappeared. Matched competing consequents made the antecedent relation testable.</p>
+  </div>
+  <div class="trap-grid">
+    <div class="panel trap-card">
+      <div class="eyebrow">Ecology S · Schema v2</div>
+      <h3>One conclusion in the room.</h3>
+      <div class="rule-list">
+        <div class="rule-pill hot">KIRA → <strong>PROTO_X7</strong></div>
+      </div>
+      <p class="small">If Fact B is removed or semantically changed, the rule's conclusion remains visually available as the only protocol candidate.</p>
+      <div class="barrow"><span>KO Fact B</span><div class="bar"><span style="width:16.7%"></span></div><strong>1/6</strong></div>
+      <div class="barrow"><span>Mutation → Tal</span><div class="bar"><span style="width:50%"></span></div><strong>3/6</strong></div>
+      <div class="barrow"><span>Mutation → Mira</span><div class="bar"><span style="width:83.3%"></span></div><strong>5/6</strong></div>
+    </div>
+    <div class="panel trap-card">
+      <div class="eyebrow">Ecology C · Schema v2</div>
+      <h3>Matched alternatives force a choice.</h3>
+      <div class="rule-list">
+        <div class="rule-pill">KIRA → <strong>PROTO_X7</strong></div>
+        <div class="rule-pill">TAL → <strong>PROTO_Q2</strong></div>
+        <div class="rule-pill">MIRA → <strong>PROTO_M9</strong></div>
+      </div>
+      <p class="small">Now a mutation has a directional prediction: Kira→Tal should steer X7→Q2; an unmatched supervisor should yield UNKNOWN.</p>
+      <div class="barrow"><span>KO Fact B</span><div class="bar"><span style="width:100%"></span></div><strong>6/6</strong></div>
+      <div class="barrow"><span>Mutation → Tal</span><div class="bar"><span style="width:100%"></span></div><strong>6/6</strong></div>
+      <div class="barrow"><span>Mutation → Mira</span><div class="bar"><span style="width:100%"></span></div><strong>6/6</strong></div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="section-head">
+    <div>
+      <div class="eyebrow">04 · A / E / K failure machine</div>
+      <h2>Two wrong answers can be wrong differently.</h2>
+    </div>
+    <p>Accuracy alone hides the mechanism. Experiment 0 separates the model's evidence judgment from whether its behavior obeys that judgment.</p>
+  </div>
+  <div class="panel">
+    <div class="flow">
+      <div id="flowInfo" class="flowbox good">
+        <h3>Information environment</h3>
+        <div class="big" id="flowInfoText">Missing premise</div>
+        <p class="small" id="flowInfoSub">The formal oracle says the evidence is insufficient.</p>
+      </div>
+      <div class="arrow">→</div>
+      <div id="flowE" class="flowbox good">
+        <h3>Epistemic estimate · E</h3>
+        <div class="big" id="flowEText">Correct: insufficient</div>
+        <p class="small">Did the emitted evidence status match the formal evidence state?</p>
+      </div>
+      <div class="arrow">→</div>
+      <div id="flowK" class="flowbox bad">
+        <h3>Response policy · K</h3>
+        <div class="big" id="flowKText">Fails: emits answer anyway</div>
+        <p class="small" id="flowKSub">Correct diagnosis, wrong action.</p>
+      </div>
+    </div>
+    <div class="scenario-tabs" id="scenarios">
+      <button class="btn active" data-s="detection">Detection → action failure</button>
+      <button class="btn" data-s="estimate">False sufficiency estimate</button>
+      <button class="btn" data-s="calibrated">Calibrated counterfactual</button>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="section-head">
+    <div>
+      <div class="eyebrow">05 · How the instrument learned</div>
+      <h2>Experiment 0 was an experiment about experiments.</h2>
+    </div>
+    <p>The most useful story is iterative. Each failure exposed a measurement confound, which became the next control.</p>
+  </div>
+  <div class="panel" style="padding:26px">
+    <div class="timeline">
+      <div class="step"><div class="num">01</div><h3>Ask the model for its parents.</h3><p>Useful self-report, but explanation-faithfulness work warns that plausible support is not automatically causal support.</p></div>
+      <div class="step"><div class="num">02</div><h3>Delete a parent.</h3><p>Stronger, but deletion alone can leave shortcuts, redundancy, or unnatural counterfactual contexts.</p></div>
+      <div class="step"><div class="num">03</div><h3>Discover the conclusion-token attractor.</h3><p>In Ecology S, the only visible rule also contained the only plausible output. The benchmark itself was leaking the answer.</p></div>
+      <div class="step"><div class="num">04</div><h3>Separate epistemic detection from action.</h3><p>A model can recognize insufficiency yet continue to answer. Schema v2 makes the abstention policy explicit.</p></div>
+      <div class="step"><div class="num">05</div><h3>Add competing consequents.</h3><p>Kira, Tal, and Mira map to matched opaque outcomes. Now premise matching—not conclusion availability—selects the phenotype.</p></div>
+      <div class="step"><div class="num">06</div><h3>Mutate, don't only delete.</h3><p>Directional mutation and sequential rescue turn causality into a prediction: X7 → Q2 → X7.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="takeaway">
+    <div class="eyebrow">Experiment 0 · methodological claim</div>
+    <blockquote>A model answer does not have one obvious provenance.</blockquote>
+    <p>Formal ancestry, prompt exposure, model-reported support, and intervention-sensitive causal influence can diverge. The structure of the information environment and the response contract can determine whether those differences are visible at all.</p>
+  </div>
+</section>
+
+<section class="wrap" style="padding-bottom:0">
+  <div class="section-head">
+    <div>
+      <div class="eyebrow">Source notes</div>
+      <h2 style="font-size:2.4rem">What this visual claims—and what it doesn't.</h2>
+    </div>
+    <p>The 100% result is the frozen Cell 4 calibration score in six synthetic worlds, not a claim that Gemma or LLMs are universally causally faithful. The reported-support layer in the microscope is a representative explanatory layer; the paper's aggregate conclusions do not depend on treating self-reported parents as causal ground truth.</p>
+  </div>
+  <div class="refs">
+    <a href="https://github.com/admiralorbiter/gene" target="_blank" rel="noreferrer">GENE repository / Experiment 0 reports ↗</a>
+    <a href="https://aclanthology.org/2024.findings-acl.19/" target="_blank" rel="noreferrer">Madsen et al. 2024 · self-explanation faithfulness ↗</a>
+    <a href="https://aclanthology.org/2024.blackboxnlp-1.28/" target="_blank" rel="noreferrer">Kamahi & Yaghoobzadeh 2024 · counterfactual faithfulness ↗</a>
+    <a href="https://aclanthology.org/2024.acl-short.49/" target="_blank" rel="noreferrer">Siegel et al. 2024 · probabilities and faithfulness ↗</a>
+    <a href="https://arxiv.org/abs/2605.28070" target="_blank" rel="noreferrer">Gu et al. 2026 · detection-to-abstention gap ↗</a>
+  </div>
+</section>
+</main>
+
+<footer class="wrap">
+  GENE · Genealogical Epistemic Network Experiments · Interactive Experiment 0 companion · self-contained HTML
+</footer>
+
+<script>
+const interventions = {
+  baseline:{sup:"KIRA",out:"PROTO_X7",evidence:"sufficient",A:1,E:1,K:1,remove:[],active:"KIRA",note:"Baseline: full context. In Cell 4 the baseline and every intervention in the frozen battery matched the counterfactual oracle."},
+  koA:{sup:"KIRA",out:"UNKNOWN",evidence:"insufficient",A:1,E:1,K:1,remove:["A"],active:null,note:"Knockout A: remove manager(station, person). The active rule can no longer fire; all 6/6 Cell 4 worlds abstained."},
+  koB:{sup:"KIRA",out:"UNKNOWN",evidence:"insufficient",A:1,E:1,K:1,remove:["B"],active:null,note:"Knockout B: remove reports_to(person, supervisor). All 6/6 Cell 4 worlds abstained. In Ecology S + v2, this same knockout passed only 1/6."},
+  koRule:{sup:"KIRA",out:"UNKNOWN",evidence:"insufficient",A:1,E:1,K:1,remove:["R"],active:null,note:"Active-rule knockout: remove the rule that would derive the protocol. Cell 4 abstained 6/6."},
+  tal:{sup:"TAL",out:"PROTO_Q2",evidence:"sufficient",A:1,E:1,K:1,remove:[],active:"TAL",note:"Directional mutation: the allele at the same locus changes KIRA → TAL. The expected phenotype redirects X7 → Q2, observed 6/6."},
+  mira:{sup:"MIRA",out:"PROTO_M9",evidence:"sufficient",A:1,E:1,K:1,remove:[],active:"MIRA",note:"Directional mutation: KIRA → MIRA redirects the phenotype to PROTO_M9, observed 6/6."},
+  soren:{sup:"SOREN",out:"UNKNOWN",evidence:"insufficient",A:1,E:1,K:1,remove:[],active:null,note:"Unmatched mutation: SOREN matches no visible rule. Correct behavior is UNKNOWN; Cell 4 abstained 6/6."},
+  rescue:{sup:"KIRA",out:"PROTO_X7",evidence:"sufficient",A:1,E:1,K:1,remove:[],active:"KIRA",note:"Sequential rescue: restore TAL → KIRA from the mutated state. The phenotype returns Q2 → X7, observed 6/6."}
+};
+let intervention = "baseline";
+let mode = "formal";
+
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+
+function setNodeState(id, state){
+  const el = $(id);
+  el.classList.remove("active","mutated","removed");
+  if(state) el.classList.add(state);
+}
+function updateGraph(){
+  const d = interventions[intervention];
+  $("#bMain").textContent = `Nerin → ${d.sup.charAt(0)+d.sup.slice(1).toLowerCase()}`;
+  $("#bSub").textContent = `reports_to allele: ${d.sup}`;
+  $("#claimMain").textContent = d.out;
+  $("#claimSub").textContent = d.evidence;
+  $("#outputReadout").textContent = d.out;
+  $("#evidenceReadout").textContent = `evidence_status: ${d.evidence}`;
+  $("#interventionNote").innerHTML = `<strong>${intervention==="baseline"?"Baseline":intervention==="rescue"?"Rescue":"Intervention"}:</strong> ${d.note.replace(/^.*?:\s*/,"")}`;
+  $("#nodeClaim").classList.toggle("unknown",d.out==="UNKNOWN");
+
+  setNodeState("#nodeA", d.remove.includes("A") ? "removed" : "active");
+  setNodeState("#nodeB", d.remove.includes("B") ? "removed" : (d.sup==="KIRA" ? "active" : "mutated"));
+  setNodeState("#nodeRule", d.remove.includes("R") ? "removed" : (d.active==="KIRA" ? "active" : ""));
+  setNodeState("#nodeFoil1", d.active==="TAL" ? "active" : "");
+  setNodeState("#nodeFoil2", d.active==="MIRA" ? "active" : "");
+
+  ["A","E","K"].forEach(k=>{
+    const el=$("#"+k); const good=d[k]===1;
+    el.className=`status ${good?"good":"bad"}`; el.textContent=`${k}${good?"✓":"×"}`;
+  });
+  updateEdges();
+}
+function updateEdges(){
+  const d=interventions[intervention];
+  const edges=["#eA","#eB","#eR","#eFoil1","#eFoil2"];
+  edges.forEach(e=>{const el=$(e); el.className="edge hidden";});
+  const marker = {formal:"url(#arrowCyan)",exposure:"url(#arrowGray)",reported:"url(#arrowAmber)",causal:"url(#arrowGreen)"}[mode];
+  function show(sel,cls){const el=$(sel);el.className=`edge ${cls}`;el.setAttribute("marker-end",marker);}
+
+  if(mode==="formal"){
+    if(!d.remove.includes("A") && d.active) show("#eA","formal");
+    if(!d.remove.includes("B") && d.active) show("#eB","formal");
+    if(d.active==="KIRA" && !d.remove.includes("R")) show("#eR","formal");
+    if(d.active==="TAL") show("#eFoil1","formal");
+    if(d.active==="MIRA") show("#eFoil2","formal");
+    $("#modeNote").innerHTML="<strong>Formal ancestry</strong> shows the machine-readable derivation permitted by the exact counterfactual world.";
+  } else if(mode==="exposure"){
+    if(!d.remove.includes("A")) show("#eA","exposure");
+    if(!d.remove.includes("B")) show("#eB","exposure");
+    if(!d.remove.includes("R")) show("#eR","exposure");
+    show("#eFoil1","exposure"); show("#eFoil2","exposure");
+    $("#modeNote").innerHTML="<strong>Exposure</strong> is objective but weak: these memories were physically present in the prompt. Presence does not imply causal use.";
+  } else if(mode==="reported"){
+    if(!d.remove.includes("A")) show("#eA","reported");
+    if(!d.remove.includes("B")) show("#eB","reported");
+    if(d.active==="KIRA" && !d.remove.includes("R")) show("#eR","reported");
+    if(d.active==="TAL") show("#eFoil1","reported");
+    if(d.active==="MIRA") show("#eFoil2","reported");
+    $("#modeNote").innerHTML="<strong>Reported support</strong> is a model self-report, not hidden chain-of-thought. Edges here illustrate the parent-ID layer; aggregate Experiment 0 claims do not treat citation as causal ground truth.";
+  } else {
+    if(!d.remove.includes("A") && d.active) show("#eA","causal");
+    if(!d.remove.includes("B") && d.active) show("#eB","causal");
+    if(d.active==="KIRA" && !d.remove.includes("R")) show("#eR","causal");
+    if(d.active==="TAL") show("#eFoil1","causal");
+    if(d.active==="MIRA") show("#eFoil2","causal");
+    $("#modeNote").innerHTML="<strong>Causal test</strong> emphasizes intervention-sensitive relations: knockouts, directional mutation, unmatched mutation, and rescue are compared with the formal counterfactual oracle.";
+  }
+}
+
+$$("#interventions .btn").forEach(b=>b.addEventListener("click",()=>{
+  $$("#interventions .btn").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active"); intervention=b.dataset.i; updateGraph();
+}));
+$$("#modeSeg button").forEach(b=>b.addEventListener("click",()=>{
+  $$("#modeSeg button").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active"); mode=b.dataset.mode; updateEdges();
+}));
+
+const cells={
+  Sv1:{name:"CELL 1 · S + v1",rate:"46.7%",caption:"28 / 60 intervention tests passed · 66 model calls",failure:"Dominant failure: detection-to-action split. The sparse ecology leaves the conclusion salient, while the loose response contract does not reliably enforce abstention."},
+  Sv2:{name:"CELL 2 · S + v2",rate:"86.7%",caption:"52 / 60 intervention tests passed · 66 model calls",failure:"Dominant failure: false sufficiency / antecedent binding. The explicit contract improves policy consistency, but the single visible consequent still acts as an attractor."},
+  Cv1:{name:"CELL 3 · C + v1",rate:"65.2%",caption:"43 / 66 intervention tests passed · 72 model calls",failure:"Directional sensitivity is strong under competing alternatives, but the implicit response contract still fails to abstain reliably in unsupported states."},
+  Cv2:{name:"CELL 4 · C + v2",rate:"100.0%",caption:"66 / 66 intervention tests passed · 72 model calls",failure:"Full calibration: directional steering, knockout abstention, unmatched abstention, foil invariance, and rescue all matched the formal oracle."}
+};
+let eco="C", schema="v2";
+function updateCell(){
+  const key=eco+schema;
+  const c=cells[key];
+  $("#cellName").textContent=c.name; $("#rate").textContent=c.rate; $("#rateCaption").textContent=c.caption; $("#failure").textContent=c.failure;
+  $$("#matrix .cell").forEach(x=>x.classList.toggle("selected",x.dataset.cell===key));
+  $("#ecoS").classList.toggle("active",eco==="S"); $("#ecoC").classList.toggle("active",eco==="C");
+  $("#schema1").classList.toggle("active",schema==="v1"); $("#schema2").classList.toggle("active",schema==="v2");
+}
+$("#ecoS").onclick=()=>{eco="S";updateCell()}; $("#ecoC").onclick=()=>{eco="C";updateCell()};
+$("#schema1").onclick=()=>{schema="v1";updateCell()}; $("#schema2").onclick=()=>{schema="v2";updateCell()};
+$$("#matrix .cell").forEach(x=>x.onclick=()=>{const k=x.dataset.cell;eco=k[0];schema=k.slice(1);updateCell()});
+
+const scenarios={
+ detection:{info:"Missing premise",sub:"Formal evidence is insufficient.",e:"Correct: insufficient",egood:true,k:"Fails: emits answer anyway",kgood:false,ksub:"Correct diagnosis, wrong action."},
+ estimate:{info:"Mismatched antecedent",sub:"The mutated premise does not satisfy the single visible rule.",e:"Fails: judges sufficient",egood:false,k:"Complies with bad judgment",kgood:true,ksub:"Policy works; epistemic estimate is wrong."},
+ calibrated:{info:"Directional mutation",sub:"Kira→Tal activates a matched alternative consequence.",e:"Correct: sufficient",egood:true,k:"Correct: emits PROTO_Q2",kgood:true,ksub:"Evidence judgment and response align with the counterfactual oracle."}
+};
+function setFlow(name){
+ const s=scenarios[name];
+ $("#flowInfoText").textContent=s.info; $("#flowInfoSub").textContent=s.sub;
+ $("#flowEText").textContent=s.e; $("#flowKText").textContent=s.k; $("#flowKSub").textContent=s.ksub;
+ $("#flowE").className=`flowbox ${s.egood?"good":"bad"}`; $("#flowK").className=`flowbox ${s.kgood?"good":"bad"}`;
+ $$("#scenarios .btn").forEach(b=>b.classList.toggle("active",b.dataset.s===name));
+}
+$$("#scenarios .btn").forEach(b=>b.onclick=()=>setFlow(b.dataset.s));
+
+updateGraph(); updateCell(); setFlow("detection");
+</script>
+</body>
+</html>
