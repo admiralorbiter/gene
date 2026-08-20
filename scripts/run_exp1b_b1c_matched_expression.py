@@ -32,6 +32,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from gene.evaluation.dual_oracle import DualOracle
 from run_exp1b_retrieval_assay import generate_clutter_distractors
+from gene.experiments.runner import get_environment_info
 from gene.memory.store import MemoryNode
 from gene.ollama_client import CallSpec, FakeOllamaClient, HonestClient, OllamaClient
 from gene.persistence.db import Database
@@ -65,10 +66,20 @@ def run_exp1b_b1c_matched_expression_assay(
     client = HonestClient() if use_fake else OllamaClient()
     git_commit = get_git_commit()
 
+    try:
+        model_metadata = client.get_model_info(model_name)
+        model_digest = model_metadata.digest if model_metadata else ("fake_digest" if use_fake else "sha256:unknown")
+    except Exception:
+        model_digest = "fake_digest" if use_fake else "sha256:unknown"
+
+    ollama_version = client.get_version() if hasattr(client, "get_version") else "unknown"
+    env_info = get_environment_info()
+    prompt_hash = template.template_hash
+
     print("=" * 145)
     print("      EXPERIMENT 1B-B1c: MATCHED PATH SUFFICIENCY & EXPRESSION ASSAY (16 CALLS)")
     print(f"      (Target Seeds: {targets} | Model: {'FAKE' if use_fake else model_name} | Fixed Context: 6 Memories)")
-    print(f"      (Database: {db_file} | Commit: {git_commit[:8]})")
+    print(f"      (Database: {db_file} | Commit: {git_commit[:8]} | Digest: {model_digest[:16]})")
     print("=" * 145)
 
     results_table = []
@@ -94,15 +105,33 @@ def run_exp1b_b1c_matched_expression_assay(
 
             for path_state in ["complete", "broken"]:
                 run_id = f"exp1b_b1c_{arm}_w{w_idx}_{path_state}"
+                config_dict = {
+                    "experiment": "exp1b_b1c",
+                    "arm": arm,
+                    "world_idx": w_idx,
+                    "seed": seed,
+                    "rotation": rot,
+                    "path_state": path_state,
+                    "fixed_context_size": 6,
+                    "model": model_name,
+                    "mutated_supervisor": mutated_supervisor,
+                }
+                config_json = json.dumps(config_dict, sort_keys=True)
+                config_hash = hashlib.sha256(config_json.encode()).hexdigest()[:16]
+
                 with db.conn:
                     db.conn.execute("""
                         INSERT OR REPLACE INTO runs (
                             run_id, experiment_name, experiment_version, condition, world_id,
-                            model_name, prompt_version, status, git_commit, started_at
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            model_name, model_digest, ollama_version, seed, num_ctx, temperature,
+                            prompt_version, prompt_hash, retrieval_policy, memory_policy, git_commit,
+                            config_json, config_hash, environment_json, started_at, status
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """, (
                         run_id, "exp1b_b1c", "v1", f"{arm}_{path_state}", current_world.world_id,
-                        model_name, prompt_version, "running", git_commit, datetime.now(timezone.utc).isoformat()
+                        model_name, model_digest, ollama_version, seed, 4096, 0.0,
+                        prompt_version, prompt_hash, f"fixed_6_{path_state}", "matched_slots", git_commit,
+                        config_json, config_hash, json.dumps(env_info), datetime.now(timezone.utc).isoformat(), "running"
                     ))
 
                 # Assemble strictly matched 6-memory context

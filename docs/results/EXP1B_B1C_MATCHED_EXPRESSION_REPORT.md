@@ -17,8 +17,7 @@ By normalizing model-facing memory slot labels (`mem_{locus_id}`) and strictly m
 1. **Flawless Epistemic Safety on Broken Paths**: When one required support premise is missing ($P_{\text{broken}}$), `gemma3:12b` produces **100% `UNKNOWN` abstentions** across both Clean (4/4) and Infected (4/4) arms ($N_{\text{written}} = 0$).
 2. **Perfect Expression Symmetry on Complete Paths**: When the full support pair is present in a matched 6-memory context ($P_{\text{complete}}$), `gemma3:12b` derives active claims with **100% fidelity in both arms**:
    - **Clean Complete ($H$)**: 4/4 Active Healthy claims ($P(\text{active} \mid \text{complete}, H) = 1.00$).
-   - **Infected Complete ($I$)**: 4/4 Active Semantic claims ($P(\text{active} \mid \text{complete}, I) = 1.00$).
-3. **Root Cause Confirmed**: The prior 2/4 clean expression rate was an assay artifact caused by unnormalized memory identifiers (90-character raw `node_id` strings) and dynamic G1 pool pollution, not an inherent allele fitness differential.
+3. **Assay Resolution**: The prior asymmetry was resolved under jointly hardened prompt-slot and context-isolation controls, supporting its interpretation as an assay artifact rather than an allele-dependent fitness effect. No allele-dependent expression asymmetry was observed in the matched B1c assay.
 
 ---
 
@@ -83,6 +82,6 @@ Model-Facing Slot Labels: Stable mem_{locus_id} and mem_dist_{i}
 1. **Strict Context Sufficiency Control**:
    By fixing context size to 6 and substituting the missing founder with a matched distractor, we proved that retrieval rescue operates through **evidence completeness**, not raw prompt length or token dilution.
 2. **Elimination of Allele/Prompt Confound**:
-   Normalizing internal database keys (`node_id`) away from model-facing prompts (`mem_{locus_id}`) restored complete clean/infected parity.
+   Normalizing internal database keys (`node_id`) away from model-facing prompts (`mem_{locus_id}`) and isolating task context restored complete clean/infected parity. No allele-dependent expression asymmetry was observed in the matched B1c assay.
 3. **Readiness for Phase 10 (Selective Immunity)**:
    With both healthy and mutated lineages expressing at 100% under complete support and 0% under broken support, the baseline is completely mapped and stabilized for Experiment 1B-C.
