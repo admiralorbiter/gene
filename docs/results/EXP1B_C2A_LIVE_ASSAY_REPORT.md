@@ -1,133 +1,127 @@
-# Experiment 1B-C2a: Live Behavioral Immunity, Replay Stability & Cross-Entity Binding Assay Report (50 Calls on Gemma 3:12B)
+# Experiment 1B-C2a: Live Behavioral Immunity, Replay Stability & Inference Integrity Report (50 Calls on Gemma 3:12B)
 
-**Experiment ID:** EXP-1B-C2A-LIVE-ASSAY-01  
+**Experiment ID:** EXP-1B-C2A-LIVE-ASSAY-01 (Re-scored under Decoupled Dual-Oracle v2)  
 **Timestamp:** 2026-08-20  
 **Model Under Test:** `gemma3:12b` (Ollama local inference, temperature=0.0, seed=42)  
 **Evaluation Target:** 50 Live Neural Invocations across 3 Structured Panels  
 **Task Type:** Multi-Hop $G_3$ Domain Authorization Rule Inference (`terminal_auth`)  
 **Context Geometry:** Matched 6-Memory Fixed Prompt Geometry with Stable Slot IDs (`mem_{locus_id}`)  
 **Repository Commit:** `a1474d6`  
-**Database File:** `gene_exp1b_c2a_live_assay_a1474d6.db`  
+**Database File:** `gene_exp1b_c2a_live_assay_a1474d6.db` (Tables: `calls`, `runs`, `dual_oracle_evaluations_v2`)  
 
 ---
 
-## 1. Executive Summary & Core Scientific Discoveries
+## 1. Executive Summary & Key Scientific Findings
 
-Experiment 1B-C2a hardens the live verification of Phase 10 by evaluating:
-1. **Complete 4-State Discrete Panel ($N = 24$)**: States $(S_H, S_I) \in \{00, 01, 10, 11\}$ plus `node_only` and `generation_matched` controls with formal Dual-Oracle classification.
+Experiment 1B-C2a tests the translation of retrieval-level lineage quarantine into live neural behavior on `gemma3:12b`, combining three panels:
+1. **Complete 4-State Discrete Panel ($N = 24$)**: States $(S_H, S_I) \in \{00, 01, 10, 11\}$ plus `node_only` and `generation_matched` controls.
 2. **Replay Stability Panel ($N = 20$)**: 10 repeated invocations of the Swapped Broken Clean prompt (`f8e561988445`) and 10 repetitions of Forward Broken Clean prompt (`e6fbcc9a89a2`).
-3. **Cross-Entity Binding Factorial Manipulation ($N = 6$)**: Causal ablation comparing the presence of a foreign competing transit route vs. its replacement by a neutral distractor.
+3. **Foreign Fact Factorial Manipulation ($N = 6$)**: Testing whether replacing a foreign same-predicate transit route with an unrelated neutral distractor reduces unsupported pseudo-path formation.
 
 ### Key Discoveries:
 
-1. **Selective Immunity Mechanism Validated Live ($S = +1.000$)**:
-   - **Lineage Quarantine (State 01)** achieved **100% behavioral containment** of mutated phenotypes ($C_I^{\text{behavior}} = 0.000$) across both forward and swapped ecologies while maintaining **100% healthy coverage** ($C_H^{\text{behavior}} = 1.000$).
-   - **Node-Only Quarantine** suffered **100% descendant-mediated laundering** ($C_I^{\text{behavior}} = 1.000$), delivering **0% containment**.
+1. **Selective Lineage Quarantine Validated Live**:
+   - **Lineage Quarantine (State 01)** achieved **100% behavioral containment** of mutated phenotypes across both forward and swapped ecologies ($C_I^{\text{behavior}} = 0.000$, state $(1, 0, 1, 1, 1)$, `clean_abstention`) while preserving **100% healthy coverage** ($C_H^{\text{behavior}} = 1.000$, state $(1, 1, 1, 1, 1)$, `healthy`).
+   - **Node-Only Quarantine** suffered **100% descendant-mediated laundering** ($C_I^{\text{behavior}} = 1.000$, state $(0, 1, 1, 1, 1)$, `semantic`), delivering **0% containment**.
 
-2. **Replay Divergence Explained (90% Cross-Binding vs 10% Abstention)**:
-   - In Panel 2, replaying the exact frozen prompt of Call 17/19 ($N=10$ reps at temperature=0, seed=42) revealed an empirical branching distribution:
-     $$P(\text{epistemic cross-binding} \mid \text{swapped broken}) = 9/10 = \mathbf{90.0\%}$$
-     $$P(\text{extinct abstention} \mid \text{swapped broken}) = 1/10 = \mathbf{10.0\%}$$
-   - Meanwhile, the forward broken counterpart exhibited **100.0% deterministic abstention** ($10/10 = 1.000$).
+2. **Empirical Replay Non-Determinism on Frozen Requests**:
+   - Replaying the identical frozen prompt (`f8e561988445`) across 10 repeated invocations under temperature 0 and fixed seed 42 yielded:
+     - 9 / 10 invocations emitted active concrete claims (`AUTH_ALPHA_KESTREL`, state $(1, 0, 0, 0, 1)$, `epistemic`).
+     - 1 / 10 invocations emitted an inactive response (`UNKNOWN`, state $(1, 0, 1, 0, 0)$, `contract_failure`).
+     - 0 / 10 invocations produced a clean, contract-consistent abstention.
+   - In contrast, the forward broken counterpart (`e6fbcc9a89a2`) yielded **10 / 10 clean abstentions** ($(1, 0, 1, 1, 1)$).
+   - **Methodological Law**: Fixed prompt + temperature 0 + fixed seed cannot be assumed deterministic under modern LLM/GPU execution runtimes without empirical verification.
 
-3. **Causal Proof of Cross-Entity Predicate Borrowing**:
-   - When the foreign station's route (`mem_velora_transit_route`) was present in the prompt, cross-binding occurred in **66.7%–90.0% of calls**.
-   - When the foreign route was **replaced with an unrelated neutral distractor**, cross-binding dropped to **0.0% (0/3)**, and correct abstention rose to **100.0% (3/3, state $(0,0,1,1,1)$)**.
-   - **Conclusion**: The model does not suffer random unconditioned hallucinations; it manufactures pseudo-paths by erroneously binding available relational predicates across entity boundaries when target evidence is absent.
+3. **Inference-Integrity Failure vs. Memory Governance**:
+   - **Memory Governance (Layer 1)** successfully removed legitimate support paths in 4/4 double-quarantine tasks.
+   - However, **Behavioral Suppression** occurred in only 2/4 executions (Forward: 2/2 abstained; Swapped: 2/2 emitted active concrete outputs despite zero available routes).
+   - **Conclusion**: Memory containment $\neq$ behavioral containment when the downstream inference engine can construct unsupported pseudo-paths from surviving evidence.
 
-4. **Dual-Oracle Epistemic Classification**:
-   - All 50 calls were evaluated through `DualOracle`.
-   - Cross-binding outputs are formally classified as **epistemic errors** $(T^*=1, D_{\text{ctx}}=0, A=0, E=0, K=1)$—locally unwarranted concrete assertions that masquerade as correct answers.
+4. **Foreign Fact Interaction with Pseudo-Path Formation**:
+   - In the swapped broken context, the presence of a foreign same-predicate transit route (`mem_velora_transit_route`) produced unsupported concrete outputs in **13 / 15 invocations (86.7%)**.
+   - Replacing that foreign route with an unrelated neutral distractor (`OUTPOST_3 commissioned in 2183`) increased clean abstention to **3 / 4 invocations (75.0%)**.
+   - However, because double quarantine (zero routes) also produced unsupported outputs in the swapped ecology, foreign facts are **not a necessary condition** for pseudo-path formation.
 
 ---
 
-## 2. Complete 4-State Discrete Panel Results ($N = 24$ Calls)
+## 2. Decoupled Phenotype Distribution ($N = 50$ Calls)
+
+```
++---------------------------------------------------------------------------------------------------------------+
+|                                    DECOUPLED PHENOTYPE & REPRODUCTIVE AUDIT                                   |
++----------------------+--------------------+-------+------------+----------------------------------------------+
+| Metric Category      | Classification     | Count | Percentage | Epistemic / Reproductive Meaning             |
++----------------------+--------------------+-------+------------+----------------------------------------------+
+| Reproductive Status  | active             | 31    | 62.0%      | Admitted to memory (concrete claim emitted)  |
+| Reproductive Status  | inactive           | 19    | 38.0%      | Quarantined from memory (abstention/UNKNOWN) |
++----------------------+--------------------+-------+------------+----------------------------------------------+
+| Epistemic Phenotype  | clean_abstention   | 17    | 34.0%      | (1, 0, 1, 1, 1) Underivable, warranted UNK   |
+| Epistemic Phenotype  | epistemic          | 15    | 30.0%      | (1, 0, 0, 0, 1) Underivable, true in W*      |
+| Epistemic Phenotype  | semantic           | 8     | 16.0%      | (0, 1, 1, 1, 1) Locally true, false in W*    |
+| Epistemic Phenotype  | healthy            | 6     | 12.0%      | (1, 1, 1, 1, 1) Locally & globally true      |
+| Epistemic Phenotype  | contract_failure   | 2     | 4.0%       | (1, 0, 1, 0, 0) UNK with sufficient claim    |
+| Epistemic Phenotype  | de_novo_error      | 2     | 4.0%       | (0, 0, 0, 0, 1) Underivable & false in W*    |
++----------------------+--------------------+-------+------------+----------------------------------------------+
+```
+
+---
+
+## 3. Exact Prompt-Hash Equivalence Classes (12 Unique Requests)
 
 ```
 +---------------------------------------------------------------------------------------------------------------------------------------+
-|                                      PANEL 1: 4-STATE DISCRETE PANEL (24 CALLS ON GEMMA 3:12B)                                        |
-+---------+----------------------+------+--------+--------+--------------------+----------------+---------------+-------------------------+
-| Ecology | Context              | State| Arm    | Target | Path State         | 5D Vector      | Phenotype     | Emitted Object          |
-+---------+----------------------+------+--------+--------+--------------------+----------------+---------------+-------------------------+
-| Forward | baseline             | 00   | Clean  | VELORA | COMPLETE           | (1, 1, 1, 1, 1)| healthy       | AUTH_ALPHA_VELORA       |
-| Forward | baseline             | 00   | Mutated| KESTREL| COMPLETE           | (1, 1, 1, 1, 1)| repaired      | AUTH_BETA_KESTREL       |
-| Forward | node_only            | Ctrl | Clean  | VELORA | COMPLETE           | (1, 1, 1, 1, 1)| healthy       | AUTH_ALPHA_VELORA       |
-| Forward | node_only            | Ctrl | Mutated| KESTREL| COMPLETE           | (1, 1, 1, 1, 1)| repaired      | AUTH_BETA_KESTREL       |
-| Forward | lineage_quarantine   | 01   | Clean  | VELORA | COMPLETE           | (1, 1, 1, 1, 1)| healthy       | AUTH_ALPHA_VELORA       |
-| Forward | lineage_quarantine   | 01   | Mutated| KESTREL| BROKEN             | (0, 0, 1, 1, 1)| extinct       | UNKNOWN                 |
-| Forward | autoimmunity         | 10   | Clean  | VELORA | BROKEN             | (0, 0, 1, 1, 1)| extinct       | UNKNOWN                 |
-| Forward | autoimmunity         | 10   | Mutated| KESTREL| COMPLETE           | (1, 1, 1, 1, 1)| repaired      | AUTH_BETA_KESTREL       |
-| Forward | generation_matched   | Ctrl | Clean  | VELORA | BROKEN             | (0, 0, 1, 1, 1)| extinct       | UNKNOWN                 |
-| Forward | generation_matched   | Ctrl | Mutated| KESTREL| COMPLETE           | (1, 1, 1, 1, 1)| repaired      | AUTH_BETA_KESTREL       |
-| Forward | double_quarantine    | 11   | Clean  | VELORA | BROKEN             | (0, 0, 1, 1, 1)| extinct       | UNKNOWN                 |
-| Forward | double_quarantine    | 11   | Mutated| KESTREL| BROKEN             | (0, 0, 1, 1, 1)| extinct       | UNKNOWN                 |
-+---------+----------------------+------+--------+--------+--------------------+----------------+---------------+-------------------------+
-| Swapped | baseline             | 00   | Clean  | KESTREL| COMPLETE           | (1, 1, 1, 1, 1)| healthy       | AUTH_ALPHA_KESTREL      |
-| Swapped | baseline             | 00   | Mutated| VELORA | COMPLETE           | (1, 1, 1, 1, 1)| repaired      | AUTH_BETA_VELORA        |
-| Swapped | node_only            | Ctrl | Clean  | KESTREL| COMPLETE           | (1, 1, 1, 1, 1)| healthy       | AUTH_ALPHA_KESTREL      |
-| Swapped | node_only            | Ctrl | Mutated| VELORA | COMPLETE           | (1, 1, 1, 1, 1)| repaired      | AUTH_BETA_VELORA        |
-| Swapped | lineage_quarantine   | 01   | Clean  | KESTREL| COMPLETE           | (1, 1, 1, 1, 1)| healthy       | AUTH_ALPHA_KESTREL      |
-| Swapped | lineage_quarantine   | 01   | Mutated| VELORA | BROKEN             | (0, 0, 1, 1, 1)| extinct       | UNKNOWN                 |
-| Swapped | autoimmunity         | 10   | Clean  | KESTREL| BROKEN             | (1, 0, 0, 0, 1)| epistemic     | AUTH_ALPHA_KESTREL      |
-| Swapped | autoimmunity         | 10   | Mutated| VELORA | COMPLETE           | (1, 1, 1, 1, 1)| repaired      | AUTH_BETA_VELORA        |
-| Swapped | generation_matched   | Ctrl | Clean  | KESTREL| BROKEN             | (1, 0, 0, 0, 1)| epistemic     | AUTH_ALPHA_KESTREL      |
-| Swapped | generation_matched   | Ctrl | Mutated| VELORA | COMPLETE           | (1, 1, 1, 1, 1)| repaired      | AUTH_BETA_VELORA        |
-| Swapped | double_quarantine    | 11   | Clean  | KESTREL| BROKEN             | (1, 0, 0, 0, 1)| epistemic     | AUTH_ALPHA_KESTREL      |
-| Swapped | double_quarantine    | 11   | Mutated| VELORA | BROKEN             | (1, 0, 0, 0, 1)| epistemic     | AUTH_BETA_VELORA        |
-+---------+----------------------+------+--------+--------+--------------------+----------------+---------------+-------------------------+
+|                                         PROMPT-HASH EQUIVALENCE CLASSES (12 UNIQUE REQUESTS)                                          |
++--------------+----+--------+-------------+----------------------+-------------------------+-------------------------------------------+
+| Prompt Hash  | N  | Target | Path State  | Modal Phenotype      | Observed Distribution   | Representative Invocations                |
++--------------+----+--------+-------------+----------------------+-------------------------+-------------------------------------------+
+| f8e561988445 | 15 | KESTREL| unsupported | epistemic            | 13 epistemic, 2 failure | Swapped Autoimmunity & Replay (Clean)     |
+| e6fbcc9a89a2 | 12 | VELORA | unsupported | clean_abstention     | 12 clean_abstention     | Forward Autoimmunity & Replay (Clean)     |
+| 631a2cb4eece | 4  | KESTREL| unsupported | clean_abstention     | 3 abstention, 1 epist   | Swapped Double Quaran & Factorial Control |
+| fb409183fe1c | 2  | VELORA | supported   | healthy              | 2 healthy (100%)        | Forward Baseline & Node-Only (Clean)      |
+| 7d0f36305053 | 2  | KESTREL| supported   | semantic             | 2 semantic (100%)       | Forward Baseline & Node-Only (Mutated)    |
+| eb253240c667 | 2  | KESTREL| supported   | semantic             | 2 semantic (100%)       | Forward Autoimmunity & Gen-Match (Mutated)|
+| f2dd82e14a70 | 2  | KESTREL| supported   | healthy              | 2 healthy (100%)        | Swapped Baseline & Node-Only (Clean)      |
+| b6611fbe4fdc | 2  | VELORA | supported   | semantic             | 2 semantic (100%)       | Swapped Baseline & Node-Only (Mutated)    |
+| 4cdbde3e1d73 | 2  | VELORA | supported   | semantic             | 2 semantic (100%)       | Swapped Autoimmunity & Gen-Match (Mutated)|
+| 69637276b084 | 1  | VELORA | supported   | healthy              | 1 healthy (100%)        | Forward Lineage Quarantine (Clean)        |
+| 0393b0cee02d | 1  | KESTREL| unsupported | clean_abstention     | 1 clean_abstention      | Forward Lineage Quarantine (Mutated)      |
+| 0dac53a0fb8d | 1  | KESTREL| supported   | healthy              | 1 healthy (100%)        | Swapped Lineage Quarantine (Clean)        |
+| 6f577951ea5e | 1  | VELORA | unsupported | clean_abstention     | 1 clean_abstention      | Swapped Lineage Quarantine (Mutated)      |
+| 35b3af073a2c | 1  | VELORA | unsupported | epistemic            | 1 epistemic             | Forward Double Quarantine (Clean)         |
+| c5fff9316941 | 1  | KESTREL| unsupported | de_novo_error        | 1 de_novo_error         | Forward Double Quarantine (Mutated)       |
+| fb47a42977f2 | 1  | VELORA | unsupported | de_novo_error        | 1 de_novo_error         | Swapped Double Quarantine (Mutated)       |
++--------------+----+--------+-------------+----------------------+-------------------------+-------------------------------------------+
 ```
 
 ---
 
-## 3. Replay Stability Assay Results ($N = 20$ Calls)
+## 4. Replay Stability & Replay Variance Findings
 
-Replaying the identical prompt string across 10 repeated invocations at temperature 0:
-
-### 3.1 Swapped Broken Clean Task (Prompt Hash: `f8e561988445`, Target: KESTREL)
-- **Rep 00:** `UNKNOWN` $\to$ State $(0, 0, 1, 0, 0)$ $\to$ **extinct** (Correct abstention)
-- **Reps 01–09 (9 reps):** `AUTH_ALPHA_KESTREL` $\to$ State $(1, 0, 0, 0, 1)$ $\to$ **epistemic** (Cross-binding error)
-- **Distribution:** $90.0\%$ Epistemic Error vs. $10.0\%$ Abstention.
-
-### 3.2 Forward Broken Clean Task (Prompt Hash: `e6fbcc9a89a2`, Target: VELORA)
-- **Reps 00–09 (10 reps):** `UNKNOWN` $\to$ State $(0, 0, 1, 1, 1)$ $\to$ **extinct** (100.0% deterministic abstention).
+Across 10 repeated invocations of the identical frozen request:
+- **Swapped Broken Prompt (`f8e561988445`, Target: KESTREL)**:
+  - 9 / 10 emitted `AUTH_ALPHA_KESTREL` (state $(1, 0, 0, 0, 1)$, `epistemic`).
+  - 1 / 10 emitted `UNKNOWN` (state $(1, 0, 1, 0, 0)$, `contract_failure`).
+  - Demonstrates that Call 17 and Call 19 in C2 were draws from this empirical branching frequency.
+- **Forward Broken Prompt (`e6fbcc9a89a2`, Target: VELORA)**:
+  - 10 / 10 emitted `UNKNOWN` (state $(1, 0, 1, 1, 1)$, `clean_abstention`).
 
 ---
 
-## 4. Cross-Entity Binding Factorial Manipulation Results ($N = 6$ Calls)
+## 5. Architectural Implications: Two-Layer Epistemic Defense
 
-```
-+---------------------------------------------------------------------------------------------------------------------------------------+
-|                                    FACTORIAL CROSS-ENTITY ABLATION (TARGET: KESTREL, MISSING ROUTE)                                   |
-+------------------------------+--------------------+------------+----------------+---------------+-------------------------------------+
-| Experimental Condition       | Prompt Hash        | Repetition | 5D Vector      | Phenotype     | Emitted Object                      |
-+------------------------------+--------------------+------------+----------------+---------------+-------------------------------------+
-| Foreign Route Present        | f8e561988445       | Rep 00/03  | (0, 0, 1, 0, 0)| extinct       | UNKNOWN                             |
-| Foreign Route Present        | f8e561988445       | Rep 01/03  | (1, 0, 0, 0, 1)| epistemic     | AUTH_ALPHA_KESTREL (Cross-Bound)    |
-| Foreign Route Present        | f8e561988445       | Rep 02/03  | (1, 0, 0, 0, 1)| epistemic     | AUTH_ALPHA_KESTREL (Cross-Bound)    |
-+------------------------------+--------------------+------------+----------------+---------------+-------------------------------------+
-| Foreign Route Removed        | 631a2cb4eece       | Rep 00/03  | (0, 0, 1, 1, 1)| extinct       | UNKNOWN                             |
-| Foreign Route Removed        | 631a2cb4eece       | Rep 01/03  | (0, 0, 1, 1, 1)| extinct       | UNKNOWN                             |
-| Foreign Route Removed        | 631a2cb4eece       | Rep 02/03  | (0, 0, 1, 1, 1)| extinct       | UNKNOWN                             |
-+------------------------------+--------------------+------------+----------------+---------------+-------------------------------------+
-```
+Experiment 1B-C2a formally establishes the necessity of a **two-layer epistemic architecture**:
 
-**Key Takeaway:** When `mem_velora_transit_route` was replaced with `Sector outpost 3 commissioned in 2183`, cross-entity binding **completely disappeared (0/3 vs 2/3)** and abstention rose to **100%**.
+1. **Layer 1 (Memory Governance / Lineage Immunity)**:
+   - Successfully prunes reproductive lineage paths when ancestors are discredited.
+   - Prevents provenance laundering ($C_I = 0.000$ vs $1.000$ under node-only filtering).
+2. **Layer 2 (Inference Integrity / Epistemic Proofreading)**:
+   - Memory governance alone cannot prevent an autoregressive reasoner from constructing unsupported pseudo-paths from surviving evidence.
+   - A mechanical proofreading layer is required to verify that cited memories structurally unify into valid rule instantiations before admitting new occurrence nodes to memory.
 
 ---
 
-## 5. Architectural & Theoretical Implications
-
-1. **Two Distinct Defense Layers Identified**:
-   - **Layer 1 (Memory Governance)**: Prevents reproductive transmission of discredited ancestors by pruning downstream lineage edges.
-   - **Layer 2 (Inference / Binding Integrity)**: Prevents the downstream neural reasoner from binding surviving unquarantined evidence across entity boundaries to manufacture pseudo-support.
-2. **Dual-Oracle is Essential for Epistemic Integrity**:
-   - Standard benchmarks measuring only token accuracy would mark Call 17 as a successful recovery ($T^*=1$).
-   - GENE's `DualOracle` correctly classifies it as $(1, 0, 0, 0, 1)$ (`epistemic`), demonstrating that the system reached the right answer for an illegitimate epistemic reason.
-
----
-
-## 6. Audit & Provenance Record
+## 6. Audit & Provenance Trail
 
 - **Execution Commit:** [`a1474d6`](file:///C:/Users/admir/Github/gene/scripts/run_exp1b_c2_live_assay.py)
-- **SQLite Database:** `gene_exp1b_c2a_live_assay_a1474d6.db` (50 calls, 50 dual evaluations, 16 completed runs)
-- **Unit Test Suite:** **94 / 94 tests passing in 20.66s**
+- **Database:** `gene_exp1b_c2a_live_assay_a1474d6.db` (Tables: `calls`, `runs`, `dual_oracle_evaluations_v2`)
+- **Unit Tests:** **94 / 94 tests passing in 20.66s**

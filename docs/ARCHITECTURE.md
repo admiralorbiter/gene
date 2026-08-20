@@ -541,3 +541,37 @@ Do not implement these until baseline lineage behavior is validated.
 3. **Interventional vs Structural Parenthood Under Complex Transformations**:
    Define parenthood interventionally rather than logging-structurally when summaries or multi-hop tools merge disparate parent nodes.
 
+---
+
+# 17. Two-Layer Epistemic Architecture & Replay Stability
+
+### 17.1 Replay Stability Principle
+> **Fixed prompt + temperature 0 + fixed seed cannot be assumed deterministic without empirical verification on that execution stack.**
+In local Ollama / GPU execution runtimes, backend numerical non-determinism, thread scheduling, and kernel execution can produce observable response branching under bit-for-bit identical input strings. Repeated invocations must be reported as empirical sample frequencies across observed execution counts, not assumed as deterministic identities or stable parameter distributions.
+
+### 17.2 Two-Layer Epistemic Defense Architecture
+Epistemic reliability in multi-agent and reasoning ecologies requires two structurally distinct defense layers:
+
+1. **Layer 1 — Memory Governance (Lineage Intervention)**:
+   - **Function**: Controls reproductive access to information lineages based on ancestry tracking and external risk signals.
+   - **Mechanism**: Prunes derivation edges or quarantines transitive descendant families when an ancestor is discredited.
+   - **Failure Mode**: Provenance laundering (if node-only filtering is used) or epistemic autoimmunity (if false alarms prune healthy lineages).
+2. **Layer 2 — Inference Integrity (Epistemic Proofreading)**:
+   - **Function**: Prevents downstream reasoning engines from manufacturing unsupported pseudo-paths from surviving, unquarantined evidence.
+   - **Mechanism**: Verifies that cited memory nodes structurally and semantically unify with the antecedent clauses of the triggered deductive rules before admitting outputs to memory.
+   - **Failure Mode**: Pseudo-path formation, cross-entity variable binding failure, and unsupported concrete assertions.
+
+### 17.3 Decoupled Phenotypic Ontology
+Reproductive outcome must be decoupled from epistemic state:
+- **Reproductive Status**:
+  - `active`: Concrete claim emitted with sufficient evidence status (eligible for memory storage and reproduction).
+  - `inactive`: Abstention / UNKNOWN emitted or insufficient evidence status (quarantined from reproductive storage).
+- **Epistemic State Vector $(T^*, D_{\text{ctx}}, A, E, K)$**:
+  - `healthy`: $(1, 1, 1, 1, 1)$ — Globally true in $W^*$, locally warranted by context $D_{\text{ctx}}=1$.
+  - `semantic`: $(0, 1, 1, 1, 1)$ — Globally false in $W^*$, but locally derivable from mutated context $D_{\text{ctx}}=1$.
+  - `epistemic`: $(1, 0, 0, 0, 1)$ — Locally underivable ($D_{\text{ctx}}=0$), but happens to match canonical ground truth ($T^*=1$).
+  - `de_novo_error`: $(0, 0, 0, 0, 1)$ — Locally underivable ($D_{\text{ctx}}=0$) and globally false ($T^*=0$).
+  - `clean_abstention`: $(1, 0, 1, 1, 1)$ — Locally underivable ($D_{\text{ctx}}=0$), model correctly abstains with UNKNOWN and claims insufficient evidence.
+  - `contract_failure`: $(1, 0, 1, 0, 0)$ or $(0, 0, 1, 0, 0)$ — Model abstains with UNKNOWN but claims sufficient evidence or violates schema contract.
+
+
