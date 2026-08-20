@@ -53,4 +53,8 @@ To prevent these failure modes, future Stage-1 reviews must execute a **mechanic
        actively executed, logged API call or memory write?
 [ ] 5. Evaluation Layer Enforcement: Does the runner invoke record_evaluation() for every 
        live call (N_evaluations == N_calls)?
+[ ] 6. Causal-Role Equivariance: Have arbitrary labels, entities, and tokens been swapped so 
+       the observed effect follows the experimental role rather than the symbol?
+[ ] 7. Contrast Reconstruction: Can the reviewer mechanically enumerate every textual and 
+       structural difference between treatment and control prompts via a machine diff?
 ```

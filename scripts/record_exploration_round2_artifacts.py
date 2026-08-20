@@ -33,7 +33,18 @@ def generate_round2_manifest(runs_dir: Path = Path("runs/explore_round2")) -> di
     manifest = {
         "manifest_version": "1.0.0",
         "round": "Exploration Round 2",
+        "evidence_class": "exploratory_local",
         "base_commit": "2685987",
+        "original_call_commit": "a2f933a",
+        "evaluation_provenance": {
+            "evaluation_origin": "retrospective_backfill",
+            "evaluation_commit": "9aa06b1",
+            "note": "Evaluations backfilled post-review to match harness evaluation layer schema; original calls logged in a2f933a."
+        },
+        "promotion_lifecycle": {
+            "is_canonical": False,
+            "prerequisite": "Requires frozen public database export, SHA-256 validation, and unconfounded protocol replication before promotion to canonical_results_manifest.json."
+        },
         "artifacts": artifacts,
     }
     return manifest

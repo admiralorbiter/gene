@@ -101,14 +101,28 @@ GENE does not claim to have invented truth maintenance or provenance. Rather, GE
 3. **Nominal Diversity $\ne$ Epistemic Independence:** Five distinct documents in a vector database may all descend from a single corrupted upstream root (Exploration Round 1 Track B).
 4. **Lineage Laundering:** Summarization and semantic paraphrasing strip provenance metadata, creating the illusion of de novo consensus (Phase 10.5).
 
+### The Epistemic Hierarchy of Persistent AI
+
+GENE's empirical progression reveals an essential conceptual distinction across five separate properties:
+
+$$\text{Truth} \ne \text{Derivability} \ne \text{Causal Influence} \ne \text{Ancestry} \ne \text{Justification}$$
+
+- **Truth:** Canonical ground truth about the state of the world ($T^*$).
+- **Derivability:** Logical validity under some set of visible premises ($D_{\text{ctx}}$), regardless of whether those premises are true.
+- **Causal Influence:** Whether a token or memory physically altered the neural generator's output distribution ($C_{\text{parent}}$), regardless of whether it was cited.
+- **Ancestry:** The historical directed graph of exposures and parent events ($G_{\text{exposure}}$).
+- **Justification:** Whether a belief currently possesses at least one valid, un-retracted combination of supporting premises ($S(c)$) that entitles the system to maintain it as the world changes.
+
+A belief can be false but locally derivable. A claim can descend from a tainted ancestor yet remain independently justified. A model can cite a premise it did not causally use. A repeated memory can look multiply confirmed while sharing a single epistemic root.
+
 ---
 
 ## 3. The Mathematics of Multi-Justification Support
 
-In a realistic memory ecology, a persistent claim $c$ is rarely a pure single-lineage leaf. It may possess multiple independent derivations.
+In a realistic memory ecology, a persistent claim $c$ is rarely a pure single-lineage leaf. It may possess multiple alternative derivations.
 
-### Minimal Epistemic Support Sets $S(c)$
-Every durable claim $c$ is associated with a set of minimal sufficient ancestral premises:
+### Minimal Epistemic Support Environments $S(c)$
+We model a durable claim $c$ as potentially associated with a set of minimal sufficient ancestral premise environments:
 $$S(c) = \{S_1, S_2, \dots, S_k\}$$
 where each $S_i = \{a_{i,1}, a_{i,2}, \dots, a_{i,m}\}$ is an irredundant conjunctive set of root assumptions such that:
 $$\bigwedge_{a \in S_i} a \implies c$$
@@ -127,7 +141,7 @@ When an ancestor $A$ is discredited or mutated ($A \leadsto 0$):
    $$P(X) = A \cdot M_1 + H \cdot M_2 \implies P(X)\mid_{A=0} = 0 + H \cdot M_2 = H \cdot M_2 > 0 \quad \text{\textbf{(PRESERVE)}}$$
 
 > [!IMPORTANT]
-> **Non-Destructive Lineage Immunity:** A naive lineage quarantine deletes any node with an infected ancestor. Under multi-justification support, the Epistemic Kernel prunes the corrupted derivation path $A \cdot M_1$ while **preserving the active claim $X$** via its surviving healthy support path $H \cdot M_2$, preventing epistemic autoimmunity.
+> **Candidate Non-Destructive Lineage Immunity:** A naive lineage quarantine deletes any node with an infected ancestor. A support-aware kernel is hypothesized to prune the corrupted derivation path $A \cdot M_1$ while **preserving the active claim $X$** via its surviving healthy support path $H \cdot M_2$, preventing epistemic autoimmunity.
 
 ### Epistemic Cut Set Size $\kappa(c)$
 We define the structural epistemic resilience of a belief:
