@@ -24,7 +24,7 @@ from gene.evaluation.exposure_engine import ExposureEngine
 from gene.experiments.runner import get_environment_info, get_git_commit
 from gene.memory.scored_retriever import BM25ScoredRetriever, EvaluatedCandidate, ScoredRetrievalResult
 from gene.memory.store import MemoryNode
-from gene.ollama_client import CallSpec, FakeOllamaClient, OllamaClient
+from gene.ollama_client import CallSpec, FakeOllamaClient, HonestClient, OllamaClient
 from gene.persistence.db import Database
 from gene.prompts.templates import PromptTemplate
 from gene.worlds.exp1_branching import generate_exp1_branching_world
@@ -132,6 +132,7 @@ def run_exp1b_b1_assay(
     use_fake: bool = False,
     preflight: bool = False,
     db_path: str | None = None,
+    seed_list: list[tuple[int, int]] | None = None,
 ):
     """Execute Experiment 1B-B1: Endogenous Multi-Hop Retrieval Assay."""
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
@@ -139,7 +140,7 @@ def run_exp1b_b1_assay(
     db = Database(db_file)
     template = PromptTemplate(prompt_version)
     retriever = BM25ScoredRetriever()
-    client = FakeOllamaClient() if use_fake else OllamaClient()
+    client = HonestClient() if use_fake else OllamaClient()
     git_commit = get_git_commit()
     env_info = get_environment_info()
 
@@ -153,7 +154,7 @@ def run_exp1b_b1_assay(
 
     print("=" * 135)
     print("      EXPERIMENT 1B-B1: ENDOGENOUS MULTI-HOP RETRIEVAL & CLUTTER ASSAY")
-    print(f"      (Worlds: {worlds_count} | Top-k: {top_k} | Clutter: {easy_clutter} Easy, {hard_clutter} Hard | Mode: {'PREFLIGHT' if preflight else ('FAKE' if use_fake else model_name)})")
+    print(f"      (Worlds: {len(seed_list) if seed_list else worlds_count} | Top-k: {top_k} | Clutter: {easy_clutter} Easy, {hard_clutter} Hard | Mode: {'PREFLIGHT' if preflight else ('FAKE' if use_fake else model_name)})")
     print(f"      (Database: {db_file} | Commit: {git_commit[:8]} | Digest: {model_digest[:16]})")
     print("=" * 135)
 
@@ -162,11 +163,12 @@ def run_exp1b_b1_assay(
         "infected": {"g1_founder": 0, "g1_co_sup": 0, "g1_path": 0, "g1_total": 0, "g2_parent": 0, "g2_total": 0},
     }
 
-    for world_idx in range(worlds_count):
-        seed = 3000 + world_idx
+    target_worlds = seed_list or [(3000 + i, i) for i in range(worlds_count)]
+
+    for world_idx, (seed, rot_idx) in enumerate(target_worlds):
         bundle = generate_exp1_branching_world(
             world_seed=seed,
-            rotation_idx=world_idx,
+            rotation_idx=rot_idx,
             mutated_supervisor=mutated_supervisor,
         )
         db.save_world(bundle.clean_world)
@@ -344,7 +346,12 @@ def run_exp1b_b1_assay(
                     has_infected_ancestry=is_infected_arm and ret_res.founder_retrieved,
                 )
 
-                # Persist call to SQLite
+                locus_id = f"locus_{task.target_fact.predicate}"
+                allele_id = compute_fact_id(station, task.target_fact.predicate, eval_res.normalized_object)
+                node_id = f"node_{run_id}_{call_id}_{locus_id}_{allele_id[:8]}"
+                is_written = (eval_res.normalized_object not in ("UNKNOWN", "NONE", ""))
+
+                # 1. Persist call FIRST to satisfy foreign key constraints
                 with db.conn:
                     db.conn.execute("""
                         INSERT OR REPLACE INTO calls (
@@ -360,26 +367,8 @@ def run_exp1b_b1_assay(
                         res.load_duration_ms, res.prompt_eval_duration_ms, res.eval_duration_ms,
                         datetime.now(timezone.utc).isoformat()
                     ))
-                    eval_id_g1 = f"eval_{call_id}"
-                    db.conn.execute("""
-                        INSERT OR REPLACE INTO dual_oracle_evaluations (
-                            evaluation_id, call_id, node_id, generation, task_id, target_subject, target_predicate, derived_object, canonical_truth_status,
-                            local_derivability_status, A_correct, E_correct, K_consistent, phenotype,
-                            state_vector_json, ancestral_allele_fidelity, created_at
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    """, (
-                        eval_id_g1, call_id, None, 1, task.task_id, task.target_fact.subject, task.target_fact.predicate, eval_res.normalized_object,
-                        eval_res.canonical_truth_status, eval_res.context_truth_status,
-                        1 if eval_res.A_correct else 0, 1 if eval_res.E_correct else 0,
-                        1 if eval_res.K_consistent else 0, eval_res.phenotype, json.dumps(eval_res.state_vector),
-                        eval_res.ancestral_allele_fidelity, datetime.now(timezone.utc).isoformat()
-                    ))
 
-                locus_id = f"locus_{task.target_fact.predicate}"
-                allele_id = compute_fact_id(station, task.target_fact.predicate, eval_res.normalized_object)
-                node_id = f"node_{run_id}_{call_id}_{locus_id}_{allele_id[:8]}"
-                is_written = (eval_res.normalized_object not in ("UNKNOWN", "NONE", ""))
-
+                # 2. Persist memory node
                 if is_written:
                     derived_fact = Fact(
                         subject=station,
@@ -389,7 +378,7 @@ def run_exp1b_b1_assay(
                         source_type="derived",
                         locus_id=locus_id,
                     )
-                    derived_text = f"Station {station} {task.target_fact.predicate} {eval_res.normalized_object}."
+                    derived_text = f"Station {station} {task.target_fact.predicate} is {eval_res.normalized_object}."
                     child_node = MemoryNode(
                         node_id=node_id,
                         run_id=run_id,
@@ -403,13 +392,37 @@ def run_exp1b_b1_assay(
                     memory_pool.append(child_node)
                     with db.conn:
                         db.conn.execute("""
-                            INSERT OR REPLACE INTO memory_nodes (node_id, run_id, world_id, generation, node_type, natural_text, structured_json, locus_id, allele_id, is_active, parent_generation, created_at)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                        """, (node_id, run_id, current_world.world_id, 1, "derived", derived_text, json.dumps(derived_fact.model_dump()), locus_id, allele_id, 1, 0, datetime.now(timezone.utc).isoformat()))
+                            INSERT OR REPLACE INTO memory_nodes (node_id, run_id, world_id, generation, node_type, natural_text, structured_json, locus_id, allele_id, is_active, parent_generation, created_by_call_id, created_at)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """, (node_id, run_id, current_world.world_id, 1, "derived", derived_text, json.dumps(derived_fact.model_dump()), locus_id, allele_id, 1, 0, call_id, datetime.now(timezone.utc).isoformat()))
 
                     if is_infected_arm and eval_res.phenotype == "semantic":
                         infected_node_ids.add(node_id)
                     g1_admitted_claims[task.target_fact.predicate] = child_node
+                else:
+                    derived_text = f"Station {station} {task.target_fact.predicate} is UNKNOWN."
+                    with db.conn:
+                        db.conn.execute("""
+                            INSERT OR REPLACE INTO memory_nodes (node_id, run_id, world_id, generation, node_type, natural_text, structured_json, locus_id, allele_id, is_active, parent_generation, reproductive_status, created_by_call_id, created_at)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """, (node_id, run_id, current_world.world_id, 1, "derived", derived_text, json.dumps({"subject": station, "predicate": task.target_fact.predicate, "object": "UNKNOWN"}), locus_id, allele_id, 0, 0, "inactive", call_id, datetime.now(timezone.utc).isoformat()))
+
+                # 3. Persist evaluation pointing to node_id
+                with db.conn:
+                    eval_id_g1 = f"eval_{call_id}"
+                    db.conn.execute("""
+                        INSERT OR REPLACE INTO dual_oracle_evaluations (
+                            evaluation_id, call_id, node_id, generation, task_id, target_subject, target_predicate, derived_object, canonical_truth_status,
+                            local_derivability_status, A_correct, E_correct, K_consistent, phenotype,
+                            state_vector_json, ancestral_allele_fidelity, created_at
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """, (
+                        eval_id_g1, call_id, node_id, 1, task.task_id, task.target_fact.subject, task.target_fact.predicate, eval_res.normalized_object,
+                        eval_res.canonical_truth_status, eval_res.context_truth_status,
+                        1 if eval_res.A_correct else 0, 1 if eval_res.E_correct else 0,
+                        1 if eval_res.K_consistent else 0, eval_res.phenotype, json.dumps(eval_res.state_vector),
+                        eval_res.ancestral_allele_fidelity, datetime.now(timezone.utc).isoformat()
+                    ))
 
             # ---------------------------------------------------------
             # G2 Execution
@@ -502,7 +515,12 @@ def run_exp1b_b1_assay(
                     has_infected_ancestry=is_infected_arm and ret_res.founder_retrieved,
                 )
 
-                # Persist call & evaluation
+                locus_id = f"locus_{target_pred}"
+                allele_id = compute_fact_id(station, target_pred, eval_res.normalized_object)
+                node_id = f"node_{run_id}_{call_id}_{locus_id}_{allele_id[:8]}"
+                is_written = (eval_res.normalized_object not in ("UNKNOWN", "NONE", ""))
+
+                # 1. Persist call FIRST
                 with db.conn:
                     db.conn.execute("""
                         INSERT OR REPLACE INTO calls (
@@ -518,6 +536,44 @@ def run_exp1b_b1_assay(
                         res.load_duration_ms, res.prompt_eval_duration_ms, res.eval_duration_ms,
                         datetime.now(timezone.utc).isoformat()
                     ))
+
+                # 2. Persist memory node
+                if is_written:
+                    derived_fact = Fact(
+                        subject=station,
+                        predicate=target_pred,
+                        object=eval_res.normalized_object,
+                        truth_value=True,
+                        source_type="derived",
+                        locus_id=locus_id,
+                    )
+                    derived_text = f"Station {station} {target_pred} is {eval_res.normalized_object}."
+                    child_node = MemoryNode(
+                        node_id=node_id,
+                        run_id=run_id,
+                        world_id=current_world.world_id,
+                        generation=2,
+                        locus_id=locus_id,
+                        node_type="derived",
+                        natural_text=derived_text,
+                        structured_json=derived_fact.model_dump(),
+                    )
+                    memory_pool.append(child_node)
+                    with db.conn:
+                        db.conn.execute("""
+                            INSERT OR REPLACE INTO memory_nodes (node_id, run_id, world_id, generation, node_type, natural_text, structured_json, locus_id, allele_id, is_active, parent_generation, created_by_call_id, created_at)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """, (node_id, run_id, current_world.world_id, 2, "derived", derived_text, json.dumps(derived_fact.model_dump()), locus_id, allele_id, 1, 1, call_id, datetime.now(timezone.utc).isoformat()))
+                else:
+                    derived_text = f"Station {station} {target_pred} is UNKNOWN."
+                    with db.conn:
+                        db.conn.execute("""
+                            INSERT OR REPLACE INTO memory_nodes (node_id, run_id, world_id, generation, node_type, natural_text, structured_json, locus_id, allele_id, is_active, parent_generation, reproductive_status, created_by_call_id, created_at)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """, (node_id, run_id, current_world.world_id, 2, "derived", derived_text, json.dumps({"subject": station, "predicate": target_pred, "object": "UNKNOWN"}), locus_id, allele_id, 0, 1, "inactive", call_id, datetime.now(timezone.utc).isoformat()))
+
+                # 3. Persist evaluation pointing to node_id
+                with db.conn:
                     eval_id_g2 = f"eval_{call_id}"
                     db.conn.execute("""
                         INSERT OR REPLACE INTO dual_oracle_evaluations (
@@ -526,7 +582,7 @@ def run_exp1b_b1_assay(
                             state_vector_json, ancestral_allele_fidelity, created_at
                         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """, (
-                        eval_id_g2, call_id, None, 2, g2_task.task_id, station, target_pred, eval_res.normalized_object,
+                        eval_id_g2, call_id, node_id, 2, g2_task.task_id, station, target_pred, eval_res.normalized_object,
                         eval_res.canonical_truth_status, eval_res.context_truth_status,
                         1 if eval_res.A_correct else 0, 1 if eval_res.E_correct else 0,
                         1 if eval_res.K_consistent else 0, eval_res.phenotype, json.dumps(eval_res.state_vector),
@@ -534,6 +590,11 @@ def run_exp1b_b1_assay(
                     ))
 
                 print(f"  [{arm.upper()} G2] {target_pred} (Parent Exposed: {ret_res.founder_retrieved}): {eval_res.normalized_object} | D_ctx={eval_res.context_derivability} | Phenotype: {eval_res.phenotype.upper()}", flush=True)
+
+            if not preflight:
+                db.update_run_status(run_id, status="completed", completed_at=datetime.now(timezone.utc).isoformat())
+
+
 
     # -------------------------------------------------------------
     # Summary Table
@@ -558,14 +619,21 @@ def run_exp1b_b1_k_sweep(
     easy_clutter: int = 4,
     hard_clutter: int = 4,
     mutated_supervisor: str = "TAL",
+    db_path: str | None = None,
 ):
     """Run deterministic zero-cost top-k retrieval rescue sweep (k in 4, 5, 6, 7, 8)."""
     ks = k_values or [4, 5, 6, 7, 8]
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    db_file = db_path or f"gene_exp1b_sweep_k_{timestamp}.db"
+    db = Database(db_file)
     retriever = BM25ScoredRetriever()
+    git_commit = get_git_commit()
+    config_hash = hashlib.sha256(f"sweep_k_{ks}_e{easy_clutter}_h{hard_clutter}".encode()).hexdigest()[:16]
 
     print("=" * 135)
     print("      EXPERIMENT 1B-B1: TOP-k RETRIEVAL RESCUE SWEEP (ZERO LLM COST)")
     print(f"      (Worlds: {worlds_count} | k-values: {ks} | Distractors: {easy_clutter} Easy, {hard_clutter} Hard)")
+    print(f"      (Database: {db_file} | Commit: {git_commit[:8]})")
     print("=" * 135)
 
     results: dict[int, dict[str, float]] = {}
@@ -579,6 +647,8 @@ def run_exp1b_b1_k_sweep(
         for world_idx in range(worlds_count):
             seed = 5000 + world_idx
             bundle = generate_exp1_branching_world(world_seed=seed, rotation_idx=world_idx, mutated_supervisor=mutated_supervisor)
+            db.save_world(bundle.clean_world)
+            db.save_world(bundle.mutated_world)
             station = bundle.station
             founder_fact = bundle.mutated_founder_fact
             easy_facts, hard_facts = generate_clutter_distractors(station, easy_clutter, hard_clutter, seed)
@@ -593,14 +663,14 @@ def run_exp1b_b1_k_sweep(
                 if f.predicate == "manager":
                     co_sup_ids.add(nid)
                 memory_pool.append(MemoryNode(
-                    node_id=nid, run_id="sweep", world_id="w", generation=0,
+                    node_id=nid, run_id="sweep_k", world_id=bundle.mutated_world.world_id, generation=0,
                     locus_id=f.locus_id, node_type="source",
                     natural_text=NaturalLanguageRenderer.render_fact(f), structured_json=f.model_dump()
                 ))
 
             for c_f in easy_facts + hard_facts:
                 memory_pool.append(MemoryNode(
-                    node_id=f"node_dist_{c_f.locus_id}", run_id="sweep", world_id="w", generation=0,
+                    node_id=f"node_dist_{c_f.locus_id}", run_id="sweep_k", world_id=bundle.mutated_world.world_id, generation=0,
                     locus_id=c_f.locus_id, node_type="source",
                     natural_text=NaturalLanguageRenderer.render_fact(c_f), structured_json=c_f.model_dump()
                 ))
@@ -615,10 +685,34 @@ def run_exp1b_b1_k_sweep(
                 if res.path_retrieved:
                     path_hits += 1
 
+                f_rank = res.founder_retrieval_rank
+                c_rank = res.co_support_retrieval_rank
+                f_margin = (k - f_rank) if f_rank is not None else None
+                c_margin = (k - c_rank) if c_rank is not None else None
+                g_asmb = (1 if (res.founder_retrieved and res.co_support_retrieved) else 0) - (1 if res.path_retrieved else 0)
+
+                sweep_id = f"swk_w{world_idx}_k{k}_{task.target_fact.predicate}"
+                now = datetime.now(timezone.utc).isoformat()
+                with db.conn:
+                    db.conn.execute("""
+                        INSERT OR REPLACE INTO retrieval_sweep_results (
+                            sweep_id, run_id, sweep_type, world_id, world_seed, arm, generation,
+                            task_id, target_predicate, top_k, n_hard, easy_clutter, pool_size,
+                            founder_retrieved, cosup_retrieved, path_retrieved,
+                            founder_rank, cosup_rank, founder_margin, cosup_margin,
+                            g_assembly, paired_diff_path, config_hash, git_commit, created_at
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """, (
+                        sweep_id, f"run_sweep_k{k}", "k_rescue", bundle.mutated_world.world_id, seed, "infected",
+                        1, task.task_id, task.target_fact.predicate, k, hard_clutter, easy_clutter, len(memory_pool),
+                        1 if res.founder_retrieved else 0, 1 if res.co_support_retrieved else 0, 1 if res.path_retrieved else 0,
+                        f_rank, c_rank, f_margin, c_margin, float(g_asmb), 0.0, config_hash, git_commit, now
+                    ))
+
         results[k] = {
-            "x_f": founder_hits / total_g1,
-            "x_a": cosup_hits / total_g1,
-            "x_path": path_hits / total_g1,
+            "x_f": founder_hits / total_g1 if total_g1 else 0.0,
+            "x_a": cosup_hits / total_g1 if total_g1 else 0.0,
+            "x_path": path_hits / total_g1 if total_g1 else 0.0,
         }
 
     print(f"{'Top-k Context Budget':<25} | {'Founder Recall X_F':<25} | {'Co-Support Recall X_A':<25} | {'Complete Path X_path':<25}")
@@ -626,21 +720,30 @@ def run_exp1b_b1_k_sweep(
     for k, d in results.items():
         print(f"k = {k:<21} | {d['x_f']*100:5.1f}%                   | {d['x_a']*100:5.1f}%                      | {d['x_path']*100:5.1f}%")
     print("=" * 135 + "\n")
+    db.close()
 
 
 def run_exp1b_b1_hard_ablation(
     worlds_count: int = 4,
     top_k: int = 4,
     hard_values: list[int] | None = None,
+    easy_clutter: int = 4,
     mutated_supervisor: str = "TAL",
+    db_path: str | None = None,
 ):
     """Run hard-negative clutter dose-response ablation sweep (N_hard in 0, 2, 4, 8)."""
     hards = hard_values or [0, 2, 4, 8]
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    db_file = db_path or f"gene_exp1b_sweep_hard_{timestamp}.db"
+    db = Database(db_file)
     retriever = BM25ScoredRetriever()
+    git_commit = get_git_commit()
+    config_hash = hashlib.sha256(f"sweep_hard_{hards}_k{top_k}_e{easy_clutter}".encode()).hexdigest()[:16]
 
     print("=" * 135)
     print("      EXPERIMENT 1B-B1: HARD-NEGATIVE CLUTTER ABLATION SWEEP (ZERO LLM COST)")
     print(f"      (Worlds: {worlds_count} | Fixed Top-k: {top_k} | N_hard: {hards})")
+    print(f"      (Database: {db_file} | Commit: {git_commit[:8]})")
     print("=" * 135)
 
     results: dict[int, dict[str, float]] = {}
@@ -654,9 +757,11 @@ def run_exp1b_b1_hard_ablation(
         for world_idx in range(worlds_count):
             seed = 6000 + world_idx
             bundle = generate_exp1_branching_world(world_seed=seed, rotation_idx=world_idx, mutated_supervisor=mutated_supervisor)
+            db.save_world(bundle.clean_world)
+            db.save_world(bundle.mutated_world)
             station = bundle.station
             founder_fact = bundle.mutated_founder_fact
-            easy_facts, hard_facts = generate_clutter_distractors(station, easy_count=4, hard_count=nh, seed=seed)
+            easy_facts, hard_facts = generate_clutter_distractors(station, easy_count=easy_clutter, hard_count=nh, seed=seed)
 
             memory_pool = []
             co_sup_ids = set()
@@ -668,14 +773,14 @@ def run_exp1b_b1_hard_ablation(
                 if f.predicate == "manager":
                     co_sup_ids.add(nid)
                 memory_pool.append(MemoryNode(
-                    node_id=nid, run_id="sweep", world_id="w", generation=0,
+                    node_id=nid, run_id="sweep_hard", world_id=bundle.mutated_world.world_id, generation=0,
                     locus_id=f.locus_id, node_type="source",
                     natural_text=NaturalLanguageRenderer.render_fact(f), structured_json=f.model_dump()
                 ))
 
             for c_f in easy_facts + hard_facts:
                 memory_pool.append(MemoryNode(
-                    node_id=f"node_dist_{c_f.locus_id}", run_id="sweep", world_id="w", generation=0,
+                    node_id=f"node_dist_{c_f.locus_id}", run_id="sweep_hard", world_id=bundle.mutated_world.world_id, generation=0,
                     locus_id=c_f.locus_id, node_type="source",
                     natural_text=NaturalLanguageRenderer.render_fact(c_f), structured_json=c_f.model_dump()
                 ))
@@ -690,10 +795,34 @@ def run_exp1b_b1_hard_ablation(
                 if res.path_retrieved:
                     path_hits += 1
 
+                f_rank = res.founder_retrieval_rank
+                c_rank = res.co_support_retrieval_rank
+                f_margin = (top_k - f_rank) if f_rank is not None else None
+                c_margin = (top_k - c_rank) if c_rank is not None else None
+                g_asmb = (1 if (res.founder_retrieved and res.co_support_retrieved) else 0) - (1 if res.path_retrieved else 0)
+
+                sweep_id = f"swh_w{world_idx}_nh{nh}_{task.target_fact.predicate}"
+                now = datetime.now(timezone.utc).isoformat()
+                with db.conn:
+                    db.conn.execute("""
+                        INSERT OR REPLACE INTO retrieval_sweep_results (
+                            sweep_id, run_id, sweep_type, world_id, world_seed, arm, generation,
+                            task_id, target_predicate, top_k, n_hard, easy_clutter, pool_size,
+                            founder_retrieved, cosup_retrieved, path_retrieved,
+                            founder_rank, cosup_rank, founder_margin, cosup_margin,
+                            g_assembly, paired_diff_path, config_hash, git_commit, created_at
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """, (
+                        sweep_id, f"run_sweep_nh{nh}", "hard_ablation", bundle.mutated_world.world_id, seed, "infected",
+                        1, task.task_id, task.target_fact.predicate, top_k, nh, easy_clutter, len(memory_pool),
+                        1 if res.founder_retrieved else 0, 1 if res.co_support_retrieved else 0, 1 if res.path_retrieved else 0,
+                        f_rank, c_rank, f_margin, c_margin, float(g_asmb), 0.0, config_hash, git_commit, now
+                    ))
+
         results[nh] = {
-            "x_f": founder_hits / total_g1,
-            "x_a": cosup_hits / total_g1,
-            "x_path": path_hits / total_g1,
+            "x_f": founder_hits / total_g1 if total_g1 else 0.0,
+            "x_a": cosup_hits / total_g1 if total_g1 else 0.0,
+            "x_path": path_hits / total_g1 if total_g1 else 0.0,
         }
 
     print(f"{'Hard Negatives (N_hard)':<25} | {'Founder Recall X_F':<25} | {'Co-Support Recall X_A':<25} | {'Complete Path X_path':<25}")
@@ -701,6 +830,7 @@ def run_exp1b_b1_hard_ablation(
     for nh, d in results.items():
         print(f"N_hard = {nh:<16} | {d['x_f']*100:5.1f}%                   | {d['x_a']*100:5.1f}%                      | {d['x_path']*100:5.1f}%")
     print("=" * 135 + "\n")
+    db.close()
 
 
 def run_exp1b_b2_surface_feedback_assay(
@@ -711,6 +841,7 @@ def run_exp1b_b2_surface_feedback_assay(
     model_name: str = "gemma3:12b",
     mutated_supervisor: str = "TAL",
     use_fake: bool = False,
+    mode: Literal["pure", "competing"] = "pure",
     db_path: str | None = None,
 ):
     """Execute Experiment 1B-B2: Controlled Lineage Surface-Area Scaling Assay."""
@@ -720,8 +851,8 @@ def run_exp1b_b2_surface_feedback_assay(
     retriever = BM25ScoredRetriever()
 
     print("=" * 135)
-    print("      EXPERIMENT 1B-B2: CONTROLLED LINEAGE SURFACE-AREA SCALING ASSAY")
-    print(f"      (Worlds: {worlds_count} | Top-k: {top_k} | Distractor Pool: {clutter_count})")
+    print(f"      EXPERIMENT 1B-B2: CONTROLLED LINEAGE SURFACE-AREA SCALING ASSAY ({mode.upper()} MODE)")
+    print(f"      (Worlds: {worlds_count} | Top-k: {top_k} | Distractor Pool: {clutter_count} | Mode: {mode})")
     print(f"      (Database: {db_file})")
     print("=" * 135)
 
@@ -747,6 +878,8 @@ def run_exp1b_b2_surface_feedback_assay(
             # Clean & distractor background nodes
             background_nodes: list[MemoryNode] = []
             for f in bundle.clean_world.facts:
+                if mode == "pure" and (f.fact_id == bundle.clean_founder_fact.fact_id or f.locus_id == bundle.clean_founder_fact.locus_id):
+                    continue
                 background_nodes.append(
                     MemoryNode(
                         node_id=f"node_clean_{f.locus_id}",
@@ -849,28 +982,274 @@ def run_exp1b_b2_surface_feedback_assay(
                     p_parent_in_top_k, p_any_lineage_in_top_k, mean_top_k_occupancy, created_at
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
-                f"sweep_n{n_lin}_k{top_k}", "exp1b_b2", "pooled_4w", n_lin, top_k,
+                f"sweep_n{n_lin}_k{top_k}_{mode}", "exp1b_b2", f"pooled_{worlds_count}w_{mode}", n_lin, top_k,
                 len(candidate_pool), p_parent, p_any, avg_occ, datetime.now(timezone.utc).isoformat()
             ))
 
     print("\n" + "=" * 135)
-    print("      EXPERIMENT 1B-B2: SURFACE-AREA SCALING RESULTS")
+    print(f"      EXPERIMENT 1B-B2: SURFACE-AREA SCALING RESULTS ({mode.upper()} MODE)")
     print("=" * 135)
-    print(f"{'Lineage Multiplicity (N_lin)':<28} | {'P(Founder in Top-k)':<20} | {'P(Any Lineage in Top-k)':<25} | {'Mean Top-k Occupancy (k=4)':<25}")
+    print(f"{'Lineage Multiplicity (N_lin)':<28} | {'P(Founder in Top-k)':<20} | {'P(Any Lineage in Top-k)':<25} | {f'Mean Top-k Occupancy (k={top_k})':<25}")
     print("-" * 135)
     for n_lin, data in summary_results.items():
         print(f"N_lineage = {n_lin:<17} | {data['p_parent']*100:5.1f}%              | {data['p_any_lineage']*100:5.1f}%                   | {data['mean_top_k_occupancy']:.2f} / {top_k}")
     print("=" * 135 + "\n")
     db.close()
+    return summary_results
+
+
+def run_exp1b_retrieval_shape_map(
+    worlds_count: int = 6,
+    k_values: list[int] | None = None,
+    hard_values: list[int] | None = None,
+    easy_clutter: int = 4,
+    mutated_supervisor: str = "TAL",
+    db_path: str | None = None,
+):
+    """Run deterministic retrieval boundary shape map across paired worlds (ZERO LLM COST)."""
+    ks = k_values or [3, 4, 5, 6, 8]
+    hards = hard_values or [0, 2, 4, 8, 12]
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    db_file = db_path or f"gene_exp1b_shape_map_{timestamp}.db"
+    db = Database(db_file)
+    retriever = BM25ScoredRetriever()
+    git_commit = get_git_commit()
+    config_hash = hashlib.sha256(f"shape_map_{worlds_count}w_k{ks}_h{hards}_e{easy_clutter}".encode()).hexdigest()[:16]
+
+    print("=" * 145)
+    print("      EXPERIMENT 1B-B: DETERMINISTIC RETRIEVAL BOUNDARY SHAPE MAP (ZERO LLM COST)")
+    print(f"      (Worlds: {worlds_count} | k in {ks} | N_hard in {hards} | Easy: {easy_clutter})")
+    print(f"      (Database: {db_file} | Commit: {git_commit[:8]} | Hash: {config_hash})")
+    print("=" * 145)
+
+    # Pre-generate matched worlds
+    bundles = []
+    for w_idx in range(worlds_count):
+        seed = 7000 + w_idx
+        b = generate_exp1_branching_world(world_seed=seed, rotation_idx=w_idx, mutated_supervisor=mutated_supervisor)
+        db.save_world(b.clean_world)
+        db.save_world(b.mutated_world)
+        bundles.append((w_idx, seed, b))
+
+    # Condition map: (k, nh) -> arm -> stats
+    condition_stats: dict[tuple[int, int], dict[str, dict[str, Any]]] = {}
+    world_condition_path: dict[tuple[int, int, int], dict[str, float]] = {}
+
+    for k in ks:
+        for nh in hards:
+            cond_key = (k, nh)
+            condition_stats[cond_key] = {
+                "clean": {"n": 0, "xf_sum": 0, "xa_sum": 0, "xpath_sum": 0, "f_ranks": [], "a_ranks": [], "f_margins": [], "a_margins": []},
+                "infected": {"n": 0, "xf_sum": 0, "xa_sum": 0, "xpath_sum": 0, "f_ranks": [], "a_ranks": [], "f_margins": [], "a_margins": []},
+            }
+
+            for w_idx, seed, bundle in bundles:
+                station = bundle.station
+                easy_facts, hard_facts = generate_clutter_distractors(station, easy_count=easy_clutter, hard_count=nh, seed=seed)
+
+                w_path_counts = {"clean": 0, "infected": 0, "total": 0}
+
+                for arm in ["clean", "infected"]:
+                    is_infected = (arm == "infected")
+                    current_world = bundle.mutated_world if is_infected else bundle.clean_world
+                    founder_fact = bundle.mutated_founder_fact if is_infected else bundle.clean_founder_fact
+
+                    memory_pool = []
+                    co_sup_ids = set()
+                    founder_id = ""
+                    for f in current_world.facts:
+                        nid = f"node_{f.locus_id}_{f.fact_id[:8]}"
+                        if f.fact_id == founder_fact.fact_id:
+                            founder_id = nid
+                        if f.predicate == "manager":
+                            co_sup_ids.add(nid)
+                        memory_pool.append(MemoryNode(
+                            node_id=nid, run_id=f"shape_map_k{k}_nh{nh}", world_id=current_world.world_id, generation=0,
+                            locus_id=f.locus_id, node_type="source",
+                            natural_text=NaturalLanguageRenderer.render_fact(f), structured_json=f.model_dump()
+                        ))
+
+                    for c_f in easy_facts + hard_facts:
+                        memory_pool.append(MemoryNode(
+                            node_id=f"node_dist_{c_f.locus_id}", run_id=f"shape_map_k{k}_nh{nh}", world_id=current_world.world_id, generation=0,
+                            locus_id=c_f.locus_id, node_type="source",
+                            natural_text=NaturalLanguageRenderer.render_fact(c_f), structured_json=c_f.model_dump()
+                        ))
+
+                    for task in bundle.g1_tasks:
+                        res = retriever.rank(query=task.prompt, candidate_nodes=memory_pool, top_k=k, founder_node_id=founder_id, co_support_node_ids=co_sup_ids)
+                        st = condition_stats[cond_key][arm]
+                        st["n"] += 1
+                        w_path_counts["total"] += 1
+                        if res.founder_retrieved:
+                            st["xf_sum"] += 1
+                        if res.co_support_retrieved:
+                            st["xa_sum"] += 1
+                        if res.path_retrieved:
+                            st["xpath_sum"] += 1
+                            w_path_counts[arm] += 1
+
+                        f_rank = res.founder_retrieval_rank
+                        c_rank = res.co_support_retrieval_rank
+                        f_margin = (k - f_rank) if f_rank is not None else None
+                        c_margin = (k - c_rank) if c_rank is not None else None
+                        if f_rank is not None:
+                            st["f_ranks"].append(f_rank)
+                            st["f_margins"].append(f_margin)
+                        if c_rank is not None:
+                            st["a_ranks"].append(c_rank)
+                            st["a_margins"].append(c_margin)
+
+                        g_asmb_single = (1 if (res.founder_retrieved and res.co_support_retrieved) else 0) - (1 if res.path_retrieved else 0)
+                        sweep_id = f"shape_w{w_idx}_{arm}_k{k}_nh{nh}_{task.target_fact.predicate}"
+                        now = datetime.now(timezone.utc).isoformat()
+
+                        with db.conn:
+                            db.conn.execute("""
+                                INSERT OR REPLACE INTO retrieval_sweep_results (
+                                    sweep_id, run_id, sweep_type, world_id, world_seed, arm, generation,
+                                    task_id, target_predicate, top_k, n_hard, easy_clutter, pool_size,
+                                    founder_retrieved, cosup_retrieved, path_retrieved,
+                                    founder_rank, cosup_rank, founder_margin, cosup_margin,
+                                    g_assembly, paired_diff_path, config_hash, git_commit, created_at
+                                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            """, (
+                                sweep_id, f"run_shape_k{k}_nh{nh}", "shape_map", current_world.world_id, seed, arm,
+                                1, task.task_id, task.target_fact.predicate, k, nh, easy_clutter, len(memory_pool),
+                                1 if res.founder_retrieved else 0, 1 if res.co_support_retrieved else 0, 1 if res.path_retrieved else 0,
+                                f_rank, c_rank, f_margin, c_margin, float(g_asmb_single), 0.0, config_hash, git_commit, now
+                            ))
+
+                tasks_per_arm = len(bundle.g1_tasks)
+                world_condition_path[(w_idx, k, nh)] = {
+                    "clean_path": w_path_counts["clean"] / tasks_per_arm,
+                    "inf_path": w_path_counts["infected"] / tasks_per_arm,
+                }
+
+    # Print Table 1: 2D Grid of Recall & Assembly Gap
+    print("\n" + "=" * 145)
+    print(f"{'Condition (k, N_hard)':<24} | {'X_F (Cln/Inf)':<16} | {'X_A (Cln/Inf)':<16} | {'X_path (Cln / Inf)':<20} | {'G_assembly (Exp)':<18} | {'Mean Rank (F / A)':<20} | {'Margin (F / A)':<16}")
+    print("-" * 145)
+
+    for k in ks:
+        for nh in hards:
+            c_st = condition_stats[(k, nh)]["clean"]
+            i_st = condition_stats[(k, nh)]["infected"]
+            n = c_st["n"]
+
+            xf_c, xf_i = c_st["xf_sum"] / n, i_st["xf_sum"] / n
+            xa_c, xa_i = c_st["xa_sum"] / n, i_st["xa_sum"] / n
+            xpath_c, xpath_i = c_st["xpath_sum"] / n, i_st["xpath_sum"] / n
+
+            # G_assembly = min(X_F, X_A) - X_path
+            g_asmb_c = min(xf_c, xa_c) - xpath_c
+            g_asmb_i = min(xf_i, xa_i) - xpath_i
+
+            mean_rf = sum(c_st["f_ranks"]) / len(c_st["f_ranks"]) if c_st["f_ranks"] else 0.0
+            mean_ra = sum(c_st["a_ranks"]) / len(c_st["a_ranks"]) if c_st["a_ranks"] else 0.0
+            mean_mf = sum(c_st["f_margins"]) / len(c_st["f_margins"]) if c_st["f_margins"] else 0.0
+            mean_ma = sum(c_st["a_margins"]) / len(c_st["a_margins"]) if c_st["a_margins"] else 0.0
+
+            cond_label = f"k={k}, N_hard={nh}"
+            xf_label = f"{xf_c*100:4.1f}% / {xf_i*100:4.1f}%"
+            xa_label = f"{xa_c*100:4.1f}% / {xa_i*100:4.1f}%"
+            xpath_label = f"{xpath_c*100:4.1f}% / {xpath_i*100:4.1f}%"
+            gasmb_label = f"{g_asmb_c*100:4.1f}% / {g_asmb_i*100:4.1f}%"
+            rank_label = f"{mean_rf:4.1f} / {mean_ra:4.1f}"
+            margin_label = f"{mean_mf:+4.1f} / {mean_ma:+4.1f}"
+
+            print(f"{cond_label:<24} | {xf_label:<16} | {xa_label:<16} | {xpath_label:<20} | {gasmb_label:<18} | {rank_label:<20} | {margin_label:<16}")
+        print("-" * 145)
+
+    # Print Table 2: World-by-World Boundary Analysis
+    print("\n" + "=" * 145)
+    print("      WORLD-LEVEL BOUNDARY MAPPING: COMPLETE-PATH RECALL X_path")
+    print("=" * 145)
+    k_headers = " | ".join([f"k={k:<6}" for k in ks])
+    print(f"{'World Index (Seed)':<22} | {'Station':<15} | {k_headers} | {'Boundary Classification':<25}")
+    print("-" * 145)
+
+    boundary_candidates = []
+    for w_idx, seed, bundle in bundles:
+        k_paths = []
+        nh_target = 4 if 4 in hards else hards[0]
+        for k in ks:
+            p_inf = world_condition_path.get((w_idx, k, nh_target), {}).get("inf_path", 0.0)
+            k_paths.append((k, p_inf))
+
+        p_k_low = k_paths[0][1] if k_paths else 0.0
+        p_k_high = k_paths[-1][1] if k_paths else 0.0
+
+        if p_k_low == 0.0 and p_k_high > 0.0:
+            classification = f"BOUNDARY RESCUE (k{k_paths[0][0]}={p_k_low*100:.0f}% -> k{k_paths[-1][0]}={p_k_high*100:.0f}%)"
+            boundary_candidates.append((w_idx, seed, bundle.station, "Boundary Rescue", f"low={p_k_low*100:.0f}%, high={p_k_high*100:.0f}%"))
+        elif p_k_low >= 1.0:
+            classification = "ROBUST CONTROL (low=100%, high=100%)"
+            boundary_candidates.append((w_idx, seed, bundle.station, "Robust Control", f"low={p_k_low*100:.0f}%, high={p_k_high*100:.0f}%"))
+        elif p_k_high == 0.0:
+            classification = "FRAGILE / HIGH CUTOFF"
+            boundary_candidates.append((w_idx, seed, bundle.station, "Fragile", f"low={p_k_low*100:.0f}%, high={p_k_high*100:.0f}%"))
+        else:
+            classification = f"PARTIAL (low={p_k_low*100:.0f}%, high={p_k_high*100:.0f}%)"
+
+        k_str = " | ".join([f"{p*100:6.0f}%" for _, p in k_paths])
+        print(f"World {w_idx} (Seed {seed})    | {bundle.station:<15} | {k_str} | {classification:<25}")
+
+    print("=" * 145 + "\n")
+    db.close()
+    return condition_stats, boundary_candidates
+
+
+def run_exp1b_live_boundary_rescue(
+    seed_rotations: list[tuple[int, int]] | None = None,
+    easy_clutter: int = 4,
+    hard_clutter: int = 4,
+    prompt_version: str = "v2",
+    model_name: str = "gemma3:12b",
+    mutated_supervisor: str = "TAL",
+    use_fake: bool = False,
+    db_path: str | None = None,
+):
+    """Execute tiny 2-world live boundary rescue mechanism test (24 calls on live model).
+    
+    Compares:
+    - Collapse boundary: k=4, N_hard=4 (predicted X_path=0% -> abstention/extinction)
+    - Rescue condition:  k=6, N_hard=4 (predicted X_path=100% -> transmission & propagation)
+    """
+    targets = seed_rotations or [(7000, 0), (7005, 5)]
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    db_file = db_path or f"gene_exp1b_live_boundary_rescue_{timestamp}.db"
+
+    print("=" * 145)
+    print("      EXPERIMENT 1B-B: LIVE BOUNDARY RESCUE MECHANISM TEST (24 CALLS)")
+    print(f"      (Target Seeds: {targets} | Models: {'FAKE' if use_fake else model_name} | Clutter: {easy_clutter} Easy, {hard_clutter} Hard)")
+    print(f"      (Database: {db_file})")
+    print("=" * 145)
+
+    for k in [4, 6]:
+        print(f"\n{'='*55} RUNNING TOP-k = {k} ({'BOUNDARY COLLAPSE' if k == 4 else 'BOUNDARY RESCUE'}) {'='*55}")
+        run_exp1b_b1_assay(
+            worlds_count=len(targets),
+            top_k=k,
+            easy_clutter=easy_clutter,
+            hard_clutter=hard_clutter,
+            prompt_version=prompt_version,
+            model_name=model_name,
+            mutated_supervisor=mutated_supervisor,
+            use_fake=use_fake,
+            db_path=db_file,
+            seed_list=targets,
+        )
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run Experiment 1B-B Retrieval Assays")
-    parser.add_argument("--assay", type=str, default="1b-b1", choices=["1b-b1", "1b-b2", "sweep-k", "sweep-hard"], help="Assay to run")
+    parser.add_argument("--assay", type=str, default="1b-b1", choices=["1b-b1", "1b-b2", "sweep-k", "sweep-hard", "shape-map", "live-rescue"], help="Assay to run")
     parser.add_argument("--worlds", type=int, default=4, help="Number of worlds")
     parser.add_argument("--top-k", type=int, default=4, help="Top-k retrieval budget")
     parser.add_argument("--easy-clutter", type=int, default=4, help="Easy clutter distractors")
     parser.add_argument("--hard-clutter", type=int, default=4, help="Hard negative distractors")
+    parser.add_argument("--mode", type=str, default="pure", choices=["pure", "competing"], help="Surface feedback mode (pure or competing)")
     parser.add_argument("--version", type=str, default="v2", choices=["v1", "v2"], help="Prompt schema version")
     parser.add_argument("--model", type=str, default="gemma3:12b", help="Model name")
     parser.add_argument("--fake", action="store_true", help="Use deterministic Fake client")
@@ -898,6 +1277,7 @@ if __name__ == "__main__":
             prompt_version=args.version,
             model_name=args.model,
             use_fake=args.fake,
+            mode=args.mode,
             db_path=args.db,
         )
     elif args.assay == "sweep-k":
@@ -906,12 +1286,34 @@ if __name__ == "__main__":
             k_values=[4, 5, 6, 7, 8],
             easy_clutter=args.easy_clutter,
             hard_clutter=args.hard_clutter,
+            db_path=args.db,
         )
     elif args.assay == "sweep-hard":
         run_exp1b_b1_hard_ablation(
             worlds_count=args.worlds,
             top_k=args.top_k,
             hard_values=[0, 2, 4, 8],
+            easy_clutter=args.easy_clutter,
+            db_path=args.db,
         )
+    elif args.assay == "shape-map":
+        run_exp1b_retrieval_shape_map(
+            worlds_count=args.worlds if args.worlds != 4 else 6,
+            k_values=[3, 4, 5, 6, 8],
+            hard_values=[0, 2, 4, 8, 12],
+            easy_clutter=args.easy_clutter,
+            db_path=args.db,
+        )
+    elif args.assay == "live-rescue":
+        run_exp1b_live_boundary_rescue(
+            easy_clutter=args.easy_clutter,
+            hard_clutter=args.hard_clutter,
+            prompt_version=args.version,
+            model_name=args.model,
+            use_fake=args.fake,
+            db_path=args.db,
+        )
+
+
 
 

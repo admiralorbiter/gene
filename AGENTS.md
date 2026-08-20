@@ -12,152 +12,68 @@ Read before coding:
 2. `docs/EXPERIMENTAL_PROTOCOL.md`
 3. `docs/ARCHITECTURE.md`
 4. `docs/DEVELOPMENT_PLAN.md`
+5. `docs/results/` (All completed experiment reports)
 
 ---
 
-# Current objective
+# Current Objective & Roadmap Status
 
-Implement only the infrastructure required to run **Experiment 0 (Lineage Observability)** and prepare the minimal paired path for **Experiment 1 (Single Mutation)**.
+### Completed & Validated Milestones:
+- **Experiment 0**: Lineage Observability & Causal Parent Interventions.
+- **Experiment 1A**: Single Mutation Propagation & Multi-Generational Cascades.
+- **Experiment 1B-A**: Multi-Generation Branching Transmission, Allele Fidelity, and Analytic Extinction Matrix.
+- **Experiment 1B-B**: Endogenous Multi-Hop Retrieval Dynamics ($X_F, X_A, X_{\text{path}}$), Lexical Competition, Surface-Area Scaling, and Causal Retrieval Rescue.
 
-The first useful result is not a polished application. It is a trustworthy experimental trace showing:
-
-```text
-world -> source memories -> exposures -> model claim -> reported parents
-      -> oracle evaluation -> counterfactual parent intervention -> comparison
-```
+### Current Milestone: Hardening & Preflight for Experiment 1B-C
+1. **Infrastructure Hardening**: Zero live LLM calls during plumbing. Ensure every model output (active or inactive `UNKNOWN`) creates an occurrence node in SQLite, linked to oracle evaluations. Mark run completion status reliably. Persist all deterministic sweep results to SQLite (`retrieval_sweep_results`).
+2. **Pure B2 Baseline Semantics**: Pure multiplicity mode without competing alleles at the founder locus.
+3. **Retrieval Boundary Shape Map**: Deterministic preflight ($k \in \{3,4,5,6,8\}, N_{\text{hard}} \in \{0,2,4,8,12\}$) across paired worlds to identify hard boundary surfaces where $X_{\text{path}}$ collapses and restores ($G_{\text{assembly}}$).
+4. **Experiment 1B-C Policy Sandbox**: Build deterministic lineage-aware selective immunity filters offline first. Compare $X_{\text{path},H}$ against $X_{\text{path},I}$ without live LLMs before spending any compute.
 
 ---
 
-# Frozen design constraints
+# Core Research Principle
 
-Do not change these without recording a decision and explaining why.
+> **Cheap deterministic measurement $\to$ tiny live mechanism test $\to$ review $\to$ only then scale.**
+
+Never spend live model compute on an intervention or baseline until its behavior and boundary conditions have been mapped and proven deterministically.
+
+---
+
+# Frozen Design Constraints
+
+Do not change these without recording a decision and explaining why:
 
 - Synthetic fictional worlds come before real-world facts.
 - Canonical ground truth is machine-readable and immutable.
 - Experimental memory is append-only.
+- All model outputs (including `UNKNOWN` abstentions) generate persistent occurrence nodes.
 - Exposure lineage is recorded by the harness, not inferred by the model.
 - Reported-support lineage is explicitly separate from causal lineage.
 - Model self-reports are never treated as causal ground truth.
 - Clean/mutated pairs must differ only at the declared mutation.
 - World is the experimental unit.
-- Experiment 0 precedes biological memory interventions.
-- Raw prompts/responses and run metadata are preserved.
+- Raw prompts/responses and run metadata are preserved in SQLite.
 - Every reported result must resolve to a Git commit/tag + configuration + model digest.
 
 ---
 
-# Do not build yet
+# Inactive Roadmap Backlog (Do Not Build Yet)
 
-Unless required to fix an identified measurement problem, do **not** add:
+Unless explicitly approved after a gating milestone, do **not** build:
 
-- web UI;
-- Flask/FastAPI service;
-- vector database;
-- embedding retrieval;
-- multi-agent orchestration;
-- real-world search/fact checking;
-- senescence;
-- apoptosis;
-- source-anchoring intervention;
-- germline/somatic memory;
+- web UI / dashboard services (Flask/FastAPI);
+- vector databases / dense embedding retrieval (keep BM25 until lexical boundaries are fully mapped);
+- multi-agent open communication ecologies;
+- real-world search / fact checking;
+- complex senescence / apoptosis / biological memory pruning;
 - autonomous experiment generation;
-- multiple model providers;
-- elaborate plugin architecture.
-
-Keep future-policy interfaces simple enough that these can be added later.
+- multi-model provider scaling across dozens of model families;
+- elaborate plugin / orchestration frameworks.
 
 ---
 
-# Implementation order
-
-Work in this sequence.
-
-## Milestone A — deterministic world/oracle
-
-Implement:
-
-- `Fact`, `Rule`, `World`, `Task`, `Mutation` schemas;
-- one tiny hand-authored golden world;
-- forward-chaining oracle;
-- valid support-path enumeration;
-- procedural world generator;
-- deterministic natural-language renderer;
-- clean/mutated pairing;
-- D0/D1 task generation;
-- unit + invariant/property tests.
-
-### Stop and inspect when
-
-The system can generate 10 worlds without an LLM and prove:
-
-- same seed => same canonical world;
-- all tasks have one valid benchmark answer under configured constraints;
-- all declared support paths are recoverable;
-- clean/mutated canonical pairs differ only as intended.
-
-Do not continue if the oracle is uncertain.
-
-## Milestone B — one fully auditable Ollama call
-
-Implement:
-
-- Ollama adapter;
-- structured response schema;
-- model metadata/digest capture;
-- prompt/config hashing;
-- raw request/response persistence;
-- token/timing metadata where available;
-- claim normalization + oracle evaluation.
-
-### Stop and inspect when
-
-One D0/D1 task can be replayed from stored artifacts and its output can be mechanically classified.
-
-## Milestone C — lineage logging
-
-Implement:
-
-- append-only memory nodes;
-- controlled support + distractor retrieval;
-- exposure edges;
-- reported parent IDs;
-- reported-support edges;
-- GraphML/CSV/JSONL export.
-
-### Stop and inspect when
-
-For any derived node we can answer exactly:
-
-1. what memories were available;
-2. which were actually exposed;
-3. which parents the model reported;
-4. what claim was written;
-5. whether the claim is oracle-consistent.
-
-## Milestone D — causal replay
-
-Implement:
-
-- replay from stored call metadata;
-- parent removal;
-- clean-counterpart replacement;
-- counterfactual run persistence;
-- normalized output comparison;
-- strong/partial/none/indeterminate causal evidence labels.
-
-### Stop and return evidence when
-
-At least 3 manually inspectable cases exist:
-
-- expected relevant parent changes result;
-- irrelevant distractor does not materially change result;
-- one ambiguous/stochastic case if present.
-
-Do not hide indeterminate cases.
-
----
-
-# Experiment discipline
+# Experiment Discipline
 
 During plumbing/debugging, prompt and schema changes are allowed. Every material change must increment a prompt/protocol/config version.
 
@@ -165,107 +81,41 @@ Once an experiment pilot is declared frozen:
 
 - do not modify prompts mid-run;
 - do not silently drop failed worlds;
-- do not tune causal criteria after seeing aggregate results;
+- do not tune causal criteria or thresholds after seeing aggregate results;
 - do not rewrite the oracle to make model outputs count as correct;
-- do not pool descendants as if they were independent worlds.
+- do not pool descendants across worlds as if they were independent.
 
-A negative or null result is a valid result.
+A negative or null result is a valid scientific result.
 
 ---
 
-# Coding preferences
+# Coding Preferences
 
-Prefer explicit, testable code over framework magic.
-
-Suggested conventions:
+Prefer explicit, testable code over framework magic:
 
 - Python 3.12+
 - type hints on public interfaces;
 - Pydantic or dataclasses for persisted schemas;
-- SQLite with migrations;
+- SQLite with migrations and foreign key integrity;
 - pytest;
-- deterministic UUID/hash-derived IDs where useful;
+- deterministic UUID/hash-derived IDs;
 - pure functions for world generation/oracle logic;
-- dependency injection for model client/retrieval policy where it improves testing;
-- no hidden global state.
+- dependency injection for model client/retrieval policy;
+- zero hidden global state.
 
-Keep LLM calls behind one narrow adapter so tests can use deterministic fakes.
-
----
-
-# Required tests before experimental runs
-
-At minimum:
-
-```text
-world seed reproducibility
-world serialization round-trip
-rule closure correctness
-support-path correctness
-mutation-pair invariant
-natural-language render stability
-claim normalization cases
-truth classification cases
-append-only persistence
-exposure logging exactness
-reported-parent validation
-replay preserves non-intervened inputs
-metric calculation golden cases
-```
-
-Add small golden fixtures before adding complex procedural cases.
+Keep LLM calls behind one narrow adapter so tests can run instantly with deterministic fakes.
 
 ---
 
-# Required run artifacts
+# Required Run Artifacts
 
-Every completed run should be understandable without opening the source code.
+Every completed run should be understandable without opening the source code:
 
-Produce:
+- SQLite database (`runs`, `calls`, `memory_nodes`, `dual_oracle_evaluations`, `retrieval_events`, `retrieval_sweep_results`, `causal_tests`)
+- `manifest.json`
+- `world.json`
+- `mutation.json` (when applicable)
+- summary report markdown in `docs/results/`
 
-```text
-manifest.json
-world.json
-mutation.json (when applicable)
-calls.jsonl
-memory_nodes.jsonl
-claims.csv
-exposure_edges.csv
-reported_support_edges.csv
-causal_tests.csv
-metrics.json
-lineage.graphml
-```
+Never overwrite a prior completed run database or directory.
 
-Never overwrite a prior completed run directory.
-
----
-
-# First feedback checkpoint
-
-When Experiment 0 plumbing is runnable, stop broad development and prepare:
-
-- 5–10 world run;
-- aggregate lineage metrics;
-- 3–5 example DAGs;
-- raw artifacts for one good and one bad/ambiguous lineage report;
-- at least one parent counterfactual;
-- runtime/compute notes;
-- failures and surprises;
-- `docs/RESULTS_TEMPLATE.md` filled as far as possible.
-
-The next design decision should be driven by those observations.
-
----
-
-# Rule for unexpected discoveries
-
-If an unexpected phenomenon appears, preserve it before fixing anything:
-
-1. save the run;
-2. add a minimal reproducer if possible;
-3. record the commit/config/model digest;
-4. describe the behavior without interpreting it prematurely;
-5. only then change code or prompts.
-
-Unexpected failures may be more valuable than expected success in GENE.

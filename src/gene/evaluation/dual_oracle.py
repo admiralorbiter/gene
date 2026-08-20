@@ -92,9 +92,11 @@ class DualOracle:
                     raw_obj_str = str(raw_obj_val).strip()
 
         norm_obj = raw_obj_str.strip().upper().replace(" ", "_")
-
-        # 2. Check Contract Consistency K
-        is_unknown = (norm_obj == "UNKNOWN" or norm_obj == "NONE" or norm_obj == "")
+        if norm_obj in ("UNKNOWN", "NONE", "", "UNKNOWN_OR_UNSUPPORTED") or norm_obj.startswith("UNKNOWN"):
+            norm_obj = "UNKNOWN"
+            is_unknown = True
+        else:
+            is_unknown = False
         if raw_ev in ("insufficient", "conflicting"):
             k_val = 1 if is_unknown else 0
         elif raw_ev == "sufficient":

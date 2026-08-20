@@ -1,0 +1,199 @@
+"""Unit and invariant tests for GENE hardening, persistence linkage, pure B2 mode, and retrieval sweeps."""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+import sqlite3
+import sys
+import pytest
+
+# Ensure repo root is on sys.path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from gene.memory.scored_retriever import BM25ScoredRetriever
+from gene.memory.store import MemoryNode
+from gene.ollama_client import FakeOllamaClient, CallSpec
+from gene.persistence.db import Database
+from gene.worlds.exp1_branching import generate_exp1_branching_world
+from gene.worlds.renderer import NaturalLanguageRenderer
+from gene.worlds.schema import Fact
+
+from scripts.run_exp1b_retrieval_assay import (
+    generate_clutter_distractors,
+    run_exp1b_b1_assay,
+    run_exp1b_b1_k_sweep,
+    run_exp1b_b2_surface_feedback_assay,
+    run_exp1b_retrieval_shape_map,
+)
+
+
+def test_g1_g2_evaluation_node_linkage_and_inactive_persistence(tmp_path: Path):
+    """Verify that all G1 and G2 outputs create occurrence nodes and evaluations point to them."""
+    db_path = tmp_path / "test_linkage.db"
+    db = Database(db_path)
+
+    run_exp1b_b1_assay(
+        worlds_count=1,
+        top_k=6,
+        easy_clutter=2,
+        hard_clutter=2,
+        prompt_version="v2",
+        model_name="fake_model",
+        use_fake=True,
+        db_path=str(db_path),
+    )
+
+    with db.conn:
+        runs = db.conn.execute("SELECT run_id, status, completed_at FROM runs").fetchall()
+        assert len(runs) >= 2
+        for r in runs:
+            assert r["status"] == "completed"
+            assert r["completed_at"] is not None
+
+        evals = db.conn.execute("SELECT evaluation_id, call_id, node_id, generation, phenotype FROM dual_oracle_evaluations").fetchall()
+        assert len(evals) > 0
+        for ev in evals:
+            node_id = ev["node_id"]
+            assert node_id is not None
+            assert isinstance(node_id, str)
+            assert len(node_id) > 0
+
+            node_row = db.conn.execute("SELECT * FROM memory_nodes WHERE node_id = ?", (node_id,)).fetchone()
+            assert node_row is not None
+            assert node_row["created_by_call_id"] == ev["call_id"]
+
+            if ev["phenotype"] == "extinct":
+                assert node_row["is_active"] == 0
+                assert node_row["reproductive_status"] == "inactive"
+                assert "UNKNOWN" in node_row["natural_text"]
+            else:
+                assert node_row["is_active"] == 1
+                assert node_row["reproductive_status"] == "active"
+
+    db.close()
+
+
+def test_inactive_unknown_persistence_under_pruned_retrieval(tmp_path: Path):
+    """Under top_k=3 (path pruned), verify model abstains and inactive UNKNOWN nodes are persisted."""
+    db_path = tmp_path / "test_unknown_nodes.db"
+    
+    run_exp1b_b1_assay(
+        worlds_count=1,
+        top_k=3,
+        easy_clutter=4,
+        hard_clutter=4,
+        prompt_version="v2",
+        model_name="fake_model",
+        use_fake=True,
+        db_path=str(db_path),
+    )
+
+    db = Database(db_path)
+    with db.conn:
+        inactive_nodes = db.conn.execute("SELECT * FROM memory_nodes WHERE is_active = 0").fetchall()
+        assert len(inactive_nodes) > 0
+        for node in inactive_nodes:
+            assert node["reproductive_status"] == "inactive"
+            assert "UNKNOWN" in node["natural_text"]
+            assert node["created_by_call_id"] is not None
+
+        for node in inactive_nodes:
+            ev = db.conn.execute("SELECT * FROM dual_oracle_evaluations WHERE node_id = ?", (node["node_id"],)).fetchone()
+            assert ev is not None
+            assert ev["phenotype"] == "extinct"
+    db.close()
+
+
+def test_pure_b2_mode_contains_single_allele_at_founder_locus(tmp_path: Path):
+    """Verify that pure B2 multiplicity mode contains exactly one allele at the founder locus."""
+    db_path = tmp_path / "test_b2_pure.db"
+    bundle = generate_exp1_branching_world(world_seed=4000, rotation_idx=0, mutated_supervisor="TAL")
+    
+    clean_founder = bundle.clean_founder_fact
+    mutated_founder = bundle.mutated_founder_fact
+
+    pure_bg = [
+        f for f in bundle.clean_world.facts
+        if not (f.fact_id == clean_founder.fact_id or f.locus_id == clean_founder.locus_id)
+    ]
+    assert not any(f.locus_id == "locus_manager_supervisor" for f in pure_bg)
+    assert not any(f.object == clean_founder.object for f in pure_bg)
+
+    comp_bg = list(bundle.clean_world.facts)
+    assert any(f.locus_id == "locus_manager_supervisor" for f in comp_bg)
+
+    results_pure = run_exp1b_b2_surface_feedback_assay(
+        worlds_count=2,
+        top_k=4,
+        clutter_count=8,
+        mode="pure",
+        db_path=str(db_path),
+    )
+    assert 0 in results_pure
+    assert 8 in results_pure
+    assert results_pure[8]["mean_top_k_occupancy"] >= results_pure[0]["mean_top_k_occupancy"]
+
+    db = Database(db_path)
+    with db.conn:
+        rows = db.conn.execute("SELECT * FROM surface_feedback_sweeps WHERE sweep_id LIKE '%_pure'").fetchall()
+        assert len(rows) == 5
+    db.close()
+
+
+def test_retrieval_sweep_results_persistence(tmp_path: Path):
+    """Verify that retrieval sweeps persist per-query and aggregate records to retrieval_sweep_results table."""
+    db_path = tmp_path / "test_sweeps.db"
+
+    run_exp1b_b1_k_sweep(
+        worlds_count=2,
+        k_values=[4, 6],
+        easy_clutter=2,
+        hard_clutter=2,
+        db_path=str(db_path),
+    )
+
+    db = Database(db_path)
+    with db.conn:
+        rows = db.conn.execute("SELECT * FROM retrieval_sweep_results WHERE sweep_type = 'k_rescue'").fetchall()
+        assert len(rows) > 0
+        for r in rows:
+            assert r["sweep_id"] is not None
+            assert r["top_k"] in (4, 6)
+            assert r["founder_retrieved"] in (0, 1)
+            assert r["cosup_retrieved"] in (0, 1)
+            assert r["path_retrieved"] in (0, 1)
+            assert r["g_assembly"] is not None
+            assert r["config_hash"] is not None
+            assert r["git_commit"] is not None
+            assert r["created_at"] is not None
+
+            if r["founder_rank"] is not None:
+                assert r["founder_margin"] == r["top_k"] - r["founder_rank"]
+            if r["cosup_rank"] is not None:
+                assert r["cosup_margin"] == r["top_k"] - r["cosup_rank"]
+
+    db.close()
+
+
+def test_paired_clean_infected_retrieval_symmetry(tmp_path: Path):
+    """Verify paired clean vs infected retrieval symmetry and shape map execution."""
+    db_path = tmp_path / "test_shape_map.db"
+
+    cond_stats, boundaries = run_exp1b_retrieval_shape_map(
+        worlds_count=2,
+        k_values=[3, 6],
+        hard_values=[0, 4],
+        easy_clutter=2,
+        db_path=str(db_path),
+    )
+
+    k6_h0 = cond_stats[(6, 0)]
+    assert k6_h0["clean"]["xpath_sum"] == k6_h0["clean"]["n"]
+    assert k6_h0["infected"]["xpath_sum"] == k6_h0["infected"]["n"]
+
+    db = Database(db_path)
+    with db.conn:
+        rows = db.conn.execute("SELECT COUNT(*) as cnt FROM retrieval_sweep_results WHERE sweep_type = 'shape_map'").fetchone()
+        assert rows["cnt"] > 0
+    db.close()

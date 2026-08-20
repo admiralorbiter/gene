@@ -213,6 +213,34 @@ CREATE TABLE IF NOT EXISTS surface_feedback_sweeps (
     created_at TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS retrieval_sweep_results (
+    sweep_id TEXT PRIMARY KEY,
+    run_id TEXT NOT NULL,
+    sweep_type TEXT NOT NULL,
+    world_id TEXT NOT NULL,
+    world_seed INTEGER,
+    arm TEXT NOT NULL,
+    generation INTEGER NOT NULL,
+    task_id TEXT NOT NULL,
+    target_predicate TEXT NOT NULL,
+    top_k INTEGER NOT NULL,
+    n_hard INTEGER NOT NULL,
+    easy_clutter INTEGER NOT NULL,
+    pool_size INTEGER NOT NULL,
+    founder_retrieved INTEGER NOT NULL,
+    cosup_retrieved INTEGER NOT NULL,
+    path_retrieved INTEGER NOT NULL,
+    founder_rank INTEGER,
+    cosup_rank INTEGER,
+    founder_margin INTEGER,
+    cosup_margin INTEGER,
+    g_assembly REAL NOT NULL,
+    paired_diff_path REAL DEFAULT 0.0,
+    config_hash TEXT,
+    git_commit TEXT,
+    created_at TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS claims (
     claim_id TEXT PRIMARY KEY,
     node_id TEXT NOT NULL,
@@ -419,3 +447,12 @@ class Database:
             return None
         data = json.loads(row["canonical_json"])
         return World.model_validate(data)
+
+    def update_run_status(self, run_id: str, status: str, completed_at: str | None = None) -> None:
+        """Update run status and optional completion timestamp."""
+        with self.conn:
+            self.conn.execute(
+                "UPDATE runs SET status = ?, completed_at = ? WHERE run_id = ?",
+                (status, completed_at, run_id),
+            )
+
