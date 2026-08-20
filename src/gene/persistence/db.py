@@ -154,6 +154,28 @@ CREATE TABLE IF NOT EXISTS lineage_transmissions (
     created_at TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS transmission_opportunities (
+    opportunity_id TEXT PRIMARY KEY,
+    run_id TEXT NOT NULL,
+    world_id TEXT NOT NULL,
+    arm TEXT NOT NULL,
+    exposure_p REAL NOT NULL,
+    parent_generation INTEGER NOT NULL,
+    child_generation INTEGER NOT NULL,
+    parent_node_id TEXT NOT NULL,
+    parent_locus_id TEXT NOT NULL,
+    parent_phenotype TEXT NOT NULL,
+    child_task_id TEXT NOT NULL,
+    target_predicate TEXT NOT NULL,
+    is_exposed INTEGER NOT NULL,
+    is_generated INTEGER NOT NULL,
+    is_written INTEGER NOT NULL,
+    child_node_id TEXT,
+    child_phenotype TEXT NOT NULL,
+    ancestral_allele_fidelity REAL,
+    created_at TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS claims (
     claim_id TEXT PRIMARY KEY,
     node_id TEXT NOT NULL,

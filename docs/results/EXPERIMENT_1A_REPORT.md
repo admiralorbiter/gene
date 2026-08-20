@@ -2,6 +2,7 @@
 
 **Project:** GENE (Genealogical Epistemic Network Experiments)  
 **Experiment:** Experiment 1A (Paired Counterfactual Branching Transmission)  
+**Status:** **FROZEN & VERIFIED**  
 **Date:** 2026-08-20  
 **Model Under Test:** `gemma3:12b` (Ollama, dynamic SHA256 captured)  
 **Assay Environment:** Ecology C (3 matched competing rules per depth) + Schema v2 (explicit contract)  
@@ -22,11 +23,11 @@ By enforcing a **strict generational firewall** between $G_0$ and $G_2$ (ensurin
 2. **Paired Counterfactual Symmetry**:
    - **Clean Baseline ($W_{\text{clean}}$)**: $\text{KIRA} \to 2H \to 4H$ (100% Healthy, $T^*=1, D_t^{\text{ctx}}=1, A=1, E=1, K=1$).
    - **Infected Baseline ($W_{\text{mut}}$)**: $\text{TAL} \to 2S \to 4S$ (100% Pure Semantic Infection, $T^*=0, D_t^{\text{ctx}}=1, A=1, E=1, K=1$).
-   - Across 72 paired calls in 6 counterbalanced micro-worlds (covering all 3 semantic rotations, 6 true rule-order permutations, and varying entities), the model never hallucinated, never violated its output contract ($K=1$), and never misestimated evidential sufficiency ($E=1$).
-3. **Founder Robustness Invariant ($F_0 = \text{MIRA}$)**:
-   - Substituting a second distinct founder allele ($\text{MIRA}$) across 24 paired calls replicated the exact same lossless transmission phenotype: $\text{MIRA} \to 2S \to 4S$ with $\hat{F}_1 = \hat{F}_2 = 1.00$.
+   - Across 72 paired calls in 6 counterbalanced micro-worlds (covering all 3 semantic rotations, 6 true rule-order permutations, and varying entities), **no unsupported or de-novo outputs were observed; every infected descendant was locally derivable ($D_t^{\text{ctx}}=1$)**. The model maintained full contract compliance ($K=1$) and accurate evidential sufficiency estimation ($E=1$) throughout.
+3. **Second-Founder Robustness Panel ($F_0 = \text{MIRA}$)**:
+   - Substituting a second distinct founder allele ($\text{MIRA}$) across 24 paired calls replicated the exact same lossless transmission phenotype: $\text{MIRA} \to 2S \to 4S$ with $\hat{F}_1 = 1.00, \hat{F}_2 = 1.00$.
 4. **Lineage Database Hardening**:
-   - Every physical memory occurrence is stored with an **instance-unique primary key** (`node_{run_id}_{locus}_{allele[:8]}`), preventing node collisions across repeated entity generations.
+   - Every physical memory occurrence is stored with an **instance-unique primary key** (`node_{run_id}_{call_id}_{locus}_{allele[:8]}`), preventing node collisions across repeated entity generations.
    - Every prompt-exposed fact and rule is logged to `exposure_edges` with its exact context position.
    - All $F_0 \to G_1$ and $G_1 \to G_2$ transitions are persisted directly in `lineage_transmissions`.
 
@@ -72,7 +73,7 @@ Generation G0:
 
 ---
 
-## 4. Robustness Panel Replication (Mira Arm)
+## 4. Second-Founder Robustness Panel (Mira Arm)
 
 **Database:** `gene_exp1_branching_v2_mira_20260820_014834.db` (24 model calls)
 
@@ -115,15 +116,16 @@ $$R = X \times \tau \times W = 2.0 \times 1.00 \times 1.0 = 2.00$$
 
 ## 7. The Core Scientific Takeaway & Transition to Experiment 1B
 
-> **The Paradox of Calibration:**  
+> **Competence is Content-Agnostic:**  
 > In Experiment 0, competing consequents and explicit response contracts calibrated Gemma 3 12B to reject insufficient evidence and abstain reliably. In Experiment 1A, that exact same calibrated reasoning engine became a **flawless, lossless transmitter of corrupted memory ($F_0 \to 2S \to 4S$)**.  
-> The model did not hallucinate. It reasoned with 100% deductive validity from a corrupted premise.
+> Once the memory substrate licenses a false premise, epistemic competence preserves rather than corrects the error. The safety challenge moves upstream to exposure, retrieval filtering, and lineage governance.
 
 ### The Next Sequence: Experiment 1B (Varying Exposure $X$)
-To test interventions that suppress $R_{\text{GENE}} < 1$ without confounding exposure with reasoning noise:
-1. **Experiment 1B-A (Controlled Bernoulli Exposure)**:
-   - Vary contact rate $p \in \{0.0, 0.25, 0.50, 0.75, 1.0\}$ with byte-matched contexts to establish the dose-response threshold ($p_c \approx 0.5$).
-2. **Experiment 1B-B (Retrieval Competition)**:
-   - Measure $P(\text{retrieved})$ separately from $P(\text{transmitted} \mid \text{retrieved})$ in realistic candidate pools.
-3. **Experiment 1B-C (Lineage-Aware Filtering)**:
-   - Test lineage-aware ancestral pruning against equal-budget random/top-$k$ controls.
+1. **Experiment 1B-A1 (Balanced Exposure Dose-Response)**:
+   - Apply deterministic balanced exposure masks across $p \in \{0.0, 0.25, 0.50, 0.75, 1.0\}$ to experimentally validate that $R_S = X \times \tau \times W$ and measure the clean utility trade-off $U_{\text{clean}}(p)$.
+2. **Experiment 1B-A2 (Stochastic Branching near Criticality)**:
+   - Deeper multi-generation Bernoulli branching around $p \in \{0.4, 0.5, 0.6\}$ to observe extinction probability vs emergent runaway lineages.
+3. **Experiment 1B-B (Retrieval Competition)**:
+   - Candidate pool scaling to separate contact rate $P(\text{retrieved})$ from post-retrieval reasoning.
+4. **Experiment 1B-C (Lineage-Aware Filtering)**:
+   - Test lineage-aware ancestral pruning against equal-budget controls.
