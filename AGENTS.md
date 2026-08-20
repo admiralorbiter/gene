@@ -23,12 +23,13 @@ Read before coding:
 - **Experiment 1A**: Single Mutation Propagation & Multi-Generational Cascades.
 - **Experiment 1B-A**: Multi-Generation Branching Transmission, Allele Fidelity, and Analytic Extinction Matrix.
 - **Experiment 1B-B**: Endogenous Multi-Hop Retrieval Dynamics ($X_F, X_A, X_{\text{path}}$), Lexical Competition, Surface-Area Scaling, and Causal Retrieval Rescue.
+- **Phase 9 / 9.5**: Persistence Hardening, Retrieval Boundary Shape Map, 48-Call Live Rescue, and 16-Call Matched Path Expression Assay ($P(\text{active}\mid\text{complete})=1, P(\text{active}\mid\text{broken})=0$).
 
-### Current Milestone: Hardening & Preflight for Experiment 1B-C
-1. **Infrastructure Hardening**: Zero live LLM calls during plumbing. Ensure every model output (active or inactive `UNKNOWN`) creates an occurrence node in SQLite, linked to oracle evaluations. Mark run completion status reliably. Persist all deterministic sweep results to SQLite (`retrieval_sweep_results`).
-2. **Pure B2 Baseline Semantics**: Pure multiplicity mode without competing alleles at the founder locus.
-3. **Retrieval Boundary Shape Map**: Deterministic preflight ($k \in \{3,4,5,6,8\}, N_{\text{hard}} \in \{0,2,4,8,12\}$) across paired worlds to identify hard boundary surfaces where $X_{\text{path}}$ collapses and restores ($G_{\text{assembly}}$).
-4. **Experiment 1B-C Policy Sandbox**: Build deterministic lineage-aware selective immunity filters offline first. Compare $X_{\text{path},H}$ against $X_{\text{path},I}$ without live LLMs before spending any compute.
+### Current Milestone: Phase 10 — Experiment 1B-C Delayed Adjudication & Lineage Immunity Sandbox
+1. **Epistemic Risk-Signal Principle**: Lineage is a mechanism for *propagating* trust or distrust, not an intrinsic truth detector (topologies are isomorphic). The policy receives ancestry metadata and an external binary risk signal ($S \in \{0, 1\}$); it never receives canonical $T^*$.
+2. **Experiment 1B-C0 (Policy Calibration Engine)**: Exact analytic verification of 6 policies (`baseline`, `uniform_thinning`, `random_family_quarantine`, `node_only_quarantine`, `lineage_quarantine`, `oracle_upper_bound`) across 4 discrete root-signal states $(S_H, S_I)$ weighted by $\text{TPR} \times \text{FPR}$.
+3. **Experiment 1B-C1 (Delayed-Adjudication Retrieval Sandbox, $G_2 \to G_3$)**: Measure post-adjudication path availability ($C_H = X_{\text{path},H}^{\text{post}}, C_I = X_{\text{path},I}^{\text{post}}$), containment ($1 - C_I$), and epistemic autoimmunity ($1 - C_H$) across 6 paired worlds under BM25 retrieval with zero live LLM compute.
+4. **Pareto Frontier Mapping**: Identify non-trivial detector quality regions where lineage quarantine outperforms node-only and topology-matched controls without excessive healthy-path loss.
 
 ---
 

@@ -39,35 +39,30 @@ The plan is strictly gated:
 
 ---
 
-# Current Phase: Phase 9 — Infrastructure Hardening & Retrieval Boundary Preflight
-
-## Objectives (Zero Live LLM Calls)
-1. **Persistence Hardening**:
-   - Ensure every G1 and G2 model output creates an occurrence node in `memory_nodes` (`is_active=1` if written, `is_active=0` if `UNKNOWN`/abstention).
-   - Ensure `dual_oracle_evaluations` points directly to `node_id`.
-   - Update `runs.status` to `"completed"` (with `completed_at`) upon finishing, or `"failed"` on unhandled exceptions.
-   - Add `retrieval_sweep_results` table in SQLite so all sweep metrics are queryable from SQLite.
-2. **Pure B2 Baseline Semantics**:
-   - Implement `mode="pure"` for the B2 surface-area assay (removing the clean counterpart at the founder locus so only the mutated founder is present).
-   - Rerun 4-world pure multiplicity sweep (deterministic BM25) and verify whether monotonic surface-area scaling holds.
-3. **Deterministic Retrieval Boundary Shape Map**:
-   - Execute a 6-world paired clean/infected preflight over $k \in \{3, 4, 5, 6, 8\}$ and $N_{\text{hard}} \in \{0, 2, 4, 8, 12\}$ with 4 easy distractors.
-   - Persist all rankings, compute exploratory assembly gap $G_{\text{assembly}} = \min(X_F, X_A) - X_{\text{path}}$, ranks, and margins.
-   - Identify 2–4 boundary candidate worlds for live follow-up gating.
+### Phase 9 & 9.5 — Hardening, Boundary Preflight, Live Rescue & Matched Expression (Completed & Frozen)
+- Phase 9: Occurrence node linkage for all outputs (active vs inactive `UNKNOWN`), run lifecycle tracking, pure B2 single-allele semantics, deterministic retrieval shape map ($k \in \{3..8\} \times N_{\text{hard}} \in \{0..12\}$), and 48-call live causal rescue verification on Gemma 3:12B ($k=4 \to k=6$).
+- Phase 9.5: Exp 1B-B1c matched path sufficiency assay (16 live calls) demonstrating perfect path-conditioned expression symmetry ($P(\text{active}\mid\text{complete}, H) = P(\text{active}\mid\text{complete}, I) = 1.00$ and $P(\text{active}\mid\text{broken}, H) = P(\text{active}\mid\text{broken}, I) = 0.00$) under stable slot IDs (`mem_{locus_id}`) and matched 6-memory geometry.
 
 ---
 
-# Next Phase: Phase 10 — Experiment 1B-C (Lineage-Aware Selective Immunity Sandbox)
+# Current Phase: Phase 10 — Experiment 1B-C (Delayed Adjudication & Lineage Immunity Sandbox)
 
-## 10.1 Deterministic Policy Sandbox (Offline First, Zero LLM Calls)
-- Test non-oracle lineage filters against equal-budget baselines (BM25, uniform thinning, lineage-aware diversity rerankers).
-- Linage policy receives ancestry metadata only (no ground truth $T^*$, no secret false flags).
-- Evaluate separation:
-  $$X_{\text{path},H} \gg X_{\text{path},I}$$
-- If deterministic lineage rules cannot shift this frontier offline, do not spend live model compute.
+## 10.1 Conceptual & Epistemic Constraints
+- **Lineage Propagates Distrust, Not Truth**: Because clean and infected graph topologies are isomorphic, a policy seeing only structural metadata cannot determine truth without an oracle.
+- **External Risk Signal**: An imperfect binary risk signal arrives at root memories ($S \in \{0, 1\}$) with controlled sensitivity ($\text{TPR} \in \{0.5, 0.75, 0.9, 1.0\}$) and specificity ($\text{FPR} \in \{0.0, 0.05, 0.10, 0.20, 0.40\}$).
+- **Oracle Isolation**: The policy never receives canonical $T^*$. The experimental harness uses $T^*$ solely to synthesize the detector with pre-registered $(\text{TPR}, \text{FPR})$.
+- **Delayed Adjudication Timeline**: $G_0 \to G_1 \to G_2$ propagation has already occurred. The risk signal arrives at $G_0$, and the system evaluates future $G_3$ reproduction path availability ($C_H = X_{\text{path},H}^{\text{post}}, C_I = X_{\text{path},I}^{\text{post}}$).
 
-## 10.2 Gated Tiny Live Follow-Up
-- If and only if the deterministic sandbox shows clear frontier separation, execute a minimal paired pilot (e.g. 2 boundary worlds, ~48 live calls) on `gemma3:12b`.
+## 10.2 Staged Implementation Sequence (Zero Live Compute First)
+1. **Experiment 1B-C0 (Policy Engine Golden Calibration)**:
+   - Analytical verification of 6 policies (`baseline`, `uniform_thinning`, `random_family_quarantine`, `node_only_quarantine`, `lineage_quarantine`, `oracle_upper_bound`) across 4 discrete root-signal states $(S_H, S_I)$ weighted by exact joint probabilities.
+   - Verify algebraic identities (e.g. $\text{TPR}=\text{FPR} \implies S = 0$, $\text{TPR}=1, \text{FPR}=0 \implies C_H=1, C_I=0$).
+2. **Experiment 1B-C1 (Delayed-Adjudication Retrieval Sandbox, $G_2 \to G_3$)**:
+   - Evaluate post-adjudication retrieval on frozen $G_0 \to G_2$ trees across 6 paired boundary worlds (seeds 7000..7005).
+   - Measure $C_H$, $C_I$, Containment ($1 - C_I$), Epistemic Autoimmunity ($1 - C_H$), and Separation ($S = C_H - C_I$).
+   - Identify whether a non-trivial region exists where lineage quarantine achieves a Pareto improvement over node-only and topology-matched controls without excessive healthy path loss.
+3. **Gated Tiny Live Follow-Up**:
+   - If and only if the deterministic sandbox shows a clear Pareto frontier, execute a minimal live mechanism check (2–3 informative detector points) on `gemma3:12b`.
 
 ---
 
