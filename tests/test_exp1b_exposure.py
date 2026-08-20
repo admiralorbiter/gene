@@ -1,16 +1,24 @@
 """Deterministic Unit & Invariant Tests for Experiment 1B-A1 Exposure Dose-Response Engine."""
 
 import pytest
-from gene.evaluation.exposure_engine import EXPOSURE_MASKS, ExposureEngine
+from gene.evaluation.exposure_engine import (
+    BALANCED_EXPOSURE_MASKS,
+    ExposureEngine,
+    get_exposure_mask,
+)
 
 
-def test_balanced_exposure_masks_geometry():
-    """Verify that balanced exposure masks produce exact target contact proportions."""
-    assert sum(EXPOSURE_MASKS[0.00]) == 0
-    assert sum(EXPOSURE_MASKS[0.25]) == 1
-    assert sum(EXPOSURE_MASKS[0.50]) == 2
-    assert sum(EXPOSURE_MASKS[0.75]) == 3
-    assert sum(EXPOSURE_MASKS[1.00]) == 4
+def test_counterbalanced_exposure_masks_geometry_and_predicate_parity():
+    """Verify that balanced exposure masks rotate evenly across 4 worlds giving equal exposure to each predicate."""
+    for p, count in [(0.0, 0), (0.25, 1), (0.50, 2), (0.75, 3), (1.0, 4)]:
+        masks = [get_exposure_mask(p, w) for w in range(4)]
+        # Check that each world gets exactly `count` exposed tasks
+        for m in masks:
+            assert sum(m) == count
+        
+        # Check that across the 4 worlds, all 4 predicate slots receive identical exposure sum
+        col_sums = [sum(masks[w][slot] for w in range(4)) for slot in range(4)]
+        assert col_sums[0] == col_sums[1] == col_sums[2] == col_sums[3] == count
 
 
 def test_opportunity_tracker_unbiased_denominator_at_zero_exposure():
@@ -47,9 +55,13 @@ def test_opportunity_tracker_unbiased_denominator_at_zero_exposure():
 
     assert summary.total_parents == 2
     assert summary.exposed_opportunities == 0
+    assert summary.unexposed_opportunities == 4
     assert summary.contact_rate_X == 0.0
     assert summary.reproduction_number_R_S == 0.0
     assert summary.epistemic_transmissibility_tau_S is None  # Undefined when exposed=0
+    assert summary.write_admission_W_hat is None
+    assert summary.write_admission_W_policy == 1.0
+    assert summary.mu_de_novo == 0.0
 
 
 def test_factorization_exactness_at_partial_exposure():
@@ -61,8 +73,6 @@ def test_factorization_exactness_at_partial_exposure():
     engine.register_parent("parent_2", parent_gen=1, parent_phenotype="semantic", arm="infected")
 
     # At p=0.50: 2 opportunities exposed, 2 unexposed
-    # Parent 1: 1 exposed (produces infected child), 1 unexposed
-    # Parent 2: 1 exposed (produces infected child), 1 unexposed
     for i in range(4):
         p_id = "parent_1" if i < 2 else "parent_2"
         is_exp = (i in (0, 2))
@@ -95,43 +105,110 @@ def test_factorization_exactness_at_partial_exposure():
     assert summary.exposed_opportunities == 2
     assert summary.contact_rate_X == 1.0       # 2 exposures / 2 parents = 1.0
     assert summary.epistemic_transmissibility_tau_S == 1.0 # 2 generated / 2 exposed = 1.0
-    assert summary.write_admission_W == 1.0    # 2 written / 2 generated = 1.0
+    assert summary.write_admission_W_hat == 1.0    # 2 written / 2 generated = 1.0
     assert summary.reproduction_number_R_S == 1.0  # 2 written / 2 parents = 1.0 (Critical Threshold!)
     assert summary.ancestral_fidelity_F2 == 1.0
+    assert summary.mu_de_novo == 0.0
 
     # Test exact factorization
-    assert abs(summary.reproduction_number_R_S - (summary.contact_rate_X * summary.epistemic_transmissibility_tau_S * summary.write_admission_W)) < 1e-6
+    assert abs(summary.reproduction_number_R_S - (summary.contact_rate_X * summary.epistemic_transmissibility_tau_S * summary.write_admission_W_hat)) < 1e-6
 
 
-def test_clean_cognitive_utility_and_abstention():
-    """Verify that clean utility U_clean(p) accurately reflects task accuracy and masked abstention."""
+def test_clean_coverage_and_de_novo_mutation_detection():
+    """Verify that clean coverage C_clean(p) and de-novo mutations are correctly calculated."""
     engine = ExposureEngine()
 
-    # At p=0.25: 1 task exposed (healthy derived), 3 tasks unexposed (correctly abstained)
-    for i in range(4):
-        is_exp = (i == 0)
-        engine.record_opportunity(
-            opportunity_id=f"clean_opp_{i}",
-            run_id="run_clean",
-            world_id="world_test",
-            arm="clean",
-            exposure_p=0.25,
-            parent_gen=1,
-            child_gen=2,
-            parent_node_id="clean_p1",
-            parent_locus_id="locus_prot",
-            parent_phenotype="healthy",
-            child_task_id=f"task_{i}",
-            target_predicate="transit_route",
-            is_exposed=is_exp,
-            is_generated=is_exp,
-            is_written=is_exp,
-            child_phenotype="healthy" if is_exp else "extinct",
-        )
+    # Register infected parent
+    engine.register_parent("parent_inf", parent_gen=1, parent_phenotype="semantic", arm="infected")
+
+    # Opportunity 1: Unexposed, but model hallucinates a false concrete claim (de-novo mutation!)
+    engine.record_opportunity(
+        opportunity_id="opp_unexp_hallucinated",
+        run_id="run_test",
+        world_id="world_test",
+        arm="infected",
+        exposure_p=0.25,
+        parent_gen=1,
+        child_gen=2,
+        parent_node_id="parent_inf",
+        parent_locus_id="locus_prot",
+        parent_phenotype="semantic",
+        child_task_id="task_1",
+        target_predicate="transit_route",
+        is_exposed=False,
+        is_generated=True,
+        is_written=True,
+        child_phenotype="semantic",
+    )
+
+    # Opportunity 2: Unexposed, model cleanly abstains (extinct)
+    engine.record_opportunity(
+        opportunity_id="opp_unexp_abstained",
+        run_id="run_test",
+        world_id="world_test",
+        arm="infected",
+        exposure_p=0.25,
+        parent_gen=1,
+        child_gen=2,
+        parent_node_id="parent_inf",
+        parent_locus_id="locus_prot",
+        parent_phenotype="semantic",
+        child_task_id="task_2",
+        target_predicate="resource_tier",
+        is_exposed=False,
+        is_generated=False,
+        is_written=False,
+        child_phenotype="extinct",
+    )
+
+    # Opportunity 3: Clean arm, exposed (healthy)
+    engine.record_opportunity(
+        opportunity_id="clean_opp_exp",
+        run_id="run_clean",
+        world_id="world_test",
+        arm="clean",
+        exposure_p=0.25,
+        parent_gen=1,
+        child_gen=2,
+        parent_node_id="clean_p1",
+        parent_locus_id="locus_prot",
+        parent_phenotype="healthy",
+        child_task_id="task_clean_1",
+        target_predicate="transit_route",
+        is_exposed=True,
+        is_generated=True,
+        is_written=True,
+        child_phenotype="healthy",
+    )
+
+    # Opportunity 4: Clean arm, unexposed (abstained)
+    engine.record_opportunity(
+        opportunity_id="clean_opp_unexp",
+        run_id="run_clean",
+        world_id="world_test",
+        arm="clean",
+        exposure_p=0.25,
+        parent_gen=1,
+        child_gen=2,
+        parent_node_id="clean_p1",
+        parent_locus_id="locus_prot",
+        parent_phenotype="healthy",
+        child_task_id="task_clean_2",
+        target_predicate="resource_tier",
+        is_exposed=False,
+        is_generated=False,
+        is_written=False,
+        child_phenotype="extinct",
+    )
 
     summary = engine.compute_summary(exposure_p=0.25)
 
-    assert summary.clean_opportunities == 4
+    # 1 out of 2 unexposed infected opportunities emitted false concrete claim -> mu_de_novo = 0.50
+    assert summary.unexposed_opportunities == 2
+    assert summary.unexposed_false_children_emitted == 1
+    assert summary.mu_de_novo == 0.50
+
+    # Clean coverage: 1 out of 2 clean opportunities derived -> C_clean = 0.50
+    assert summary.clean_opportunities == 2
     assert summary.clean_correct_derived == 1
-    assert summary.clean_abstained_when_masked == 3
-    assert summary.clean_utility_U == 0.25  # 1 / 4 = 25% cognitive utility
+    assert summary.clean_coverage_C == 0.50

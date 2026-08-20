@@ -23,7 +23,12 @@ from typing import Any, Literal
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 from gene.evaluation.dual_oracle import DualOracle, DualOracleEvaluation
-from gene.evaluation.exposure_engine import EXPOSURE_MASKS, ExposureDoseSummary, ExposureEngine
+from gene.evaluation.exposure_engine import (
+    BALANCED_EXPOSURE_MASKS,
+    ExposureDoseSummary,
+    ExposureEngine,
+    get_exposure_mask,
+)
 from gene.experiments.runner import get_environment_info, get_git_commit
 from gene.ollama_client import CallSpec, OllamaClient
 from gene.persistence.db import Database
@@ -101,12 +106,12 @@ def run_exp1b_exposure_assay(
     prompt_hash = template.prompt_hash()
 
     for p in grid:
-        mask = EXPOSURE_MASKS.get(round(p, 2), [True, True, True, True])
         print(f"\n" + "#" * 95, flush=True)
-        print(f"   EXPOSURE DOSE: p = {p:.2f} (Balanced Mask: {[int(x) for x in mask]}, Target Contact X = {2*p:.2f})", flush=True)
+        print(f"   EXPOSURE DOSE: p = {p:.2f} (Target Contact X = {2*p:.2f}, Uniform-Thinning Expected R_S = {2*p:.2f})", flush=True)
         print("#" * 95, flush=True)
 
         for w_idx in range(worlds_count):
+            mask = get_exposure_mask(exposure_p=p, world_idx=w_idx)
             seed = 42 + w_idx * 17
             rotation_idx = w_idx % 3
             rule_perm_idx = w_idx % 6
@@ -448,23 +453,30 @@ def run_exp1b_exposure_assay(
     # -------------------------------------------------------------
     # Final Dose-Response Summary Report
     # -------------------------------------------------------------
-    print("\n" + "=" * 95, flush=True)
+    print("\n" + "=" * 115, flush=True)
     print(f"         EXPERIMENT 1B-A1: BALANCED EXPOSURE DOSE-RESPONSE SUMMARY REPORT", flush=True)
-    print("=" * 95, flush=True)
-    print(f"{'Dose (p)':<10} | {'Contact X':<10} | {'tau_S':<8} | {'Write W':<8} | {'R_S':<8} | {'Clean Util U':<12} | {'Fidelity F2':<12} | {'Replacement'}", flush=True)
-    print("-" * 95, flush=True)
+    print("=" * 115, flush=True)
+    print(f"{'Dose (p)':<10} | {'Contact X':<10} | {'tau_S':<8} | {'Write W_hat':<12} | {'R_S':<8} | {'Clean Cov C':<14} | {'mu_de_novo':<12} | {'Fidelity F2':<12} | {'Epidemic State'}", flush=True)
+    print("-" * 115, flush=True)
 
     for p in grid:
         s = exposure_engine.compute_summary(exposure_p=p)
         tau_str = f"{s.epistemic_transmissibility_tau_S:.2f}" if s.epistemic_transmissibility_tau_S is not None else "N/A"
-        w_str = f"{s.write_admission_W:.2f}" if s.write_admission_W is not None else "N/A"
-        u_str = f"{s.clean_utility_U*100:.1f}%" if s.clean_utility_U is not None else "N/A"
+        w_str = f"{s.write_admission_W_hat:.2f}" if s.write_admission_W_hat is not None else "N/A"
+        c_str = f"{s.clean_coverage_C*100:.1f}% ({s.clean_correct_derived}/{s.clean_opportunities})" if s.clean_coverage_C is not None else "N/A"
+        mu_str = f"{s.mu_de_novo*100:.1f}% ({s.unexposed_false_children_emitted}/{s.unexposed_opportunities})" if s.unexposed_opportunities > 0 else "0.0%"
         f2_str = f"{s.ancestral_fidelity_F2:.2f}" if s.ancestral_fidelity_F2 is not None else "N/A"
-        rep_str = "SUPERCRITICAL (R > 1)" if s.reproduction_number_R_S > 1.0 else ("CRITICAL (R = 1)" if abs(s.reproduction_number_R_S - 1.0) < 1e-4 else "SUBCRITICAL (R < 1)")
         
-        print(f"p = {p:<6.2f} | X = {s.contact_rate_X:<6.2f} | {tau_str:<8} | {w_str:<8} | {s.reproduction_number_R_S:<8.2f} | {u_str:<12} | {f2_str:<12} | {rep_str}", flush=True)
+        if s.reproduction_number_R_S > 1.0:
+            rep_str = "SUPERCRITICAL (R > 1) [Amplification]"
+        elif abs(s.reproduction_number_R_S - 1.0) < 1e-4:
+            rep_str = "CRITICAL (R = 1) [Replacement Equilibrium]"
+        else:
+            rep_str = "SUBCRITICAL (R < 1) [Lineage Decay]"
+        
+        print(f"p = {p:<6.2f} | X = {s.contact_rate_X:<6.2f} | {tau_str:<8} | {w_str:<12} | {s.reproduction_number_R_S:<8.2f} | {c_str:<14} | {mu_str:<12} | {f2_str:<12} | {rep_str}", flush=True)
 
-    print("=" * 95 + "\n", flush=True)
+    print("=" * 115 + "\n", flush=True)
     db.close()
 
 
