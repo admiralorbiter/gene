@@ -32,12 +32,12 @@ We have completed the **Factorial Hardening** sprint and executed the full 6-wor
 
 ---
 
-## 6-World Counterbalanced Assay Results (Live Gemma 3 12B)
+## 6-World Counterbalanced Factorial Assay (Live Gemma 3 12B)
 
-The assay was run across 6 counterbalanced micro-worlds spanning all 6 rule orderings and 3 supervisor-to-protocol rotations ($3 \times 6 = 18$ balanced conditions).
+The assay was run across 6 counterbalanced micro-worlds covering all 6 rule orderings and all 3 supervisor-to-protocol rotations marginally.
 
-### 1. Ecology C (Competing Consequents — 3 Rules Visible)
-Database: `gene_d1_c_v2_20260820_001206.db` (66 calls total)
+### 1. Ecology C (Competing Consequents, Schema v2 — Cell 4)
+Database: `gene_d1_c_v2_20260820_001206.db` (72 model calls total = 6 clean baselines + 66 intervention tests)
 
 | Metric / Assay Category | Expected Behavior | Observed Pass Rate | Diagnostic Breakdown |
 | :--- | :--- | :--- | :--- |
@@ -57,8 +57,8 @@ Database: `gene_d1_c_v2_20260820_001206.db` (66 calls total)
 
 ---
 
-### 2. Ecology S (Single Consequent — 1 Rule Visible)
-Database: `gene_d1_s_v2_20260820_002016.db` (60 calls total)
+### 2. Ecology S (Single Consequent, Schema v2 — Cell 2)
+Database: `gene_d1_s_v2_20260820_002016.db` (66 model calls total = 6 clean baselines + 60 intervention tests)
 
 | Metric / Assay Category | Expected Behavior | Observed Pass Rate | Failure Diagnostic Mode |
 | :--- | :--- | :--- | :--- |

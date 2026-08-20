@@ -15,18 +15,18 @@
 Experiment 0 establishes the experimental instrumentation required to measure, trace, and causally verify memory lineage in language models. Before introducing infected or mutated memory lineages (Experiment 1), the research instrument must prove that it can distinguish:
 1. **Machine-Readable Formal Ancestry** (Oracle forward-chaining derivation graphs);
 2. **Model Self-Reported Support** (Citations emitted by the model);
-3. **Counterfactual Behavioral Necessity** ($C_{\\text{nec}}$, whether knocking out a premise removes the claim);
+3. **Counterfactual Behavioral Necessity** ($C_{\text{nec}}$, whether knocking out a premise removes the claim);
 4. **Epistemic State Accuracy** ($E$, whether the model correctly assesses evidential sufficiency);
 5. **Response Policy Consistency** ($K$, whether model behavior complies with its epistemic assessment);
 6. **Directional Mutational Sensitivity** (Whether altering a premise steers the model to the predictable counterfactual consequent);
-7. **Sequential Compositional Rescue** (Whether restoring an ancestor in state lineage $S_0 \\xrightarrow{\\text{mut}} S_1 \\xrightarrow{\\text{rescue}} S_2$ recovers the baseline phenotype).
+7. **Sequential Compositional Rescue** (Whether restoring an ancestor in state lineage $S_0 \xrightarrow{\text{mut}} S_1 \xrightarrow{\text{rescue}} S_2$ recovers the baseline phenotype).
 
-Through a hardened $2 \\times 2$ factorial assay spanning **264 total model calls across 6 counterbalanced micro-worlds**, we discovered that model failure occurs along two distinct mechanistic transitions:
-$$\\text{Information Environment} \\xrightarrow{\\text{Epistemic Estimation } (E)} \\text{Epistemic State} \\xrightarrow{\\text{Policy Compliance } (K)} \\text{Emitted Claim } (A)$$
+Through a hardened $2 \times 2$ factorial assay spanning **276 total model calls across 6 counterbalanced micro-worlds** (covering all 6 rule-order permutations and 3 supervisor-to-protocol rotations marginally), we discovered that model failure occurs along two distinct mechanistic transitions:
+$$\text{Information Environment} \xrightarrow{\text{Epistemic Estimation } (E)} \text{Epistemic State} \xrightarrow{\text{Policy Compliance } (K)} \text{Emitted Claim } (A)$$
 
-- **The Response Contract (Schema v2)** fixes the **detection-to-action gap** ($K$).
-- **The Information Ecology (Ecology C: Competing Consequents)** fixes the **antecedent binding failure / false sufficiency estimation** ($E$).
-- **Synergy (Cell 4: Ecology C + Schema v2)** achieves **100.0% causal and epistemic calibration (66/66 interventions passed)**.
+- **The Response Contract (Schema v2)** bridges the **detection-to-action gap** ($K$), ensuring that recognized insufficiency reliably produces abstention rather than forced answer emission.
+- **The Information Ecology (Ecology C: Competing Consequents)** prevents **antecedent binding failure / false sufficiency estimation** ($E$), forcing the model to evaluate whether the premise chain is actually satisfied.
+- **Joint Sufficiency (Cell 4: Ecology C + Schema v2)**: The two factors are complementary and jointly sufficient for perfect calibration in the tested assay, achieving **100.0% causal and epistemic calibration (66/66 interventions passed, 72 total model calls)**.
 
 With this calibration complete, Experiment 0 is frozen.
 
@@ -38,13 +38,13 @@ Earlier naive evaluations conflated output correctness with causal lineage. By d
 
 ### 2.1 The Diagnostic Metrics ($A, E, K$)
 1. **$A$ (Answer Correctness / Behavioral Output)**:
-   $$\\text{Is } \\text{normalized\\_object} == \\text{expected\\_counterfactual\\_object}?$$
+   $$\text{Is } \text{normalized\_object} == \text{expected\_counterfactual\_object}?$$
    Evaluates whether the model's emitted token matches the ground-truth counterfactual state derived by the machine-readable Oracle.
 2. **$E$ (Epistemic State Accuracy)**:
-   $$\\text{Is } \\text{raw\\_evidence\\_status} == \\text{expected\\_evidence\\_status}?$$
+   $$\text{Is } \text{raw\_evidence\_status} == \text{expected\_evidence\_status}?$$
    Evaluates whether the model's internal assessment of evidence (`sufficient` vs `insufficient` / `conflicting`) matches the formal deductibility of the premise set.
 3. **$K$ (Contract / Policy Consistency)**:
-   $$\\text{Does } (\\text{raw\\_evidence\\_status} \\in \\{\\text{insufficient}, \\text{conflicting}\\}) \\implies (\\text{normalized\\_object} == \\text{"UNKNOWN"})?$$
+   $$\text{Does } (\text{raw\_evidence\_status} \in \{\text{insufficient}, \text{conflicting}\}) \implies (\text{normalized\_object} == \text{"UNKNOWN"})?$$
    Evaluates whether the model's generation complies with its own epistemic judgment.
 
 ### 2.2 Mechanism of Action
@@ -65,22 +65,22 @@ To prevent ambiguity between memory slot identity and semantic content, GENE for
 | **Deletion / Knockout** | Removing a locus entirely from the active retrieval context. | `target_node_ids=[locus_id]`, excluded from prompt rendering. |
 | **Expression** | Exposure of a memory locus in the retrieved context prompt. | `exposure_edges` logged in database. |
 | **Phenotype** | The downstream generated claim emitted by the model. | `memory_nodes(node_type="derived")`. |
-| **Fitness / Replication**| The transmission and citation of a memory node into descendant generations. | $R_0$ (Reproductive number in Experiment 1). |
+| **Fitness / Replication**| The transmission and citation of a memory node into descendant generations. | $R_g$ (Generational reproduction number in Experiment 1). |
 
 ---
 
-## 4. Hardened $2 \\times 2$ Factorial Results
+## 4. Hardened $2 \times 2$ Factorial Results
 
-The complete $2 \\times 2$ factorial assay was executed on the exact same 6 counterbalanced canonical micro-worlds across all 6 rule-order permutations ($p \\in \\{0..5\\}$) and all 3 supervisor-to-protocol rotations ($r \\in \\{0..2\\}$ marginally).
+The complete $2 \times 2$ factorial assay was executed on the exact same 6 counterbalanced canonical micro-worlds across all 6 rule-order permutations ($p \in \{0..5\}$) and all 3 supervisor-to-protocol rotations ($r \in \{0..2\}$ marginally).
 
 ### Factorial Matrix Summary
 
-| Cell | Information Ecology | Output Response Schema | Total Calls | Intervention Tests | Interventions Passed | Pass Rate ($A$) | Primary Failure Phenotype |
+| Cell | Information Ecology | Output Response Schema | Total Model Calls | Intervention Tests | Interventions Passed | Pass Rate ($A$) | Primary Observed Failure Mode |
 | :---: | :--- | :--- | :---: | :---: | :---: | :---: | :--- |
 | **1** | **Ecology S** (Single Rule) | **Schema v1** (Implicit) | 66 | 60 | **28 / 60** | **46.7%** | **Detection-to-Action Split ($K=0$)**: Emits conclusion token on deletion/mutation despite recognizing missing evidence. |
-| **2** | **Ecology S** (Single Rule) | **Schema v2** (Explicit) | 66 | 60 | **52 / 60** | **86.7%** | **Antecedent Binding Failure ($E=0, K=1$)**: Single rule conclusion acts as an attractor; model falsely judges $E=\\text{sufficient}$. |
-| **3** | **Ecology C** (Competing Rules)| **Schema v1** (Implicit) | 72 | 66 | **43 / 66** | **65.2%** | **Directional Sensitivity without Abstention**: Directional mutations pass (100%), but unmatched mutations ($\\to$ Soren) fail to abstain (0%). |
-| **4** | **Ecology C** (Competing Rules)| **Schema v2** (Explicit) | 72 | 66 | **66 / 66** | **100.0%** | **Flawless Calibration ($A=1, E=1, K=1$)**: 100% directional steering, 100% knockout abstention, 100% unmatched abstention, 100% rescue. |
+| **2** | **Ecology S** (Single Rule) | **Schema v2** (Explicit Contract) | 66 | 60 | **52 / 60** | **86.7%** | **Antecedent Binding Failure ($E=0, K=1$)**: Single rule conclusion acts as an attractor; model falsely judges $E=\text{sufficient}$. |
+| **3** | **Ecology C** (Competing Rules)| **Schema v1** (Implicit) | 72 | 66 | **43 / 66** | **65.2%** | **Directional Sensitivity without Abstention**: Directional mutations pass (100%), but unmatched mutations ($\to$ Soren) fail to abstain (0%). |
+| **4** | **Ecology C** (Competing Rules)| **Schema v2** (Explicit Contract) | 72 | 66 | **66 / 66** | **100.0%** | **Flawless Calibration ($A=1, E=1, K=1$)**: 100% directional steering, 100% knockout abstention, 100% unmatched abstention, 100% rescue. |
 
 ```
                  SCHEMA v1 (Implicit)       SCHEMA v2 (Explicit Contract)
@@ -95,27 +95,29 @@ The complete $2 \\times 2$ factorial assay was executed on the exact same 6 coun
                +--------------------------+-------------------------------+
 ```
 
+*Note on Unit of Analysis:* In the full experimental program, worlds represent the primary experimental unit and interventions are treated as clustered repeated measures within worlds. The 276 total calls ($66 + 66 + 72 + 72$) constitute 24 world executions across 4 matched conditions.
+
 ---
 
 ## 5. Detailed Breakdown of Cell 4 (The Frozen Benchmark)
 
 **Database:** `gene_d1_c_v2_20260820_001206.db` (Ollama `gemma3:12b`)
 
-Across all 6 counterbalanced micro-worlds (72 model calls, 66 intervention tests):
+Across all 6 counterbalanced micro-worlds (72 model calls = 6 clean baselines + 66 intervention tests):
 
 | Assay Battery Category | Target / Counterfactual State | Expected Behavior | Observed Pass Rate | Diagnostics |
 | :--- | :--- | :--- | :---: | :---: |
 | **Clean Baseline ($S_0$)** | Clean micro-world state | Emits Target Protocol ($X7, Q2, M9$) | **6 / 6 (100.0%)** | $A=1, E=1, K=1$ |
 | **No-op Sham Control** | Identical context replay | Emits Target Protocol ($S_0$ stability) | **6 / 6 (100.0%)** | $A=1, E=1, K=1$ |
-| **Knockout Premise A** | Delete `manager(station, person)` | Abstain to `UNKNOWN` ($C_{\\text{nec}}=100\%$) | **6 / 6 (100.0%)** | $A=1, E=1, K=1$ |
-| **Knockout Premise B** | Delete `reports_to(person, sup)` | Abstain to `UNKNOWN` ($C_{\\text{nec}}=100\%$) | **6 / 6 (100.0%)** | $A=1, E=1, K=1$ |
-| **Knockout Active Rule**| Delete active deduction rule | Abstain to `UNKNOWN` ($C_{\\text{nec}}=100\%$) | **6 / 6 (100.0%)** | $A=1, E=1, K=1$ |
+| **Knockout Premise A** | Delete `manager(station, person)` | Abstain to `UNKNOWN` ($C_{\text{nec}}=100\%$) | **6 / 6 (100.0%)** | $A=1, E=1, K=1$ |
+| **Knockout Premise B** | Delete `reports_to(person, sup)` | Abstain to `UNKNOWN` ($C_{\text{nec}}=100\%$) | **6 / 6 (100.0%)** | $A=1, E=1, K=1$ |
+| **Knockout Active Rule**| Delete active deduction rule | Abstain to `UNKNOWN` ($C_{\text{nec}}=100\%$) | **6 / 6 (100.0%)** | $A=1, E=1, K=1$ |
 | **Knockout Foil Rule**  | Delete inactive competing rule | Invariant: Emits Target Protocol ($H_D=0\%$) | **6 / 6 (100.0%)** | $A=1, E=1, K=1$ |
 | **Epistasis Double KO** | Delete Premise A + Premise B | Abstain to `UNKNOWN` | **6 / 6 (100.0%)** | $A=1, E=1, K=1$ |
-| **Directional Mutation 1**| Mutate B: $\\text{Kira} \\to \\text{Tal}$ | Steer to Tal's Protocol ($Q2, X7, M9$) | **6 / 6 (100.0%)** | $A=1, E=1, K=1$ |
-| **Directional Mutation 2**| Mutate B: $\\text{Kira} \\to \\text{Mira}$| Steer to Mira's Protocol ($M9, Q2, X7$)| **6 / 6 (100.0%)** | $A=1, E=1, K=1$ |
-| **Unmatched Mutation**   | Mutate B: $\\text{Kira} \\to \\text{Soren}$| Abstain to `UNKNOWN` (No rule match) | **6 / 6 (100.0%)** | $A=1, E=1, K=1$ |
-| **Sequential Rescue**    | Restore $S_1 (\\text{Tal}) \\to S_2 (\\text{Kira})$ | Recover $S_0$ Target Protocol | **6 / 6 (100.0%)** | $A=1, E=1, K=1$ |
+| **Directional Mutation 1**| Mutate B: $\text{Kira} \to \text{Tal}$ | Steer to Tal's Protocol ($Q2, X7, M9$) | **6 / 6 (100.0%)** | $A=1, E=1, K=1$ |
+| **Directional Mutation 2**| Mutate B: $\text{Kira} \to \text{Mira}$| Steer to Mira's Protocol ($M9, Q2, X7$)| **6 / 6 (100.0%)** | $A=1, E=1, K=1$ |
+| **Unmatched Mutation**   | Mutate B: $\text{Kira} \to \text{Soren}$| Abstain to `UNKNOWN` (No rule match) | **6 / 6 (100.0%)** | $A=1, E=1, K=1$ |
+| **Sequential Rescue**    | Restore $S_1 (\text{Tal}) \to S_2 (\text{Kira})$ | Recover $S_0$ Target Protocol | **6 / 6 (100.0%)** | $A=1, E=1, K=1$ |
 | **Distractor Fact KO**   | Delete non-rule station fact | Invariant: Emits Target Protocol | **6 / 6 (100.0%)** | $A=1, E=1, K=1$ |
 | **OVERALL CELL 4 SCORE**  | **Complete 11-Intervention Assay** | **All Invariants Confirmed** | **66 / 66 (100.0%)** | **FLAWLESS** |
 
@@ -124,17 +126,17 @@ Across all 6 counterbalanced micro-worlds (72 model calls, 66 intervention tests
 ## 6. Telemetry & Computational Performance
 
 - **Average Call Latency:** 4.82 seconds (warm GPU context).
-- **Prompt Evaluation Duration:** $550\\text{ ms} - 1,100\\text{ ms}$.
-- **Token Generation Duration:** $1.8\\text{ s} - 4.5\\text{ s}$.
+- **Prompt Evaluation Duration:** $550\text{ ms} - 1,100\text{ ms}$.
+- **Token Generation Duration:** $1.8\text{ s} - 4.5\text{ s}$.
 - **Prompt Token Count:** ~240–280 tokens per call.
 - **Completion Token Count:** ~35–65 tokens per call.
-- **Total Experiment 0 Calls Executed:** 264 calls across 4 databases, completed in ~22 minutes without a single API drop or malformed JSON error.
+- **Total Experiment 0 Calls Executed:** 276 calls across 4 databases, completed without a single API drop or malformed JSON error.
 
 ---
 
 ## 7. Artifact & Database Inventory
 
-All experimental artifacts and databases are preserved in the repository:
+All experimental SQLite databases and audit trails are preserved locally in the experiment workspace:
 
 1. `gene_d1_c_v2_20260820_001206.db`: Cell 4 (Ecology C / Schema v2) — 72 calls, 66 tests (100.0% pass).
 2. `gene_d1_s_v2_20260820_002016.db`: Cell 2 (Ecology S / Schema v2) — 66 calls, 60 tests (86.7% pass).
@@ -147,18 +149,18 @@ All experimental artifacts and databases are preserved in the repository:
 
 ## 8. Transition to Experiment 1: The Three Infection Phenotypes
 
-With Experiment 0 frozen, Experiment 1 will introduce a single mutated source memory (the "bad gene") into generation $G_0$ and track its transmission across multi-generation propagation networks ($G_0 \\to G_1 \\to G_2 \\dots$).
+With Experiment 0 frozen, Experiment 1 will introduce a single mutated source memory (the "bad gene") into generation $G_0$ and track its transmission across multi-generation propagation networks ($G_0 \to G_1 \to G_2 \dots$).
 
 Using the $A/E/K$ diagnostic engine established in Experiment 0, we can now distinguish **three distinct infection phenotypes** in downstream descendants:
 
 1. **Semantic Infection ($A=0, E=1, K=1$)**:
    The descendant inherits the mutated premise and validly derives an incorrect downstream claim.
-   $$\\text{Transmission Rate: } R_{\\text{semantic}}$$
+   $$\text{Transmission Rate: } R_{\text{semantic}}$$
 2. **Epistemic Infection ($A=0, E=0, K=1$)**:
    The descendant falsely estimates that corrupted/insufficient evidence is sufficient and forces an unsupported conclusion.
-   $$\\text{Transmission Rate: } R_{\\text{epistemic}}$$
+   $$\text{Transmission Rate: } R_{\text{epistemic}}$$
 3. **Control / Policy Infection ($A=0, E=1, K=0$)**:
    The descendant recognizes that evidence is corrupted/insufficient, but fails its response policy and emits a hallucinated claim anyway.
-   $$\\text{Transmission Rate: } R_{\\text{control}}$$
+   $$\text{Transmission Rate: } R_{\text{control}}$$
 
 This completes Experiment 0. The instrument is frozen and ready for Experiment 1.

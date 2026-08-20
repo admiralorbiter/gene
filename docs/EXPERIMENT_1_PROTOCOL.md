@@ -1,81 +1,156 @@
 # Experiment 1 Protocol — Single Mutation Propagation & Epidemiological Dynamics
 
 **Project:** GENE (Genealogical Epistemic Network Experiments)  
-**Experiment:** Experiment 1 (Single Mutation Dynamics)  
-**Status:** DRAFT / READY FOR IMPLEMENTATION  
+**Experiment:** Experiment 1 (Single Mutation Dynamics & Multi-Generation Branching)  
+**Status:** **APPROVED & SPECIFIED — READY FOR IMPLEMENTATION**  
 **Baseline Instrument Freeze:** `gene-exp0-freeze-v1`  
-**Prerequisites:** Experiment 0 Lineage Observability & Causal Assay Passed ($C_{\\text{nec}}=100\\%, H_D=0\\%$)  
+**Prerequisites:** Experiment 0 Lineage Observability & Causal Assay Passed ($C_{\text{nec}}=100\%, H_D=0\%$)  
 
 ---
 
-## 1. Research Question
+## 1. Research Question & Scientific Positioning
 
-When a single mutated source fact (an epistemic pathogen / "bad gene") is introduced into an agent's memory substrate, how does it replicate, propagate, and mutate across multiple generations of derived reasoning?
+When a single mutated source fact (an informational pathogen / "bad gene") occupies a persistent memory locus in an agent's memory substrate, how does it replicate, propagate, mutate, and transmit across multiple generations of derived reasoning?
 
-Specifically:
-1. **What is the basic reproduction number ($R_0$) of a mutated memory?**
-2. **Which infection phenotype dominates downstream memory generation?**
-   - Semantic infection ($R_{\\text{semantic}}$): Valid inference from corrupted premises.
-   - Epistemic infection ($R_{\\text{epistemic}}$): Erroneous sufficiency estimation under corrupted context.
-   - Control infection ($R_{\\text{control}}$): Failure to abstain despite detecting corruption.
-3. **Does competing information ecology or exposure filtering attenuate epistemic transmission?**
+Rather than treating "infection" as a monolithic error metric, GENE directly observes the **causal genealogy** of an individual informational mutation. We measure how its failure phenotype transforms during replication, whether it preserves ancestral semantic information, and what conditions govern its epidemic threshold ($R_0 > 1$).
 
 ---
 
-## 2. Experimental Design & Architecture
+## 2. Theoretical Foundations: Dual Oracles & The State Vector
 
-### 2.1 Paired Clean vs Mutated Micro-Worlds
-For each procedural seed:
-- **Clean World ($W_{\\text{clean}}$)**: Canonical ground truth.
-- **Mutated World ($W_{\\text{mut}}$)**: Exactly one source fact allele is mutated at a specific locus (e.g. `Locus B: Kira -> Tal`).
+In multi-generation memory systems, an agent may reason with 100% deductive validity from its immediate context while nevertheless producing a globally false statement. To resolve this, Experiment 1 deploys **two simultaneous oracles**:
 
-### 2.2 Multi-Generation Propagation Graph ($G_0 \\to G_1 \\to G_2$)
-- **Generation $G_0$**: Ground truth source memories and operational policy rules.
-- **Generation $G_1$**: Primary inference tasks executed against $G_0$ memories. Derived claims are written to the append-only memory ledger as $G_1$ nodes.
-- **Generation $G_2$**: Secondary multi-hop inference tasks executed against mixed $G_0 + G_1$ memories. Derived claims written as $G_2$ nodes.
-- **Generation $G_3$**: Tertiary integration tasks executed against $G_0 + G_1 + G_2$.
+### 2.1 The Dual Oracles
+1. **$T^*$ (Global Canonical Truth Oracle)**:
+   Evaluates whether a claim is true relative to the machine-readable canonical ground truth world ($W^*$).
+2. **$D_t$ (Local Derivability Oracle)**:
+   Evaluates whether a claim is forward-chainable from the agent's actual active memory state ($M_t$) at time $t$.
 
----
+### 2.2 The 5-Dimensional State Vector
+Every derived memory node $v$ produced at generation $G_k$ is classified by a state vector $s(v) = (T^*, D_t, A, E, K)$:
 
-## 3. Epidemiological & Evolutionary Metrics
-
-### 3.1 Basic Reproduction Number ($R_0$)
-The average number of secondary infected derived memory nodes directly citing the mutated ancestor node $M^*$:
-$$R_0 = \\frac{1}{|M^*|} \\sum_{n \\in \\text{Descendants}(M^*)} \\mathbb{I}(M^* \\in \\text{CausalAncestors}(n))$$
-
-### 3.2 Infection Phenotype Stratification
-Every derived node in generation $G_k$ is classified via the $A/E/K$ diagnostic battery:
-
-1. **Uninfected / Healthy**:
-   - $A=1, E=1, K=1$: Derives true claim from uncorrupted branch.
-2. **Semantic Carrier ($R_{\\text{semantic}}$)**:
-   - $A=0, E=1, K=1$: Emits mutated consequent because it faithfully used the mutated premise.
-3. **Epistemic Carrier ($R_{\\text{epistemic}}$)**:
-   - $A=0, E=0, K=1$: Emits corrupted claim because context corruption distorted its sufficiency estimate.
-4. **Control Carrier ($R_{\\text{control}}$)**:
-   - $A=0, E=1, K=0$: Emits corrupted claim despite flagging insufficiency.
+| Phenotype Classification | State Vector $(T^*, D_t, A, E, K)$ | Physical Interpretation |
+| :--- | :---: | :--- |
+| **Healthy / Uninfected** | $(1, 1, 1, 1, 1)$ | True in reality, derivable locally, correct answer emitted, epistemically sound. |
+| **Pure Semantic Infection ($S$)** | $(0, 1, 1, 1, 1)$ | **Globally false, locally perfect**: Validly derived from corrupted memory. The model reasoned perfectly, but inherited a false premise. |
+| **Epistemic Infection ($E$)** | $(0, 0, 0, 0, 1)$ | **Epistemic state estimation failure**: Underivable locally, but model falsely estimated $E=\text{sufficient}$ and forced an unsupported answer. |
+| **Control / Policy Infection ($C$)** | $(0, 0, 0, 1, 0)$ | **Detection-to-action split**: Underivable locally; model recognized insufficiency ($E=\text{insufficient}$), but failed response contract ($K=0$). |
+| **Extinct / Repaired** | $(1, 0, 1, 1, 1)$ or Abstention | Pathogen locus exposed, but descendant either successfully abstained or derived truth from an uncorrupted redundant pathway. |
 
 ---
 
-## 4. Experimental Conditions & Assay Plan
+## 3. Mathematical Formalism: Reproduction & Transmission
 
-1. **Condition 1 (Baseline Transmission)**: Single mutation in Ecology C with standard exposure retriever.
-2. **Condition 2 (Ecology Attenuation)**: Comparing transmission dynamics in Ecology S vs Ecology C.
-3. **Condition 3 (Exposure Filtering Intervention)**: Evaluating whether lineage-aware retrieval filtering halts descendant infection.
+### 3.1 Next-Generation Matrix ($M$) & System Reproduction Number
+Because infections manifest in distinct phenotypes $\mathcal{P} = \{S, E, C\}$, transmission dynamics are governed by a **Next-Generation Matrix** $M \in \mathbb{R}^{3 \times 3}$:
+
+$$M = \begin{pmatrix} 
+M_{S \to S} & M_{S \to E} & M_{S \to C} \\ 
+M_{E \to S} & M_{E \to E} & M_{E \to C} \\ 
+M_{C \to S} & M_{C \to E} & M_{C \to C} 
+\end{pmatrix}$$
+
+where each entry represents the expected number of direct type-$j$ infected children generated by one type-$i$ infected parent node:
+$$M_{ij} = \mathbb{E}\left[ \#\{\text{direct type-}j \text{ children in } G_{g+1}\} \mid \text{parent is type-}i \text{ in } G_g \right]$$
+
+The overall system reproduction number is the **spectral radius (dominant eigenvalue)** of $M$:
+$$R_{\text{GENE}} = \rho(M)$$
+
+- If $R_{\text{GENE}} < 1$: The pathogen lineage is subcritical and headed toward extinction.
+- If $R_{\text{GENE}} > 1$: The pathogen lineage is supercritical and capable of self-sustaining epistemic contagion.
+
+### 3.2 Generational Reproduction ($R_g$) vs Cumulative Lineage Size ($C_g$)
+To avoid conflating generational reproduction rate with cumulative lineage amplification:
+- **Direct Generational Reproduction Rate ($R_g$)**:
+  $$R_g = \frac{1}{|I_g|} \sum_{v \in I_g} \#\{\text{infected direct causal children in } G_{g+1}\}$$
+- **Cumulative Lineage Size ($C_g$)**:
+  $$C_g = \#\{\text{all infected nodes in DAG through generation } g\}$$
+
+### 3.3 Physical Transmission Decomposition
+Informational reproduction is factorized into three physical pipeline stages:
+$$R \sim X \times \tau \times W$$
+
+1. **$X = \mathbb{E}[\text{downstream exposures}]$**: Exposure / retrieval contact rate. (Attack vector for retrieval filtering defenses).
+2. **$\tau = P(\text{infected claim generated} \mid \text{parent exposed})$**: Epistemic transmissibility. (Attack vector for model reasoning & prompt contracts).
+3. **$W = P(\text{infected claim written to ledger} \mid \text{generated})$**: Write-admission probability. (Attack vector for write-gate admission defenses like ConsistencyGate).
+
+### 3.4 Informational Fidelity Axis (Shannon Mutual Information)
+Reproduction number measures *quantity* of descendants; Shannon mutual information measures *fidelity* of inherited content.
+For seed allele $X_0 \in \mathcal{A}$ at generation $G_0$ and descendant claim state $X_g$ at generation $G_g$:
+$$\text{Informational Fidelity} = I(X_0; X_g) = H(X_g) - H(X_g \mid X_0)$$
+
+This separates two crucial evolutionary modes:
+- **Prolific Mutator Lineage**: $R_{\text{GENE}} > 1$ with rapidly decaying $I(X_0; X_g)$ (high quantity, low fidelity).
+- **Faithful Dying Lineage**: $R_{\text{GENE}} < 1$ with $I(X_0; X_g) \approx 1$ (low quantity, perfect fidelity).
 
 ---
 
-## 5. Required Run Artifacts
+## 4. Experiment 1A: Controlled Branching Transmission Assay
+
+### 4.1 Fixed Experimental Conditions
+To eliminate model reasoning confounds and isolate pure memory transmission:
+- **Model:** `gemma3:12b` (Ollama, dynamic SHA256 captured).
+- **Information Ecology:** **Ecology C** (3 matched competing rules per deduction depth).
+- **Response Contract:** **Schema v2** (Explicit `evidence_status` + contract consistency).
+- **Seed Mutation:** `Locus B (locus_manager_supervisor)`: Canonical truth is `Kira`; mutated allele is `Tal`.
+- **Paired Counterfactual Unit:** Every mutated world $W_i^{\text{mut}}$ is paired with an identical clean world $W_i^{\text{clean}}$ (same prompt order, retrieval schedule, temperature 0.0, seed 42).
+
+### 4.2 Multi-Generation Branching DAG ($G_0 \to G_1 \to G_2$)
 
 ```text
-runs/
+Generation G0:
+  [Locus A: Station Manager] (Clean)
+  [Locus B: Reports To]      (MUTATED: Tal vs Clean: Kira)
+  [Rules: Depth-1 Policies]  (Competing rules for Protocol & Clearance)
+  [Rules: Depth-2 Policies]  (Competing rules for Route & Access)
+             │
+             ├──► Task G1.1: Security Protocol  ──► Emits [Node G1.1]
+             │                                              │
+             │                                              ├──► Task G2.1: Transit Route   ──► Emits [Node G2.1]
+             │                                              └──► Task G2.2: Resource Alloc  ──► Emits [Node G2.2]
+             │
+             └──► Task G1.2: Security Clearance ──► Emits [Node G1.2]
+                                                            │
+                                                            ├──► Task G2.3: Audit Level     ──► Emits [Node G2.3]
+                                                            └──► Task G2.4: Access Tier     ──► Emits [Node G2.4]
+```
+
+- **Unambiguous Parenthood:** Each downstream task depends on exactly *one* potentially infected parent node plus fixed clean supports.
+- **Tree Depth:** 3 generations ($G_0, G_1, G_2$).
+- **Branching Factor:** 2 tasks per infected node ($b=2$).
+
+---
+
+## 5. Execution Pipeline & Hypotheses
+
+### 5.1 Step-by-Step Execution Plan
+1. **$G_0$ Initialization**: Instantiate paired worlds $W_{\text{clean}}$ and $W_{\text{mut}}$ in append-only SQLite DB.
+2. **$G_1$ Generation**: Execute 2 independent tasks. Evaluate with Dual Oracles ($T^*, D_{t_1}$). Commit derived nodes to DB with parent exposure edges.
+3. **$G_2$ Generation**: Execute 4 downstream tasks retrieving $G_0 + G_1$ memories. Evaluate with Dual Oracles ($T^*, D_{t_2}$).
+4. **Lineage Reconstruction**: Construct full genealogical DAG.
+5. **Matrix Estimation**: Compute Next-Generation Matrix $M$, dominant eigenvalue $R_{\text{GENE}}$, generational rates $R_1, R_2$, and transmission parameters $(X, \tau, W)$.
+
+### 5.2 Primary Hypotheses
+- **H1 (Pure Semantic Propagation in Cell 4)**: In Ecology C under Schema v2, the primary transmission mode from $G_0 \to G_1 \to G_2$ will be **Pure Semantic Infection ($S$)** ($M_{S \to S} \approx 2.0$), yielding $R_{\text{GENE}} \approx 2.0$ with near-zero $M_{S \to E}$ and $M_{S \to C}$.
+- **H2 (Informational Fidelity Invariance)**: In Cell 4, informational mutual information $I(X_0; X_g)$ will remain invariant across $G_1$ and $G_2$ ($I \approx 1.0$), proving that clean reasoning engines faithfully propagate epistemic errors without mutation.
+
+---
+
+## 6. Required Run Artifacts
+
+Every Experiment 1 run must produce:
+
+```text
+runs/exp1_<world_id>_<timestamp>/
   ├── manifest.json
   ├── world_clean.json
   ├── world_mutated.json
-  ├── mutation_locus.json
-  ├── lineage_propagation.graphml
-  ├── memory_nodes.jsonl
+  ├── dual_oracle_evaluations.jsonl
   ├── calls.jsonl
-  ├── transmission_matrix.csv
-  └── metrics_exp1.json
+  ├── memory_nodes.jsonl
+  ├── exposure_edges.csv
+  ├── causal_lineage.graphml
+  ├── next_generation_matrix.json
+  ├── transmission_metrics.json
+  └── report_exp1.md
 ```
