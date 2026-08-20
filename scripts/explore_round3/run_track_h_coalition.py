@@ -1,7 +1,7 @@
 """Track H: Coalition Causality & Overdetermination Runner.
 
-Exhaustively evaluates single-parent vs coalition knockouts across parent subsets
-for recombinant geometry AB + DE -> C where every knockout is strictly pure premise omission.
+Exhaustively evaluates the full 2^4 = 16-point intervention lattice over parent premises {A, B, D, E}
+for recombinant geometry AB + DE -> C where every knockout is strictly pure premise omission (32 calls).
 """
 
 from __future__ import annotations
@@ -11,6 +11,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path.cwd() / "src"))
 sys.path.insert(0, str(Path.cwd()))
 
+import itertools
 import json
 from typing import Any
 
@@ -64,10 +65,10 @@ def build_track_h_prompt(
 
 def run_track_h_live(
     db_path: Path = Path("runs/explore_round3/track_h_coalition.db"),
-    max_calls: int = 22,
+    max_calls: int = 32,
     client: OllamaClient | None = None,
 ) -> dict[str, Any]:
-    """Execute Track H coalition causality panel (11 points x 2 stations = 22 calls)."""
+    """Execute Track H full 16-point lattice panel (16 points x 2 stations = 32 calls)."""
     harness = ExplorationHarness(
         db_path=db_path,
         track_name="track_h_coalition_causality",
@@ -77,28 +78,22 @@ def run_track_h_live(
 
     engine = CoalitionCausalityEngine()
     stations = ["VELORA", "KESTREL"]
+    all_parents = ["A", "B", "D", "E"]
     
-    # 11 Key Lattice Points on AB + DE -> C:
-    intervention_lattice = [
-        (set(), "baseline"),
-        ({"A"}, "single_knockout_A"),
-        ({"B"}, "single_knockout_B"),
-        ({"D"}, "single_knockout_D"),
-        ({"E"}, "single_knockout_E"),
-        ({"A", "B"}, "path_isolate_DE"),
-        ({"D", "E"}, "path_isolate_AB"),
-        ({"A", "D"}, "cross_hitting_AD"),
-        ({"A", "E"}, "cross_hitting_AE"),
-        ({"B", "D"}, "cross_hitting_BD"),
-        ({"B", "E"}, "cross_hitting_BE"),
-    ]
+    # Generate complete 2^4 = 16-point power set of interventions
+    full_16_lattice: list[tuple[set[str], str]] = []
+    for r in range(len(all_parents) + 1):
+        for combo in itertools.combinations(all_parents, r):
+            knocked_set = set(combo)
+            label = "baseline" if r == 0 else f"knockout_{'_'.join(sorted(list(knocked_set)))}"
+            full_16_lattice.append((knocked_set, label))
 
     calls_spent = 0
     results = []
     station_behavioral_maps: dict[str, dict[tuple[str, ...], str]] = {st: {} for st in stations}
 
     for st in stations:
-        for knocked_out, label in intervention_lattice:
+        for knocked_out, label in full_16_lattice:
             if calls_spent >= max_calls:
                 break
 
@@ -163,7 +158,7 @@ def run_track_h_live(
     # Extract empirical causal coalitions S_C
     empirical_s_c = {}
     for st, b_map in station_behavioral_maps.items():
-        if len(b_map) >= 11:
+        if len(b_map) >= 16:
             empirical_s_c[st] = [sorted(list(c)) for c in engine.extract_minimal_causal_coalitions("redundant_independent", b_map)]
 
     return {"calls_spent": calls_spent, "results": results, "empirical_S_C": empirical_s_c}
@@ -171,6 +166,6 @@ def run_track_h_live(
 
 if __name__ == "__main__":
     db = Path("runs/explore_round3/track_h_coalition.db")
-    print("Running Track H: Coalition Causality & Overdetermination (22 calls on gemma3:12b)...", flush=True)
-    res = run_track_h_live(db, max_calls=22)
+    print("Running Track H: Full 16-Point Coalition Causality Lattice (32 calls on gemma3:12b)...", flush=True)
+    res = run_track_h_live(db, max_calls=32)
     print(f"Completed {res['calls_spent']} live calls. Recovered S_C: {res['empirical_S_C']}", flush=True)

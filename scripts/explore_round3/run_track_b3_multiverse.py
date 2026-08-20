@@ -1,7 +1,7 @@
 """Track B3: Monoculture Measurement Multiverse Runner.
 
 Executes the balanced 16-cell factorial design with pure lexical isolation + 4 exact CallSpec replays (seed 42)
-+ 4 seed-perturbed replays (seed 43) across a balanced half-fraction (24 calls) to measure epsilon_replay and epsilon_seed.
++ 4 seed-perturbed replays (seed 43) across a strictly balanced half-fraction (24 calls) to measure epsilon_replay and epsilon_seed.
 """
 
 from __future__ import annotations
@@ -15,8 +15,30 @@ import json
 from typing import Any
 
 from gene.experiments.exploration_harness import ExplorationHarness
-from gene.experiments.multiverse_generator import MultiverseGenerator
+from gene.experiments.multiverse_generator import MultiverseCell, MultiverseGenerator
 from gene.ollama_client import CallSpec, OllamaClient
+
+
+def get_balanced_replay_subsets(cells: list[MultiverseCell]) -> tuple[list[MultiverseCell], list[MultiverseCell]]:
+    """Partition cells into two strictly balanced 4-cell half-fractions across all 4 factors."""
+    velora_cells = [c for c in cells if c.station == "VELORA"]
+    kestrel_cells = [c for c in cells if c.station == "KESTREL"]
+    
+    # Exact-Replay Subset (4 cells):
+    # VELORA[0]: indep, M4, forward
+    # VELORA[7]: mono, Q7, interleaved
+    # KESTREL[3]: indep, Q7, interleaved
+    # KESTREL[4]: mono, M4, forward
+    exact_replay_cells = [velora_cells[0], velora_cells[7], kestrel_cells[3], kestrel_cells[4]]
+
+    # Seed-Perturbation Subset (4 cells):
+    # VELORA[1]: indep, M4, interleaved
+    # VELORA[6]: mono, Q7, forward
+    # KESTREL[2]: indep, Q7, forward
+    # KESTREL[5]: mono, M4, interleaved
+    seed_perturb_cells = [velora_cells[1], velora_cells[6], kestrel_cells[2], kestrel_cells[5]]
+
+    return exact_replay_cells, seed_perturb_cells
 
 
 def run_track_b3_live(
@@ -34,17 +56,7 @@ def run_track_b3_live(
 
     gen = MultiverseGenerator()
     cells = gen.generate_all_16_cells()
-    
-    # Construct a balanced 8-cell half-fraction subset:
-    # 4 cells for exact replay (2 VELORA, 2 KESTREL, balanced on root/token/order)
-    # 4 cells for seed perturbation (2 VELORA, 2 KESTREL, balanced on root/token/order)
-    velora_cells = [c for c in cells if c.station == "VELORA"]
-    kestrel_cells = [c for c in cells if c.station == "KESTREL"]
-    
-    # Pick balanced indices: [0, 3] from VELORA and [1, 2] from KESTREL for exact replay
-    exact_replay_cells = [velora_cells[0], velora_cells[3], kestrel_cells[1], kestrel_cells[2]]
-    # Pick balanced indices: [1, 2] from VELORA and [0, 3] from KESTREL for seed perturbation
-    seed_perturb_cells = [velora_cells[1], velora_cells[2], kestrel_cells[0], kestrel_cells[3]]
+    exact_replay_cells, seed_perturb_cells = get_balanced_replay_subsets(cells)
 
     calls_spent = 0
     results = []

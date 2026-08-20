@@ -22,15 +22,17 @@ def test_track_g2_zero_auxiliary_count_leak():
 
 
 def test_track_g2_governance_5_arms_exactness():
-    """Verify all 5 governance conditions produce exact formal expectations."""
-    # 1. Independent baseline -> PROTO_X7
+    """Verify all 5 governance conditions produce exact formal expectations and dynamic rule bindings."""
+    # 1. Independent baseline -> PROTO_X7 (rule 2 binds to S2)
     p1, _, e1 = build_track_g2_governance_prompt("VELORA", "baseline_independent")
     assert e1 == "PROTO_X7"
+    assert "reports_to(person, S2)" in p1
     assert "MEM_01" in p1 and "MEM_03" in p1
 
-    # 2. Shared baseline -> PROTO_X7
+    # 2. Shared baseline -> PROTO_X7 (rule 2 dynamically binds to S1, forming true AX+AY)
     p2, _, e2 = build_track_g2_governance_prompt("VELORA", "baseline_shared")
     assert e2 == "PROTO_X7"
+    assert "reports_to(person, S1)" in p2
     assert "MEM_01" in p2 and "MEM_03" in p2
 
     # 3. Naive Lineage Quarantine -> Autoimmunity -> UNKNOWN

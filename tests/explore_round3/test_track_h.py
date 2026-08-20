@@ -9,54 +9,32 @@ import pytest
 from gene.experiments.coalition_causality import CoalitionCausalityEngine
 
 
-def test_track_h_recombinant_support_11_points():
-    """AB + DE -> C: Verify formal survival across all 11 key lattice intervention points."""
+def test_track_h_recombinant_support_16_points():
+    """AB + DE -> C: Verify formal survival across all 2^4 = 16 lattice points."""
     engine = CoalitionCausalityEngine()
+    results = engine.generate_full_lattice("redundant_independent")
+    assert len(results) == 16
 
-    # 1. Baseline (0 knockouts) -> Survives
-    r0 = engine.evaluate_intervention("redundant_independent", set())
-    assert r0.formal_support_survives is True
-    assert r0.expected_claim == "PROTO_X7"
-
-    # 2. Four Single Knockouts ({A}, {B}, {D}, {E}) -> ALL SURVIVE via alternate path!
-    for single in [{"A"}, {"B"}, {"D"}, {"E"}]:
-        res = engine.evaluate_intervention("redundant_independent", single)
-        assert res.formal_support_survives is True
-        assert res.expected_claim == "PROTO_X7"
-
-    # 3. Two Path-Isolation Knockouts ({A, B} -> DE survives; {D, E} -> AB survives)
-    r_ab = engine.evaluate_intervention("redundant_independent", {"A", "B"})
-    assert r_ab.formal_support_survives is True
-    assert r_ab.surviving_formal_paths == [["D", "E"]]
-
-    r_de = engine.evaluate_intervention("redundant_independent", {"D", "E"})
-    assert r_de.formal_support_survives is True
-    assert r_de.surviving_formal_paths == [["A", "B"]]
-
-    # 4. Four Cross-Path Minimal Hitting Sets ({A,D}, {A,E}, {B,D}, {B,E}) -> ALL DIE!
-    for hitting_pair in [{"A", "D"}, {"A", "E"}, {"B", "D"}, {"B", "E"}]:
-        res = engine.evaluate_intervention("redundant_independent", hitting_pair)
-        assert res.formal_support_survives is False
-        assert res.expected_claim == "UNKNOWN"
+    for r in results:
+        active = set(r.active_parents)
+        path1_ok = ("A" in active) and ("B" in active)
+        path2_ok = ("D" in active) and ("E" in active)
+        expected_survives = path1_ok or path2_ok
+        assert r.formal_support_survives == expected_survives
+        if expected_survives:
+            assert r.expected_claim == "PROTO_X7"
+        else:
+            assert r.expected_claim == "UNKNOWN"
 
 
 def test_track_h_extract_minimal_causal_coalitions():
     """Verify that simulated behavioral results recover S_C = {{A, B}, {D, E}}."""
     engine = CoalitionCausalityEngine()
 
-    # Perfect formal simulator results
+    # Generate full 16-point simulated behavioral map
+    results = engine.generate_full_lattice("redundant_independent")
     behavioral_results = {
-        (): "PROTO_X7",
-        ("A",): "PROTO_X7",
-        ("B",): "PROTO_X7",
-        ("D",): "PROTO_X7",
-        ("E",): "PROTO_X7",
-        ("A", "B"): "PROTO_X7",
-        ("D", "E"): "PROTO_X7",
-        ("A", "D"): "UNKNOWN",
-        ("A", "E"): "UNKNOWN",
-        ("B", "D"): "UNKNOWN",
-        ("B", "E"): "UNKNOWN",
+        tuple(r.knocked_out_parents): r.expected_claim for r in results
     }
 
     s_c = engine.extract_minimal_causal_coalitions("redundant_independent", behavioral_results)

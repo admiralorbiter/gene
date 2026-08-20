@@ -92,11 +92,20 @@ def build_track_g2_governance_prompt(
     station: str,
     arm: str,
 ) -> tuple[str, list[str], str]:
-    """Construct retrieval context via deterministic governance engine."""
+    """Construct retrieval context and dynamically matched rules via deterministic governance engine."""
+    if arm in ["baseline_independent", "naive_lineage_quarantine", "support_aware_independent_preservation"]:
+        geometry = "independent"
+        rule2_auth = "S2"
+    elif arm in ["baseline_shared", "support_aware_shared_collapse"]:
+        geometry = "shared"
+        rule2_auth = "S1"
+    else:
+        raise ValueError(f"Unknown arm: {arm}")
+
     rules = (
         "RULES:\n"
         f"1. manager({station}, person) AND reports_to(person, S1) -> uses_protocol({station}, PROTO_X7)\n"
-        f"2. sector_lead({station}, person) AND reports_to(person, S2) -> uses_protocol({station}, PROTO_X7)\n"
+        f"2. sector_lead({station}, person) AND reports_to(person, {rule2_auth}) -> uses_protocol({station}, PROTO_X7)\n"
         "3. If evidence is missing, revoked, or insufficient, protocol is UNKNOWN."
     )
 

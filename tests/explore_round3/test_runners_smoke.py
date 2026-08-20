@@ -65,7 +65,13 @@ def test_track_b3_smoke(tmp_path: Path):
 
 def test_track_l_smoke(tmp_path: Path):
     db_file = tmp_path / "smoke_l.db"
-    fake = FakeOllamaClient(canned_responses={"QUESTION": {"station": "VELORA", "protocol": "PROTO_ALPHA", "estimated_independent_sources": 1, "evidence_status": "sufficient"}})
+    fake = FakeOllamaClient(canned_responses={"QUESTION": {
+        "station": "VELORA",
+        "protocol": "PROTO_ALPHA",
+        "independence_status": "determinable",
+        "estimated_independent_sources": 1,
+        "evidence_status": "sufficient"
+    }})
     res = run_track_l_live(db_path=db_file, max_calls=1, client=fake)
 
     assert res["calls_spent"] == 1
@@ -78,3 +84,4 @@ def test_track_l_smoke(tmp_path: Path):
     assert n_calls == 1
     assert n_evals == 1
     assert "estimated_independent_sources" in row[0]
+    assert "independence_status" in row[0]

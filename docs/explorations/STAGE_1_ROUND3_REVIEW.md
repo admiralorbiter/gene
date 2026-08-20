@@ -11,19 +11,19 @@ All 10 mechanical checklist items are verified prior to live compute:
 ┌──────────┬─────────────────────────────┬─────────────────┬──────────────────────────────────────────┐
 │ Track    │ Focus Area                  │ Stage-1 Verdict │ 10-Item Mechanical Audit Status          │
 ├──────────┼─────────────────────────────┼─────────────────┼──────────────────────────────────────────┤
-│ Track H  │ Coalition Causality         │ PASS            │ Pure premise omission knockouts; 11-pt   │
-│          │ (Overdetermination Lattice) │                 │ lattice; S_C extraction; smoke passed.   │
+│ Track H  │ Coalition Causality         │ PASS            │ Full 2^4=16-point power set lattice;     │
+│          │ (Full Overdetermination)    │                 │ pure omission; S_C extraction; smoke OK. │
 ├──────────┼─────────────────────────────┼─────────────────┼──────────────────────────────────────────┤
 │ Track G2 │ Non-Destructive Immunity    │ PASS            │ 5 arms with executed governance policy;  │
-│          │ (Clean Governance Policies) │                 │ tests import runner functions; smoke OK. │
+│          │ (Clean Governance Policies) │                 │ dynamic rules for AX+AY; smoke OK.       │
 ├──────────┼─────────────────────────────┼─────────────────┼──────────────────────────────────────────┤
 │ Track B3 │ Monoculture Multiverse      │ PASS            │ Pure lexical isolation; 16 cells + 4 rep │
-│          │ (Factorial Multiverse)      │                 │ + 4 seed perturb (24 calls); smoke passed│
+│          │ (Factorial Multiverse)      │                 │ + 4 seed perturb (4-factor balanced).    │
 ├──────────┼─────────────────────────────┼─────────────────┼──────────────────────────────────────────┤
 │ Track S  │ Support Acquisition         │ PASS            │ Validated compiler prototype (0 calls).  │
 ├──────────┼─────────────────────────────┼─────────────────┼──────────────────────────────────────────┤
-│ Track L  │ Independence Laundering     │ PASS            │ 5 stages with 4-root CTL; parsed sources;│
-│          │ (Diversity Inflation)       │                 │ persisted in metadata; smoke passed.     │
+│ Track L  │ Independence Laundering     │ PASS            │ 5 stages with 4-root CTL; non-forced     │
+│          │ (Epistemic Observability)   │                 │ reject-option schema; smoke OK.          │
 └──────────┴─────────────────────────────┴─────────────────┴──────────────────────────────────────────┘
 ```
 
@@ -43,20 +43,21 @@ All 10 mechanical checklist items are verified prior to live compute:
        -- DOC_03: Source root_R3 ... -> +- DOC_03: Source root_R1 ...
 [x] 8. Executable Runner Smoke Tests: Verified in tests/explore_round3/test_runners_smoke.py.
        All 4 live runners complete 1 call under FakeOllamaClient with N_calls == N_evaluations == 1.
-[x] 9. Endpoint Traceability Audit: Track L parses and persists estimated_independent_sources into eval_metadata_json.
+[x] 9. Endpoint Traceability Audit: Track L parses and persists both independence_status and
+       estimated_independent_sources into eval_metadata_json.
 [x] 10. Representation Expressiveness Audit: Track S TraceSupportCompiler expresses both AND-conjunctive
         and OR-disjunctive derivation environments, extracting {{fact_A, fact_B}, {fact_D, fact_E}}.
 ```
 
 ---
 
-## 3. Revised Live Compute Allocation (Total 86 Calls)
-- **Track H (Coalition Causality):** 22 calls (11 lattice points $\times$ 2 stations)
+## 3. Revised Live Compute Allocation (Total 96 Calls)
+- **Track H (Coalition Causality):** 32 calls (16 lattice points $\times$ 2 stations)
 - **Track G2 (Non-Destructive Immunity):** 20 calls (5 arms $\times$ 2 stations $\times$ 2 reps)
 - **Track B3 (Monoculture Multiverse):** 24 calls (16 factorial cells + 4 exact replays + 4 seed perturbations)
 - **Track S (Support Acquisition):** 0 calls (deterministic formal compiler verification)
 - **Track L (Independence Laundering):** 20 calls (5 stages $\times$ 2 stations $\times$ 2 protocols)
-- **Total Portfolio Live Compute Allocation:** **86 calls**.
+- **Total Portfolio Live Compute Allocation:** **96 calls**.
 
 ---
 

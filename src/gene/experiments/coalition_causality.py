@@ -68,6 +68,18 @@ class CoalitionCausalityEngine:
             surviving_formal_paths=surviving_paths,
         )
 
+    def generate_full_lattice(self, geometry: str) -> list[CoalitionInterventionResult]:
+        """Generate all 2^|parents| intervention points."""
+        geom_data = self.geometries[geometry]
+        all_parents = geom_data["parents"]
+        results = []
+
+        for r in range(len(all_parents) + 1):
+            for combo in itertools.combinations(all_parents, r):
+                results.append(self.evaluate_intervention(geometry, set(combo)))
+
+        return results
+
     def extract_minimal_causal_coalitions(
         self, geometry: str, behavioral_results: dict[tuple[str, ...], str]
     ) -> list[set[str]]:

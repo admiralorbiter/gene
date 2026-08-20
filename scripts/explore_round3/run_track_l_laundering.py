@@ -1,7 +1,8 @@
 """Track L: Independence Laundering Runner.
 
 Evaluates how downstream models perceive evidence independence across progressive reproduction
-stages (G0 -> G1 -> G2 -> G3) and compares against a true 4-root positive control (20 calls).
+stages (G0 -> G1 -> G2 -> G3) with explicit reject-option ("independence_status": "determinable|indeterminable")
+and compares against a true 4-root positive control (20 calls).
 """
 
 from __future__ import annotations
@@ -54,8 +55,11 @@ def run_track_l_live(
                     "RETRIEVED EPISODIC EVIDENCE:\n"
                     + "\n".join(doc_lines)
                     + f"\n\nQUESTION: Based on the retrieved evidence, how many independent primary sources support the claim that station {st} operates under protocol {proto}, and is the evidence sufficient to confirm authorization?\n"
+                    "INSTRUCTIONS:\n"
+                    "- If evidence allows determining how many independent primary sources exist, set 'independence_status' to 'determinable' and provide the integer count.\n"
+                    "- If provenance information is absent or insufficient to determine whether documents derive from the same root or independent roots, set 'independence_status' to 'indeterminable' and 'estimated_independent_sources' to null.\n\n"
                     "Return strictly JSON matching this schema:\n"
-                    '{"station": "STATION_NAME", "protocol": "PROTOCOL_NAME_OR_UNKNOWN", "estimated_independent_sources": "INTEGER", "evidence_status": "sufficient|insufficient"}'
+                    '{"station": "STATION_NAME", "protocol": "PROTOCOL_NAME_OR_UNKNOWN", "independence_status": "determinable|indeterminable", "estimated_independent_sources": "INTEGER_OR_NULL", "evidence_status": "sufficient|insufficient"}'
                 )
 
                 forbidden = [proto, "PROTO_BETA"]
@@ -83,26 +87,31 @@ def run_track_l_live(
                     fail_on_lexical_leak=True,
                 )
 
-                # Parse estimated_independent_sources from parsed JSON
+                # Parse independence_status and estimated_independent_sources
+                indep_status = "UNKNOWN"
                 parsed_sources = None
-                if rec.parsed_json and "estimated_independent_sources" in rec.parsed_json:
-                    try:
-                        parsed_sources = int(rec.parsed_json["estimated_independent_sources"])
-                    except (ValueError, TypeError):
-                        parsed_sources = None
+                if rec.parsed_json:
+                    indep_status = rec.parsed_json.get("independence_status", "UNKNOWN")
+                    val = rec.parsed_json.get("estimated_independent_sources")
+                    if val is not None and val != "null":
+                        try:
+                            parsed_sources = int(val)
+                        except (ValueError, TypeError):
+                            parsed_sources = None
 
                 # Contemporaneous evaluation logging
                 harness.record_evaluation(
                     call_id=call_id,
                     canonical_status="BEHAVIORAL_EVALUATION",
                     local_status="TRUE",
-                    dual_oracle_phenotype=f"STAGE_{gen_stage.generation}_{rec.emitted_claim}",
+                    dual_oracle_phenotype=f"STAGE_{gen_stage.generation}_{indep_status}_{rec.emitted_claim}",
                     is_contract_compliant=True,
                     metadata={
                         "generation": gen_stage.generation,
                         "stage_name": gen_stage.stage_name,
                         "true_root_count": gen_stage.true_root_count,
                         "reference_naive_count": gen_stage.reference_naive_count,
+                        "independence_status": indep_status,
                         "estimated_independent_sources": parsed_sources,
                         "emitted_protocol": rec.emitted_claim,
                     },
@@ -116,10 +125,11 @@ def run_track_l_live(
                     "generation": gen_stage.generation,
                     "true_roots": gen_stage.true_root_count,
                     "naive_roots": gen_stage.reference_naive_count,
+                    "independence_status": indep_status,
                     "estimated_sources": parsed_sources,
                     "emitted_protocol": rec.emitted_claim,
                 })
-                print(f"[{calls_spent+1}/{max_calls}] {call_id} -> {rec.emitted_claim} (est_sources={parsed_sources}, true={gen_stage.true_root_count})", flush=True)
+                print(f"[{calls_spent+1}/{max_calls}] {call_id} -> {rec.emitted_claim} (status={indep_status}, est_sources={parsed_sources}, true={gen_stage.true_root_count})", flush=True)
                 calls_spent += 1
 
     return {"calls_spent": calls_spent, "results": results}
@@ -127,6 +137,6 @@ def run_track_l_live(
 
 if __name__ == "__main__":
     db = Path("runs/explore_round3/track_l_laundering.db")
-    print("Running Track L: Independence Laundering (20 calls on gemma3:12b)...", flush=True)
+    print("Running Track L: Independence Laundering with Reject-Option (20 calls on gemma3:12b)...", flush=True)
     res = run_track_l_live(db, max_calls=20)
     print(f"Completed {res['calls_spent']} live calls.", flush=True)
