@@ -217,3 +217,31 @@ def test_exp1b_b1c_matched_expression_assay(tmp_path: Path):
         nodes = db.conn.execute("SELECT COUNT(*) as cnt FROM memory_nodes").fetchone()
         assert nodes["cnt"] == 8
     db.close()
+
+
+def test_exp1b_c1_delayed_adjudication_sandbox(tmp_path: Path):
+    """Verify 1B-C1 delayed adjudication sandbox execution and SQLite persistence."""
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
+    from run_exp1b_c_immunity_sandbox import run_exp1b_c_immunity_sandbox
+
+    db_path = tmp_path / "test_c1_sandbox.db"
+    results = run_exp1b_c_immunity_sandbox(
+        world_seeds=[(7000, 0)],
+        tprs=[0.9],
+        fprs=[0.1],
+        top_k_list=[6],
+        db_path=str(db_path),
+    )
+
+    # Check that lineage quarantine achieved superior separation compared to node_only
+    lin_res = results[6]["lineage_quarantine"][(0.9, 0.1)]
+    node_res = results[6]["node_only_quarantine"][(0.9, 0.1)]
+    assert lin_res["s"] > node_res["s"]
+    assert lin_res["containment"] > node_res["containment"]
+    assert node_res["containment"] == 0.0  # Provenance laundering under node-only
+
+    db = Database(db_path)
+    with db.conn:
+        sweeps = db.conn.execute("SELECT COUNT(*) as cnt FROM retrieval_sweep_results WHERE sweep_type = 'immunity_sandbox'").fetchone()
+        assert sweeps["cnt"] == 6  # 6 policies x 1 grid point x 1 top_k
+    db.close()
