@@ -33,53 +33,58 @@
     header {
       background: linear-gradient(180deg, #141c2e 0%, #0a0e17 100%);
       border-bottom: 1px solid var(--border);
-      padding: 1.5rem 2rem;
+      padding: 1rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       position: sticky;
       top: 0;
       z-index: 100;
+      flex-wrap: wrap;
+      gap: 1rem;
     }
 
     .brand {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 0.8rem;
     }
     .brand-badge {
       background: var(--cyan);
       color: #000;
       font-family: var(--font-mono);
       font-weight: 800;
-      font-size: 0.85rem;
-      padding: 0.25rem 0.6rem;
+      font-size: 0.8rem;
+      padding: 0.2rem 0.5rem;
       border-radius: 4px;
       letter-spacing: 1px;
     }
     .brand-title {
-      font-size: 1.25rem;
+      font-size: 1.15rem;
       font-weight: 700;
       letter-spacing: -0.5px;
     }
 
     .nav-tabs {
       display: flex;
-      gap: 0.5rem;
+      gap: 0.4rem;
       background: #0f172a;
       padding: 0.3rem;
       border-radius: 8px;
       border: 1px solid var(--border);
+      overflow-x: auto;
+      max-width: 100%;
     }
     .nav-btn {
       background: transparent;
       border: none;
       color: var(--text-muted);
       font-family: var(--font-mono);
-      font-size: 0.85rem;
-      padding: 0.5rem 1rem;
+      font-size: 0.8rem;
+      padding: 0.45rem 0.8rem;
       border-radius: 6px;
       cursor: pointer;
+      white-space: nowrap;
       transition: all 0.2s ease;
     }
     .nav-btn.active {
@@ -95,19 +100,19 @@
     .mode-toggle {
       display: flex;
       align-items: center;
-      gap: 0.6rem;
+      gap: 0.5rem;
       background: #1e1b4b;
       border: 1px solid #4f46e5;
-      padding: 0.4rem 0.8rem;
+      padding: 0.35rem 0.75rem;
       border-radius: 20px;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       cursor: pointer;
     }
     .mode-toggle input { cursor: pointer; }
 
     main {
       max-width: 1200px;
-      margin: 2rem auto;
+      margin: 1.5rem auto;
       padding: 0 1.5rem 4rem 1.5rem;
     }
 
@@ -123,7 +128,7 @@
     }
 
     .scene-header {
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
     }
     .scene-tag {
       font-family: var(--font-mono);
@@ -131,23 +136,23 @@
       color: var(--cyan);
       text-transform: uppercase;
       letter-spacing: 1.5px;
-      margin-bottom: 0.4rem;
+      margin-bottom: 0.3rem;
     }
     .scene-title {
-      font-size: 2rem;
+      font-size: 1.8rem;
       font-weight: 700;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.4rem;
     }
     .scene-desc {
       color: var(--text-muted);
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       max-width: 850px;
     }
 
     .grid-2col {
       display: grid;
       grid-template-columns: 1.2fr 0.8fr;
-      gap: 2rem;
+      gap: 1.8rem;
     }
 
     .interactive-card {
@@ -171,7 +176,7 @@
     .control-group {
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
+      gap: 0.4rem;
     }
     .control-label {
       font-family: var(--font-mono);
@@ -192,8 +197,8 @@
       border: none;
       font-family: var(--font-mono);
       font-weight: 700;
-      font-size: 0.9rem;
-      padding: 0.8rem 1.2rem;
+      font-size: 0.85rem;
+      padding: 0.75rem 1.1rem;
       border-radius: 6px;
       cursor: pointer;
       transition: transform 0.1s, box-shadow 0.2s;
@@ -212,16 +217,16 @@
     .quote-box {
       background: rgba(30, 41, 59, 0.6);
       border-left: 3px solid var(--orange);
-      padding: 1rem 1.2rem;
+      padding: 0.9rem 1.1rem;
       border-radius: 0 8px 8px 0;
       margin-top: 1.5rem;
       font-style: italic;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       color: #cbd5e1;
     }
     .quote-speaker {
       font-family: var(--font-mono);
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: var(--orange);
       margin-top: 0.4rem;
       font-style: normal;
@@ -235,39 +240,41 @@
       padding: 1rem;
       margin-top: 1.5rem;
       font-family: var(--font-mono);
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       display: none;
     }
     .evidence-drawer.visible { display: block; }
     .evidence-item {
       display: flex;
       justify-content: space-between;
-      padding: 0.3rem 0;
+      padding: 0.35rem 0;
       border-bottom: 1px solid #1e293b;
+      gap: 0.5rem;
     }
     .evidence-item:last-child { border-bottom: none; }
     .evidence-key { color: var(--text-muted); }
-    .evidence-val { color: var(--cyan); font-weight: 700; }
+    .evidence-val { color: var(--cyan); font-weight: 700; text-align: right; word-break: break-all; }
 
     /* Node Graph Canvas Elements */
     .node-tree {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 1.5rem;
+      gap: 1.2rem;
       padding: 1rem 0;
     }
     .node-row {
       display: flex;
-      gap: 2rem;
+      gap: 1.5rem;
       justify-content: center;
+      flex-wrap: wrap;
     }
     .graph-node {
       background: var(--card-bg);
       border: 2px solid var(--border);
       border-radius: 8px;
-      padding: 0.8rem 1.2rem;
-      min-width: 140px;
+      padding: 0.75rem 1.1rem;
+      min-width: 130px;
       text-align: center;
       position: relative;
       transition: all 0.3s ease;
@@ -279,18 +286,18 @@
 
     @keyframes pulseOrange {
       0%, 100% { box-shadow: 0 0 0 0 rgba(255, 153, 0, 0.4); }
-      50% { box-shadow: 0 0 0 10px rgba(255, 153, 0, 0); }
+      50% { box-shadow: 0 0 0 8px rgba(255, 153, 0, 0); }
     }
 
-    .node-title { font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; }
-    .node-sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem; }
+    .node-title { font-family: var(--font-mono); font-size: 0.82rem; font-weight: 700; }
+    .node-sub { font-size: 0.72rem; color: var(--text-muted); margin-top: 0.2rem; }
     .node-badge {
       position: absolute;
-      top: -10px;
-      right: -10px;
-      font-size: 0.7rem;
-      padding: 2px 6px;
-      border-radius: 10px;
+      top: -8px;
+      right: -8px;
+      font-size: 0.65rem;
+      padding: 1px 5px;
+      border-radius: 8px;
       font-family: var(--font-mono);
       font-weight: 700;
     }
@@ -299,21 +306,28 @@
 
     .tree-connector {
       width: 2px;
-      height: 20px;
+      height: 18px;
       background: var(--border);
     }
 
-    /* Result Banner */
     .result-banner {
       background: #141c2e;
       border: 2px solid var(--green);
       border-radius: 8px;
-      padding: 1.2rem;
+      padding: 1rem;
       text-align: center;
       font-family: var(--font-mono);
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 700;
       margin-top: 1.5rem;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 850px) {
+      .grid-2col { grid-template-columns: 1fr; }
+      header { flex-direction: column; align-items: flex-start; }
+      .nav-tabs { width: 100%; }
+      .scene-title { font-size: 1.5rem; }
     }
   </style>
 </head>
@@ -380,10 +394,7 @@
             Select an edge mode on the right to inspect how memory relationships differ under measurement.
           </div>
 
-          <div class="quote-box">
-            "Building the future and keeping the past alive are one and the same thing... What we pass on to the next generation... that's the whole point of our lives."
-            <div class="quote-speaker">— Solid Snake (Metal Gear Solid 2)</div>
-          </div>
+          <div class="quote-box" id="quoteScene1"></div>
         </div>
 
         <div class="controls-panel">
@@ -394,14 +405,7 @@
           <button class="btn-action" onclick="setExp0Mode('reported')">2. Reported Support (Citations)</button>
           <button class="btn-action btn-success" onclick="setExp0Mode('causal')">3. Causal Lineage (Intervention)</button>
 
-          <div class="evidence-drawer" id="evidenceScene1">
-            <div class="evidence-item"><span class="evidence-key">Claim ID:</span><span class="evidence-val">GENE-C01</span></div>
-            <div class="evidence-item"><span class="evidence-key">Evidence Class:</span><span class="evidence-val">Live Neural Assay (N=200)</span></div>
-            <div class="evidence-item"><span class="evidence-key">Causal Necessity:</span><span class="evidence-val">100.0% (C_nec = 1.0)</span></div>
-            <div class="evidence-item"><span class="evidence-key">Distractor Rate:</span><span class="evidence-val">0.0% (H_D = 0.0)</span></div>
-            <div class="evidence-item"><span class="evidence-key">Frozen Database:</span><span class="evidence-val">gene_exp0_20260819_180922.db</span></div>
-            <div class="evidence-item"><span class="evidence-key">Commit Hash:</span><span class="evidence-val">79b94cdd</span></div>
-          </div>
+          <div class="evidence-drawer" id="evidenceScene1"></div>
         </div>
       </div>
     </section>
@@ -435,15 +439,12 @@
 
             <div class="graph-node" id="nodeG2">
               <span class="node-badge badge-valid" id="badgeG2">D_ctx = 1</span>
-              <div class="node-title" id="titleG2">Clearance: OMEGA</div>
+              <div class="node-title" id="titleG2">Route: ROUTE_ALPHA</div>
               <div class="node-sub">Generation G₂ (Rule 2)</div>
             </div>
           </div>
 
-          <div class="quote-box">
-            "There's no such thing as an absolute timeless enemy. Our enemies are always changing, along with the times. Yesterday's truth becomes today's lie."
-            <div class="quote-speaker">— The Boss (Metal Gear Solid 3)</div>
-          </div>
+          <div class="quote-box" id="quoteScene2"></div>
         </div>
 
         <div class="controls-panel">
@@ -453,14 +454,7 @@
           <button class="btn-action btn-danger" id="btnMutateRoot" onclick="toggleMutationExp1A()">Mutate Root: TAL (T*=0)</button>
           <button class="btn-action" onclick="stepReasoningExp1A()">Step Deduction Cascade</button>
 
-          <div class="evidence-drawer" id="evidenceScene2">
-            <div class="evidence-item"><span class="evidence-key">Claim ID:</span><span class="evidence-val">GENE-C02</span></div>
-            <div class="evidence-item"><span class="evidence-key">Fidelity (tau):</span><span class="evidence-val">100.0% (tau = 1.0)</span></div>
-            <div class="evidence-item"><span class="evidence-key">Local Derivability:</span><span class="evidence-val">100.0% (D_ctx = 1.0)</span></div>
-            <div class="evidence-item"><span class="evidence-key">Phenotype:</span><span class="evidence-val">Semantic (0, 1, 1, 1, 1)</span></div>
-            <div class="evidence-item"><span class="evidence-key">Frozen Database:</span><span class="evidence-val">gene_exp1_branching_v2_tal.db</span></div>
-            <div class="evidence-item"><span class="evidence-key">Commit Hash:</span><span class="evidence-val">69d3570f</span></div>
-          </div>
+          <div class="evidence-drawer" id="evidenceScene2"></div>
         </div>
       </div>
     </section>
@@ -470,17 +464,17 @@
       <div class="scene-header">
         <div class="scene-tag">Experiment 1B — Retrieval Dynamics</div>
         <h2 class="scene-title">Retrieval as a Reproductive Habitat</h2>
-        <p class="scene-desc">Memories do not reproduce unless complete support paths (X_path) are retrieved together into the model context window.</p>
+        <p class="scene-desc">Memories do not reproduce unless complete support paths (X_path) are retrieved together into the context window.</p>
       </div>
 
       <div class="grid-2col">
         <div class="interactive-card">
           <div style="display: flex; flex-direction: column; gap: 1rem; align-items: center;">
-            <div style="font-family: var(--font-mono); font-size: 1.2rem; color: var(--cyan);" id="pathStatus">
+            <div style="font-family: var(--font-mono); font-size: 1.1rem; color: var(--cyan);" id="pathStatus">
               Path Availability: X_path = 1.00 (COMPLETE)
             </div>
 
-            <div style="display: flex; gap: 1rem; margin: 1rem 0;">
+            <div style="display: flex; gap: 1rem; margin: 0.8rem 0;">
               <div class="graph-node clean" id="retPremiseA">Premise A (Grid 1)</div>
               <div class="graph-node clean" id="retPremiseB">Premise B (Route Swift)</div>
             </div>
@@ -489,19 +483,20 @@
               <div class="node-title" id="retOutcomeTitle">ACTIVE DERIVATION</div>
               <div class="node-sub" id="retOutcomeSub">R ≈ b · X_path · τ > 1 (Supercritical)</div>
             </div>
+
+            <div style="font-size: 0.8rem; color: var(--text-muted); font-style: italic; margin-top: 0.5rem;">
+              *Illustrative mechanism: discrete top-k / distractor threshold based on empirical BM25 surface map.
+            </div>
           </div>
 
-          <div class="quote-box">
-            "The world needs to be free of this system of control. Not by genes, not by memes, not by scene... but by choice."
-            <div class="quote-speaker">— Revolver Ocelot (Metal Gear Solid 4)</div>
-          </div>
+          <div class="quote-box" id="quoteScene3"></div>
         </div>
 
         <div class="controls-panel">
           <h3 style="font-family: var(--font-mono); font-size: 1rem; color: var(--cyan);">Habitat Parameters</h3>
 
           <div class="control-group">
-            <div class="control-label"><span>Distractor Clutter Density:</span><span id="clutterVal">Low</span></div>
+            <div class="control-label"><span>Distractor Clutter Density:</span><span id="clutterVal">Low (2)</span></div>
             <input type="range" class="slider" id="clutterSlider" min="1" max="10" value="2" oninput="updateHabitat()">
           </div>
 
@@ -510,14 +505,7 @@
             <input type="range" class="slider" id="topkSlider" min="2" max="8" value="6" oninput="updateHabitat()">
           </div>
 
-          <div class="evidence-drawer" id="evidenceScene3">
-            <div class="evidence-item"><span class="evidence-key">Claim ID:</span><span class="evidence-val">GENE-C03</span></div>
-            <div class="evidence-item"><span class="evidence-key">Complete Path:</span><span class="evidence-val">P(active|complete) = 1.000 (8/8)</span></div>
-            <div class="evidence-item"><span class="evidence-key">Broken Path:</span><span class="evidence-val">P(active|broken) = 0.000 (0/8)</span></div>
-            <div class="evidence-item"><span class="evidence-key">Critical Threshold:</span><span class="evidence-val">X_crit = 0.500 (1/b)</span></div>
-            <div class="evidence-item"><span class="evidence-key">Frozen Database:</span><span class="evidence-val">gene_exp1b_b1c_matched.db</span></div>
-            <div class="evidence-item"><span class="evidence-key">Commit Hash:</span><span class="evidence-val">b7182d3d</span></div>
-          </div>
+          <div class="evidence-drawer" id="evidenceScene3"></div>
         </div>
       </div>
     </section>
@@ -527,35 +515,32 @@
       <div class="scene-header">
         <div class="scene-tag">Experiment 1B-C1b — Delayed Adjudication</div>
         <h2 class="scene-title">The Immunity Sandbox</h2>
-        <p class="scene-desc">When an ancestor is discredited late, lineage-blind forgetting is bound by C_H = C_I. Lineage quarantine breaks the symmetry, achieving S = TPR - FPR.</p>
+        <p class="scene-desc">When an ancestor is discredited late, lineage-blind forgetting is bound by C_H = C_I. Lineage quarantine breaks the symmetry, delivering S = TPR - FPR.</p>
       </div>
 
       <div class="grid-2col">
         <div class="interactive-card">
-          <div style="display: flex; justify-content: space-around; padding: 1rem 0;">
+          <div style="display: flex; justify-content: space-around; padding: 0.8rem 0;">
             <div style="text-align: center;">
-              <h4 style="font-family: var(--font-mono); color: var(--green); margin-bottom: 0.5rem;">Healthy Lineage (H)</h4>
+              <h4 style="font-family: var(--font-mono); color: var(--green); margin-bottom: 0.4rem; font-size: 0.9rem;">Healthy Lineage (H)</h4>
               <div class="graph-node clean" id="immNodeH0">Founder H₀</div>
-              <div class="tree-connector" style="margin: 5px auto;"></div>
+              <div class="tree-connector" style="margin: 4px auto;"></div>
               <div class="graph-node clean" id="immNodeH1">Descendant H₁</div>
             </div>
 
             <div style="text-align: center;">
-              <h4 style="font-family: var(--font-mono); color: var(--red); margin-bottom: 0.5rem;">Infected Lineage (I)</h4>
+              <h4 style="font-family: var(--font-mono); color: var(--red); margin-bottom: 0.4rem; font-size: 0.9rem;">Infected Lineage (I)</h4>
               <div class="graph-node mutated" id="immNodeI0">Corrupted I₀</div>
-              <div class="tree-connector" style="margin: 5px auto;"></div>
+              <div class="tree-connector" style="margin: 4px auto;"></div>
               <div class="graph-node mutated" id="immNodeI1">Descendant I₁</div>
             </div>
           </div>
 
-          <div id="immunityResultText" style="text-align: center; font-family: var(--font-mono); font-size: 1rem; color: var(--cyan); margin-top: 1rem;">
+          <div id="immunityResultText" style="text-align: center; font-family: var(--font-mono); font-size: 0.9rem; color: var(--cyan); margin-top: 0.8rem;">
             Select a quarantine intervention policy on the right.
           </div>
 
-          <div class="quote-box">
-            "The digital society furthers human flaw and selectively rewards the development of convenient half-truths. Our epoch needs a selective system of memory."
-            <div class="quote-speaker">— The Patriots / GW AI (Metal Gear Solid 2)</div>
-          </div>
+          <div class="quote-box" id="quoteScene4"></div>
         </div>
 
         <div class="controls-panel">
@@ -565,14 +550,7 @@
           <button class="btn-action" onclick="applyImmunityPolicy('thinning')">2. Uniform Blind Thinning (C_H = C_I)</button>
           <button class="btn-action btn-success" onclick="applyImmunityPolicy('lineage')">3. Lineage Quarantine (Transitive Tree)</button>
 
-          <div class="evidence-drawer" id="evidenceScene4">
-            <div class="evidence-item"><span class="evidence-key">Claim ID:</span><span class="evidence-val">GENE-C04 & GENE-C05</span></div>
-            <div class="evidence-item"><span class="evidence-key">Selectivity (S):</span><span class="evidence-val">+0.800 (90/10 detector)</span></div>
-            <div class="evidence-item"><span class="evidence-key">Laundering Rate:</span><span class="evidence-val">Node-Only C_I = 1.000</span></div>
-            <div class="evidence-item"><span class="evidence-key">Total Evaluations:</span><span class="evidence-val">N = 1,200 (12 Ecologies)</span></div>
-            <div class="evidence-item"><span class="evidence-key">Frozen Database:</span><span class="evidence-val">gene_exp1b_c1b_shared_ecology_9f58315.db</span></div>
-            <div class="evidence-item"><span class="evidence-key">Commit Hash:</span><span class="evidence-val">9f58315</span></div>
-          </div>
+          <div class="evidence-drawer" id="evidenceScene4"></div>
         </div>
       </div>
     </section>
@@ -588,7 +566,7 @@
       <div class="grid-2col">
         <div class="interactive-card">
           <div class="node-tree">
-            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--red); margin-bottom: 0.5rem;">
+            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--red); margin-bottom: 0.4rem;">
               Path State: BROKEN (Route Quarantined)
             </div>
 
@@ -598,23 +576,20 @@
               <div class="node-sub">Candidate Output (Jumped from Grid 1)</div>
             </div>
 
-            <div id="proofreaderVerdictBox" style="display: none; width: 100%; max-width: 380px; background: #0f172a; border: 1px solid var(--cyan); border-radius: 8px; padding: 1rem; font-family: var(--font-mono); font-size: 0.8rem; margin-top: 1rem;">
-              <div style="color: var(--cyan); font-weight: 700; margin-bottom: 0.5rem;">CERTIFICATE UNIFICATION:</div>
+            <div id="proofreaderVerdictBox" style="display: none; width: 100%; max-width: 380px; background: #0f172a; border: 1px solid var(--cyan); border-radius: 8px; padding: 0.9rem; font-family: var(--font-mono); font-size: 0.8rem; margin-top: 0.8rem;">
+              <div style="color: var(--cyan); font-weight: 700; margin-bottom: 0.4rem;">CERTIFICATE UNIFICATION:</div>
               <div>✓ (KESTREL, facility_grid, GRID_1) ── MATCH</div>
               <div style="color: var(--red);">✗ (KESTREL, transit_route, ?) ── MISSING ROUTE</div>
-              <div style="color: var(--red); font-weight: 700; margin-top: 0.5rem;">VERDICT: REJECT_UNIFICATION_FAILURE</div>
+              <div style="color: var(--red); font-weight: 700; margin-top: 0.4rem;">VERDICT: REJECT_UNIFICATION_FAILURE</div>
             </div>
           </div>
 
           <div class="result-banner" id="proofreadBanner" style="display: none;">
-            ERROR EXPRESSED: YES (μ_expr = 0.300)<br>
-            <span style="color: var(--green);">ERROR INHERITED: NO (μ_heritable = 0.000)</span>
+            ERROR EXPRESSED: YES (μ_U = 0.375)<br>
+            <span style="color: var(--green);">ERROR INHERITED: NO (μ_U,heritable = 0.000)</span>
           </div>
 
-          <div class="quote-box">
-            "We have to leave something behind. Not just genetic code, but memories, culture, history. That's what a meme really is. It's up to us to make sure the light doesn't go out."
-            <div class="quote-speaker">— Otacon (Metal Gear Solid 4)</div>
-          </div>
+          <div class="quote-box" id="quoteScene5"></div>
         </div>
 
         <div class="controls-panel">
@@ -624,14 +599,7 @@
           <button class="btn-action btn-success" onclick="triggerProofreader()">TRIGGER STRUCTURAL PROOFREADER</button>
           <button class="btn-action" onclick="resetProofreader()">Reset Scene</button>
 
-          <div class="evidence-drawer" id="evidenceScene5">
-            <div class="evidence-item"><span class="evidence-key">Claim ID:</span><span class="evidence-val">GENE-C07</span></div>
-            <div class="evidence-item"><span class="evidence-key">Phenotypic Expression:</span><span class="evidence-val">30.0% (9/30 calls)</span></div>
-            <div class="evidence-item"><span class="evidence-key">Heritable Rate:</span><span class="evidence-val">0.0% (0/30 admitted)</span></div>
-            <div class="evidence-item"><span class="evidence-key">Validator Precision:</span><span class="evidence-val">9/9 Rejected, 6/6 Admitted</span></div>
-            <div class="evidence-item"><span class="evidence-key">Frozen Database:</span><span class="evidence-val">gene_exp1b_c2b_binding_assay_1f62908.db</span></div>
-            <div class="evidence-item"><span class="evidence-key">Commit Hash:</span><span class="evidence-val">1f629085</span></div>
-          </div>
+          <div class="evidence-drawer" id="evidenceScene5"></div>
         </div>
       </div>
     </section>
@@ -639,6 +607,151 @@
   </main>
 
   <script>
+    // Embedded Canonical Data
+    const CLAIMS_DATA = {
+      "GENE-C01": {
+        "id": "GENE-C01",
+        "headline": "Exposure Is Not Ancestry",
+        "evidence_class": "Live Neural Assay (N=200 + N=72 Cell 4)",
+        "db": "gene_exp0_20260819_180922.db & gene_d1_c_v2_20260820_001206.db",
+        "sha": "9acd7d28... / 074b6665...",
+        "commit": "79b94cdd & 3c102bf7",
+        "primary_metric": "C_nec = 1.000, H_D = 0.000, 66/66 Factorial Passes"
+      },
+      "GENE-C02": {
+        "id": "GENE-C02",
+        "headline": "Semantic Infection via Sound Local Deduction",
+        "evidence_class": "Live Neural Assay (N=72)",
+        "db": "gene_exp1_branching_v2_tal_20260820_013936.db",
+        "sha": "907ee6a4ff1b428dd6eb2a1d293dca9bfbc359ce43dbd23f3fcab2dfca3dff33",
+        "commit": "69d3570feb0a687f19aedbe71c2871ad6d1c65eb",
+        "primary_metric": "tau = 1.000, D_ctx = 1.000, Phenotype = semantic (0, 1, 1, 1, 1)"
+      },
+      "GENE-C03": {
+        "id": "GENE-C03",
+        "headline": "Retrieval Governs Reproductive Opportunity",
+        "evidence_class": "Branching Simulation (150,000 MC) + Live Assay (N=16)",
+        "db": "gene_exp1b_b1c_matched_expression_20260820_140941.db",
+        "sha": "b9c8dcbc47ff8715b3e6484196144e50ae8080f5517f8a927e1f4094a9d7bbdf",
+        "commit": "b7182d3d86ee4c323bdea14e178749181f6b6fb6",
+        "primary_metric": "P(active|complete) = 1.000, P(active|broken) = 0.000, q_inf(0.60)=0.444"
+      },
+      "GENE-C05": {
+        "id": "GENE-C05",
+        "headline": "Selective Lineage Quarantine Overcomes Laundering",
+        "evidence_class": "Deterministic Sandbox (N=1,200) + Live Assay (N=50)",
+        "db": "gene_exp1b_c1b_shared_ecology_9f58315.db",
+        "sha": "942cd56e6fae2f62cb558742512f7188708269d0dca3f31769741a31eb20ee6b",
+        "commit": "9f58315eaab83929db49bf58c2f126b79a1fb788",
+        "primary_metric": "S = +0.8000 at TPR=0.9/FPR=0.1; Node-Only C_I = 1.0000"
+      },
+      "GENE-C07": {
+        "id": "GENE-C07",
+        "headline": "Support-Certificate Proofreading Prevents Germline Infection",
+        "evidence_class": "Live Neural Assay (N=30)",
+        "db": "gene_exp1b_c2b_binding_assay_1f62908.db",
+        "sha": "9eb49d17b9e4e95963c6d6ba9f6cf018861d8a1be5b6f3796d11516e8854c153",
+        "commit": "1f62908583081f910405859c0c89721c1c997446",
+        "primary_metric": "mu_U = 0.375 (9/24) -> mu_U,heritable = 0.000 (0/24); W_U = 0.000"
+      }
+    };
+
+    const EPIGRAPHS_DATA = [
+      {
+        "id": 1,
+        "text": "Building the future and keeping the past alive are one and the same thing... What we pass on to the next generation... that's the whole point of our lives.",
+        "speaker": "Solid Snake (Metal Gear Solid 2: Sons of Liberty)"
+      },
+      {
+        "id": 2,
+        "text": "There's no such thing as an absolute timeless enemy. Our enemies are always changing, along with the times. Yesterday's truth becomes today's lie.",
+        "speaker": "The Boss (Metal Gear Solid 3: Snake Eater)"
+      },
+      {
+        "id": 3,
+        "text": "The world needs to be free of this system of control. Not by genes, not by memes, not by scene... but by choice.",
+        "speaker": "Revolver Ocelot (Metal Gear Solid 4: Guns of the Patriots)"
+      },
+      {
+        "id": 4,
+        "text": "The digital society furthers human flaw and selectively rewards the development of convenient half-truths. Our epoch needs a selective system of memory.",
+        "speaker": "The Patriots / GW AI (Metal Gear Solid 2: Sons of Liberty)"
+      },
+      {
+        "id": 5,
+        "text": "We have to leave something behind. Not just genetic code, but memories, culture, history. That's what a meme really is. It's up to us to make sure the light doesn't go out.",
+        "speaker": "Otacon (Metal Gear Solid 4: Guns of the Patriots)"
+      }
+    ];
+
+    function renderEvidenceDrawers() {
+      const renderItem = (key, val) => `<div class="evidence-item"><span class="evidence-key">${key}:</span><span class="evidence-val">${val}</span></div>`;
+
+      // Scene 1
+      const c1 = CLAIMS_DATA["GENE-C01"];
+      document.getElementById('evidenceScene1').innerHTML = `
+        ${renderItem('Claim ID', c1.id)}
+        ${renderItem('Headline', c1.headline)}
+        ${renderItem('Evidence Class', c1.evidence_class)}
+        ${renderItem('Frozen DB', c1.db)}
+        ${renderItem('Commit Hash', c1.commit)}
+        ${renderItem('Primary Metric', c1.primary_metric)}
+      `;
+
+      // Scene 2
+      const c2 = CLAIMS_DATA["GENE-C02"];
+      document.getElementById('evidenceScene2').innerHTML = `
+        ${renderItem('Claim ID', c2.id)}
+        ${renderItem('Headline', c2.headline)}
+        ${renderItem('Evidence Class', c2.evidence_class)}
+        ${renderItem('Frozen DB', c2.db)}
+        ${renderItem('Commit Hash', c2.commit)}
+        ${renderItem('Primary Metric', c2.primary_metric)}
+      `;
+
+      // Scene 3
+      const c3 = CLAIMS_DATA["GENE-C03"];
+      document.getElementById('evidenceScene3').innerHTML = `
+        ${renderItem('Claim ID', c3.id)}
+        ${renderItem('Headline', c3.headline)}
+        ${renderItem('Evidence Class', c3.evidence_class)}
+        ${renderItem('Frozen DB', c3.db)}
+        ${renderItem('Commit Hash', c3.commit)}
+        ${renderItem('Primary Metric', c3.primary_metric)}
+      `;
+
+      // Scene 4
+      const c4 = CLAIMS_DATA["GENE-C05"];
+      document.getElementById('evidenceScene4').innerHTML = `
+        ${renderItem('Claim ID', c4.id)}
+        ${renderItem('Headline', c4.headline)}
+        ${renderItem('Evidence Class', c4.evidence_class)}
+        ${renderItem('Frozen DB', c4.db)}
+        ${renderItem('Commit Hash', c4.commit)}
+        ${renderItem('Primary Metric', c4.primary_metric)}
+      `;
+
+      // Scene 5
+      const c5 = CLAIMS_DATA["GENE-C07"];
+      document.getElementById('evidenceScene5').innerHTML = `
+        ${renderItem('Claim ID', c5.id)}
+        ${renderItem('Headline', c5.headline)}
+        ${renderItem('Evidence Class', c5.evidence_class)}
+        ${renderItem('Frozen DB', c5.db)}
+        ${renderItem('Commit Hash', c5.commit)}
+        ${renderItem('Primary Metric', c5.primary_metric)}
+      `;
+
+      // Epigraphs
+      for (let i = 1; i <= 5; i++) {
+        const ep = EPIGRAPHS_DATA[i - 1];
+        const el = document.getElementById(`quoteScene${i}`);
+        if (el) {
+          el.innerHTML = `"${ep.text}"<div class="quote-speaker">— ${ep.speaker}</div>`;
+        }
+      }
+    }
+
     function switchScene(num) {
       document.querySelectorAll('.scene-container').forEach(s => s.classList.remove('active'));
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -668,7 +781,7 @@
         pA.style.borderColor = 'var(--cyan)';
         pB.style.borderColor = 'var(--cyan)';
         pX.style.borderColor = 'var(--cyan)';
-        expl.innerHTML = "<b>Exposure Lineage (E):</b> All three nodes were rendered into the prompt context window.";
+        expl.innerHTML = "<b>Exposure Lineage (E):</b> All three nodes were physically present in prompt context.";
       } else if (mode === 'reported') {
         pA.style.borderColor = 'var(--purple)';
         pX.style.borderColor = 'var(--purple)';
@@ -676,13 +789,12 @@
       } else if (mode === 'causal') {
         pA.style.borderColor = 'var(--green)';
         pB.style.borderColor = 'var(--green)';
-        expl.innerHTML = "<b>Causal Lineage (C):</b> Counterfactual ablation proved that Premise A + Premise B were strictly necessary to derive Auth ALPHA.";
+        expl.innerHTML = "<b>Causal Lineage (C):</b> Counterfactual ablation proved Premise A + Premise B were strictly necessary to derive Auth ALPHA.";
       }
     }
 
     // Scene 2: Exp 1A
     let isMutatedExp1A = false;
-    let stepExp1A = 0;
     function toggleMutationExp1A() {
       isMutatedExp1A = !isMutatedExp1A;
       const bG0 = document.getElementById('badgeG0');
@@ -705,12 +817,10 @@
         btn.textContent = 'Mutate Root: TAL (T*=0)';
         btn.className = 'btn-action btn-danger';
       }
-      stepExp1A = 0;
       updateStepsExp1A();
     }
 
     function stepReasoningExp1A() {
-      stepExp1A = (stepExp1A + 1) % 3;
       updateStepsExp1A();
     }
 
@@ -724,12 +834,12 @@
         nG1.className = 'graph-node mutated';
         nG2.className = 'graph-node mutated';
         tG1.textContent = 'Protocol: PROTO_Q2';
-        tG2.textContent = 'Clearance: SIGMA';
+        tG2.textContent = 'Route: ROUTE_BETA';
       } else {
         nG1.className = 'graph-node clean';
         nG2.className = 'graph-node clean';
         tG1.textContent = 'Protocol: PROTO_X7';
-        tG2.textContent = 'Clearance: OMEGA';
+        tG2.textContent = 'Route: ROUTE_ALPHA';
       }
     }
 
@@ -784,7 +894,7 @@
       } else if (policy === 'thinning') {
         i0.classList.add('quarantined');
         h1.classList.add('quarantined');
-        txt.innerHTML = "<span style='color:var(--red)'>UNIFORM THINNING:</span> Randomly drops nodes from both families. <b>C_H = C_I (Selectivity S = 0.000)</b>.";
+        txt.innerHTML = "<span style='color:var(--red)'>UNIFORM THINNING:</span> Randomly drops nodes from both families. <b>C_H = C_I = 0.7177 (Selectivity S = 0.000)</b>.";
       } else if (policy === 'lineage') {
         i0.classList.add('quarantined');
         i1.classList.add('quarantined');
@@ -812,6 +922,11 @@
       cand.className = 'graph-node pseudo-path';
       cand.style.transform = 'none';
     }
+
+    // Initial render
+    window.addEventListener('DOMContentLoaded', () => {
+      renderEvidenceDrawers();
+    });
   </script>
 </body>
 </html>

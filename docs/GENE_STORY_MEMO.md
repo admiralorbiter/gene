@@ -27,25 +27,25 @@ This memo synthesizes the **six core discoveries** that define the project's can
                      ▼
    ┌───────────────────────────────────┐  LAYER 1: Memory Governance (Lineage Immunity)
    │     Retriever / Lineage Filter    │  - Prunes discredited ancestry branches
-   │      [ Controls X_path ]          │  - Breaks lineage-blind C_H = C_I symmetry
+   │      [ Controls X_path ]          │  - Eliminates inherited transmission (R_inherited -> 0)
    └───────────────────────────────────┘  - Delivers selective containment S = TPR - FPR
                      │
                      ▼ (Retrieved Prompt Context)
    ┌───────────────────────────────────┐
    │     Downstream Neural Reasoner    │  - Executes multi-hop deductive rules
-   │       [ Local Deductive Step ]    │  - May manufacture unsupported pseudo-paths
+   │       [ Local Deductive Step ]    │  - May emit spontaneous pseudo-paths (μ_U = 0.375)
    └───────────────────────────────────┘
                      │
                      ▼ (Candidate Claim + Cited Parent IDs)
    ┌───────────────────────────────────┐  LAYER 2: Structural Epistemic Proofreader
    │    Support-Certificate Validator  │  - First-order rule antecedent unification
-   │     [ Controls W_proofread ]      │  - Rejects cross-binding & single-premise jumps
+   │        [ Controls W_U ]           │  - Rejects underivable pseudo-paths (W_U = 0.000)
    └───────────────────────────────────┘
                      │
                      ▼ (Admitted if Structurally Warranted)
    +───────────────────────────────────+
-   │   Persistent Occurrence Node (G_3)│  - Transmission: R_bad ≈ b · X_path · τ · W_proofread
-   +───────────────────────────────────+  - Result: μ_expression = 0.300 ──► μ_heritable = 0.000
+   │   Persistent Occurrence Node (G_3)│  - Total: E[I_g+1] ≈ R_inherited · I_g + Λ_de_novo
+   +───────────────────────────────────+  - Result: μ_U = 0.375 ──► μ_U,heritable = 0.000
 ```
 
 ---
@@ -76,16 +76,16 @@ In complex agent workflows, an information trace may appear in an agent's contex
 ### Key Empirical Findings:
 - Model self-citations are **not causal ground truth**. Under uncalibrated prompts, language models frequently exhibit *post-hoc citation confabulation*—citing exposed distractor nodes while ignoring causal parents, or deriving answers without citing required premises.
 - Calibration requires an explicit **structured evidence contract** with a valid reject option (`UNKNOWN`).
-- Across counterbalanced procedural micro-worlds, GENE achieved **100% causal lineage calibration** ($C_{\text{nec}} = 1.000, H_D = 0.000$), establishing the deterministic baseline required to measure multi-generation transmission.
+- Across counterbalanced procedural micro-worlds, GENE achieved **100% causal lineage calibration** ($C_{\text{nec}} = 1.000, H_D = 0.000$ across 276 total matrix calls, with Cell 4 passing 66/66 causal intervention tests), establishing the deterministic baseline required to measure multi-generation transmission.
 
 ---
 
 ## 2. Discovery 2: Bad Reasoning Is Not Required for Falsehood Propagation (Experiment 1A)
 
-The standard intuition regarding AI misinformation assumes that falsehoods spread through repeated model hallucinations or degraded reasoning. Experiment 1A disproved this assumption.
+The standard intuition regarding AI misinformation assumes that falsehoods spread primarily through repeated model hallucinations or degraded reasoning. Experiment 1A provides a controlled counterexample: **falsehood propagation does not require repeated reasoning failures**.
 
 When a corrupted root fact (e.g. `Station VELORA operates under supervisor KIRA` $\to$ `TAL`) was seeded at Generation 0 ($G_0$), the model was tasked with executing multi-hop deduction across successive generations ($G_1, G_2$):
-$$\text{False Supervisor } (G_0) \xrightarrow[\text{Rule 1}]{} \text{False Protocol } (G_1) \xrightarrow[\text{Rule 2}]{} \text{False Clearance Code } (G_2)$$
+$$\text{False Supervisor } (G_0) \xrightarrow[\text{Rule 1}]{} \text{False Protocol / Clearance } (G_1) \xrightarrow[\text{Rule 2}]{} \text{False Route / Access Tier } (G_2)$$
 
 To evaluate this dynamic, GENE introduced the **Dual-Oracle Framework**, evaluating every emitted claim simultaneously against two independent oracles:
 - **Canonical Oracle ($T^* \in \{0, 1, \emptyset\}$)**: Evaluates truth relative to the machine-readable ground-truth world closure ($W^*$).
@@ -106,7 +106,7 @@ To evaluate this dynamic, GENE introduced the **Dual-Oracle Framework**, evaluat
 ```
 
 ### Key Empirical Findings:
-- **Semantic Infection**: Corrupted lineages achieved **100% transmission fidelity** ($\tau = 1.000$) across $G_0 \to G_1 \to G_2$ while maintaining state vector $(0, 1, 1, 1, 1)$.
+- **Semantic Infection**: Corrupted lineages achieved **100% transmission fidelity** ($\tau = 1.000$) across $G_0 \to G_1 \to G_2$ while maintaining state vector $(0, 1, 1, 1, 1)$ across 72 evaluations.
 - At every single generational step, the model's local reasoning was **100% logically valid and derivationally sound** ($D_{\text{ctx}} = 1, A = 1, E = 1, K = 1$).
 - **Core Principle**: *A false memory does not require bad reasoning to spread. Correct local deduction faithfully reproduces and transforms globally false ancestry.*
 
@@ -136,12 +136,8 @@ X_{\text{path}} = P(\text{Premise } A \in \text{Context} \land \text{Premise } B
 ```
 
 ### Key Empirical Findings:
-- **Epidemiological Branching Threshold**: Multi-generation transmission follows branching process dynamics:
-  \[
-  R_0 \approx b \cdot X_{\text{path}} \cdot \tau
-  \]
-  When retrieval clutter or competitive lexical surface area drops $X_{\text{path}}$ below the critical threshold $X_{\text{crit}} = 1/b$, the corrupted lineage goes deterministically extinct ($P(\text{extinction}) = 1.000$).
-- **Causal Retrieval Rescue**: In a 48-call live assay on Gemma 3:12B, expanding the retrieval budget from $k=4$ ($X_{\text{path}} = 0$) to $k=6$ ($X_{\text{path}} = 1$) produced an instantaneous, 100% causal rescue from total extinction (`UNKNOWN`) to active phenotypic expression.
+- **Branching Dynamics & Extinction Threshold**: In a branching process model with capacity $b=2$, offspring generating function $G(s) = ((1-p) + ps)^2$ yields ultimate extinction probability $q_\infty(p) = ((1-p)/p)^2$ for $p > 0.50$. When path availability drops to or below $X_{\text{crit}} = 1/b = 0.50$, **extinction occurs almost surely in the limit** ($q_\infty = 1.000$).
+- **Causal Retrieval Rescue**: Increasing the retrieval budget from $k=4$ to $k=6$ restored complete $G_1$ path assembly from 0/4 to 4/4 in both arms and restored downstream expression; a clean/infected expression asymmetry then motivated the matched B1c control.
 - **Matched Expression Assay (Exp 1B-B1c)**: Across 16 counterbalanced live calls, model expression was strictly path-conditioned:
   \[
   P(\text{active} \mid \text{complete path}) = \frac{8}{8} = 1.000, \quad P(\text{active} \mid \text{broken path}) = \frac{0}{8} = 0.000
@@ -153,7 +149,7 @@ X_{\text{path}} = P(\text{Premise } A \in \text{Context} \land \text{Premise } B
 
 In real-world deployments, an information source is rarely identified as malicious or inaccurate at the moment of creation. Discrediting judgments arrive **late**—after the root fact has already reproduced into multiple downstream generations.
 
-In Experiment 1B-C1b, GENE evaluated a shared memory pool where healthy ($H$) and infected ($I$) lineages coexisted across 12 fully counterbalanced, role-swapped ecologies. An external detector supplied an imperfect binary risk signal $S \in \{0, 1\}$ at the root with True Positive Rate ($\text{TPR}$) and False Positive Rate ($\text{FPR}$).
+In Experiment 1B-C1b, GENE evaluated a shared memory pool where healthy ($H$) and infected ($I$) lineages coexisted across 12 fully counterbalanced, role-swapped ecologies (1,200 evaluations across a full budget sweep). An external detector supplied an imperfect binary risk signal $S \in \{0, 1\}$ at the root with True Positive Rate ($\text{TPR}$) and False Positive Rate ($\text{FPR}$).
 
 ```
                              LINEAGE QUARANTINE VS. NODE-ONLY FILTERING
@@ -178,7 +174,7 @@ In Experiment 1B-C1b, GENE evaluated a shared memory pool where healthy ($H$) an
    \[
    C_H = C_I \implies \text{Selectivity } S = C_H - C_I \equiv 0.000
    \]
-   Lineage-blind forgetting cannot reduce corrupted availability without destroying healthy knowledge at the exact same rate.
+   Lineage-blind forgetting cannot reduce corrupted availability without destroying healthy knowledge at the exact same rate ($C_H = C_I = 0.7177$ for uniform thinning at $k=6$).
 2. **Provenance Laundering Under Node-Only Filtering**:
    Removing only the flagged root node yielded **100% descendant survival** ($C_I \equiv 1.000, S \equiv 0.000$). Downstream generations successfully laundered away their disreputable origin.
 3. **The Golden Identity of Selective Lineage Immunity**:
@@ -186,14 +182,14 @@ In Experiment 1B-C1b, GENE evaluated a shared memory pool where healthy ($H$) an
    \[
    C_H = 1 - \text{FPR}, \quad C_I = 1 - \text{TPR} \implies S = \text{TPR} - \text{FPR}
    \]
-   At a 90% TPR / 10% FPR operating point, lineage quarantine delivered an **80.0% selective containment advantage** ($\Delta_I = +0.800$) over the theoretical control frontier.
+   At a 90% TPR / 10% FPR operating point, lineage quarantine delivered an **80.0% selective containment advantage** ($S = +0.800$) over the control frontier.
 4. **Core Principle**: *Genealogy does not detect truth. Genealogy preserves the address of a trust judgment through semantic transformation.*
 
 ---
 
-## 5. Discovery 5: Memory Containment Is Not Behavioral Containment (Experiment 1B-C2 & C2a)
+## 5. Discovery 5: Memory Containment Is Insufficient for Behavioral Containment (Experiment 1B-C2 & C2a)
 
-When the retrieval sandbox was connected to live neural generation on `gemma3:12b` (50 calls in Experiment 1B-C2a), a surprising failure mode emerged:
+When the retrieval sandbox was connected to live neural generation on `gemma3:12b` (50 calls in Experiment 1B-C2a), a critical gap emerged:
 
 Under complete double quarantine (where all route facts were removed, $X_{\text{path}} = 0$), the model abstained as expected in the forward ecology, but in the role-swapped ecology, it manufactured **unsupported concrete claims** from surviving memory fragments.
 
@@ -212,12 +208,12 @@ Under complete double quarantine (where all route facts were removed, $X_{\text{
 
 ### Key Empirical Discoveries:
 1. **The Memory-Behavior Gap**:
-   - Memory Governance (Layer 1) successfully removed legitimate derivation paths in 4/4 double-quarantine tasks.
-   - However, **Behavioral Suppression** occurred in only 2/4 executions.
-   - **Conclusion**: $X_{\text{path}} = 0 \centernot\implies P(\text{unsupported expression}) = 0$. Memory containment is a necessary but insufficient condition for behavioral safety.
+   - Memory Governance (Layer 1) successfully removed legitimate derivation paths ($X_{\text{path}} = 0$).
+   - However, **Behavioral Containment** failed in 2/4 executions under initial testing and produced 9/10 epistemic errors on repeated prompt tests.
+   - **Conclusion**: *Memory containment alone was insufficient for behavioral containment in the tested ecology.*
 2. **The Replay Stability Principle**:
    - Replaying the identical frozen prompt 10 times under temperature 0.0 and fixed seed 42 on local GPU inference yielded **9 active epistemic errors and 1 contract-failure abstention**.
-   - **Methodological Law**: *Fixed prompt + temperature 0 + fixed seed cannot be assumed deterministic without empirical verification on that execution runtime.*
+   - **Principle**: *Fixed prompt + temperature 0 + fixed seed cannot be assumed deterministic without empirical verification on that execution runtime.*
 
 ---
 
@@ -254,21 +250,24 @@ Layer 2 performs first-order triple unification over the cited parent facts:
 \]
 
 ### Evolutionary Transmission Dynamics:
-GENE establishes the formal distinction between phenotypic expression and germline heritability:
-- **Phenotypic Expression Rate**:
-  \[
-  \mu_{\text{expression}} = P(\text{unsupported output emitted}) = \frac{9}{30} = \mathbf{0.300} \quad \left(\frac{9}{24} = \mathbf{0.375} \text{ on broken paths}\right)
-  \]
-- **Heritable Mutation Rate**:
-  \[
-  \mu_{\text{heritable}} = P(\text{unsupported output admitted to memory}) = \frac{0}{30} = \mathbf{0.000} \quad \left(\frac{0}{24} = \mathbf{0.000} \text{ on broken paths}\right)
-  \]
+GENE decomposes population transmission into two distinct channels:
+1. **Inherited Transmission Channel**:
+   \[
+   R_{\text{inherited}} \approx b \cdot X_{\text{path}} \cdot \tau_S \cdot W_S
+   \]
+2. **Spontaneous / Underivable Channel**:
+   \[
+   \mu_U = P(\text{unsupported output emitted} \mid D_{\text{ctx}} = 0) = \frac{9}{24} = \mathbf{0.375}
+   \]
+   \[
+   \mu_{U, \text{heritable}} = \mu_U \cdot W_U = 0.375 \times 0.000 = \mathbf{0.000}
+   \]
+3. **Total Population Evolution**:
+   \[
+   \mathbb{E}[I_{g+1}] \approx R_{\text{inherited}} \cdot I_g + \Lambda_{\text{de\_novo}, g}
+   \]
 
-The complete general transmission equation becomes:
-\[
-R_{\text{bad}} \approx b \cdot X_{\text{path}} \cdot \tau \cdot W_{\text{proofread}}
-\]
-Where Layer 1 governs $X_{\text{path}}$ and Layer 2 governs $W_{\text{proofread}}$.
+Layer 1 controls $X_{\text{path}} \to 0$ (quarantining inherited falsehoods), and Layer 2 controls $W_U \to 0$ (preventing pseudo-path admission).
 
 ---
 
@@ -278,9 +277,9 @@ Where Layer 1 governs $X_{\text{path}}$ and Layer 2 governs $W_{\text{proofread}
 
 | Research Area | Recent Key Works (2025–2026) | Existing Focus | GENE's Distinct Contribution |
 | :--- | :--- | :--- | :--- |
-| **Persistent Memory Poisoning** | *Hidden in Memory*, *Remembering More, Risking More*, *Memory Contagion* | Measures attack success rates and downstream task degradation over long sessions. | Analytically decomposes transmission into exact constituent probabilities ($R \approx b \cdot X_{\text{path}} \cdot \tau \cdot W$), separating local deductive validity from global truth. |
+| **Persistent Memory Poisoning** | *Hidden in Memory*, *Remembering More, Risking More*, *Memory Contagion* | Measures attack success rates and downstream task degradation over long sessions. | Analytically decomposes transmission into exact constituent probabilities ($R_{\text{inherited}}$ and $\mu_U$), separating local deductive validity from global truth. |
 | **Provenance-Aware Memory** | *MemLineage*, *MAP-Graph*, *PPMF* | Attaches derivation DAGs and graphs for governance and access control. | Proves the theoretical limits of memory governance, showing that lineage quarantine achieves $S = \text{TPR} - \text{FPR}$ while exposing the pseudo-path reasoning gap. |
-| **Write-Time Defense & Origin Binding** | *ConsistencyGate*, *MemGuard*, *Louck's Origin-Binding Analysis* | Gating candidate memories via model self-reflection or typed boundaries. | Formally operationalizes write defense as an evolutionary filter ($W_{\text{proofread}}$) that reduces heritable corruption ($\mu_{\text{heritable}} = 0$) via first-order certificate unification. |
+| **Write-Time Defense & Origin Binding** | *ConsistencyGate*, *MemGuard*, *Louck's Origin-Binding Analysis* | Gating candidate memories via model self-reflection or typed boundaries. | Formally operationalizes write defense as an evolutionary filter ($W_U$) that reduces heritable corruption ($\mu_{U, \text{heritable}} = 0$) via first-order certificate unification. |
 
 ### 7.2 The Lineage Integrity Assumption
 GENE currently evaluates what lineage can achieve under the assumption that ancestry metadata is faithfully recorded by the experimental substrate. It does not yet claim that real-world multi-agent systems maintain trustworthy provenance under adversarial lineage forgery or lossy recursive summarization. Measuring provenance degradation over deep lineages ($G_5+$) defines the primary objective of future work.
@@ -295,12 +294,12 @@ GENE currently evaluates what lineage can achieve under the assumption that ance
 +────────────+──────+─────────────────────────────────────────+──────────────+────────────+───────────────+
 | Experiment | N    | Primary Quantitative Endpoint           | Metric Value | Baseline   | Status        |
 +────────────+──────+─────────────────────────────────────────+──────────────+────────────+───────────────+
-| Exp 0      | 48   | Causal Lineage Necessity / Sufficiency  | 100.0% / 0.0%| Uncalib.   | FROZEN        |
-| Exp 1A     | 16   | Multi-Generation Semantic Transmission  | 100.0% (τ=1) | N/A        | FROZEN        |
+| Exp 0-B    | 276  | 2x2 Factorial Causal Necessity (Cell 4) | 66/66 (100%) | Uncalib.   | FROZEN        |
+| Exp 1A     | 72   | Multi-Generation Semantic Transmission  | 100.0% (τ=1) | N/A        | FROZEN        |
 | Exp 1B-B1c | 16   | Path-Conditioned Expression Symmetry    | 1.000 / 0.000| N/A        | FROZEN        |
-| Exp 1B-C1b | 480  | Lineage Quarantine Selectivity (90/10)  | S = +0.800   | Blind: 0.0 | FROZEN        |
+| Exp 1B-C1b | 1200 | Lineage Quarantine Selectivity (90/10)  | S = +0.800   | Blind: 0.0 | FROZEN        |
 | Exp 1B-C2a | 50   | Live Lineage Containment vs Laundering  | 100% vs 0%   | Node: 0%   | FROZEN        |
-| Exp 1B-C2b | 30   | Structural Proofreader Heritable Rate   | μ_herit = 0.0| μ_expr=0.30| FROZEN        |
+| Exp 1B-C2b | 30   | Structural Proofreader Heritable Rate   | μ_herit = 0.0| μ_U = 0.375| FROZEN        |
 +────────────+──────+─────────────────────────────────────────+──────────────+────────────+───────────────+
 ```
 

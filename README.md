@@ -12,27 +12,27 @@ Rather than treating memory failures simply as transient hallucinations or black
 $$\text{Ancestry} \longrightarrow \text{Retrieval Exposure} \longrightarrow \text{Local Reasoning} \longrightarrow \text{Reproduction} \longrightarrow \text{Lineage Governance} \longrightarrow \text{Structural Admission}$$
 
 ```
-                                      THE GENE TRANSMISSION PIPELINE
-                                      
+                                       THE GENE TRANSMISSION PIPELINE
+                                       
   [ Ancestral Root Node ] 
             │
             ▼
   ┌───────────────────┐    Layer 1: Memory Governance (Lineage Immunity)
   │ Retrieval Filter  │ ──► Prunes discredited ancestry branches (Modulates X_path)
-  └───────────────────┘
+  └───────────────────┘     R_inherited ≈ b · X_path · τ_S · W_S  (Eliminates inherited transmission)
             │ (Retrieved Context)
             ▼
   ┌───────────────────┐
-  │ Neural Reasoner   │ ──► Executes multi-hop deduction (May generate pseudo-paths)
+  │ Neural Reasoner   │ ──► Executes multi-hop deduction (May generate pseudo-paths, μ_U = 0.375)
   └───────────────────┘
             │ (Candidate Output Claim)
             ▼
   ┌───────────────────┐    Layer 2: Structural Epistemic Proofreader
-  │ Support Validator │ ──► Formally unifies cited premises against rules (Modulates W_proofread)
-  └───────────────────┘
+  │ Support Validator │ ──► Formally unifies cited premises against rules (Modulates W_U = 0.000)
+  └───────────────────┘     μ_U,heritable = μ_U · W_U = 0.000
             │
             ▼ (Admitted if Valid)
-  [ Persistent Occurrence Node ] ──► Eligible for future generation inheritance (R ≈ b · X_path · τ · W_proofread)
+  [ Persistent Occurrence Node ] ──► Population: E[I_g+1] ≈ R_inherited · I_g + Λ_de_novo
 ```
 
 ---
@@ -43,7 +43,7 @@ $$\text{Ancestry} \longrightarrow \text{Retrieval Exposure} \longrightarrow \tex
    Informational ancestry cannot be treated as a single observable. GENE formally separates **exposure lineage** (what was in context), **reported-support lineage** (what the model claimed to cite), and **causal lineage** (what counterfactually changed the output). Model self-reports are never causal ground truth.
 
 2. **Bad Reasoning Is Not Required for Falsehood Propagation (Experiment 1A)**:
-   A corrupted ancestral premise can be transformed across multiple semantic forms (e.g. *false supervisor* $\to$ *protocol* $\to$ *transit route* $\to$ *terminal authorization*) while each intermediate step remains locally logically valid. Globally false information reproduces through locally correct reasoning without requiring repeated hallucinations.
+   A corrupted ancestral premise can be transformed across multiple semantic forms (e.g. *false supervisor* $\to$ *protocol / clearance* $\to$ *transit route / access tier*) while each intermediate step remains locally logically valid. Globally false information reproduces through locally correct reasoning without requiring repeated hallucinations.
 
 3. **Retrieval Regulates Reproductive Contact (Experiment 1B-B)**:
    Memory existence does not imply reproductive opportunity. Full multi-premise support-path retrieval availability ($X_{\text{path}}$) governs branching reproduction. Retrieval surface area scales subcritical/supercritical branching thresholds.
@@ -51,11 +51,11 @@ $$\text{Ancestry} \longrightarrow \text{Retrieval Exposure} \longrightarrow \tex
 4. **Lineage Enables Selective Delayed Quarantine (Experiment 1B-C1b)**:
    When an ancestor is discredited after it has already reproduced, lineage-blind forgetting is bound by $C_H = C_I$ (it cannot reduce corrupted availability without destroying healthy coverage at the same rate). Lineage-aware quarantine breaks this symmetry, delivering selective containment $S = C_H - C_I = \text{TPR} - \text{FPR}$. Genealogy preserves the target of a trust judgment across semantic transformation.
 
-5. **Memory Containment Is Not Behavioral Containment (Experiment 1B-C2 / C2a)**:
+5. **Memory Containment Is Insufficient for Behavioral Containment (Experiment 1B-C2 / C2a)**:
    Removing the legitimate support path ($X_{\text{path}} = 0$) does not guarantee behavioral suppression ($P(\text{unsupported expression}) = 0$). Neural reasoners can manufacture unsupported pseudo-paths from surviving fragments. Memory Governance (Layer 1) requires an independent Inference Integrity layer (Layer 2).
 
 6. **Structural Proofreading Prevents Phenotypic Errors from Becoming Heritable (Experiment 1B-C2b)**:
-   A mechanical first-order support-certificate validator checks whether cited memories structurally unify with deductive rule antecedents. In 30 live calls on Gemma 3:12B, the validator reduced a phenotypic expression rate of $\mu_{\text{expression}} = 0.300$ ($0.375$ on broken paths) to a heritable mutation rate of $\mu_{\text{heritable}} = \mathbf{0.000}$ ($0 / 24$ false admissions), admitting 100% of valid derivations. Transient reasoning errors are prevented from entering the germline.
+   A mechanical first-order support-certificate validator checks whether cited memories structurally unify with deductive rule antecedents. In 30 live calls on Gemma 3:12B, the validator reduced a phenotypic expression rate of $\mu_U = 0.375$ on broken paths ($0.300$ overall) to a heritable mutation rate of $\mu_{U, \text{heritable}} = \mathbf{0.000}$ ($0 / 24$ false admissions), admitting 100% of valid derivations. Transient reasoning errors are prevented from entering the germline.
 
 ---
 
@@ -64,12 +64,12 @@ $$\text{Ancestry} \longrightarrow \text{Retrieval Exposure} \longrightarrow \tex
 | Phase | Milestone Name | Key Objective | Status | Execution Commit |
 | :--- | :--- | :--- | :--- | :--- |
 | **Phase 0–4** | Instrumentation & Invariants | Deterministic SQLite persistence, dual oracles, causal interventions | **FROZEN** | `3b59368` |
-| **Phase 5–6** | Experiment 0 | Lineage Observability, Causal Parentage, & Ecological Contracts | **FROZEN** | `3b59368` |
-| **Phase 7** | Experiment 1A | Multi-Generational Mutation Cascades ($G_0 \to G_2$) | **FROZEN** | `68c3447` |
+| **Phase 5–6** | Experiment 0 | Lineage Observability, Causal Parentage, & 2x2 Factorial Matrix | **FROZEN** | `79b94cd` / `3c102bf` |
+| **Phase 7** | Experiment 1A | Multi-Generational Mutation Cascades ($G_0 \to G_2$) | **FROZEN** | `69d3570` |
 | **Phase 8** | Experiment 1B-A / B1 | Allele Fidelity, Multi-Hop Retrieval Dynamics ($X_{\text{path}}$), & Causal Rescue | **FROZEN** | `f6d6cbe` |
 | **Phase 9 / 9.5** | Preflight & Matched Expression | Shape Map, Persistence Hardening, & 16-Call Live Matched Assay | **FROZEN** | `b7182d3` |
-| **Phase 10** | Experiment 1B-C0 / C1b | Analytic Calibration & 12-Ecology Delayed Adjudication Sandbox | **FROZEN** | `15abd87` |
-| **Phase 10.5** | Experiment 1B-C2 / C2a / C2b | Live Behavioral Immunity, Replay Stability, & Support-Certificate Validator | **FROZEN** | [`1f62908`](scripts/run_exp1b_c2b_binding_assay.py) / [`acd6660`](docs/ARCHITECTURE.md) |
+| **Phase 10** | Experiment 1B-C0 / C1b | Analytic Calibration & 12-Ecology Delayed Adjudication Sandbox | **FROZEN** | `9f58315` |
+| **Phase 10.5** | Experiment 1B-C2 / C2a / C2b | Live Behavioral Immunity, Replay Stability, & Support-Certificate Validator | **FROZEN** | `a1474d6` / `1f62908` |
 
 ---
 
@@ -97,4 +97,4 @@ All experimental fixtures, oracle closures, statistical analyzers, and proofread
 ```bash
 pytest
 ```
-*Current test health: 97 passed in 22.23s (Zero warnings/errors).*
+*Current test health: 100 passed in 29.65s (Zero warnings/errors).*

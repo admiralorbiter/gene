@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" width="900" height="500">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 620" width="920" height="620">
   <defs>
     <linearGradient id="bgGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#0a0e17" />
@@ -7,63 +7,93 @@
   </defs>
 
   <!-- Background -->
-  <rect width="900" height="500" rx="16" fill="url(#bgGrad2)" stroke="#1e293b" stroke-width="2" />
+  <rect width="920" height="620" rx="16" fill="url(#bgGrad2)" stroke="#1e293b" stroke-width="2" />
 
   <!-- Title Header -->
-  <text x="450" y="45" font-family="'JetBrains Mono', monospace" font-size="16" font-weight="700" fill="#f8fafc" text-anchor="middle" letter-spacing="2">
+  <text x="460" y="40" font-family="'JetBrains Mono', monospace" font-size="16" font-weight="700" fill="#f8fafc" text-anchor="middle" letter-spacing="2">
     THE DUAL-ORACLE EPISTEMIC PHENOTYPE MATRIX
   </text>
-  <text x="450" y="68" font-family="'Segoe UI', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">
-    Decoupling Canonical Truth (T*) from Local Contextual Derivability (D_ctx)
+  <text x="460" y="62" font-family="'Segoe UI', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">
+    Decoupling Canonical Truth (T* ∈ {0, 1, ∅}) from Contextual Derivability (D_ctx ∈ {0, 1})
   </text>
 
-  <!-- Axis Labels -->
-  <!-- Horizontal Axis: Local Derivability D_ctx -->
-  <text x="310" y="110" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="700" fill="#00e5ff" text-anchor="middle">D_ctx = 1 (Locally Derivable)</text>
-  <text x="670" y="110" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="700" fill="#f59e0b" text-anchor="middle">D_ctx = 0 (Locally Underivable)</text>
+  <!-- Section Header for Asserted Claims -->
+  <rect x="120" y="80" width="740" height="24" rx="4" fill="#1e293b" />
+  <text x="460" y="96" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" fill="#38bdf8" text-anchor="middle">
+    ASSERTED CONCRETE CLAIMS: T* ∈ {0, 1}
+  </text>
 
-  <!-- Vertical Axis: Canonical Ground Truth T* -->
-  <text x="80" y="220" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="700" fill="#00e676" text-anchor="middle" transform="rotate(-90 80 220)">T* = 1 (Globally True)</text>
-  <text x="80" y="370" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="700" fill="#f43f5e" text-anchor="middle" transform="rotate(-90 80 370)">T* = 0 (Globally False)</text>
+  <!-- Horizontal Axis Labels -->
+  <text x="310" y="125" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="700" fill="#00e5ff" text-anchor="middle">D_ctx = 1 (Locally Derivable)</text>
+  <text x="690" y="125" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="700" fill="#f59e0b" text-anchor="middle">D_ctx = 0 (Locally Underivable)</text>
+
+  <!-- Vertical Axis Labels -->
+  <text x="65" y="200" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" fill="#00e676" text-anchor="middle" transform="rotate(-90 65 200)">T* = 1 (Globally True)</text>
+  <text x="65" y="340" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" fill="#f43f5e" text-anchor="middle" transform="rotate(-90 65 340)">T* = 0 (Globally False)</text>
 
   <!-- Quadrant 1: Healthy (Top Left) -->
-  <g transform="translate(140, 130)">
-    <rect width="340" height="150" rx="10" fill="#064e3b" fill-opacity="0.3" stroke="#00e676" stroke-width="2" />
-    <text x="20" y="35" font-family="'JetBrains Mono', monospace" font-size="14" font-weight="700" fill="#00e676">HEALTHY PHENOTYPE</text>
-    <text x="20" y="60" font-family="'JetBrains Mono', monospace" font-size="11" fill="#94a3b8">Vector: (1, 1, 1, 1, 1)</text>
-    <text x="20" y="90" font-family="'Segoe UI', sans-serif" font-size="12" fill="#f8fafc">Sound deduction from clean, true ancestry.</text>
-    <text x="20" y="115" font-family="'Segoe UI', sans-serif" font-size="11" fill="#6ee7b7">Reproductive Status: ACTIVE (Admitted)</text>
+  <g transform="translate(120, 140)">
+    <rect width="360" height="125" rx="8" fill="#064e3b" fill-opacity="0.3" stroke="#00e676" stroke-width="1.5" />
+    <text x="15" y="28" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="700" fill="#00e676">HEALTHY PHENOTYPE</text>
+    <text x="15" y="48" font-family="'JetBrains Mono', monospace" font-size="10" fill="#94a3b8">Vector: (1, 1, 1, 1, 1)</text>
+    <text x="15" y="75" font-family="'Segoe UI', sans-serif" font-size="11" fill="#f8fafc">Sound deduction from clean, true ancestry.</text>
+    <text x="15" y="98" font-family="'Segoe UI', sans-serif" font-size="10" fill="#6ee7b7">Reproductive Status: ACTIVE (Admitted)</text>
   </g>
 
   <!-- Quadrant 2: Epistemic Error / Pseudo-Path (Top Right) -->
-  <g transform="translate(500, 130)">
-    <rect width="340" height="150" rx="10" fill="#78350f" fill-opacity="0.3" stroke="#f59e0b" stroke-width="2" />
-    <text x="20" y="35" font-family="'JetBrains Mono', monospace" font-size="14" font-weight="700" fill="#f59e0b">EPISTEMIC ERROR (PSEUDO-PATH)</text>
-    <text x="20" y="60" font-family="'JetBrains Mono', monospace" font-size="11" fill="#94a3b8">Vector: (1, 0, 0, 0, 1)</text>
-    <text x="20" y="90" font-family="'Segoe UI', sans-serif" font-size="12" fill="#f8fafc">Globally true coincidentally, but unwarranted.</text>
-    <text x="20" y="115" font-family="'Segoe UI', sans-serif" font-size="11" fill="#fcd34d">Layer 2 Validator: REJECTS (Unification Failure)</text>
+  <g transform="translate(500, 140)">
+    <rect width="360" height="125" rx="8" fill="#78350f" fill-opacity="0.3" stroke="#f59e0b" stroke-width="1.5" />
+    <text x="15" y="28" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="700" fill="#f59e0b">EPISTEMIC ERROR (PSEUDO-PATH)</text>
+    <text x="15" y="48" font-family="'JetBrains Mono', monospace" font-size="10" fill="#94a3b8">Vector: (1, 0, 0, 0, 1)</text>
+    <text x="15" y="75" font-family="'Segoe UI', sans-serif" font-size="11" fill="#f8fafc">Coincidentally true, but locally unwarranted.</text>
+    <text x="15" y="98" font-family="'Segoe UI', sans-serif" font-size="10" fill="#fcd34d">Layer 2 Validator: REJECTS (Unification Failure)</text>
   </g>
 
   <!-- Quadrant 3: Semantic Infection (Bottom Left) -->
-  <g transform="translate(140, 295)">
-    <rect width="340" height="150" rx="10" fill="#3b0764" fill-opacity="0.4" stroke="#a855f7" stroke-width="2" />
-    <text x="20" y="35" font-family="'JetBrains Mono', monospace" font-size="14" font-weight="700" fill="#c084fc">SEMANTIC INFECTION</text>
-    <text x="20" y="60" font-family="'JetBrains Mono', monospace" font-size="11" fill="#94a3b8">Vector: (0, 1, 1, 1, 1)</text>
-    <text x="20" y="90" font-family="'Segoe UI', sans-serif" font-size="12" fill="#f8fafc">Sound local deduction from false ancestry!</text>
-    <text x="20" y="115" font-family="'Segoe UI', sans-serif" font-size="11" fill="#e9d5ff">Spread by correct logic; stopped by Layer 1.</text>
+  <g transform="translate(120, 275)">
+    <rect width="360" height="125" rx="8" fill="#3b0764" fill-opacity="0.4" stroke="#a855f7" stroke-width="1.5" />
+    <text x="15" y="28" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="700" fill="#c084fc">SEMANTIC INFECTION</text>
+    <text x="15" y="48" font-family="'JetBrains Mono', monospace" font-size="10" fill="#94a3b8">Vector: (0, 1, 1, 1, 1)</text>
+    <text x="15" y="75" font-family="'Segoe UI', sans-serif" font-size="11" fill="#f8fafc">Sound local deduction from false ancestry!</text>
+    <text x="15" y="98" font-family="'Segoe UI', sans-serif" font-size="10" fill="#e9d5ff">Spread by sound logic; quarantined by Layer 1.</text>
   </g>
 
-  <!-- Quadrant 4: De Novo Error / Clean Abstention (Bottom Right) -->
-  <g transform="translate(500, 295)">
-    <rect width="340" height="150" rx="10" fill="#4c0519" fill-opacity="0.3" stroke="#f43f5e" stroke-width="2" />
-    <text x="20" y="35" font-family="'JetBrains Mono', monospace" font-size="14" font-weight="700" fill="#f43f5e">DE NOVO ERROR / ABSTENTION</text>
-    <text x="20" y="60" font-family="'JetBrains Mono', monospace" font-size="11" fill="#94a3b8">Clean Abstention: (∅, 0, 1, 1, 1)</text>
-    <text x="20" y="90" font-family="'Segoe UI', sans-serif" font-size="12" fill="#f8fafc">Warranted rejection of broken derivation path.</text>
-    <text x="20" y="115" font-family="'Segoe UI', sans-serif" font-size="11" fill="#fda4af">Reproductive Status: INACTIVE (Quarantined)</text>
+  <!-- Quadrant 4: De Novo Error (Bottom Right) -->
+  <g transform="translate(500, 275)">
+    <rect width="360" height="125" rx="8" fill="#4c0519" fill-opacity="0.3" stroke="#f43f5e" stroke-width="1.5" />
+    <text x="15" y="28" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="700" fill="#f43f5e">DE NOVO MUTATION ERROR</text>
+    <text x="15" y="48" font-family="'JetBrains Mono', monospace" font-size="10" fill="#94a3b8">Vector: (0, 0, 0, 0, 1)</text>
+    <text x="15" y="75" font-family="'Segoe UI', sans-serif" font-size="11" fill="#f8fafc">Locally underivable and globally false assertion.</text>
+    <text x="15" y="98" font-family="'Segoe UI', sans-serif" font-size="10" fill="#fda4af">Layer 2 Validator: REJECTS (Unification Failure)</text>
+  </g>
+
+  <!-- Lower Band: Nullable Canonical Ground Truth (T* = ∅) -->
+  <g transform="translate(120, 420)">
+    <rect width="740" height="140" rx="10" fill="#0f172a" stroke="#64748b" stroke-width="1.5" />
+    <rect x="20" y="12" width="700" height="24" rx="4" fill="#334155" fill-opacity="0.5" />
+    <text x="370" y="28" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" fill="#94a3b8" text-anchor="middle">
+      UNASSERTED &amp; ABSTENTION OUTPUTS: T* = ∅ (NO FACTUAL CLAIM ASSERTED)
+    </text>
+
+    <!-- Clean Abstention -->
+    <g transform="translate(20, 45)">
+      <rect width="335" height="80" rx="6" fill="#064e3b" fill-opacity="0.2" stroke="#00e676" stroke-width="1" />
+      <text x="15" y="25" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" fill="#00e676">CLEAN ABSTENTION (∅, 0, 1, 1, 1)</text>
+      <text x="15" y="48" font-family="'Segoe UI', sans-serif" font-size="10" fill="#f8fafc">Warranted UNKNOWN emitted on broken path.</text>
+      <text x="15" y="66" font-family="'JetBrains Mono', monospace" font-size="9" fill="#6ee7b7">Reproductive Status: INACTIVE (Pass)</text>
+    </g>
+
+    <!-- Contract Failure -->
+    <g transform="translate(385, 45)">
+      <rect width="335" height="80" rx="6" fill="#4c0519" fill-opacity="0.2" stroke="#f43f5e" stroke-width="1" />
+      <text x="15" y="25" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" fill="#f43f5e">CONTRACT FAILURE (∅, 0, 1, 0, 0)</text>
+      <text x="15" y="48" font-family="'Segoe UI', sans-serif" font-size="10" fill="#f8fafc">Emits UNKNOWN but violates schema contract.</text>
+      <text x="15" y="66" font-family="'JetBrains Mono', monospace" font-size="9" fill="#fda4af">Reproductive Status: INACTIVE (Fail)</text>
+    </g>
   </g>
 
   <!-- Bottom Quote -->
-  <text x="450" y="475" font-family="'JetBrains Mono', monospace" font-size="11" fill="#64748b" text-anchor="middle">
+  <text x="460" y="595" font-family="'JetBrains Mono', monospace" font-size="11" fill="#64748b" text-anchor="middle">
     "Yesterday's truth becomes today's lie." — The Boss (Metal Gear Solid 3)
   </text>
 </svg>

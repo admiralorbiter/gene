@@ -1,5 +1,8 @@
+"""Tests for canonical results manifest and claim ledger integrity."""
+
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 import sys
@@ -11,11 +14,21 @@ sys.path.insert(0, str(root_dir))
 from scripts.generate_results_manifest import generate_manifest
 
 
+def compute_sha256(file_path: Path) -> str:
+    """Compute the SHA-256 hex digest of a local file."""
+    h = hashlib.sha256()
+    with open(file_path, "rb") as f:
+        while chunk := f.read(65536):
+            h.update(chunk)
+    return h.hexdigest()
+
+
 def test_manifest_generation_and_schema():
     """Verify that manifest generation produces valid data matching the schema."""
     manifest = generate_manifest()
     assert manifest["manifest_version"] == "1.0.0"
     assert manifest["project"] == "GENE (Genealogical Epistemic Network Experiments)"
+    assert "T" in manifest["generated_at"]  # Dynamic ISO timestamp
 
     experiments = manifest["canonical_experiments"]
     assert "exp0" in experiments
@@ -27,57 +40,103 @@ def test_manifest_generation_and_schema():
     assert "exp1b_c2b" in experiments
 
     # Check key numerical invariants
-    assert experiments["exp0"]["causal_necessity_calibrated"] == 1.0
+    sub_exp0 = experiments["exp0"]["sub_experiments"]
+    assert sub_exp0["exp0_a_observability_audit"]["causal_necessity_calibrated"] == 1.0
+    assert sub_exp0["exp0_b_factorial_calibration"]["cell_4_causal_tests"] == 66
+
     assert experiments["exp1a"]["transmission_fidelity_tau"] == 1.0
+
+    # Galton-Watson closed form math
+    ext_probs = experiments["exp1b_a"]["analytical_extinction_probabilities"]
+    assert ext_probs["critical_boundary_p0.50"] == 1.0
+    assert ext_probs["supercritical_p0.60"] == 0.44444
+    assert ext_probs["supercritical_p0.75"] == 0.11111
+
     assert experiments["exp1b_b1c"]["p_active_given_complete_path"] == 1.0
     assert experiments["exp1b_b1c"]["p_active_given_broken_path"] == 0.0
-    assert experiments["exp1b_c1b"]["operating_point_tpr90_fpr10"]["lineage_quarantine"]["selectivity_S"] == 0.8
+
+    # C1b at canonical top_k = 6
+    c1b_k6 = experiments["exp1b_c1b"]["canonical_operating_point_k6_tpr90_fpr10"]
+    assert c1b_k6["lineage_quarantine"]["selectivity_S"] == 0.8
+    assert c1b_k6["signal_blind_uniform_thinning"]["selectivity_S"] == -0.0
+
     assert experiments["exp1b_c2b"]["mu_expression_overall"] == 0.3
     assert experiments["exp1b_c2b"]["mu_heritable_overall"] == 0.0
 
 
-def test_claim_ledger_integrity():
+def test_claim_ledger_multi_source_integrity():
     """Verify that all claims in claim_ledger.json are complete, valid, and resolve to existing reports."""
-    root_dir = Path(__file__).resolve().parent.parent
     ledger_path = root_dir / "data" / "claim_ledger.json"
     assert ledger_path.exists(), "data/claim_ledger.json must exist"
 
     with open(ledger_path, "r", encoding="utf-8") as f:
         ledger = json.load(f)
 
-    assert ledger["ledger_version"] == "1.0.0"
+    assert ledger["ledger_version"] == "2.0.0"
     claims = ledger["claims"]
     assert len(claims) >= 8
 
-    required_fields = [
+    required_claim_fields = [
         "claim_id",
+        "claim_status",
         "headline",
         "claim_text",
-        "evidence_class",
-        "model_tested",
-        "configurations_and_worlds",
-        "sample_size",
-        "primary_metric",
-        "frozen_db",
-        "execution_commit",
-        "formal_report",
+        "evidence_sources",
         "scope_limitations",
-        "mgs_thematic_quote",
+        "replication_status",
+    ]
+
+    required_source_fields = [
+        "experiment",
+        "evidence_class",
+        "artifact",
+        "artifact_sha256",
+        "execution_commit",
+        "model",
+        "n_calls",
+        "n_evaluations",
+        "unit_of_analysis",
+        "formal_report",
+        "primary_metric",
     ]
 
     for claim in claims:
-        for field in required_fields:
+        for field in required_claim_fields:
             assert field in claim, f"Claim {claim.get('claim_id')} missing field {field}"
-            assert claim[field], f"Claim {claim.get('claim_id')} has empty field {field}"
 
-        # Verify formal report file exists
-        report_path = root_dir / claim["formal_report"]
-        assert report_path.exists(), f"Report {claim['formal_report']} for claim {claim['claim_id']} does not exist"
+        sources = claim["evidence_sources"]
+        assert len(sources) >= 1, f"Claim {claim['claim_id']} must have at least one evidence source"
 
-        # Verify frozen database exists
-        db_path = root_dir / claim["frozen_db"]
-        assert db_path.exists(), f"Database {claim['frozen_db']} for claim {claim['claim_id']} does not exist"
+        for src in sources:
+            for field in required_source_fields:
+                assert field in src, f"Source in claim {claim['claim_id']} missing {field}"
 
-        # Verify MGS quote structure
-        quote_obj = claim["mgs_thematic_quote"]
-        assert "speaker" in quote_obj and "quote" in quote_obj
+            # Verify formal report file exists
+            report_path = root_dir / src["formal_report"]
+            assert report_path.exists(), f"Report {src['formal_report']} for claim {claim['claim_id']} does not exist"
+
+            # If artifact is a .db file, verify it exists and checksum matches
+            if src["artifact"].endswith(".db"):
+                db_path = root_dir / src["artifact"]
+                assert db_path.exists(), f"Database {src['artifact']} for claim {claim['claim_id']} does not exist"
+                actual_sha = compute_sha256(db_path)
+                assert actual_sha.lower() == src["artifact_sha256"].lower(), (
+                    f"SHA256 mismatch for {src['artifact']} in {claim['claim_id']}: expected {src['artifact_sha256']}, got {actual_sha}"
+                )
+
+
+def test_epigraphs_file_integrity():
+    """Verify that docs/design/epigraphs.json is well-structured."""
+    epigraphs_path = root_dir / "docs" / "design" / "epigraphs.json"
+    assert epigraphs_path.exists(), "docs/design/epigraphs.json must exist"
+
+    with open(epigraphs_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    assert "epigraphs" in data
+    assert len(data["epigraphs"]) >= 8
+    for ep in data["epigraphs"]:
+        assert "speaker" in ep
+        assert "source" in ep
+        assert "text" in ep
+        assert "theme" in ep

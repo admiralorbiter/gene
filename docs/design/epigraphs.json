@@ -1,0 +1,62 @@
+{
+  "project": "GENE (Genealogical Epistemic Network Experiments)",
+  "description": "Curated thematic epigraphs from the Metal Gear Solid series reflecting on memes, memory control, genetic determinism, and the preservation of truth across generations.",
+  "epigraphs": [
+    {
+      "id": "epigraph-01-memes-future",
+      "speaker": "Solid Snake",
+      "source": "Metal Gear Solid 2: Sons of Liberty",
+      "theme": "Information Inheritance & Memes",
+      "text": "Building the future and keeping the past alive are one and the same thing. We can tell other people about - having faith. What we've fought for, and what we've believed in... What we pass on to the next generation... that's the whole point of our lives."
+    },
+    {
+      "id": "epigraph-02-truth-context",
+      "speaker": "The Boss",
+      "source": "Metal Gear Solid 3: Snake Eater",
+      "theme": "Epistemic Context & Semantic Transformation",
+      "text": "There's no such thing as an absolute timeless enemy. Our enemies are always changing, along with the times. Yesterday's truth becomes today's lie."
+    },
+    {
+      "id": "epigraph-03-control-systems",
+      "speaker": "Revolver Ocelot",
+      "source": "Metal Gear Solid 4: Guns of the Patriots",
+      "theme": "Systems of Control & Epistemic Habitats",
+      "text": "The world needs to be free of this system of control. Not by genes, not by memes, not by scene... but by choice."
+    },
+    {
+      "id": "epigraph-04-selective-memory",
+      "speaker": "The Patriots / GW AI",
+      "source": "Metal Gear Solid 2: Sons of Liberty",
+      "theme": "Memory Governance & Selective Forgetting",
+      "text": "The digital society furthers human flaw and selectively rewards the development of convenient half-truths. Our epoch needs a selective system of memory."
+    },
+    {
+      "id": "epigraph-05-lineage-curse",
+      "speaker": "Liquid Snake",
+      "source": "Metal Gear Solid",
+      "theme": "Lineage & Ancestral Provenance",
+      "text": "It's all in the genes! You can't escape your lineage! The sins of the father are passed down to the son!"
+    },
+    {
+      "id": "epigraph-06-junk-data",
+      "speaker": "Colonel Campbell / AI",
+      "source": "Metal Gear Solid 2: Sons of Liberty",
+      "theme": "Information Pollution & Pseudo-Path Formation",
+      "text": "You exercise your right to 'freedom' and this is the result: loss of context, malicious half-truths, and triviality. The digital world is creating junk data faster than anyone can delete it."
+    },
+    {
+      "id": "epigraph-07-passing-the-light",
+      "speaker": "Otacon",
+      "source": "Metal Gear Solid 4: Guns of the Patriots",
+      "theme": "Proofreading & Germline Preservation",
+      "text": "We have to leave something behind. Not just genetic code, but memories, culture, history. That's what a meme really is. It's up to us to make sure the light doesn't go out."
+    },
+    {
+      "id": "epigraph-08-self-determination",
+      "speaker": "Solid Snake",
+      "source": "Metal Gear Solid",
+      "theme": "Inference Autonomy & Non-Determinism",
+      "text": "A strong man doesn't need to read the future. He makes his own."
+    }
+  ]
+}

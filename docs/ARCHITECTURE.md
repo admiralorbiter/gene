@@ -564,36 +564,48 @@ Epistemic reliability in multi-agent and reasoning ecologies requires two struct
    - **Target**: Acts on the selective admission rate $W_{\text{proofread}} = P(\text{claim admitted} \mid \text{claim generated})$.
    - **Failure Mode**: Transient pseudo-path formation, cross-entity variable binding shortcuts, and single-premise conclusion jumping.
 
-### 17.3 Evolutionary Transmission Dynamics: Expression vs. Heritability
-The integration of Layer 1 memory governance and Layer 2 structural proofreading transforms the general multi-generation branching reproduction equation:
+### 17.3 Evolutionary Transmission Dynamics: Two-Channel Decomposition (Inherited vs. De Novo)
+
+In a persistent memory ecology, corrupted or false information enters downstream generations through two distinct causal mechanisms:
+
+#### 1. The Inherited Transmission Channel ($R_{\text{inherited}}$)
+When a candidate claim is derived from a corrupted ancestral premise present in the retrieved context:
 \[
-q_{\text{bad}} = X_{\text{path}} \times \tau \times W_{\text{proofread}}
-\]
-\[
-R_{\text{bad}} \approx b \cdot q_{\text{bad}} = b \cdot X_{\text{path}} \cdot \tau \cdot W_{\text{proofread}}
+R_{\text{inherited}} \approx b \cdot X_{\text{path}} \cdot \tau_S \cdot W_S
 \]
 where:
-- $b$ is the expected branching factor / reproductive opportunity capacity per parent node;
-- $X_{\text{path}}$ is the retrieval support-path availability ($X_{\text{path}} = P(\text{full support retrieved})$), modulated by Layer 1 Lineage Governance;
-- $\tau$ is local transmission fidelity ($\tau = P(\text{descendant derived} \mid \text{full support})$);
-- $W_{\text{proofread}}$ is the selective write admission rate ($W_{\text{proofread}} = P(\text{claim admitted to memory} \mid \text{claim generated})$), governed by the Layer 2 Structural Proofreader.
+- $b$ is the branching factor / reproductive opportunity capacity per parent node;
+- $X_{\text{path}}$ is the retrieval support-path availability ($X_{\text{path}} = P(\text{full support retrieved})$), modulated by **Layer 1 Lineage Governance**;
+- $\tau_S$ is local deductive transmission fidelity ($\tau_S = P(\text{descendant derived} \mid \text{full support})$);
+- $W_S$ is the selective write admission rate for structurally valid derivations ($W_S = 1.000$ for warranted deductions).
 
-We formally separate:
-- **Phenotypic Expression Rate**:
-  \[
-  \mu_{\text{expression}} = P(\text{unsupported concrete claim emitted})
-  \]
-- **Heritable Mutation Rate**:
-  \[
-  \mu_{\text{heritable}} = P(\text{unsupported claim admitted to persistent memory}) = \mu_{\text{expression}} \times W_{\text{proofread}}
-  \]
+#### 2. The Spontaneous / Underivable Channel ($\mu_U$)
+When legitimate retrieval paths are broken or quarantined ($D_{\text{ctx}} = 0, X_{\text{path}} = 0$), downstream neural reasoners may nevertheless emit unsupported concrete claims via single-premise conclusion jumping or variable cross-binding shortcuts:
+\[
+\mu_U = P(\text{unsupported concrete claim emitted} \mid D_{\text{ctx}} = 0)
+\]
+\[
+\mu_{U, \text{heritable}} = \mu_U \times W_U
+\]
+where $W_U = P(\text{underivable claim admitted to memory} \mid \text{underivable claim emitted})$ is governed strictly by the **Layer 2 Structural Support-Certificate Validator**.
+
+#### 3. Total Population Dynamics
+At the population level across generational step $g \to g+1$:
+\[
+\mathbb{E}[I_{g+1}] \approx R_{\text{inherited}} \cdot I_g + \Lambda_{\text{de\_novo}, g}
+\]
+where $\Lambda_{\text{de\_novo}, g} = N_{\text{opp}} \cdot \mu_{U, \text{heritable}}$.
+
+This mathematical separation explains why two defense layers are structurally necessary:
+- **Layer 1 (Memory Governance)** eliminates the inherited reproduction term by setting $X_{\text{path}} \to 0 \implies R_{\text{inherited}} \to 0$.
+- **Layer 2 (Structural Proofreading)** eliminates the spontaneous heritability term by setting $W_U \to 0 \implies \mu_{U, \text{heritable}} \to 0$.
 
 In Experiment 1B-C2b on Gemma 3:12B, across 30 invocations:
 \[
-\mu_{\text{expression}} = \frac{9}{30} = 0.300 \quad \left(\frac{9}{24} = 0.375 \text{ on broken-path opportunities}\right)
+\mu_U = \frac{9}{24} = \mathbf{0.375} \quad (\text{broken-path phenotypic expression rate})
 \]
 \[
-\mu_{\text{heritable}} = \frac{0}{30} = \mathbf{0.000} \quad \left(\frac{0}{24} = \mathbf{0.000} \text{ on broken-path opportunities}\right)
+W_U = \frac{0}{9} = \mathbf{0.000} \implies \mu_{U, \text{heritable}} = \frac{0}{24} = \mathbf{0.000}
 \]
 
 Transient reasoning errors may occur phenotypically ($\mu_{\text{expression}} > 0$) without entering the germline ($\mu_{\text{heritable}} = 0$) when protected by a structural proofreading firewall.
