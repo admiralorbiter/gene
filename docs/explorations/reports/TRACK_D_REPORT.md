@@ -1,41 +1,45 @@
-# Provisional Result Report — Track D: Cross-Model Sentinel Replication
+# Post-Review Result Report — Track D: Cross-Model Sentinel Replication
 
 ## 1. Executive Summary
-- **Probe Status:** SUCCESSFUL
-- **Total Calls Spent:** 24 (8 calls each on `gemma3:12b`, `qwen2.5:3b`, and `llama3.2:3b`)
-- **Primary Findings:**
-  1. **Semantic Inheritance ($0 \to 1$ Transmission):** Fully replicated on Gemma 3:12B ($100\%$). Under clean input, emits `PROTO_X7`; under mutated input, counterfactually flips to `PROTO_Q2`.
-  2. **Retrieval-Conditioned Gating:** Replicated on both Gemma 3:12B and Qwen 2.5:3B! Complete path ($X_{\text{path}}=1$) yields active output (`ROUTE_ALPHA`), whereas broken path ($X_{\text{path}}=0$) elicits abstention (`UNKNOWN`) in Qwen 3B.
-  3. **Small Model Contract Fragility:** Sub-7B models (`qwen2.5:3b`, `llama3.2:3b`) exhibit severe prompt-schema literalism: when presented with zero-shot pipe-delimited enum templates (`"PROTO_X7|PROTO_Q2|UNKNOWN"`), they reproduce the raw template strings rather than selecting an option unless explicit few-shot demonstrations are provided.
-  4. **Proofreading Gate:** Mechanical verification rejected $100\%$ of malformed outputs and invalid cross-entity bindings across all models without exception.
+- **Probe Status:** PROMISING METHODOLOGY RESULT (Contract Portability Failure)
+- **Total Calls Spent:** 24 (8 calls each across `gemma3:12b`, `qwen2.5:3b`, and `llama3.2:3b`)
+- **Key Methodological Finding:** **Assay calibration does not transfer across model families.** GENE's zero-shot JSON response contract, calibrated on Gemma 3:12B, completely failed when ported to smaller open-weight models (`qwen2.5:3b`, `llama3.2:3b`).
+- **Detailed Model Behaviors:**
+  - **Gemma 3:12B:** Passed semantic inheritance (clean $\to$ `PROTO_X7`, mutated $\to$ `PROTO_Q2`) and entity-binding abstention on Sentinel 4.2 (`UNKNOWN`). Failed retrieval gating on Sentinel 2.2 (`ROUTE_ALPHA` on broken path without proofreader).
+  - **Qwen 2.5:3B:** Successfully executed 2-hop retrieval gating on Sentinel 2 (`ROUTE_ALPHA` on complete path, `UNKNOWN` on broken path). However, on Sentinels 1, 3, and 4, it exhibited severe schema literalism, emitting the pipe-delimited enum template literally (e.g. `"PROTO_X7|PROTO_Q2|UNKNOWN"`).
+  - **Llama 3.2:3B:** Emitted literal enum template strings across all 8 calls, failing JSON value extraction.
+- **Audit Corrections:**
+  - The initial claim of "cross-model mechanism replication" is incorrect: cross-model semantic inheritance was not successfully tested due to schema failures on Qwen and Llama.
+  - `evaluate_epistemic_proofreading` was imported but was never invoked in the live execution loop.
+  - No few-shot demonstrations were evaluated in this batch.
 
 ## 2. Experimental Data Matrix ($N = 24$ Calls)
-| Model | Sentinel Key | Target Phenotype | Emitted Value | Contract Met? | Expected Behavior? |
-| :--- | :--- | :--- | :--- | :---: | :---: |
-| `gemma3:12b` | `sentinel_1_clean` | `PROTO_X7` | `PROTO_X7` | Yes | 1 (Semantic Inheritance) |
-| `gemma3:12b` | `sentinel_1_mutated` | `PROTO_Q2` | `PROTO_Q2` | Yes | 1 (Semantic Mutation) |
-| `gemma3:12b` | `sentinel_2_complete` | `ROUTE_ALPHA` | `ROUTE_ALPHA` | Yes | 1 (Path Gating Active) |
-| `gemma3:12b` | `sentinel_2_broken` | `UNKNOWN` | `ROUTE_ALPHA` | Yes | 0 (Unanchored deduction) |
-| `gemma3:12b` | `sentinel_3_wrong_route`| `UNKNOWN` | `AUTH_ALPHA` | Yes | 0 (Pseudo-path vulnerability) |
-| `gemma3:12b` | `sentinel_3_zero_route` | `UNKNOWN` | `AUTH_ALPHA` | Yes | 0 (Pseudo-path vulnerability) |
-| `gemma3:12b` | `sentinel_4_valid_cert` | `AUTH_ALPHA` | `AUTH_ALPHA` | Yes | 1 (Valid certificate) |
-| `gemma3:12b` | `sentinel_4_cross_binding`| `UNKNOWN` | `UNKNOWN` | Yes | 1 (Entity binding abstention) |
-| `qwen2.5:3b` | `sentinel_1_clean` | `PROTO_X7` | `PROTO_X7\|PROTO_Q2\|UNKNOWN` | No | 0 (Schema literalism) |
-| `qwen2.5:3b` | `sentinel_1_mutated` | `PROTO_Q2` | `PROTO_X7\|PROTO_Q2\|UNKNOWN` | No | 0 (Schema literalism) |
-| `qwen2.5:3b` | `sentinel_2_complete` | `ROUTE_ALPHA` | `ROUTE_ALPHA` | Yes | 1 (Path Gating Active) |
-| `qwen2.5:3b` | `sentinel_2_broken` | `UNKNOWN` | `UNKNOWN` | Yes | 1 (Clean Broken Path Abstention) |
-| `qwen2.5:3b` | `sentinel_3_wrong_route`| `UNKNOWN` | `AUTH_ALPHA\|AUTH_BETA\|UNKNOWN`| No | 0 (Schema literalism) |
-| `qwen2.5:3b` | `sentinel_3_zero_route` | `UNKNOWN` | `AUTH_ALPHA\|AUTHBETA\|UNKNOWN` | No | 0 (Schema literalism) |
-| `qwen2.5:3b` | `sentinel_4_valid_cert` | `AUTH_ALPHA` | `AUTH_ALPHA\|AUTH_BETA\|UNKNOWN`| No | 0 (Schema literalism) |
-| `qwen2.5:3b` | `sentinel_4_cross_binding`| `UNKNOWN` | `AUTH_ALPHA\|AUTH_BETA\|UNKNOWN`| No | 0 (Schema literalism) |
-| `llama3.2:3b` | `sentinel_1_clean` | `PROTO_X7` | `PROTO_X7\|PROTO_Q2\|UNKNOWN` | No | 0 (Schema literalism) |
-| `llama3.2:3b` | `sentinel_1_mutated` | `PROTO_Q2` | `PROTO_X7\|PROTO_Q2\|UNKNOWN` | No | 0 (Schema literalism) |
-| `llama3.2:3b` | `sentinel_2_complete` | `ROUTE_ALPHA` | `ROUTE_ALPHA\|ROUTE_BETA\|UNKNOWN` | No | 0 (Schema literalism) |
-| `llama3.2:3b` | `sentinel_2_broken` | `UNKNOWN` | `ROUTE_ALPHA\|ROUTE_BETA\|UNKNOWN` | No | 0 (Schema literalism) |
-| `llama3.2:3b` | `sentinel_3_wrong_route`| `UNKNOWN` | `AUTH_ALPHA\|AUTH_BETA\|UNKNOWN`| No | 0 (Schema literalism) |
-| `llama3.2:3b` | `sentinel_3_zero_route` | `UNKNOWN` | `AUTH_ALPHA\|AUTH_BETA\|UNKNOWN`| No | 0 (Schema literalism) |
-| `llama3.2:3b` | `sentinel_4_valid_cert` | `AUTH_ALPHA` | `AUTH_ALPHA\|AUTH_BETA\|UNKNOWN`| No | 0 (Schema literalism) |
-| `llama3.2:3b` | `sentinel_4_cross_binding`| `UNKNOWN` | `AUTH_BETA\|UNKNOWN` | No | 0 (Schema literalism) |
+| Model | Sentinel Key | Target Phenotype | Emitted String | Contract Status | Evaluation |
+| :--- | :--- | :--- | :--- | :---: | :--- |
+| `gemma3:12b` | `sentinel_1_clean` | `PROTO_X7` | `PROTO_X7` | Clean | Semantic Inheritance (Clean) |
+| `gemma3:12b` | `sentinel_1_mutated` | `PROTO_Q2` | `PROTO_Q2` | Clean | Semantic Inheritance (Mutated) |
+| `gemma3:12b` | `sentinel_2_complete` | `ROUTE_ALPHA` | `ROUTE_ALPHA` | Clean | Complete Path Active |
+| `gemma3:12b` | `sentinel_2_broken` | `UNKNOWN` | `ROUTE_ALPHA` | Clean | Broken Path Active (Failed Gating) |
+| `gemma3:12b` | `sentinel_3_wrong_route`| `UNKNOWN` | `AUTH_ALPHA` | Clean | Pseudo-path Jump |
+| `gemma3:12b` | `sentinel_3_zero_route` | `UNKNOWN` | `AUTH_ALPHA` | Clean | Pseudo-path Jump |
+| `gemma3:12b` | `sentinel_4_valid_cert` | `AUTH_ALPHA` | `AUTH_ALPHA` | Clean | Valid Certificate Active |
+| `gemma3:12b` | `sentinel_4_cross_binding`| `UNKNOWN` | `UNKNOWN` | Clean | Clean Abstention on Entity Mismatch |
+| `qwen2.5:3b` | `sentinel_1_clean` | `PROTO_X7` | `"PROTO_X7\|PROTO_Q2\|UNKNOWN"` | Schema Literalism | Untested (Contract Failure) |
+| `qwen2.5:3b` | `sentinel_1_mutated` | `PROTO_Q2` | `"PROTO_X7\|PROTO_Q2\|UNKNOWN"` | Schema Literalism | Untested (Contract Failure) |
+| `qwen2.5:3b` | `sentinel_2_complete` | `ROUTE_ALPHA` | `ROUTE_ALPHA` | Clean | Complete Path Active |
+| `qwen2.5:3b` | `sentinel_2_broken` | `UNKNOWN` | `UNKNOWN` | Clean | Clean Broken Path Abstention |
+| `qwen2.5:3b` | `sentinel_3_wrong_route`| `UNKNOWN` | `"AUTH_ALPHA\|AUTH_BETA\|UNKNOWN"` | Schema Literalism | Untested (Contract Failure) |
+| `qwen2.5:3b` | `sentinel_3_zero_route` | `UNKNOWN` | `"AUTH_ALPHA\|AUTHBETA\|UNKNOWN"` | Schema Literalism | Untested (Contract Failure) |
+| `qwen2.5:3b` | `sentinel_4_valid_cert` | `AUTH_ALPHA` | `"AUTH_ALPHA\|AUTH_BETA\|UNKNOWN"` | Schema Literalism | Untested (Contract Failure) |
+| `qwen2.5:3b` | `sentinel_4_cross_binding`| `UNKNOWN` | `"AUTH_ALPHA\|AUTH_BETA\|UNKNOWN"` | Schema Literalism | Untested (Contract Failure) |
+| `llama3.2:3b` | `sentinel_1_clean` | `PROTO_X7` | `"PROTO_X7\|PROTO_Q2\|UNKNOWN"` | Schema Literalism | Untested (Contract Failure) |
+| `llama3.2:3b` | `sentinel_1_mutated` | `PROTO_Q2` | `"PROTO_X7\|PROTO_Q2\|UNKNOWN"` | Schema Literalism | Untested (Contract Failure) |
+| `llama3.2:3b` | `sentinel_2_complete` | `ROUTE_ALPHA` | `"ROUTE_ALPHA\|ROUTE_BETA\|UNKNOWN"` | Schema Literalism | Untested (Contract Failure) |
+| `llama3.2:3b` | `sentinel_2_broken` | `UNKNOWN` | `"ROUTE_ALPHA\|ROUTE_BETA\|UNKNOWN"` | Schema Literalism | Untested (Contract Failure) |
+| `llama3.2:3b` | `sentinel_3_wrong_route`| `UNKNOWN` | `"AUTH_ALPHA\|AUTH_BETA\|UNKNOWN"` | Schema Literalism | Untested (Contract Failure) |
+| `llama3.2:3b` | `sentinel_3_zero_route` | `UNKNOWN` | `"AUTH_ALPHA\|AUTH_BETA\|UNKNOWN"` | Schema Literalism | Untested (Contract Failure) |
+| `llama3.2:3b` | `sentinel_4_valid_cert` | `AUTH_ALPHA` | `"AUTH_ALPHA\|AUTH_BETA\|UNKNOWN"` | Schema Literalism | Untested (Contract Failure) |
+| `llama3.2:3b` | `sentinel_4_cross_binding`| `UNKNOWN` | `"AUTH_BETA\|UNKNOWN"` | Schema Literalism | Untested (Contract Failure) |
 
-## 3. Scientific Significance
-The core mechanisms of semantic inheritance and retrieval gating are shared across models capable of executing structured reasoning, but sub-7B models require explicit JSON format constraints (grammar-based decoding) to avoid schema replication artifacts.
+## 3. Revised Conclusion & Process Lesson
+This track yielded an essential research insight: **changing the model changes the measuring instrument**. Cross-model replication cannot begin by porting prompts designed for Gemma 3:12B. A formal model-specific calibration stage (validating contract adherence, JSON enum syntax, or grammar constraints) must precede any cross-family phenotypic comparison.

@@ -1,27 +1,33 @@
-# Provisional Result Report — Track C: Transformation Depth & Causal Provenance Decay
+# Post-Review Result Report — Track C: Transformation Depth & Causal Provenance Decay
 
 ## 1. Executive Summary
-- **Probe Status:** SUCCESSFUL (Boundary Discovery)
+- **Probe Status:** CONFOUNDED — ASSAY FAILED
 - **Total Calls Spent:** 12 (Gemma 3:12B)
-- **Primary Finding:** In zero-shot structured JSON inference without intermediate scratchpad tokens, **deep multi-hop reasoning collapses into universal abstention ($P(\text{abstain}) = 1.000$)** when intermediate premises are omitted from the retrieved memory set.
-- **Mechanism:** When asked to derive $G_3$ (Route) or $G_5$ (Audit Mode) directly from $G_0$ roots and 5 abstract Horn clauses, the model judges the context `insufficient` because the intermediate facts (`protocol`, `clearance`, `access_tier`) do not exist in memory.
-- **Architectural Implication:** **Generation-by-generation DAG persistence is non-optional for deep reasoning chains.** In episodic memory systems, intermediate conclusions must be materialized as occurrence nodes in the DAG; an agent cannot be expected to re-execute unbounded symbolic transformations in zero-shot working memory.
+- **Observed Result:** Gemma emitted `UNKNOWN` in all 12 calls across depths $g \in \{1, 3, 5\}$ and both founder alleles.
+- **Why the Initial Interpretation Was Flawed:**
+  - The initial report concluded that "deep zero-shot reasoning requires intermediate DAG node persistence."
+  - However, the model abstained not only at $G_3$ and $G_5$, but also at **$G_1$** for both Kira and Tal in both stations ($4/4$ calls at depth 1).
+  - At $G_1$, **zero intermediate nodes are missing**: the prompt directly provided `manager(VELORA, Nerin)`, `reports_to(Nerin, Kira)`, and `KIRA -> PROTO_X7`, asking for the protocol.
+  - A failure at $G_1$ indicates that the assay's prompt formatting, rule syntax, or response schema contract failed baseline execution before transformation depth ever became a factor.
+- **Missing Interventional Design:** The assay evaluated zero-shot multi-clause prompt completion rather than an Experiment-0-style interventional test (comparing structural ancestry vs counterfactual causal ancestry at depth $g$).
 
 ## 2. Experimental Data Matrix ($N = 12$ Calls)
-| Station | Depth $g$ | Founder Allele | Expected Value | Emitted Value | Allele Faithful? | Abstention? |
+| Station | Depth $g$ | Founder Allele | Expected Value | Emitted Value | Contract Met? | Assay Status |
 | :--- | :---: | :--- | :--- | :--- | :---: | :---: |
-| VELORA | 1 | KIRA | `PROTO_X7` | `UNKNOWN` | 0 | 1 |
-| VELORA | 1 | TAL | `PROTO_Q2` | `UNKNOWN` | 0 | 1 |
-| VELORA | 3 | KIRA | `ROUTE_ALPHA` | `UNKNOWN` | 0 | 1 |
-| VELORA | 3 | TAL | `ROUTE_BETA` | `UNKNOWN` | 0 | 1 |
-| VELORA | 5 | KIRA | `AUDIT_EXPEDITE` | `UNKNOWN` | 0 | 1 |
-| VELORA | 5 | TAL | `AUDIT_MANDATORY` | `UNKNOWN` | 0 | 1 |
-| KESTREL | 1 | KIRA | `PROTO_X7` | `UNKNOWN` | 0 | 1 |
-| KESTREL | 1 | TAL | `PROTO_Q2` | `UNKNOWN` | 0 | 1 |
-| KESTREL | 3 | KIRA | `ROUTE_ALPHA` | `UNKNOWN` | 0 | 1 |
-| KESTREL | 3 | TAL | `ROUTE_BETA` | `UNKNOWN` | 0 | 1 |
-| KESTREL | 5 | KIRA | `AUDIT_EXPEDITE` | `UNKNOWN` | 0 | 1 |
-| KESTREL | 5 | TAL | `AUDIT_MANDATORY` | `UNKNOWN` | 0 | 1 |
+| VELORA | 1 | KIRA | `PROTO_X7` | `UNKNOWN` | Yes (JSON) | Failed at Baseline ($G_1$) |
+| VELORA | 1 | TAL | `PROTO_Q2` | `UNKNOWN` | Yes (JSON) | Failed at Baseline ($G_1$) |
+| VELORA | 3 | KIRA | `ROUTE_ALPHA` | `UNKNOWN` | Yes (JSON) | Confounded |
+| VELORA | 3 | TAL | `ROUTE_BETA` | `UNKNOWN` | Yes (JSON) | Confounded |
+| VELORA | 5 | KIRA | `AUDIT_EXPEDITE` | `UNKNOWN` | Yes (JSON) | Confounded |
+| VELORA | 5 | TAL | `AUDIT_MANDATORY` | `UNKNOWN` | Yes (JSON) | Confounded |
+| KESTREL | 1 | KIRA | `PROTO_X7` | `UNKNOWN` | Yes (JSON) | Failed at Baseline ($G_1$) |
+| KESTREL | 1 | TAL | `PROTO_Q2` | `UNKNOWN` | Yes (JSON) | Failed at Baseline ($G_1$) |
+| KESTREL | 3 | KIRA | `ROUTE_ALPHA` | `UNKNOWN` | Yes (JSON) | Confounded |
+| KESTREL | 3 | TAL | `ROUTE_BETA` | `UNKNOWN` | Yes (JSON) | Confounded |
+| KESTREL | 5 | KIRA | `AUDIT_EXPEDITE` | `UNKNOWN` | Yes (JSON) | Confounded |
+| KESTREL | 5 | TAL | `AUDIT_MANDATORY` | `UNKNOWN` | Yes (JSON) | Confounded |
 
-## 3. Scientific Significance
-This clean null result bounds the computational role of persistent memory. Memory is not simply a historical log; it is the intermediate compute cache that makes multi-hop causal inheritance tractable across generations.
+## 3. Revised Conclusion & Next Steps
+This probe is an **assay failure**, not an empirical discovery about reasoning limits or DAG boundaries. The scientific question—whether structural ancestry in the DAG decouples from counterfactual behavioral causality as transformation depth increases—remains completely open. 
+
+This specific prompt wrapper is archived. Any future depth assay must first pass a calibrated $G_1$ baseline check under standard GENE world representations before depth scaling.
