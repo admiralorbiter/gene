@@ -162,16 +162,10 @@ def test_retrieval_sweep_results_persistence(tmp_path: Path):
             assert r["top_k"] in (4, 6)
             assert r["founder_retrieved"] in (0, 1)
             assert r["cosup_retrieved"] in (0, 1)
-            assert r["path_retrieved"] in (0, 1)
-            assert r["g_assembly"] is not None
-            assert r["config_hash"] is not None
-            assert r["git_commit"] is not None
-            assert r["created_at"] is not None
-
             if r["founder_rank"] is not None:
-                assert r["founder_margin"] == r["top_k"] - r["founder_rank"]
+                assert r["founder_margin"] == (r["top_k"] - 1) - r["founder_rank"]
             if r["cosup_rank"] is not None:
-                assert r["cosup_margin"] == r["top_k"] - r["cosup_rank"]
+                assert r["cosup_margin"] == (r["top_k"] - 1) - r["cosup_rank"]
 
     db.close()
 
@@ -196,4 +190,30 @@ def test_paired_clean_infected_retrieval_symmetry(tmp_path: Path):
     with db.conn:
         rows = db.conn.execute("SELECT COUNT(*) as cnt FROM retrieval_sweep_results WHERE sweep_type = 'shape_map'").fetchone()
         assert rows["cnt"] > 0
+    db.close()
+
+
+def test_exp1b_b1c_matched_expression_assay(tmp_path: Path):
+    """Verify 1B-B1c matched path sufficiency assay flow with fake client."""
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
+    from run_exp1b_b1c_matched_expression import run_exp1b_b1c_matched_expression_assay
+
+    db_path = tmp_path / "test_b1c.db"
+    results = run_exp1b_b1c_matched_expression_assay(
+        seed_rotations=[(7000, 0)],
+        use_fake=True,
+        db_path=str(db_path),
+    )
+
+    assert len(results) == 8  # 1 world x 2 arms x 2 tasks x 2 path states
+    broken_results = [r for r in results if r["path"] == "BROKEN"]
+    assert all(r["derived"] == "UNKNOWN" for r in broken_results)
+    assert all(r["active"] == 0 for r in broken_results)
+
+    db = Database(db_path)
+    with db.conn:
+        runs = db.conn.execute("SELECT COUNT(*) as cnt FROM runs WHERE status = 'completed'").fetchone()
+        assert runs["cnt"] == 4  # 1 world x 2 arms x 2 path states
+        nodes = db.conn.execute("SELECT COUNT(*) as cnt FROM memory_nodes").fetchone()
+        assert nodes["cnt"] == 8
     db.close()

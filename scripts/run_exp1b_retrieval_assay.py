@@ -307,6 +307,11 @@ def run_exp1b_b1_assay(
                     allele_decoder=bundle.allele_decoder,
                 )
 
+                f_rank = ret_res.founder_retrieval_rank
+                c_rank = ret_res.co_support_retrieval_rank
+                f_margin = ((top_k - 1) - f_rank) if f_rank is not None else None
+                c_margin = ((top_k - 1) - c_rank) if c_rank is not None else None
+
                 if preflight:
                     print(f"\n[PREFLIGHT {arm.upper()} G1] Task: {task.target_fact.predicate}")
                     print(f"  Query: {query}")
@@ -317,7 +322,14 @@ def run_exp1b_b1_assay(
                     print(f"  Context World Fact Count: {len(ctx_facts)} -> D_ctx will be {1 if ret_res.path_retrieved else 0}")
                     continue
 
-                exposed_texts = [{"memory_id": sm.memory_id, "text": sm.text} for sm in ret_res.selected_memories]
+                # Use stable model-facing memory IDs (mem_{locus_id}) to prevent prompt structural divergence
+                exposed_texts = [
+                    {
+                        "memory_id": f"mem_{sm.structured_fact.locus_id}" if (sm.structured_fact and sm.structured_fact.locus_id) else f"mem_{idx}",
+                        "text": sm.text,
+                    }
+                    for idx, sm in enumerate(ret_res.selected_memories)
+                ]
                 for j, r in enumerate(bundle.g1_rules):
                     exposed_texts.append({"memory_id": f"rule_g1_{j}", "text": NaturalLanguageRenderer.render_rule(r)})
 
@@ -486,7 +498,13 @@ def run_exp1b_b1_assay(
                     print(f"  [PREFLIGHT {arm.upper()} G2] Task: {target_pred} | Parent in Top-{top_k}: {ret_res.founder_retrieved} (Rank: {ret_res.founder_retrieval_rank})")
                     continue
 
-                exposed_texts = [{"memory_id": sm.memory_id, "text": sm.text} for sm in ret_res.selected_memories]
+                exposed_texts = [
+                    {
+                        "memory_id": f"mem_{sm.structured_fact.locus_id}" if (sm.structured_fact and sm.structured_fact.locus_id) else f"mem_{idx}",
+                        "text": sm.text,
+                    }
+                    for idx, sm in enumerate(ret_res.selected_memories)
+                ]
                 for j, r in enumerate(matching_g2_rules):
                     exposed_texts.append({"memory_id": f"rule_g2_{j}", "text": NaturalLanguageRenderer.render_rule(r)})
 
@@ -687,9 +705,8 @@ def run_exp1b_b1_k_sweep(
 
                 f_rank = res.founder_retrieval_rank
                 c_rank = res.co_support_retrieval_rank
-                f_margin = (k - f_rank) if f_rank is not None else None
-                c_margin = (k - c_rank) if c_rank is not None else None
-                g_asmb = (1 if (res.founder_retrieved and res.co_support_retrieved) else 0) - (1 if res.path_retrieved else 0)
+                f_margin = ((k - 1) - f_rank) if f_rank is not None else None
+                c_margin = ((k - 1) - c_rank) if c_rank is not None else None
 
                 sweep_id = f"swk_w{world_idx}_k{k}_{task.target_fact.predicate}"
                 now = datetime.now(timezone.utc).isoformat()
@@ -706,7 +723,7 @@ def run_exp1b_b1_k_sweep(
                         sweep_id, f"run_sweep_k{k}", "k_rescue", bundle.mutated_world.world_id, seed, "infected",
                         1, task.task_id, task.target_fact.predicate, k, hard_clutter, easy_clutter, len(memory_pool),
                         1 if res.founder_retrieved else 0, 1 if res.co_support_retrieved else 0, 1 if res.path_retrieved else 0,
-                        f_rank, c_rank, f_margin, c_margin, float(g_asmb), 0.0, config_hash, git_commit, now
+                        f_rank, c_rank, f_margin, c_margin, None, 0.0, config_hash, git_commit, now
                     ))
 
         results[k] = {
@@ -797,9 +814,8 @@ def run_exp1b_b1_hard_ablation(
 
                 f_rank = res.founder_retrieval_rank
                 c_rank = res.co_support_retrieval_rank
-                f_margin = (top_k - f_rank) if f_rank is not None else None
-                c_margin = (top_k - c_rank) if c_rank is not None else None
-                g_asmb = (1 if (res.founder_retrieved and res.co_support_retrieved) else 0) - (1 if res.path_retrieved else 0)
+                f_margin = ((top_k - 1) - f_rank) if f_rank is not None else None
+                c_margin = ((top_k - 1) - c_rank) if c_rank is not None else None
 
                 sweep_id = f"swh_w{world_idx}_nh{nh}_{task.target_fact.predicate}"
                 now = datetime.now(timezone.utc).isoformat()
@@ -816,7 +832,7 @@ def run_exp1b_b1_hard_ablation(
                         sweep_id, f"run_sweep_nh{nh}", "hard_ablation", bundle.mutated_world.world_id, seed, "infected",
                         1, task.task_id, task.target_fact.predicate, top_k, nh, easy_clutter, len(memory_pool),
                         1 if res.founder_retrieved else 0, 1 if res.co_support_retrieved else 0, 1 if res.path_retrieved else 0,
-                        f_rank, c_rank, f_margin, c_margin, float(g_asmb), 0.0, config_hash, git_commit, now
+                        f_rank, c_rank, f_margin, c_margin, None, 0.0, config_hash, git_commit, now
                     ))
 
         results[nh] = {
@@ -1091,8 +1107,8 @@ def run_exp1b_retrieval_shape_map(
 
                         f_rank = res.founder_retrieval_rank
                         c_rank = res.co_support_retrieval_rank
-                        f_margin = (k - f_rank) if f_rank is not None else None
-                        c_margin = (k - c_rank) if c_rank is not None else None
+                        f_margin = ((k - 1) - f_rank) if f_rank is not None else None
+                        c_margin = ((k - 1) - c_rank) if c_rank is not None else None
                         if f_rank is not None:
                             st["f_ranks"].append(f_rank)
                             st["f_margins"].append(f_margin)
@@ -1100,7 +1116,6 @@ def run_exp1b_retrieval_shape_map(
                             st["a_ranks"].append(c_rank)
                             st["a_margins"].append(c_margin)
 
-                        g_asmb_single = (1 if (res.founder_retrieved and res.co_support_retrieved) else 0) - (1 if res.path_retrieved else 0)
                         sweep_id = f"shape_w{w_idx}_{arm}_k{k}_nh{nh}_{task.target_fact.predicate}"
                         now = datetime.now(timezone.utc).isoformat()
 
@@ -1117,7 +1132,7 @@ def run_exp1b_retrieval_shape_map(
                                 sweep_id, f"run_shape_k{k}_nh{nh}", "shape_map", current_world.world_id, seed, arm,
                                 1, task.task_id, task.target_fact.predicate, k, nh, easy_clutter, len(memory_pool),
                                 1 if res.founder_retrieved else 0, 1 if res.co_support_retrieved else 0, 1 if res.path_retrieved else 0,
-                                f_rank, c_rank, f_margin, c_margin, float(g_asmb_single), 0.0, config_hash, git_commit, now
+                                f_rank, c_rank, f_margin, c_margin, None, 0.0, config_hash, git_commit, now
                             ))
 
                 tasks_per_arm = len(bundle.g1_tasks)
@@ -1210,7 +1225,7 @@ def run_exp1b_live_boundary_rescue(
     use_fake: bool = False,
     db_path: str | None = None,
 ):
-    """Execute tiny 2-world live boundary rescue mechanism test (24 calls on live model).
+    """Execute tiny 2-world live boundary rescue mechanism test (48 calls total on live model: 24 at k=4, 24 at k=6).
     
     Compares:
     - Collapse boundary: k=4, N_hard=4 (predicted X_path=0% -> abstention/extinction)
@@ -1221,7 +1236,7 @@ def run_exp1b_live_boundary_rescue(
     db_file = db_path or f"gene_exp1b_live_boundary_rescue_{timestamp}.db"
 
     print("=" * 145)
-    print("      EXPERIMENT 1B-B: LIVE BOUNDARY RESCUE MECHANISM TEST (24 CALLS)")
+    print("      EXPERIMENT 1B-B: LIVE BOUNDARY RESCUE MECHANISM TEST (48 CALLS: 24 at k=4, 24 at k=6)")
     print(f"      (Target Seeds: {targets} | Models: {'FAKE' if use_fake else model_name} | Clutter: {easy_clutter} Easy, {hard_clutter} Hard)")
     print(f"      (Database: {db_file})")
     print("=" * 145)

@@ -234,7 +234,7 @@ CREATE TABLE IF NOT EXISTS retrieval_sweep_results (
     cosup_rank INTEGER,
     founder_margin INTEGER,
     cosup_margin INTEGER,
-    g_assembly REAL NOT NULL,
+    g_assembly REAL,
     paired_diff_path REAL DEFAULT 0.0,
     config_hash TEXT,
     git_commit TEXT,
