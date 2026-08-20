@@ -75,6 +75,7 @@ CREATE TABLE IF NOT EXISTS runs (
     git_commit TEXT,
     config_json TEXT,
     config_hash TEXT,
+    environment_json TEXT,
     started_at TEXT NOT NULL,
     completed_at TEXT,
     status TEXT NOT NULL,
@@ -200,7 +201,10 @@ class Database:
         """Initialize all schema tables and apply non-destructive migrations."""
         with self.conn:
             self.conn.executescript(SCHEMA_SQL)
-            # Safe column migrations for existing databases
+            run_cols = {row["name"] for row in self.conn.execute("PRAGMA table_info(runs)").fetchall()}
+            if "environment_json" not in run_cols:
+                self.conn.execute("ALTER TABLE runs ADD COLUMN environment_json TEXT")
+
             call_cols = {row["name"] for row in self.conn.execute("PRAGMA table_info(calls)").fetchall()}
             for col in ("load_duration_ms", "prompt_eval_duration_ms", "eval_duration_ms"):
                 if col not in call_cols:

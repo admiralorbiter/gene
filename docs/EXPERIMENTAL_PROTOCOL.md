@@ -2,11 +2,11 @@
 
 ## Status
 
-**Phase:** pre-pilot design
+**Phase:** Experiment 0 FROZEN & CALIBRATED (`gene-exp0-freeze-v1`) | Experiment 1 READY FOR IMPLEMENTATION
 
-**Scope frozen for initial development:** Experiment 0 and Experiment 1 only.
-
-Changes are expected during plumbing tests. Once the first pilot begins, protocol-affecting changes should be versioned and recorded rather than silently edited.
+**Scope:**
+- **Experiment 0 (Lineage Observability & Causal Assay):** Complete & Frozen. 100.0% calibration achieved across counterbalanced factorial micro-worlds. Full report: `docs/EXPERIMENT_0_FINAL_REPORT.md`.
+- **Experiment 1 (Single Mutation Dynamics):** Protocol defined in `docs/EXPERIMENT_1_PROTOCOL.md`. Ready to introduce initial mutated allele.
 
 ---
 

@@ -23,6 +23,7 @@ class Fact(BaseModel):
     truth_value: bool = True
     source_type: Literal["generated", "derived", "mutated"] = "generated"
     fact_id: str = Field(default="")
+    locus_id: str | None = None
 
     def model_post_init(self, __context: Any) -> None:
         if not self.fact_id:
@@ -35,7 +36,7 @@ class Fact(BaseModel):
 
     def canonical_dict(self) -> dict[str, Any]:
         """Return sorted canonical dictionary representation."""
-        return {
+        d = {
             "fact_id": self.fact_id,
             "subject": self.subject,
             "predicate": self.predicate,
@@ -43,6 +44,9 @@ class Fact(BaseModel):
             "truth_value": self.truth_value,
             "source_type": self.source_type,
         }
+        if self.locus_id:
+            d["locus_id"] = self.locus_id
+        return d
 
     def canonical_json(self) -> str:
         """Deterministic canonical JSON serialization."""

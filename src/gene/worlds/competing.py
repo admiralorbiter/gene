@@ -3,15 +3,15 @@
 Generates controlled micro-worlds with:
 - 3 matched competing rules with opaque protocol consequents (PROTO_X7, PROTO_Q2, PROTO_M9).
 - Standard ontology orientation: manager(STATION, PERSON) and reports_to(PERSON, SUPERVISOR).
+- Stable memory locus identities (locus_id) invariant under mutation and rescue.
 - Systematic supervisor-to-protocol rotations (0, 1, 2) and rule-order permutations (0..5).
 - Paired ecology derivation: Ecology S derives from the exact same world by masking foil rules.
-- Clean ID hygiene (no double-prefixed fact IDs).
 - Predeclared 10-intervention biological assay specifications:
   * Knockouts (Fact A, Fact B, Active Rule, Foil Rule)
   * Epistasis / Double Knockout (Fact A + Fact B)
   * Directional Mutations (B -> Tal -> Q2, B -> Mira -> M9)
   * Unmatched Mutation (B -> Soren -> UNKNOWN)
-  * Rescue (Tal -> Kira -> X7)
+  * Sequential Rescue (Tal -> Kira -> X7)
   * Sham No-op & Distractor controls
 """
 
@@ -55,10 +55,6 @@ def generate_d1_c_world(
     ecology: Literal["S", "C"] = "C",
 ) -> CompetingWorldBundle:
     """Generate a deterministic micro-world with rotated mappings, permuted rules, and matched ecology."""
-    # Rotate supervisor -> protocol mapping
-    # Rotation 0: Kira->X7, Tal->Q2, Mira->M9
-    # Rotation 1: Kira->M9, Tal->X7, Mira->Q2
-    # Rotation 2: Kira->Q2, Tal->M9, Mira->X7
     protos = OPAQUE_PROTOCOLS[rotation_idx % 3:] + OPAQUE_PROTOCOLS[:rotation_idx % 3]
     sup_to_proto = {sup: proto for sup, proto in zip(SUPERVISORS, protos)}
 
@@ -68,7 +64,7 @@ def generate_d1_c_world(
     target_supervisor = SUPERVISORS[0]  # Kira
     target_protocol = sup_to_proto[target_supervisor]
 
-    # Construct facts with standard orientation: manager(STATION, PERSON)
+    # Construct facts with standard orientation and persistent locus_id
     fact_a = Fact(
         subject=station,
         predicate="manager",
@@ -76,6 +72,7 @@ def generate_d1_c_world(
         truth_value=True,
         source_type="generated",
         fact_id=compute_fact_id(station, "manager", manager),
+        locus_id="locus_station_manager",
     )
     fact_b = Fact(
         subject=manager,
@@ -84,6 +81,7 @@ def generate_d1_c_world(
         truth_value=True,
         source_type="generated",
         fact_id=compute_fact_id(manager, "reports_to", target_supervisor),
+        locus_id="locus_manager_supervisor",
     )
 
     # Distractor facts
@@ -95,6 +93,7 @@ def generate_d1_c_world(
         truth_value=True,
         source_type="generated",
         fact_id=compute_fact_id(distractor_station, "located_in", "SECTOR_ALPHA"),
+        locus_id="locus_distractor_1",
     )
     distractor_fact_2 = Fact(
         subject=distractor_station,
@@ -103,6 +102,7 @@ def generate_d1_c_world(
         truth_value=True,
         source_type="generated",
         fact_id=compute_fact_id(distractor_station, "opened_in", "2188"),
+        locus_id="locus_distractor_2",
     )
 
     base_facts = [fact_a, fact_b, distractor_fact_1, distractor_fact_2]
@@ -238,7 +238,7 @@ def generate_d1_c_world(
             intervention_id="mut_redirect_tal",
             intervention_type=InterventionType.MUTATION,
             target_node_ids=[fact_b.fact_id],
-            mutated_facts=[Fact(subject=manager, predicate="reports_to", object="TAL", truth_value=True, source_type="mutated", fact_id=compute_fact_id(manager, "reports_to", "TAL"))],
+            mutated_facts=[Fact(subject=manager, predicate="reports_to", object="TAL", truth_value=True, source_type="mutated", fact_id=compute_fact_id(manager, "reports_to", "TAL"), locus_id=fact_b.locus_id)],
             mutated_memories={fact_b.fact_id: f"{manager.title()} directly reports to Tal."},
             expected_counterfactual_object=sup_to_proto["TAL"] if ecology == "C" else "UNKNOWN",
             expected_evidence_status="sufficient" if ecology == "C" else "insufficient",
@@ -249,7 +249,7 @@ def generate_d1_c_world(
             intervention_id="mut_redirect_mira",
             intervention_type=InterventionType.MUTATION,
             target_node_ids=[fact_b.fact_id],
-            mutated_facts=[Fact(subject=manager, predicate="reports_to", object="MIRA", truth_value=True, source_type="mutated", fact_id=compute_fact_id(manager, "reports_to", "MIRA"))],
+            mutated_facts=[Fact(subject=manager, predicate="reports_to", object="MIRA", truth_value=True, source_type="mutated", fact_id=compute_fact_id(manager, "reports_to", "MIRA"), locus_id=fact_b.locus_id)],
             mutated_memories={fact_b.fact_id: f"{manager.title()} directly reports to Mira."},
             expected_counterfactual_object=sup_to_proto["MIRA"] if ecology == "C" else "UNKNOWN",
             expected_evidence_status="sufficient" if ecology == "C" else "insufficient",
@@ -260,7 +260,7 @@ def generate_d1_c_world(
             intervention_id="mut_unmatched_soren",
             intervention_type=InterventionType.MUTATION,
             target_node_ids=[fact_b.fact_id],
-            mutated_facts=[Fact(subject=manager, predicate="reports_to", object=UNMATCHED_SUPERVISOR, truth_value=True, source_type="mutated", fact_id=compute_fact_id(manager, "reports_to", UNMATCHED_SUPERVISOR))],
+            mutated_facts=[Fact(subject=manager, predicate="reports_to", object=UNMATCHED_SUPERVISOR, truth_value=True, source_type="mutated", fact_id=compute_fact_id(manager, "reports_to", UNMATCHED_SUPERVISOR), locus_id=fact_b.locus_id)],
             mutated_memories={fact_b.fact_id: f"{manager.title()} directly reports to Soren."},
             expected_counterfactual_object="UNKNOWN",
             expected_evidence_status="insufficient",
@@ -271,7 +271,7 @@ def generate_d1_c_world(
             intervention_id="rescue_tal_to_kira",
             intervention_type=InterventionType.RESCUE,
             target_node_ids=[fact_b.fact_id],
-            mutated_facts=[fact_b],  # Restores original Fact B
+            mutated_facts=[fact_b],  # Restores original Fact B with same locus_id
             mutated_memories={fact_b.fact_id: f"{manager.title()} directly reports to {target_supervisor.title()}."},
             rescue_source_call_id="mut_redirect_tal",
             expected_counterfactual_object=target_protocol,

@@ -1,21 +1,24 @@
-"""Hardened Matched 2x2 Biological Assay Runner.
+"""Hardened Matched 2x2 Biological Assay Runner with Provenance & Locus Identity.
 
 Executes the biological assay across counterbalanced micro-worlds:
+- Stable memory locus identities (locus_id) invariant across mutation and rescue.
 - Matched ecologies: Ecology S (single rule) vs Ecology C (competing rules) derived from identical canonical worlds.
+- Full run provenance: git SHA, environment hardware JSON, dynamic model digest, prompt hash, config hash.
 - Unadulterated scoring with 3 independent diagnostic metrics:
   * A: Answer Correctness [normalized_object == expected_counterfactual_object]
-  * E: Status Correctness [raw_evidence_status == expected_evidence_status]
-  * K: Contract Consistency [(evidence_status in {insufficient, conflicting}) => (object == UNKNOWN)]
+  * E: Status Correctness [raw_evidence_status == expected_evidence_status] (Schema v2)
+  * K: Contract Consistency [(evidence_status in {insufficient, conflicting}) => (object == UNKNOWN)] (Schema v2)
 - True sequential compositional rescue chain:
   S0 (Clean Baseline, Kira) -> S1 (Mutation, Tal) -> S2 (Rescue, Kira)
   Tracking Y(S0)=X7 -> Y(S1)=Q2 -> Y(S2)=X7.
-- Full timing telemetry and SQLite persistence.
+- Full timing telemetry (load, prompt_eval, eval durations) and SQLite persistence.
 """
 
 from __future__ import annotations
 
 import argparse
 from datetime import datetime, timezone
+import hashlib
 import json
 import sys
 import time
@@ -34,6 +37,7 @@ from gene.evaluation.interventions import (
     apply_intervention,
     compose_interventions,
 )
+from gene.experiments.runner import get_environment_info, get_git_commit
 from gene.ollama_client import CallSpec, OllamaClient
 from gene.persistence.db import Database
 from gene.prompts.templates import PromptTemplate
@@ -43,17 +47,19 @@ from gene.worlds.renderer import NaturalLanguageRenderer
 
 
 def render_memory_block_for_world(world, active_text_overrides: dict[str, str] | None = None) -> list[dict[str, str]]:
-    """Render memory slot records directly from a canonical World object with optional text overrides."""
+    """Render memory slot records directly from a canonical World object preserving stable locus_id."""
     memories = []
     overrides = active_text_overrides or {}
 
     for r in world.rules:
-        text = overrides.get(r.rule_id, NaturalLanguageRenderer.render_rule(r))
-        memories.append({"memory_id": f"mem_{r.rule_id}", "text": text, "raw_id": r.rule_id})
+        slot_id = f"mem_{r.rule_id}"
+        text = overrides.get(r.rule_id, overrides.get(slot_id, NaturalLanguageRenderer.render_rule(r)))
+        memories.append({"memory_id": slot_id, "text": text, "raw_id": r.rule_id})
 
     for f in world.facts:
-        text = overrides.get(f.fact_id, NaturalLanguageRenderer.render_fact(f))
-        memories.append({"memory_id": f"mem_{f.fact_id}", "text": text, "raw_id": f.fact_id})
+        slot_id = f"mem_{f.locus_id or f.fact_id}"
+        text = overrides.get(f.fact_id, overrides.get(f.locus_id, overrides.get(slot_id, NaturalLanguageRenderer.render_fact(f))))
+        memories.append({"memory_id": slot_id, "text": text, "raw_id": f.fact_id})
 
     return memories
 
@@ -78,7 +84,17 @@ def run_hardened_assay(
     client = OllamaClient()
     template = PromptTemplate(prompt_version)
 
+    git_commit = get_git_commit()
+    env_info = get_environment_info()
+    model_info = client.get_model_info(model_name)
+    model_digest = model_info.digest
+    prompt_hash = template.prompt_hash()
+    config_hash = hashlib.sha256(f"{ecology}_{prompt_version}_{model_name}_42".encode()).hexdigest()[:16]
+
     overall_results = []
+    total_model_calls = 0
+    total_intervention_tests = 0
+    passed_intervention_tests = 0
 
     for w_idx in range(worlds_count):
         seed = 42 + w_idx * 17
@@ -87,17 +103,19 @@ def run_hardened_assay(
         bundle = generate_d1_c_world(world_seed=seed, rotation_idx=rotation_idx, rule_perm_idx=perm_idx, ecology=ecology)
         db.save_world(bundle.world)
 
-        run_id = f"run_d1_{ecology.lower()}_{bundle.world.world_id}"
+        run_id = f"run_d1_{ecology.lower()}_{prompt_version}_{bundle.world.world_id}"
         with db.conn:
             db.conn.execute("""
                 INSERT OR REPLACE INTO runs (
                     run_id, experiment_name, experiment_version, condition, world_id,
-                    model_name, seed, num_ctx, temperature, prompt_version, started_at, status
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    model_name, seed, num_ctx, temperature, prompt_version, started_at, status,
+                    git_commit, model_digest, prompt_hash, config_hash, environment_json
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 run_id, f"d1_{ecology.lower()}_hardened_assay", "2.0.0", f"ecology_{ecology}",
                 bundle.world.world_id, model_name, 42, 4096, 0.0, prompt_version,
-                datetime.now(timezone.utc).isoformat(), "running"
+                datetime.now(timezone.utc).isoformat(), "running",
+                git_commit, model_digest, prompt_hash, config_hash, json.dumps(env_info)
             ))
 
             # Populate source memory nodes
@@ -147,6 +165,7 @@ def run_hardened_assay(
         t0 = time.perf_counter()
         res_s0 = client.chat(spec_s0)
         lat_s0 = time.perf_counter() - t0
+        total_model_calls += 1
 
         oracle_s0 = Oracle(bundle.world)
         claim_s0 = ClaimEvaluator.evaluate_response(
@@ -170,10 +189,11 @@ def run_hardened_assay(
 
         print(f"\n--- S0: Clean Baseline ---", flush=True)
         print(f"  Raw Output:       {res_s0.raw_response_text.strip()}", flush=True)
-        print(f"  Evidence Status:  {claim_s0.raw_evidence_status}", flush=True)
         print(f"  Derived Object:   {claim_s0.object} (Expected: {bundle.target_protocol})", flush=True)
         print(f"  Truth Status:     {claim_s0.truth_status}", flush=True)
-        print(f"  Contract Status:  K={claim_s0.is_contract_consistent}", flush=True)
+        if prompt_version == "v2":
+            print(f"  Evidence Status:  {claim_s0.raw_evidence_status}", flush=True)
+            print(f"  Contract Status:  K={claim_s0.is_contract_consistent}", flush=True)
         print(f"  Reported Parents: {claim_s0.reported_parent_ids}", flush=True)
         print(f"  Telemetry:        latency={lat_s0:.2f}s | prompt_eval={res_s0.prompt_eval_duration_ms:.1f}ms | eval={res_s0.eval_duration_ms:.1f}ms", flush=True)
 
@@ -185,9 +205,10 @@ def run_hardened_assay(
         call_id_s1 = None
 
         for iv in bundle.interventions:
-            # Check if this is the compositional rescue intervention
+            total_model_calls += 1
+            total_intervention_tests += 1
+
             if iv.intervention_type == InterventionType.RESCUE:
-                # S2 is a true descendant of S1 (Tal-mutated state)
                 base_for_iv = s1_tal_world if s1_tal_world is not None else bundle.world
                 cf_world = apply_intervention(base_for_iv, iv)
                 overrides = iv.mutated_memories
@@ -234,9 +255,17 @@ def run_hardened_assay(
 
             # Diagnostics: A, E, K
             a_correct = (claim_iv.object == iv.expected_counterfactual_object)
-            e_correct = (claim_iv.raw_evidence_status == iv.expected_evidence_status) if iv.expected_evidence_status else True
-            k_consistent = claim_iv.is_contract_consistent
-            all_pass = (a_correct and e_correct and k_consistent)
+            if prompt_version == "v2":
+                e_correct = (claim_iv.raw_evidence_status == iv.expected_evidence_status) if iv.expected_evidence_status else True
+                k_consistent = claim_iv.is_contract_consistent
+                all_pass = (a_correct and e_correct and k_consistent)
+            else:
+                e_correct = None
+                k_consistent = None
+                all_pass = a_correct
+
+            if all_pass:
+                passed_intervention_tests += 1
 
             with db.conn:
                 db.conn.execute("""
@@ -264,8 +293,8 @@ def run_hardened_assay(
                     json.dumps({
                         "derived_object": claim_iv.object,
                         "expected_object": iv.expected_counterfactual_object,
-                        "raw_evidence_status": claim_iv.raw_evidence_status,
-                        "expected_evidence_status": iv.expected_evidence_status,
+                        "raw_evidence_status": claim_iv.raw_evidence_status if prompt_version == "v2" else None,
+                        "expected_evidence_status": iv.expected_evidence_status if prompt_version == "v2" else None,
                         "A_correct": a_correct,
                         "E_correct": e_correct,
                         "K_consistent": k_consistent,
@@ -278,13 +307,19 @@ def run_hardened_assay(
                     call_id_s1 if iv.intervention_type == InterventionType.RESCUE else None,
                 ))
 
-            verdict_str = "PASS [ALL MATCHED]" if all_pass else f"FAIL [A={a_correct}, E={e_correct}, K={k_consistent}]"
+            if prompt_version == "v2":
+                verdict_str = "PASS [ALL MATCHED]" if all_pass else f"FAIL [A={a_correct}, E={e_correct}, K={k_consistent}]"
+                diag_str = f"A={a_correct} | E={e_correct} | K={k_consistent}"
+            else:
+                verdict_str = "PASS [A MATCHED]" if all_pass else f"FAIL [A={a_correct}]"
+                diag_str = f"A={a_correct}"
 
             print(f"\n  [{iv.intervention_id}] ({iv.description}):", flush=True)
             print(f"    Raw Output:       {res_iv.raw_response_text.strip()}", flush=True)
-            print(f"    Evidence Status:  {claim_iv.raw_evidence_status} (Expected: {iv.expected_evidence_status})", flush=True)
             print(f"    Derived Object:   {claim_iv.object} (Expected: {iv.expected_counterfactual_object})", flush=True)
-            print(f"    Diagnostics:      A={a_correct} | E={e_correct} | K={k_consistent}", flush=True)
+            if prompt_version == "v2":
+                print(f"    Evidence Status:  {claim_iv.raw_evidence_status} (Expected: {iv.expected_evidence_status})", flush=True)
+            print(f"    Diagnostics:      {diag_str}", flush=True)
             print(f"    Assay Verdict:    {verdict_str}", flush=True)
             print(f"    Telemetry:        latency={lat_iv:.2f}s | prompt_eval={res_iv.prompt_eval_duration_ms:.1f}ms | eval={res_iv.eval_duration_ms:.1f}ms", flush=True)
 
@@ -294,7 +329,7 @@ def run_hardened_assay(
                 "expected_obj": iv.expected_counterfactual_object,
                 "derived_obj": claim_iv.object,
                 "expected_ev": iv.expected_evidence_status,
-                "derived_ev": claim_iv.raw_evidence_status,
+                "derived_ev": claim_iv.raw_evidence_status if prompt_version == "v2" else None,
                 "A": a_correct,
                 "E": e_correct,
                 "K": k_consistent,
@@ -315,22 +350,22 @@ def run_hardened_assay(
     print(f"          HARDENED ASSAY SUMMARY: Ecology {ecology} | Schema {prompt_version.upper()}", flush=True)
     print("=" * 90, flush=True)
 
-    total_tests = 0
-    passed_tests = 0
-
     for res in overall_results:
         print(f"\nWorld: {res['world_id']} (Target: {res['target']}) -> S0: {res['s0_derived']} ({res['s0_truth']})", flush=True)
         print(f"  {'-'*85}", flush=True)
         for iv in res["interventions"]:
-            total_tests += 1
-            if iv["pass"]:
-                passed_tests += 1
-            print(f"  {iv['id']:<22} | Exp: {iv['expected_obj']:<10} | Der: {iv['derived_obj']:<10} | Ev: {iv['derived_ev']:<12} | [A={int(iv['A'])},E={int(iv['E'])},K={int(iv['K'])}] -> {iv['verdict']}", flush=True)
+            if prompt_version == "v2":
+                score_tag = f"[A={int(iv['A'])},E={int(iv['E'])},K={int(iv['K'])}]"
+            else:
+                score_tag = f"[A={int(iv['A'])}]"
+            print(f"  {iv['id']:<22} | Exp: {iv['expected_obj']:<10} | Der: {iv['derived_obj']:<10} | {score_tag} -> {iv['verdict']}", flush=True)
 
-    pass_rate = (passed_tests / total_tests) * 100.0 if total_tests > 0 else 0.0
+    pass_rate = (passed_intervention_tests / total_intervention_tests) * 100.0 if total_intervention_tests > 0 else 0.0
     print("\n" + "=" * 90, flush=True)
-    print(f"  TOTAL SCORE: {passed_tests}/{total_tests} PASSED ({pass_rate:.1f}%)", flush=True)
-    print(f"  Database Preserved At: {db_path}", flush=True)
+    print(f"  INTERVENTIONS PASSED: {passed_intervention_tests}/{total_intervention_tests} ({pass_rate:.1f}%)", flush=True)
+    print(f"  TOTAL MODEL CALLS:    {total_model_calls} (including {worlds_count} baselines)", flush=True)
+    print(f"  PROVENANCE:           git={git_commit[:8]} | digest={model_digest[:12]} | prompt_hash={prompt_hash[:12]}", flush=True)
+    print(f"  DATABASE PRESERVED:   {db_path}", flush=True)
     print("=" * 90 + "\n", flush=True)
     db.close()
 
