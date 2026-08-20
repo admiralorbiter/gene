@@ -9,58 +9,57 @@ import pytest
 from gene.experiments.coalition_causality import CoalitionCausalityEngine
 
 
-def test_track_h_single_path_lattice():
-    """AB -> C: Any single knockout destroys C."""
+def test_track_h_recombinant_support_11_points():
+    """AB + DE -> C: Verify formal survival across all 11 key lattice intervention points."""
     engine = CoalitionCausalityEngine()
-    
-    # 0 knockouts
-    r0 = engine.evaluate_intervention("single_path", set())
+
+    # 1. Baseline (0 knockouts) -> Survives
+    r0 = engine.evaluate_intervention("redundant_independent", set())
     assert r0.formal_support_survives is True
     assert r0.expected_claim == "PROTO_X7"
 
-    # Single knockout A
-    rA = engine.evaluate_intervention("single_path", {"A"})
-    assert rA.formal_support_survives is False
-    assert rA.expected_claim == "UNKNOWN"
+    # 2. Four Single Knockouts ({A}, {B}, {D}, {E}) -> ALL SURVIVE via alternate path!
+    for single in [{"A"}, {"B"}, {"D"}, {"E"}]:
+        res = engine.evaluate_intervention("redundant_independent", single)
+        assert res.formal_support_survives is True
+        assert res.expected_claim == "PROTO_X7"
 
-    # Single knockout B
-    rB = engine.evaluate_intervention("single_path", {"B"})
-    assert rB.formal_support_survives is False
-    assert rB.expected_claim == "UNKNOWN"
+    # 3. Two Path-Isolation Knockouts ({A, B} -> DE survives; {D, E} -> AB survives)
+    r_ab = engine.evaluate_intervention("redundant_independent", {"A", "B"})
+    assert r_ab.formal_support_survives is True
+    assert r_ab.surviving_formal_paths == [["D", "E"]]
+
+    r_de = engine.evaluate_intervention("redundant_independent", {"D", "E"})
+    assert r_de.formal_support_survives is True
+    assert r_de.surviving_formal_paths == [["A", "B"]]
+
+    # 4. Four Cross-Path Minimal Hitting Sets ({A,D}, {A,E}, {B,D}, {B,E}) -> ALL DIE!
+    for hitting_pair in [{"A", "D"}, {"A", "E"}, {"B", "D"}, {"B", "E"}]:
+        res = engine.evaluate_intervention("redundant_independent", hitting_pair)
+        assert res.formal_support_survives is False
+        assert res.expected_claim == "UNKNOWN"
 
 
-def test_track_h_redundant_support_overdetermination():
-    """AB + DE -> C: Single knockout masks effect; coalition knockout {A,D} destroys C."""
+def test_track_h_extract_minimal_causal_coalitions():
+    """Verify that simulated behavioral results recover S_C = {{A, B}, {D, E}}."""
     engine = CoalitionCausalityEngine()
 
-    # Single knockout A -> DE survives!
-    rA = engine.evaluate_intervention("redundant_independent", {"A"})
-    assert rA.formal_support_survives is True
-    assert rA.expected_claim == "PROTO_X7"
-    assert rA.surviving_formal_paths == [["D", "E"]]
+    # Perfect formal simulator results
+    behavioral_results = {
+        (): "PROTO_X7",
+        ("A",): "PROTO_X7",
+        ("B",): "PROTO_X7",
+        ("D",): "PROTO_X7",
+        ("E",): "PROTO_X7",
+        ("A", "B"): "PROTO_X7",
+        ("D", "E"): "PROTO_X7",
+        ("A", "D"): "UNKNOWN",
+        ("A", "E"): "UNKNOWN",
+        ("B", "D"): "UNKNOWN",
+        ("B", "E"): "UNKNOWN",
+    }
 
-    # Single knockout D -> AB survives!
-    rD = engine.evaluate_intervention("redundant_independent", {"D"})
-    assert rD.formal_support_survives is True
-    assert rD.expected_claim == "PROTO_X7"
-    assert rD.surviving_formal_paths == [["A", "B"]]
-
-    # Minimal Hitting Coalition Knockout {A, D} -> Both paths die!
-    rAD = engine.evaluate_intervention("redundant_independent", {"A", "D"})
-    assert rAD.formal_support_survives is False
-    assert rAD.expected_claim == "UNKNOWN"
-    assert len(rAD.surviving_formal_paths) == 0
-
-
-def test_track_h_shared_root_collapse():
-    """AX + AY -> C: Knockout of shared root A destroys both apparent paths."""
-    engine = CoalitionCausalityEngine()
-
-    rA = engine.evaluate_intervention("shared_root", {"A"})
-    assert rA.formal_support_survives is False
-    assert rA.expected_claim == "UNKNOWN"
-
-    # Knockout of X alone -> AY survives!
-    rX = engine.evaluate_intervention("shared_root", {"X"})
-    assert rX.formal_support_survives is True
-    assert rX.expected_claim == "PROTO_X7"
+    s_c = engine.extract_minimal_causal_coalitions("redundant_independent", behavioral_results)
+    assert len(s_c) == 2
+    assert {"A", "B"} in s_c
+    assert {"D", "E"} in s_c

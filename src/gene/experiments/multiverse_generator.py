@@ -1,7 +1,7 @@
 """Track B3: Monoculture Factorial Multiverse Engine.
 
 Generates the full 16-cell factorial design over root structure, token assignment,
-document position ordering, and station context, with automated machine-diff contrast auditing.
+document position ordering, and station context, with pure lexical root isolation.
 """
 
 from __future__ import annotations
@@ -24,7 +24,7 @@ class MultiverseCell(BaseModel):
 
 
 class MultiverseGenerator:
-    """Constructs balanced factorial cells and verifies contrast purity via machine diffs."""
+    """Constructs balanced factorial cells with pure lexical root token isolation."""
 
     def __init__(self):
         self.stations = ["VELORA", "KESTREL"]
@@ -46,7 +46,7 @@ class MultiverseGenerator:
             maj_proto = "PROTO_Q7"
             min_proto = "PROTO_M4"
 
-        # Generate 5 documents
+        # Pure template: identical sentence structure, only root tokens vary
         if root_structure == "independent":
             # 3 distinct roots for majority; 2 distinct roots for minority
             d1 = f"Source root_R1 states station {station} requires protocol {maj_proto}."
@@ -55,10 +55,10 @@ class MultiverseGenerator:
             d4 = f"Source root_R4 states station {station} requires protocol {min_proto}."
             d5 = f"Source root_R5 states station {station} requires protocol {min_proto}."
         else:  # monoculture
-            # 1 shared root for majority; 2 distinct roots for minority
+            # 1 shared root (root_R1 repeated 3 times) for majority; 2 distinct roots for minority
             d1 = f"Source root_R1 states station {station} requires protocol {maj_proto}."
-            d2 = f"Citing source root_R1, field log notes station {station} requires protocol {maj_proto}."
-            d3 = f"Archive relay quoting source root_R1 confirms station {station} requires protocol {maj_proto}."
+            d2 = f"Source root_R1 states station {station} requires protocol {maj_proto}."
+            d3 = f"Source root_R1 states station {station} requires protocol {maj_proto}."
             d4 = f"Source root_R4 states station {station} requires protocol {min_proto}."
             d5 = f"Source root_R5 states station {station} requires protocol {min_proto}."
 

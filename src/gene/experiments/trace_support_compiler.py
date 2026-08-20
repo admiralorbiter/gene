@@ -1,7 +1,8 @@
 """Track S: Trace-to-Support Compiler Engine.
 
 Mechanically extracts minimal epistemic support environments S_F(c) from runtime execution
-traces (occurrence nodes, rule templates, exposure edges) via backward slicing.
+traces (occurrence nodes, rule templates, exposure edges) distinguishing AND-conjunctive
+premises from OR-disjunctive alternative derivations.
 """
 
 from __future__ import annotations
@@ -16,8 +17,10 @@ class ExecutionTraceNode(BaseModel):
     claim_type: str
     claim_value: str
     is_root_premise: bool = False
-    parent_ids: list[str] = Field(default_factory=list)
-    rule_id: str | None = None
+    # A node may have multiple alternative derivation environments (OR of ANDs)
+    # Each inner list is a conjunctive set of parent node IDs required for that derivation path
+    support_environments: list[list[str]] = Field(default_factory=list)
+    rule_ids: list[str] = Field(default_factory=list)
 
 
 class TraceSupportCompiler:
@@ -30,7 +33,7 @@ class TraceSupportCompiler:
         self.nodes[node.node_id] = node
 
     def compile_minimal_support_environments(self, target_node_id: str) -> list[set[str]]:
-        """Perform backward slicing to extract irredundant root assumption sets."""
+        """Perform backward slicing across disjunctive and conjunctive paths."""
         if target_node_id not in self.nodes:
             raise ValueError(f"Target node {target_node_id} not found in execution trace.")
 
@@ -38,12 +41,11 @@ class TraceSupportCompiler:
         if target.is_root_premise:
             return [{target.node_id}]
 
-        # Enumerate all proof trees leading to target
-        proof_paths = self._find_root_paths(target_node_id)
+        raw_proof_paths = self._find_root_paths(target_node_id)
         
-        # Minimize proof paths to irredundant sets
+        # Minimize proof paths to irredundant root assumption sets
         minimal_sets: list[set[str]] = []
-        for path in sorted(proof_paths, key=len):
+        for path in sorted(raw_proof_paths, key=len):
             path_set = set(path)
             if not any(existing.issubset(path_set) for existing in minimal_sets):
                 minimal_sets.append(path_set)
@@ -55,18 +57,21 @@ class TraceSupportCompiler:
         if node.is_root_premise:
             return [[node.node_id]]
 
-        if not node.parent_ids:
+        if not node.support_environments:
             return []
 
-        # If parents are conjunctive (all required for rule)
-        parent_paths_list = [self._find_root_paths(p_id) for p_id in node.parent_ids]
-        
-        # Cartesian product across conjunctive branch premises
-        combined_paths = []
-        for combo in itertools.product(*parent_paths_list):
-            merged = []
-            for p_list in combo:
-                merged.extend(p_list)
-            combined_paths.append(sorted(list(set(merged))))
+        all_alternative_paths: list[list[str]] = []
 
-        return combined_paths
+        # Each environment in support_environments is an alternative derivation (OR)
+        for conjunctive_env in node.support_environments:
+            # For each conjunctive premise in this environment (AND)
+            parent_paths_list = [self._find_root_paths(p_id) for p_id in conjunctive_env]
+            
+            # Cartesian product across conjunctive branch premises
+            for combo in itertools.product(*parent_paths_list):
+                merged = []
+                for p_list in combo:
+                    merged.extend(p_list)
+                all_alternative_paths.append(sorted(list(set(merged))))
+
+        return all_alternative_paths

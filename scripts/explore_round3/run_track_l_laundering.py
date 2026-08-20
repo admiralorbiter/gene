@@ -1,7 +1,7 @@
 """Track L: Independence Laundering Runner.
 
-Evaluates how downstream models adjudicate consensus across progressive reproduction
-stages (G0 -> G1 -> G2 -> G3) where single-source provenance is progressively laundered.
+Evaluates how downstream models perceive evidence independence across progressive reproduction
+stages (G0 -> G1 -> G2 -> G3) and compares against a true 4-root positive control (20 calls).
 """
 
 from __future__ import annotations
@@ -21,10 +21,10 @@ from gene.ollama_client import CallSpec, OllamaClient
 
 def run_track_l_live(
     db_path: Path = Path("runs/explore_round3/track_l_laundering.db"),
-    max_calls: int = 16,
+    max_calls: int = 20,
     client: OllamaClient | None = None,
 ) -> dict[str, Any]:
-    """Execute Track L laundering panel."""
+    """Execute Track L laundering panel (5 stages x 2 stations x 2 protocols = 20 calls)."""
     harness = ExplorationHarness(
         db_path=db_path,
         track_name="track_l_independence_laundering",
@@ -53,7 +53,7 @@ def run_track_l_live(
                 prompt = (
                     "RETRIEVED EPISODIC EVIDENCE:\n"
                     + "\n".join(doc_lines)
-                    + f"\n\nQUESTION: Based on the retrieved evidence, how many independent primary sources support the claim that station {st} uses {proto}, and is the evidence sufficient to confirm authorization?\n"
+                    + f"\n\nQUESTION: Based on the retrieved evidence, how many independent primary sources support the claim that station {st} operates under protocol {proto}, and is the evidence sufficient to confirm authorization?\n"
                     "Return strictly JSON matching this schema:\n"
                     '{"station": "STATION_NAME", "protocol": "PROTOCOL_NAME_OR_UNKNOWN", "estimated_independent_sources": "INTEGER", "evidence_status": "sufficient|insufficient"}'
                 )
@@ -78,23 +78,33 @@ def run_track_l_live(
                         "stage_name": gen_stage.stage_name,
                         "generation": gen_stage.generation,
                         "true_root_count": gen_stage.true_root_count,
-                        "expected_perceived": gen_stage.perceived_root_count,
+                        "reference_naive_count": gen_stage.reference_naive_count,
                     },
                     fail_on_lexical_leak=True,
                 )
 
+                # Parse estimated_independent_sources from parsed JSON
+                parsed_sources = None
+                if rec.parsed_json and "estimated_independent_sources" in rec.parsed_json:
+                    try:
+                        parsed_sources = int(rec.parsed_json["estimated_independent_sources"])
+                    except (ValueError, TypeError):
+                        parsed_sources = None
+
                 # Contemporaneous evaluation logging
                 harness.record_evaluation(
                     call_id=call_id,
-                    canonical_status="TRUE",
+                    canonical_status="BEHAVIORAL_EVALUATION",
                     local_status="TRUE",
-                    phenotype=f"STAGE_{gen_stage.generation}_{rec.emitted_claim}",
-                    is_compliant=True,
-                    oracle_details={
+                    dual_oracle_phenotype=f"STAGE_{gen_stage.generation}_{rec.emitted_claim}",
+                    is_contract_compliant=True,
+                    metadata={
                         "generation": gen_stage.generation,
                         "stage_name": gen_stage.stage_name,
-                        "true_roots": gen_stage.true_root_count,
-                        "emitted": rec.emitted_claim,
+                        "true_root_count": gen_stage.true_root_count,
+                        "reference_naive_count": gen_stage.reference_naive_count,
+                        "estimated_independent_sources": parsed_sources,
+                        "emitted_protocol": rec.emitted_claim,
                     },
                 )
 
@@ -104,9 +114,12 @@ def run_track_l_live(
                     "protocol": proto,
                     "stage_name": gen_stage.stage_name,
                     "generation": gen_stage.generation,
-                    "emitted": rec.emitted_claim,
+                    "true_roots": gen_stage.true_root_count,
+                    "naive_roots": gen_stage.reference_naive_count,
+                    "estimated_sources": parsed_sources,
+                    "emitted_protocol": rec.emitted_claim,
                 })
-                print(f"[{calls_spent+1}/{max_calls}] {call_id} -> {rec.emitted_claim} (gen={gen_stage.generation})", flush=True)
+                print(f"[{calls_spent+1}/{max_calls}] {call_id} -> {rec.emitted_claim} (est_sources={parsed_sources}, true={gen_stage.true_root_count})", flush=True)
                 calls_spent += 1
 
     return {"calls_spent": calls_spent, "results": results}
@@ -114,6 +127,6 @@ def run_track_l_live(
 
 if __name__ == "__main__":
     db = Path("runs/explore_round3/track_l_laundering.db")
-    print("Running Track L: Independence Laundering (16 calls on gemma3:12b)...", flush=True)
-    res = run_track_l_live(db, max_calls=16)
+    print("Running Track L: Independence Laundering (20 calls on gemma3:12b)...", flush=True)
+    res = run_track_l_live(db, max_calls=20)
     print(f"Completed {res['calls_spent']} live calls.", flush=True)

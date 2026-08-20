@@ -27,21 +27,11 @@ class CoalitionCausalityEngine:
     """Evaluates formal support closure across the power set of parent interventions."""
 
     def __init__(self):
-        # Formal minimal support sets for canonical geometries
+        # Formal minimal support sets for canonical recombinant geometry
         self.geometries = {
-            "single_path": {
-                "paths": [["A", "B"]],
-                "parents": ["A", "B"],
-                "target": "PROTO_X7",
-            },
             "redundant_independent": {
                 "paths": [["A", "B"], ["D", "E"]],
                 "parents": ["A", "B", "D", "E"],
-                "target": "PROTO_X7",
-            },
-            "shared_root": {
-                "paths": [["A", "X"], ["A", "Y"]],
-                "parents": ["A", "X", "Y"],
                 "target": "PROTO_X7",
             },
         }
@@ -78,18 +68,6 @@ class CoalitionCausalityEngine:
             surviving_formal_paths=surviving_paths,
         )
 
-    def generate_full_lattice(self, geometry: str) -> list[CoalitionInterventionResult]:
-        """Generate all 2^|parents| intervention points."""
-        geom_data = self.geometries[geometry]
-        all_parents = geom_data["parents"]
-        results = []
-
-        for r in range(len(all_parents) + 1):
-            for combo in itertools.combinations(all_parents, r):
-                results.append(self.evaluate_intervention(geometry, set(combo)))
-
-        return results
-
     def extract_minimal_causal_coalitions(
         self, geometry: str, behavioral_results: dict[tuple[str, ...], str]
     ) -> list[set[str]]:
@@ -108,10 +86,9 @@ class CoalitionCausalityEngine:
                 sufficient_active_sets.append(active)
 
         # Minimize to irredundant sets
-        minimal_coalitions = []
-        for s in sufficient_active_sets:
-            if not any(other < s for other in sufficient_active_sets):
-                if s not in minimal_coalitions:
-                    minimal_coalitions.append(s)
+        minimal_coalitions: list[set[str]] = []
+        for s in sorted(sufficient_active_sets, key=len):
+            if not any(existing.issubset(s) for existing in minimal_coalitions):
+                minimal_coalitions.append(s)
 
         return minimal_coalitions

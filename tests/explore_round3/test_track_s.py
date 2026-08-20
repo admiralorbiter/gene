@@ -10,7 +10,7 @@ from gene.experiments.trace_support_compiler import ExecutionTraceNode, TraceSup
 
 
 def test_trace_support_compiler_recombinant_support():
-    """Verify that backward slicing extracts {{A, B}, {D, E}} from execution DAG."""
+    """Verify that backward slicing extracts {{A, B}, {D, E}} from execution DAG with OR-support."""
     compiler = TraceSupportCompiler()
 
     # Root assumptions
@@ -20,16 +20,23 @@ def test_trace_support_compiler_recombinant_support():
     compiler.add_node(ExecutionTraceNode(node_id="fact_E", claim_type="assignment", claim_value="DIRECTOR", is_root_premise=True))
 
     # Intermediate G1 deductions
-    compiler.add_node(ExecutionTraceNode(node_id="lemma_P1", claim_type="protocol", claim_value="PROTO_X7", parent_ids=["fact_A", "fact_B"]))
-    compiler.add_node(ExecutionTraceNode(node_id="lemma_P2", claim_type="protocol", claim_value="PROTO_X7", parent_ids=["fact_D", "fact_E"]))
+    compiler.add_node(ExecutionTraceNode(node_id="lemma_P1", claim_type="protocol", claim_value="PROTO_X7", support_environments=[["fact_A", "fact_B"]]))
+    compiler.add_node(ExecutionTraceNode(node_id="lemma_P2", claim_type="protocol", claim_value="PROTO_X7", support_environments=[["fact_D", "fact_E"]]))
 
-    # Target G2 synthesis
-    compiler.add_node(ExecutionTraceNode(node_id="target_C", claim_type="protocol", claim_value="PROTO_X7", parent_ids=["lemma_P1"]))
+    # Target G2 synthesis: target_C is supported EITHER by lemma_P1 OR by lemma_P2
+    compiler.add_node(ExecutionTraceNode(
+        node_id="target_C",
+        claim_type="protocol",
+        claim_value="PROTO_X7",
+        support_environments=[["lemma_P1"], ["lemma_P2"]]
+    ))
 
     # Compile support for P1
     s_p1 = compiler.compile_minimal_support_environments("lemma_P1")
     assert s_p1 == [{"fact_A", "fact_B"}]
 
-    # Compile support for target_C
+    # Compile support for target_C -> genuinely recovers both alternative environments!
     s_c = compiler.compile_minimal_support_environments("target_C")
-    assert s_c == [{"fact_A", "fact_B"}]
+    assert len(s_c) == 2
+    assert {"fact_A", "fact_B"} in s_c
+    assert {"fact_D", "fact_E"} in s_c

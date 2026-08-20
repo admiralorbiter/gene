@@ -25,7 +25,7 @@ def test_multiverse_generator_16_cells():
 
 
 def test_multiverse_machine_diff_purity():
-    """Verify that machine-diff between matched treatment/control isolates only root tokens."""
+    """Verify that machine-diff between matched treatment/control isolates strictly root tokens."""
     gen = MultiverseGenerator()
     
     # Compare independent vs monoculture holding station, token, order constant
@@ -37,6 +37,11 @@ def test_multiverse_machine_diff_purity():
 
     # Both must have 5 docs
     assert len(c_indep.raw_docs) == len(c_mono.raw_docs) == 5
-    # The diff should isolate the source phrasing differences in docs 2 and 3
-    assert "root_R2" in diff_text or "root_R3" in diff_text
-    assert "field log" in diff_text or "Archive relay" in diff_text
+    # The diff should isolate ONLY root_R2 and root_R3 changing to root_R1
+    assert "-- DOC_02: Source root_R2" in diff_text
+    assert "+- DOC_02: Source root_R1" in diff_text
+    assert "-- DOC_03: Source root_R3" in diff_text
+    assert "+- DOC_03: Source root_R1" in diff_text
+    # Zero phrasing differences
+    assert "field log" not in diff_text
+    assert "Archive relay" not in diff_text

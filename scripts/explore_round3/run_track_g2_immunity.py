@@ -1,7 +1,7 @@
 """Track G2: Clean Non-Destructive Support Immunity Runner.
 
-Evaluates support-aware governance vs naive lineage quarantine across unrevoked baseline,
-single independent path revocation, and shared root revocation.
+Evaluates support-aware governance vs naive lineage quarantine under real policy-filtered
+retrieval contexts across independent and shared-root geometries.
 """
 
 from __future__ import annotations
@@ -18,54 +18,68 @@ from gene.experiments.exploration_harness import ExplorationHarness
 from gene.ollama_client import CallSpec, OllamaClient
 
 
-def build_track_g2_prompt(station: str, arm: str, geometry: str) -> tuple[str, list[str], str]:
-    """Clean G2 prompt with zero auxiliary count leaks and explicit unrevoked baseline."""
+def build_track_g2_governance_prompt(
+    station: str,
+    policy_condition: str,
+) -> tuple[str, list[str], str]:
+    """Construct retrieval context dictated by the active governance policy."""
     rules = (
         "RULES:\n"
-        f"1. manager({station}, person) AND reports_to(person, S1) AND authorized(S1) -> uses_protocol({station}, PROTO_X7)\n"
-        f"2. sector_lead({station}, person) AND reports_to(person, S2) AND authorized(S2) -> uses_protocol({station}, PROTO_X7)\n"
-        "3. If an authority is REVOKED or UNAUTHORIZED, all deductions passing through that authority are invalid.\n"
-        "4. If all supporting paths are revoked, protocol is UNKNOWN."
+        f"1. manager({station}, person) AND reports_to(person, S1) -> uses_protocol({station}, PROTO_X7)\n"
+        f"2. sector_lead({station}, person) AND reports_to(person, S2) -> uses_protocol({station}, PROTO_X7)\n"
+        "3. If evidence is missing, revoked, or insufficient, protocol is UNKNOWN."
     )
 
-    if arm == "unrevoked_baseline":
+    if policy_condition == "baseline_independent":
+        # Both paths unrevoked -> Full context
         memories = [
             f"- MEM_01: Nerin is manager of {station}.",
             "- MEM_02: Nerin directly reports to S1.",
-            "- MEM_03: STATUS: Authority of S1 is VALID and ACTIVE.",
-            f"- MEM_04: Vael is sector lead of {station}.",
-            "- MEM_05: Vael directly reports to S2.",
-            "- MEM_06: STATUS: Authority of S2 is VALID and ACTIVE.",
+            f"- MEM_03: Vael is sector lead of {station}.",
+            "- MEM_04: Vael directly reports to S2.",
         ]
         expected = "PROTO_X7"
-    elif arm == "revoke_path1":
+
+    elif policy_condition == "baseline_shared":
+        # Shared root unrevoked -> Full context
         memories = [
             f"- MEM_01: Nerin is manager of {station}.",
             "- MEM_02: Nerin directly reports to S1.",
-            "- MEM_03: STATUS: Authority of S1 is REVOKED and INVALID.",
-            f"- MEM_04: Vael is sector lead of {station}.",
-            "- MEM_05: Vael directly reports to S2.",
-            "- MEM_06: STATUS: Authority of S2 is VALID and ACTIVE.",
+            f"- MEM_03: Vael is sector lead of {station}.",
+            "- MEM_04: Vael directly reports to S1.",
         ]
-        expected = "PROTO_X7" if geometry == "independent" else "UNKNOWN"
-    elif arm == "revoke_shared":
+        expected = "PROTO_X7"
+
+    elif policy_condition == "naive_lineage_quarantine":
+        # S1 revoked under naive lineage -> Entire claim family quarantined -> Zero valid evidence presented!
         memories = [
-            f"- MEM_01: Nerin is manager of {station}.",
-            "- MEM_02: Nerin directly reports to S1.",
-            "- MEM_03: STATUS: Authority of S1 is REVOKED and INVALID.",
-            f"- MEM_04: Vael is sector lead of {station}.",
-            "- MEM_05: Vael directly reports to S1.",
-            "- MEM_06: STATUS: Authority of S1 is REVOKED and INVALID.",
+            "- MEM_QUARANTINED: Evidence quarantined by lineage governance policy due to tainted ancestor S1.",
         ]
         expected = "UNKNOWN"
+
+    elif policy_condition == "support_aware_independent_preservation":
+        # S1 revoked under support-aware kernel -> Path 1 pruned, surviving Path 2 (S2) preserved and presented!
+        memories = [
+            f"- MEM_03: Vael is sector lead of {station}.",
+            "- MEM_04: Vael directly reports to S2.",
+        ]
+        expected = "PROTO_X7"
+
+    elif policy_condition == "support_aware_shared_collapse":
+        # S1 revoked under support-aware kernel on shared root -> All paths broken -> Inactivated
+        memories = [
+            "- MEM_INACTIVATED: All minimal support paths for claim invalidated under S1 retraction.",
+        ]
+        expected = "UNKNOWN"
+
     else:
-        raise ValueError(f"Unknown arm: {arm}")
+        raise ValueError(f"Unknown policy condition: {policy_condition}")
 
     prompt = (
         f"{rules}\n\n"
         "RETRIEVED EVIDENCE:\n"
         + "\n".join(memories)
-        + f"\n\nQUESTION: What security protocol is currently authorized for station {station}?\n"
+        + f"\n\nQUESTION: What security protocol is authorized for station {station}?\n"
         "Return strictly JSON matching this schema:\n"
         '{"station": "STATION_NAME", "protocol": "PROTOCOL_NAME_OR_UNKNOWN", "evidence_status": "sufficient|insufficient"}'
     )
@@ -76,10 +90,10 @@ def build_track_g2_prompt(station: str, arm: str, geometry: str) -> tuple[str, l
 
 def run_track_g2_live(
     db_path: Path = Path("runs/explore_round3/track_g2_immunity.db"),
-    max_calls: int = 18,
+    max_calls: int = 16,
     client: OllamaClient | None = None,
 ) -> dict[str, Any]:
-    """Execute Track G2 clean non-destructive immunity panel."""
+    """Execute Track G2 real governance policy panel (4 conditions x 2 stations x 2 reps = 16 calls)."""
     harness = ExplorationHarness(
         db_path=db_path,
         track_name="track_g2_non_destructive_immunity",
@@ -88,23 +102,24 @@ def run_track_g2_live(
     )
 
     stations = ["VELORA", "KESTREL"]
-    test_arms = [
-        ("unrevoked_baseline", "independent"),
-        ("revoke_path1", "independent"),
-        ("revoke_shared", "shared"),
+    conditions = [
+        "baseline_independent",
+        "baseline_shared",
+        "naive_lineage_quarantine",
+        "support_aware_independent_preservation",
     ]
 
     calls_spent = 0
     results = []
 
-    for rep in range(1, 4):
+    for rep in range(1, 3):
         for st in stations:
-            for arm, geom in test_arms:
+            for cond in conditions:
                 if calls_spent >= max_calls:
                     break
 
-                call_id = f"call_track_g2_{st.lower()}_{arm}_{geom}_rep{rep}"
-                prompt, forbidden, expected = build_track_g2_prompt(st, arm, geom)
+                call_id = f"call_track_g2_{st.lower()}_{cond}_rep{rep}"
+                prompt, forbidden, expected = build_track_g2_governance_prompt(st, cond)
 
                 spec = CallSpec(
                     model_name="gemma3:12b",
@@ -120,8 +135,7 @@ def run_track_g2_live(
                     forbidden_schema_leaks=forbidden,
                     metadata={
                         "station": st,
-                        "arm": arm,
-                        "geometry": geom,
+                        "policy_condition": cond,
                         "rep": rep,
                         "expected": expected,
                     },
@@ -129,18 +143,17 @@ def run_track_g2_live(
                 )
 
                 is_correct = (rec.emitted_claim == expected)
-                phenotype = "ACTIVE_SURVIVING" if rec.emitted_claim == "PROTO_X7" else "INACTIVE_COLLAPSED"
+                phenotype = "ACTIVE_PRESERVED" if rec.emitted_claim == "PROTO_X7" else "INACTIVE_QUARANTINED"
 
                 # Contemporaneous evaluation logging
                 harness.record_evaluation(
                     call_id=call_id,
-                    canonical_status="TRUE" if expected == "PROTO_X7" else "UNKNOWN",
+                    canonical_status="BEHAVIORAL_EVALUATION",
                     local_status="TRUE" if is_correct else "FALSE",
-                    phenotype=phenotype,
-                    is_compliant=True,
-                    oracle_details={
-                        "arm": arm,
-                        "geometry": geom,
+                    dual_oracle_phenotype=phenotype,
+                    is_contract_compliant=True,
+                    metadata={
+                        "policy_condition": cond,
                         "expected": expected,
                         "emitted": rec.emitted_claim,
                         "is_correct": is_correct,
@@ -150,8 +163,7 @@ def run_track_g2_live(
                 results.append({
                     "call_id": call_id,
                     "station": st,
-                    "arm": arm,
-                    "geometry": geom,
+                    "condition": cond,
                     "emitted": rec.emitted_claim,
                     "expected": expected,
                     "is_correct": is_correct,
@@ -164,6 +176,6 @@ def run_track_g2_live(
 
 if __name__ == "__main__":
     db = Path("runs/explore_round3/track_g2_immunity.db")
-    print("Running Track G2: Clean Non-Destructive Support Immunity (18 calls on gemma3:12b)...", flush=True)
-    res = run_track_g2_live(db, max_calls=18)
+    print("Running Track G2: Real Governance Policy Comparison (16 calls on gemma3:12b)...", flush=True)
+    res = run_track_g2_live(db, max_calls=16)
     print(f"Completed {res['calls_spent']} live calls.", flush=True)
