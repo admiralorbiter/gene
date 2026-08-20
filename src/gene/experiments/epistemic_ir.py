@@ -1,8 +1,11 @@
-"""Epistemic Intermediate Representation (EpistemicIR v2.1).
+"""Epistemic Intermediate Representation (EpistemicIR v2.2).
 
-Separates the machine-readable EpistemicState, QueryContract, and ExperimentOracle.
-Provides typed RuleSpecs, occurrence and semantic claim identities, recombinant roots,
-exact state hashing (H_state), semantic equivalence hashing (H_equiv), and an IR self-consistency validator.
+Provides:
+1. Complete exact state hashing (H_state) including parentage and citations.
+2. Typed equivalence class hashing (H_perm, H_rep, H_alpha).
+3. First-class provenance status (known_single, recombinant, unknown_untracked, asserted_unverified).
+4. Truthful subselected state validation.
+5. Deterministic proof-rule structural correspondence validator.
 """
 
 from __future__ import annotations
@@ -23,6 +26,14 @@ class PrivilegeLevel(str, Enum):
     PROOF_CARRYING_CERTIFICATE = "proof_carrying_certificate"
 
 
+class ProvenanceStatus(str, Enum):
+    """Status of ancestral provenance for a premise."""
+    KNOWN_SINGLE_ROOT = "known_single_root"
+    KNOWN_RECOMBINANT_ROOTS = "known_recombinant_roots"
+    UNKNOWN_UNTRACKED = "unknown_untracked"
+    ASSERTED_UNVERIFIED = "asserted_unverified"
+
+
 class PremiseNode(BaseModel):
     """An individual atomic premise or evidence unit in the epistemic state."""
     occurrence_id: str
@@ -34,6 +45,7 @@ class PremiseNode(BaseModel):
     target_value: str | None = None
     root_ids: list[str] = Field(default_factory=list)
     parent_occurrence_ids: list[str] = Field(default_factory=list)
+    provenance_status: ProvenanceStatus = ProvenanceStatus.KNOWN_SINGLE_ROOT
     authority_level: str = "standard"  # "standard", "root_authority", "relay"
     generation: int = 0
     citations: list[str] = Field(default_factory=list)
@@ -114,7 +126,7 @@ class EpistemicState(BaseModel):
         return len(self.get_surviving_support_environments()) > 0
 
     def compute_state_hash(self) -> str:
-        """Compute exact cryptographic hash of full state (H_state), including occurrences and ancestry."""
+        """Compute exact cryptographic hash of full state (H_state), including parentage and citations."""
         premise_data = {}
         for occ_id, p in sorted(self.premises.items()):
             premise_data[occ_id] = {
@@ -125,6 +137,9 @@ class EpistemicState(BaseModel):
                 "role": p.role,
                 "target_value": p.target_value,
                 "root_ids": sorted(p.root_ids),
+                "parent_occurrence_ids": sorted(p.parent_occurrence_ids),
+                "citations": sorted(p.citations),
+                "provenance_status": p.provenance_status.value,
                 "is_valid": p.is_valid,
                 "authority_level": p.authority_level,
                 "generation": p.generation,
@@ -144,13 +159,25 @@ class EpistemicState(BaseModel):
         }
         return hashlib.sha256(json.dumps(state_repr, sort_keys=True).encode("utf-8")).hexdigest()
 
-    def compute_equiv_hash(self) -> str:
-        """Compute cryptographic hash of semantic equivalence class (H_equiv)."""
+    def compute_permutation_equiv_hash(self) -> str:
+        """H_perm: Invariant under premise reordering."""
         data = {
             "active_claims": sorted(list(self.get_active_semantic_claim_ids())),
             "invalidated_roots": sorted(self.invalidated_roots),
             "surviving_paths": sorted([e.path_id for e in self.get_surviving_support_environments()]),
             "rules": sorted([r.rule_id for r in self.rules.values()]),
+        }
+        return hashlib.sha256(json.dumps(data, sort_keys=True).encode("utf-8")).hexdigest()
+
+    def compute_reproduction_equiv_hash(self) -> str:
+        """H_rep: Invariant under copy multiplication (same roots, same semantic claims)."""
+        active = self.get_active_premises()
+        lineage_claim_pairs = sorted(list(set(
+            (tuple(sorted(p.root_ids)), p.semantic_claim_id) for p in active.values()
+        )))
+        data = {
+            "lineage_claim_pairs": [(list(r), c) for r, c in lineage_claim_pairs],
+            "surviving_paths": sorted([e.path_id for e in self.get_surviving_support_environments()]),
         }
         return hashlib.sha256(json.dumps(data, sort_keys=True).encode("utf-8")).hexdigest()
 
@@ -164,8 +191,12 @@ class EpistemicState(BaseModel):
         return sub
 
 
-def validate_ir_consistency(state: EpistemicState, query: QueryContract | None = None) -> list[str]:
-    """Validate internal consistency across PremiseNodes, RuleSpecs, SupportEnvironments, and QueryContract."""
+def validate_ir_consistency(
+    state: EpistemicState,
+    query: QueryContract | None = None,
+    allow_partial_substate: bool = False,
+) -> list[str]:
+    """Validate internal proof-rule consistency, premise identities, and query alignment."""
     errors = []
 
     # 1. Premise validation
@@ -174,8 +205,8 @@ def validate_ir_consistency(state: EpistemicState, query: QueryContract | None =
             errors.append(f"Premise {occ_id} has empty occurrence_id")
         if not p.semantic_claim_id:
             errors.append(f"Premise {occ_id} has empty semantic_claim_id")
-        if not p.root_ids:
-            errors.append(f"Premise {occ_id} has empty root_ids list")
+        if p.provenance_status != ProvenanceStatus.UNKNOWN_UNTRACKED and not p.root_ids:
+            errors.append(f"Premise {occ_id} has status {p.provenance_status} but empty root_ids list")
 
     # 2. Rule validation
     for r_id, r in state.rules.items():
@@ -184,14 +215,44 @@ def validate_ir_consistency(state: EpistemicState, query: QueryContract | None =
         if not r.consequent_predicate:
             errors.append(f"Rule {r_id} has empty consequent_predicate")
 
-    # 3. Support environment validation
+    # 3. Support Environment Proof-Rule Correspondence
+    active_claim_ids = state.get_active_semantic_claim_ids()
+
     for env in state.support_environments:
         if env.rule_id not in state.rules:
             errors.append(f"SupportEnvironment {env.path_id} references unregistered rule {env.rule_id}")
-        for cid in env.required_semantic_claim_ids:
+            continue
+
+        rule = state.rules[env.rule_id]
+        req_cids = env.required_semantic_claim_ids
+
+        # If partial substate, skip full proof check for inactive environments whose claims aren't present
+        if allow_partial_substate and not all(cid in active_claim_ids for cid in req_cids):
+            continue
+
+        # Check required claims exist in state
+        env_premises = []
+        for cid in req_cids:
             matching = [p for p in state.premises.values() if p.semantic_claim_id == cid]
             if not matching:
-                errors.append(f"SupportEnvironment {env.path_id} requires semantic claim {cid} not present in state.premises")
+                errors.append(f"SupportEnvironment {env.path_id} requires semantic claim {cid} not present in state")
+            else:
+                env_premises.append(matching[0])
+
+        # Proof Checking: Verify that env_premises actually satisfy rule.antecedents
+        if len(env_premises) == len(req_cids):
+            for ant in rule.antecedents:
+                matched_ant = False
+                for p in env_premises:
+                    if p.predicate == ant.predicate:
+                        if ant.predicate == "has_role" and p.role == ant.subject_role:
+                            matched_ant = True
+                            break
+                        elif ant.predicate == "reports_to" and p.target_value == ant.target_value:
+                            matched_ant = True
+                            break
+                if not matched_ant:
+                    errors.append(f"SupportEnvironment {env.path_id} does not satisfy Rule {rule.rule_id} antecedent ({ant.predicate}, {ant.subject_role or ant.target_value})")
 
     # 4. Query alignment validation
     if query is not None:
