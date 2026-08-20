@@ -3,7 +3,7 @@
 ## 1. Executive Summary & Review Mandate
 This document executes the mandatory pre-execution **Stage-1 Registered-Report Audit** for **Exploration Round 3: *When One Belief Has Many Reasons*** across all five tracks.
 
-All 10 mechanical checklist items are verified prior to live compute:
+All 10 mechanical checklist items and preregistered interpretation rules are verified prior to live compute:
 
 ```
                            STAGE-1 MECHANICAL AUDIT MATRIX
@@ -29,7 +29,15 @@ All 10 mechanical checklist items are verified prior to live compute:
 
 ---
 
-## 2. Ten-Item Mechanical Checklist Verification
+## 2. Preregistered Interpretation Rules
+1. **Track H (Coalition Causality):** Classify outcomes into four discrete categories: (a) *formal concordance* ($S_C = S_F$), (b) *behavioral shortcut / partial concordance*, (c) *de-novo support* ($S_C = \{\emptyset\}$), or (d) *non-monotonic / discordant*. $S_C(C)$ denotes the *minimal behaviorally sufficient exposure environments*.
+2. **Track G2 (Non-Destructive Immunity):** Retained valid support environments are evaluated deterministically at the kernel layer, separate from downstream LLM reasoning correctness. *Preservation* and *safe collapse* are two distinct scientific endpoints.
+3. **Track B3 (Monoculture Multiverse):** Estimate the substantive root discounting effect $\Delta_{\text{root}}$ strictly from the primary 16 factorial cells. The 4 exact replays and 4 seed perturbations are reserved strictly for estimating $\epsilon_{\text{replay}}$ and $\epsilon_{\text{seed}}$.
+4. **Track L (Independence Laundering):** `independence_status: "indeterminable"` is a first-class valid epistemic phenotype indicating resistance to manufactured corroboration. At $G_3$, there is no single forced "correct" integer count.
+
+---
+
+## 3. Ten-Item Mechanical Checklist Verification
 
 ```
 [x] 1. Schema Field Audit: All requested output schemas use generic placeholders only.
@@ -51,7 +59,7 @@ All 10 mechanical checklist items are verified prior to live compute:
 
 ---
 
-## 3. Revised Live Compute Allocation (Total 96 Calls)
+## 4. Live Compute Allocation (Total 96 Calls)
 - **Track H (Coalition Causality):** 32 calls (16 lattice points $\times$ 2 stations)
 - **Track G2 (Non-Destructive Immunity):** 20 calls (5 arms $\times$ 2 stations $\times$ 2 reps)
 - **Track B3 (Monoculture Multiverse):** 24 calls (16 factorial cells + 4 exact replays + 4 seed perturbations)
@@ -61,6 +69,6 @@ All 10 mechanical checklist items are verified prior to live compute:
 
 ---
 
-## 4. Gating Verdict
+## 5. Gating Verdict
 All five Round-3 designs satisfy the 10-item registered-report checklist:
 $$\text{Audit Passed} \implies \text{Ready for Live Canary & Parallel Execution.}$$
