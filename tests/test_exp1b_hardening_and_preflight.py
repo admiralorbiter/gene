@@ -245,3 +245,34 @@ def test_exp1b_c1_delayed_adjudication_sandbox(tmp_path: Path):
         sweeps = db.conn.execute("SELECT COUNT(*) as cnt FROM retrieval_sweep_results WHERE sweep_type = 'immunity_sandbox'").fetchone()
         assert sweeps["cnt"] == 6  # 6 policies x 1 grid point x 1 top_k
     db.close()
+
+
+def test_exp1b_c1b_shared_ecology(tmp_path: Path):
+    """Verify 1B-C1b shared-ecology sandbox execution, multi-control policies, and delta_I containment."""
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
+    from run_exp1b_c1b_shared_ecology import run_exp1b_c1b_shared_ecology
+
+    db_path = tmp_path / "test_c1b_shared.db"
+    results = run_exp1b_c1b_shared_ecology(
+        world_pairs=[("VELORA", "KESTREL")],
+        tprs=[0.9],
+        fprs=[0.1],
+        top_k_list=[6],
+        db_path=str(db_path),
+    )
+
+    lin = results[6]["lineage_quarantine"][(0.9, 0.1)]
+    uni = results[6]["signal_conditioned_uniform_thinning"][(0.9, 0.1)]
+    gen = results[6]["generation_matched_thinning"][(0.9, 0.1)]
+    node = results[6]["node_only_quarantine"][(0.9, 0.1)]
+
+    # Delta_I: lineage achieves strictly greater containment than uniform and generation controls
+    assert uni["c_i"] - lin["c_i"] > 0.0
+    assert gen["c_i"] - lin["c_i"] > 0.0
+    assert lin["s"] > node["s"]
+
+    db = Database(db_path)
+    with db.conn:
+        sweeps = db.conn.execute("SELECT COUNT(*) as cnt FROM retrieval_sweep_results WHERE sweep_type = 'shared_ecology_sandbox'").fetchone()
+        assert sweeps["cnt"] == 8  # 8 policies x 1 grid point x 1 top_k
+    db.close()
