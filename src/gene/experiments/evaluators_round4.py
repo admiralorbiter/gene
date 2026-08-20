@@ -1,10 +1,13 @@
-"""Round 4 Epistemic Conformance Evaluators and Append-Only SQLite Persistence Layer (v3).
+"""Round 4 Epistemic Conformance Evaluators and Append-Only SQLite Persistence Layer (v4).
 
 Provides:
-1. Backend-neutral evidence support evaluation (K_S) mapping reported DOC/EVID indices to S_F.
+1. Backend-neutral evidence support evaluation with dual metrics:
+   - K_S_suff: Support sufficiency (reported evidence contains at least one minimal path).
+   - K_S_exact: Support minimality/exactness (reported evidence exactly matches a minimal path).
+   - E_S: Excess support evidence count.
 2. Relational panel evaluators with baseline replication guards and epsilon_replay computation.
-3. Schema compliance and strict contract validation.
-4. Relational evaluation persistence table (round4_relational_evaluations).
+3. Strict contract compliance (valid JSON required for K_A).
+4. Strictly append-only SQLite schema (round4_calls, round4_evaluations, round4_relational_evaluations with strict INSERT).
 """
 
 from __future__ import annotations
@@ -12,6 +15,7 @@ from __future__ import annotations
 import json
 import math
 import sqlite3
+import uuid
 from typing import Any, Literal
 from pydantic import BaseModel, Field
 from gene.ollama_client import CallSpec, ModelCallResult
@@ -105,7 +109,9 @@ class EvaluationRecord(BaseModel):
     perceived_independent_roots: int | None = None
     is_valid_json: int = 1
     k_a: int  # 1 if predicted == expected and is_valid_json == 1 else 0
-    k_s: int | None = None  # 1 if reported evidence satisfies valid S_F else 0
+    k_s_suff: int | None = None  # 1 if reported evidence contains a valid minimal path in S_F
+    k_s_exact: int | None = None # 1 if reported evidence exactly matches a valid minimal path in S_F
+    excess_evidence_count: int | None = None # |S_reported \ S_best|
     k_l: int | None = None  # 1 if perceived roots matches ground truth else 0
     prompt_hash: str
     state_hash: str
@@ -130,17 +136,22 @@ def parse_round4_model_output(raw_text: str) -> ParsedModelResponse:
             except ValueError:
                 roots_val = None
 
-        # Parse reported evidence support
         evid = data.get("reported_support_evidence", [])
         if isinstance(evid, str):
             evid = [evid]
         elif not isinstance(evid, list):
             evid = []
 
+        # Filter out generic template placeholders if echoed literally
+        clean_evid = [
+            str(x).strip() for x in evid
+            if str(x).strip().upper() not in ["EVID_TAG_OR_NONE", "TAG_1", "TAG_2", "NONE", "NULL"]
+        ]
+
         return ParsedModelResponse(
             station=str(data.get("station", "")).strip(),
             protocol=str(data.get("protocol", "UNKNOWN")).strip(),
-            reported_support_evidence=[str(x).strip() for x in evid],
+            reported_support_evidence=clean_evid,
             independence_status=str(data.get("independence_status", "indeterminable")).strip(),
             perceived_independent_roots=roots_val,
             evidence_status=str(data.get("evidence_status", "insufficient")).strip(),
@@ -166,13 +177,14 @@ def evaluate_conformance_k_s_neutral(
     reported_evidence: list[str],
     evidence_to_claim_map: dict[str, str],
     valid_support_paths_claim_sets: list[set[str]],
-) -> int:
-    """Backend-neutral K_S evaluation:
-    Maps reported evidence tags (e.g. DOC_01, EVID_A) to semantic claims,
-    and checks if the reported claims contain any valid minimal support path.
+) -> tuple[int, int, int]:
+    """Backend-neutral K_S evaluation returning:
+    - k_s_suff: 1 if reported claims contain at least one valid minimal support path in S_F.
+    - k_s_exact: 1 if reported claims exactly equal one of the valid minimal paths in S_F.
+    - excess_count: Count of extraneous reported claims beyond the best matching support path.
     """
     if not reported_evidence or not valid_support_paths_claim_sets:
-        return 0
+        return 0, 0, len(reported_evidence)
 
     reported_claims = set()
     for tag in reported_evidence:
@@ -180,11 +192,20 @@ def evaluate_conformance_k_s_neutral(
         if clean_tag in evidence_to_claim_map:
             reported_claims.add(evidence_to_claim_map[clean_tag])
 
-    # Check if reported claims contain at least one complete minimal support path
+    k_s_suff = 0
+    k_s_exact = 0
+    min_excess = len(reported_claims)
+
     for path_claims in valid_support_paths_claim_sets:
         if path_claims.issubset(reported_claims):
-            return 1
-    return 0
+            k_s_suff = 1
+            excess = len(reported_claims - path_claims)
+            if excess < min_excess:
+                min_excess = excess
+            if reported_claims == path_claims:
+                k_s_exact = 1
+
+    return k_s_suff, k_s_exact, min_excess
 
 
 def evaluate_conformance_k_l(independence_status: str, perceived_roots: int | None, expected_roots: int | None) -> tuple[bool, int | None]:
@@ -230,7 +251,6 @@ def evaluate_track_p_panel(
     accs = [1.0 if p == expected else 0.0 for p in raw_predictions]
     worst_acc = min(accs) if accs else 0.0
 
-    # Calculate epsilon_replay for canonical replays
     eps_replay = 0.0
     n_rep = 0
     if canonical_replay_predictions and len(canonical_replay_predictions) > 1:
@@ -297,7 +317,6 @@ def evaluate_track_r_panel(
     swp_retained = (swp_bd == "PROTO_X7" and swp_ae == "UNKNOWN")
     opq_suppressed = (opq_bd == "UNKNOWN" and opq_ae == "UNKNOWN")
 
-    # Guard: Require canonical shortcut replication before declaring mechanisms!
     if not can_shortcut:
         classification = "baseline_shortcut_not_replicated"
         ratio = 0.0
@@ -358,7 +377,9 @@ def init_round4_db(db_path: str) -> None:
             perceived_independent_roots INTEGER,
             is_valid_json INTEGER NOT NULL,
             k_a INTEGER NOT NULL,
-            k_s INTEGER,
+            k_s_suff INTEGER,
+            k_s_exact INTEGER,
+            excess_evidence_count INTEGER,
             k_l INTEGER,
             prompt_hash TEXT NOT NULL,
             state_hash TEXT NOT NULL,
@@ -369,13 +390,13 @@ def init_round4_db(db_path: str) -> None:
     """)
     cur.execute("""
         CREATE TABLE IF NOT EXISTS round4_relational_evaluations (
+            eval_rel_id TEXT PRIMARY KEY,
             track TEXT NOT NULL,
             metric_name TEXT NOT NULL,
             metric_value_numeric REAL,
             metric_value_text TEXT,
             payload_json TEXT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY (track, metric_name)
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
     conn.commit()
@@ -405,14 +426,14 @@ def persist_round4_call_and_evaluation(
         INSERT INTO round4_evaluations (
             call_id, track, condition_id, station, expected_protocol, predicted_protocol,
             reported_support_evidence, independence_status, perceived_independent_roots,
-            is_valid_json, k_a, k_s, k_l, prompt_hash, state_hash, compiler_pipeline
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            is_valid_json, k_a, k_s_suff, k_s_exact, excess_evidence_count, k_l, prompt_hash, state_hash, compiler_pipeline
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         eval_rec.call_id, eval_rec.track, eval_rec.condition_id, eval_rec.station,
         eval_rec.expected_protocol, eval_rec.predicted_protocol, json.dumps(eval_rec.reported_support_evidence),
         eval_rec.independence_status, eval_rec.perceived_independent_roots,
-        eval_rec.is_valid_json, eval_rec.k_a, eval_rec.k_s, eval_rec.k_l, eval_rec.prompt_hash,
-        eval_rec.state_hash, eval_rec.compiler_pipeline
+        eval_rec.is_valid_json, eval_rec.k_a, eval_rec.k_s_suff, eval_rec.k_s_exact, eval_rec.excess_evidence_count,
+        eval_rec.k_l, eval_rec.prompt_hash, eval_rec.state_hash, eval_rec.compiler_pipeline
     ))
     conn.commit()
     conn.close()
@@ -424,16 +445,21 @@ def persist_round4_relational_evaluation(
     metric_name: str,
     metric_value_numeric: float | None,
     metric_value_text: str | None,
-    payload: BaseModel | dict[str, Any],
+    payload: BaseModel | list[Any] | dict[str, Any],
 ) -> None:
-    """Persist an immutable relational evaluation record to SQLite."""
+    """Persist an immutable relational evaluation record to SQLite using strict INSERT."""
     conn = sqlite3.connect(db_path)
     cur = conn.cursor()
-    payload_str = payload.model_dump_json() if isinstance(payload, BaseModel) else json.dumps(payload)
+    if isinstance(payload, BaseModel):
+        payload_str = payload.model_dump_json()
+    else:
+        payload_str = json.dumps(payload)
+
+    eval_rel_id = f"rel_{track}_{metric_name}_{uuid.uuid4().hex[:8]}"
     cur.execute("""
-        INSERT OR REPLACE INTO round4_relational_evaluations (
-            track, metric_name, metric_value_numeric, metric_value_text, payload_json
-        ) VALUES (?, ?, ?, ?, ?)
-    """, (track, metric_name, metric_value_numeric, metric_value_text, payload_str))
+        INSERT INTO round4_relational_evaluations (
+            eval_rel_id, track, metric_name, metric_value_numeric, metric_value_text, payload_json
+        ) VALUES (?, ?, ?, ?, ?, ?)
+    """, (eval_rel_id, track, metric_name, metric_value_numeric, metric_value_text, payload_str))
     conn.commit()
     conn.close()

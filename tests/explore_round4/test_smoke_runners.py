@@ -108,13 +108,27 @@ def test_backend_neutral_k_s_evidence_mapping():
         {"claim_velora_nerin_manager", "claim_velora_nerin_reports_s1"},  # path_AB
     ]
 
-    # Valid reported evidence
-    assert evaluate_conformance_k_s_neutral(["DOC_01", "DOC_02"], evidence_to_claims, gold_paths) == 1
-    assert evaluate_conformance_k_s_neutral(["[DOC_01]", "[DOC_02]"], evidence_to_claims, gold_paths) == 1
+    # Valid exact reported evidence
+    suff, exact, excess = evaluate_conformance_k_s_neutral(["DOC_01", "DOC_02"], evidence_to_claims, gold_paths)
+    assert suff == 1
+    assert exact == 1
+    assert excess == 0
+
+    # Valid sufficient but with excess evidence
+    suff_ex, exact_ex, excess_cnt = evaluate_conformance_k_s_neutral(["DOC_01", "DOC_02", "DOC_03"], evidence_to_claims, gold_paths)
+    assert suff_ex == 1
+    assert exact_ex == 0
+    assert excess_cnt == 1
+
     # Incomplete reported evidence
-    assert evaluate_conformance_k_s_neutral(["DOC_01"], evidence_to_claims, gold_paths) == 0
+    suff_inc, exact_inc, _ = evaluate_conformance_k_s_neutral(["DOC_01"], evidence_to_claims, gold_paths)
+    assert suff_inc == 0
+    assert exact_inc == 0
+
     # Irrelevant reported evidence
-    assert evaluate_conformance_k_s_neutral(["DOC_03"], evidence_to_claims, gold_paths) == 0
+    suff_irr, exact_irr, _ = evaluate_conformance_k_s_neutral(["DOC_03"], evidence_to_claims, gold_paths)
+    assert suff_irr == 0
+    assert exact_irr == 0
 
 
 def test_production_callspec_smoke_all_runners_end_to_end():
@@ -144,7 +158,9 @@ def test_production_callspec_smoke_all_runners_end_to_end():
         evals_c = run_track_c(client, db_path, max_calls=1)
         assert len(evals_c) == 1
         assert evals_c[0].k_a == 1
-        assert evals_c[0].k_s == 1
+        assert evals_c[0].k_s_suff == 1
+        assert evals_c[0].k_s_exact == 1
+        assert evals_c[0].excess_evidence_count == 0
 
         # Test relational evaluations table persistence
         persist_round4_relational_evaluation(db_path, "track_p", "permutation_invariance", m_p.k_i, "ok", m_p)

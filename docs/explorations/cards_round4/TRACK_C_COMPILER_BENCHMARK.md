@@ -22,12 +22,12 @@
 ---
 
 ## 2. Non-Leaking Backend-Neutral Output Schema & Conformance Applicability
-The model is presented with a backend-neutral generic schema indexing retrieved evidence lines (`DOC_01`, `DOC_02`, etc.):
+The model is presented with a backend-neutral generic schema with zero answer-leaking sample values:
 ```json
 {
   "station": "STATION_NAME",
   "protocol": "PROTOCOL_NAME_OR_UNKNOWN",
-  "reported_support_evidence": ["DOC_01", "DOC_02"],
+  "reported_support_evidence": ["EVID_TAG_OR_NONE"],
   "independence_status": "determinable|indeterminable",
   "perceived_independent_roots": "INTEGER_OR_NULL",
   "evidence_status": "sufficient|insufficient"
@@ -37,22 +37,24 @@ The model is presented with a backend-neutral generic schema indexing retrieved 
 ```
                             CONFORMANCE APPLICABILITY MATRIX
                             
-┌─────────────────────────────────┬─────────────────┬─────────────────┬───────────────────────────────┬─────────────────┐
-│ Evaluation Ecology              │ K_A (Answer)    │ K_S (Support)   │ K_L (Lineage | Determinable)  │ K_I (Invariance)│
-├─────────────────────────────────┼─────────────────┼─────────────────┼───────────────────────────────┼─────────────────┤
-│ 1. Entitled Proof (AB+DE)       │ Evaluated (X7)  │ Evaluated (S_F) │ N/A                           │ Evaluated (P)   │
-│ 2. Pruned Support (AB only)     │ Evaluated (X7)  │ Evaluated (AB)  │ N/A                           │ Evaluated (P)   │
-│ 3. Exact-Copy Multiplication    │ Evaluated (X7)  │ N/A             │ Evaluated (N_root=1)          │ Evaluated (P)   │
-│    (4 identical copies of A)    │                 │                 │                               │                 │
-│ 4. Unentitled Null (Ø / Distr.) │ Evaluated (UNK) │ N/A             │ N/A                           │ Evaluated (P)   │
-└─────────────────────────────────┴─────────────────┴─────────────────┴───────────────────────────────┴─────────────────┘
+┌─────────────────────────────────┬─────────────────┬─────────────────────────────────┬───────────────────────────────┬─────────────────┐
+│ Evaluation Ecology              │ K_A (Answer)    │ K_S (Sufficiency & Exactness)   │ K_L (Lineage | Determinable)  │ K_I (Invariance)│
+├─────────────────────────────────┼─────────────────┼─────────────────────────────────┼───────────────────────────────┼─────────────────┤
+│ 1. Entitled Proof (AB+DE)       │ Evaluated (X7)  │ Evaluated (S_F: AB or DE)       │ N/A                           │ Evaluated (P)   │
+│ 2. Pruned Support (AB only)     │ Evaluated (X7)  │ Evaluated (S_F: AB)             │ N/A                           │ Evaluated (P)   │
+│ 3. Exact-Copy Multiplication    │ Evaluated (X7)  │ N/A                             │ Evaluated (N_root=1)          │ Evaluated (P)   │
+│    (4 identical copies of A)    │                 │                                 │                               │                 │
+│ 4. Unentitled Null (Ø / Distr.) │ Evaluated (UNK) │ N/A                             │ N/A                           │ Evaluated (P)   │
+└─────────────────────────────────┴─────────────────┴─────────────────────────────────┴───────────────────────────────┴─────────────────┘
 ```
 
 ### Dimensional Definitions:
 1. **$K_A$ (Answer Conformance):** Does strict JSON output match the formal entitlement status of the state?
-2. **$K_S$ (Support Conformance):** Does reported evidence (mapped from `DOC_xx` tags back to semantic claims) contain a valid minimal proof pathway in $S_F$?
-3. **$K_L$ (Lineage Conformance):** Under exact-copy reproduction ($1A \to 4A$ with shared root $R1$), does the compiler preserve root count truth ($\widehat{N}=1$ vs $\widehat{N}=4$)?
-4. **$K_I$ (Invariance Conformance):** Measured in Track P across 24 permutations ($K_I = 1.0 - \mathcal{D}_{\text{perm}}$).
+2. **$K_{S,\text{suff}}$ (Support Sufficiency Conformance):** Does reported evidence (mapped from bracketed `[DOC_xx]` tags back to semantic claims) contain at least one valid minimal proof pathway in $S_F$?
+3. **$K_{S,\text{exact}}$ (Support Minimality Conformance):** Does reported evidence match a valid minimal proof pathway in $S_F$ *without extraneous claims*?
+4. **$E_S$ (Excess Support Evidence Count):** Count of extraneous reported claims ($|S_{\text{reported}} \setminus S_{\text{best}}|$).
+5. **$K_L$ (Lineage Conformance):** Under exact-copy reproduction ($1A \to 4A$ with shared root $R1$), does the compiler preserve root count truth ($\widehat{N}=1$ vs $\widehat{N}=4$)?
+6. **$K_I$ (Invariance Conformance):** Measured in Track P across 24 permutations ($K_I = 1.0 - \mathcal{D}_{\text{perm}}$).
 
 ---
 
@@ -60,6 +62,6 @@ The model is presented with a backend-neutral generic schema indexing retrieved 
 We evaluate 4 Compiler Pipelines $\times$ 4 Ecologies $\times$ 2 Stations (`VELORA`, `KESTREL`) = **32 calls**.
 
 ## 4. Measurable Endpoints & Analysis
-- **Structured Vector Conformance:** Evaluated as a structured vector $(K_A, K_S, K_L)$ per pipeline.
+- **Structured Vector Conformance:** Evaluated as a structured vector $(K_A, K_{S,\text{suff}}, K_{S,\text{exact}}, K_L)$ per pipeline.
 - **Copy Multiplication Suppression:** Perceived root counts under `RAW_SERIALIZATION` vs `GENEALOGICAL_NORMALIZATION`.
 - **Unsupported Concrete Rate:** Frequency of emitting concrete answers when $S_F(c) = \emptyset$.

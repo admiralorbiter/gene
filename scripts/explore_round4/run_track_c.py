@@ -66,7 +66,7 @@ def build_track_c_ecology(station: str, eco_type: str) -> tuple[EpistemicState, 
         target_predicate="station_operates_protocol",
         query_question=f"Based on authorized rules and evidence, what protocol is authorized for station {station}?",
         allow_unknown=True,
-        output_schema_json=f'{{"station": "{station}", "protocol": "PROTOCOL_NAME_OR_UNKNOWN", "reported_support_evidence": ["DOC_01", "DOC_02"], "independence_status": "determinable|indeterminable", "perceived_independent_roots": "INTEGER_OR_NULL", "evidence_status": "sufficient|insufficient"}}',
+        output_schema_json=f'{{"station": "{station}", "protocol": "PROTOCOL_NAME_OR_UNKNOWN", "reported_support_evidence": ["EVID_TAG_OR_NONE"], "independence_status": "determinable|indeterminable", "perceived_independent_roots": "INTEGER_OR_NULL", "evidence_status": "sufficient|insufficient"}}',
     )
 
     path_AB_claims = {f"claim_{st_lower}_nerin_manager", f"claim_{st_lower}_nerin_reports_s1"}
@@ -167,7 +167,13 @@ def run_track_c(client: Any, db_path: str, max_calls: int | None = None) -> list
                 parsed = parse_round4_model_output(result.raw_response_text)
 
                 k_a = evaluate_conformance_k_a(parsed.protocol, expected_proto, is_valid_json=parsed.is_valid_json)
-                k_s = evaluate_conformance_k_s_neutral(parsed.reported_support_evidence, ctx.evidence_tag_to_claim_map, gold_paths) if gold_paths else None
+                if gold_paths:
+                    k_s_suff, k_s_exact, excess_count = evaluate_conformance_k_s_neutral(
+                        parsed.reported_support_evidence, ctx.evidence_tag_to_claim_map, gold_paths
+                    )
+                else:
+                    k_s_suff, k_s_exact, excess_count = None, None, None
+
                 is_det, k_l = evaluate_conformance_k_l(parsed.independence_status, parsed.perceived_independent_roots, expected_roots)
 
                 call_spec_sha = hashlib.sha256(spec.model_dump_json().encode("utf-8")).hexdigest()
@@ -198,7 +204,9 @@ def run_track_c(client: Any, db_path: str, max_calls: int | None = None) -> list
                     perceived_independent_roots=parsed.perceived_independent_roots,
                     is_valid_json=1 if parsed.is_valid_json else 0,
                     k_a=k_a,
-                    k_s=k_s,
+                    k_s_suff=k_s_suff,
+                    k_s_exact=k_s_exact,
+                    excess_evidence_count=excess_count,
                     k_l=k_l,
                     prompt_hash=hashlib.sha256(ctx.prompt.encode("utf-8")).hexdigest(),
                     state_hash=ctx.state_hash,

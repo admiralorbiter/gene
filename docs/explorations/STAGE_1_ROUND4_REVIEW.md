@@ -31,8 +31,10 @@ All 7 mechanical and executable preflight gates are fully verified prior to live
 ├──────────────────────────────┼────────┼────────────────────────────────────────────────────────────────────────┤
 │ 6. Executable Endpoints      │ PASS   │ Production CallSpec/ModelCallResult integration, relational evaluators │
 │                              │        │ (K_I panel entropy/disagreement, K_mono S->E transitions, K_role       │
-│                              │        │ classification), immutable round4_calls/round4_evaluations tables, and │
-│                              │        │ fake smoke tests verified across all 4 runners.                        │
+│                              │        │ classification with replication guard), dual support metrics           │
+│                              │        │ (K_S_suff, K_S_exact, E_S), immutable round4_calls,                   │
+│                              │        │ round4_evaluations, round4_relational_evaluations tables, and fake     │
+│                              │        │ smoke tests verified across all 4 runners.                             │
 ├──────────────────────────────┼────────┼────────────────────────────────────────────────────────────────────────┤
 │ 7. Privilege Audit Matrix    │ PASS   │ Explicitly audits passes (validity, dedup, ordering, certificate) for  │
 │                              │        │ RAW, TOPOLOGY_AWARE, GENEALOGICAL_NORM, and PROOF_CARRYING pipelines.  │
@@ -51,12 +53,13 @@ All 7 mechanical and executable preflight gates are fully verified prior to live
 ├──────────┼─────────────────────────────┼───────────┼───────────────────────────────────┼────────────────────────────────────────────────────────┤
 │ Track R  │ Role Equivariance           │ 24 calls  │ K_role (Role Follow vs Slot)      │ scripts/explore_round4/run_track_r.py                  │
 ├──────────┼─────────────────────────────┼───────────┼───────────────────────────────────┼────────────────────────────────────────────────────────┤
-│ Track P  │ Permutation Invariance      │ 28 calls  │ K_I (Permutation Invariance)      │ scripts/explore_round4/run_track_p.py                  │
+│ Track P  │ Permutation Invariance      │ 28 calls  │ K_I (Permutation Invariance) &    │ scripts/explore_round4/run_track_p.py                  │
+│          │                             │           │ epsilon_replay                    │                                                        │
 ├──────────┼─────────────────────────────┼───────────┼───────────────────────────────────┼────────────────────────────────────────────────────────┤
 │ Track M  │ Support-Preserving          │ 32 calls  │ K_mono (Monotonic Scaffolding)    │ scripts/explore_round4/run_track_m.py                  │
 ├──────────┼─────────────────────────────┼───────────┼───────────────────────────────────┼────────────────────────────────────────────────────────┤
-│ Track C  │ Epistemic Compiler          │ 32 calls  │ K_A (Answer), K_S (Support Path), │ scripts/explore_round4/run_track_c.py                  │
-│          │ Conformance Benchmark       │           │ K_L (Lineage Root Count)          │                                                        │
+│ Track C  │ Epistemic Compiler          │ 32 calls  │ K_A (Answer), K_S_suff/exact      │ scripts/explore_round4/run_track_c.py                  │
+│          │ Conformance Benchmark       │           │ (Support), K_L (Lineage Roots)    │                                                        │
 └──────────┴─────────────────────────────┴───────────┴───────────────────────────────────┴────────────────────────────────────────────────────────┘
 ```
 
@@ -64,5 +67,5 @@ All 7 mechanical and executable preflight gates are fully verified prior to live
 
 ## 3. Preflight Gating & Canary Strategy
 - **Master Orchestrator:** [`scripts/explore_round4/run_round4_master.py`](../../scripts/explore_round4/run_round4_master.py)
-- **Canary Protocol:** Before spending the 116 live calls, 4 isolated canary calls (1 per track) will be executed into a disposable canary database (`data/canary_round4.db`) using the production `OllamaClient` to verify real Gemma 3:12B JSON formatting and schema conformance.
-- **Stage 1 Status:** **100% Passed (145/145 unit tests passing across repo).**
+- **Canary Protocol:** Before spending the 116 live calls, 4 isolated canary calls (1 per track) are executed into a disposable canary database (`data/canary_round4.db`) using the production `OllamaClient` to verify real Gemma 3:12B JSON formatting and schema conformance.
+- **Stage 1 Status:** **100% Passed (146/146 unit tests passing across repo).**
