@@ -1,7 +1,7 @@
 """Track C Runner: Epistemic Context Compiler Conformance Benchmark (32 Calls).
 
 Evaluates 4 compiler pipelines x 4 test ecologies x 2 stations.
-Uses production CallSpec, generic non-leaking schema, and immutable SQLite persistence.
+Uses backend-neutral evidence support reporting, exact-copy multiplication scoping, and immutable persistence.
 """
 
 from __future__ import annotations
@@ -27,17 +27,17 @@ from gene.experiments.evaluators_round4 import (
     FROZEN_ROUND4_SYSTEM_PROMPT,
     evaluate_conformance_k_a,
     evaluate_conformance_k_l,
-    evaluate_conformance_k_s,
+    evaluate_conformance_k_s_neutral,
     init_round4_db,
     parse_round4_model_output,
     persist_round4_call_and_evaluation,
 )
 
 
-def build_track_c_ecology(station: str, eco_type: str) -> tuple[EpistemicState, QueryContract, str, list[str], int | None]:
+def build_track_c_ecology(station: str, eco_type: str) -> tuple[EpistemicState, QueryContract, str, list[set[str]], int | None]:
     """Construct specific test ecology for Track C.
     
-    Returns: (state, query, expected_protocol, gold_paths, expected_roots)
+    Returns: (state, query, expected_protocol, gold_paths_claim_sets, expected_roots)
     """
     st_lower = station.lower()
     rules = {
@@ -66,8 +66,11 @@ def build_track_c_ecology(station: str, eco_type: str) -> tuple[EpistemicState, 
         target_predicate="station_operates_protocol",
         query_question=f"Based on authorized rules and evidence, what protocol is authorized for station {station}?",
         allow_unknown=True,
-        output_schema_json=f'{{"station": "{station}", "protocol": "PROTOCOL_NAME_OR_UNKNOWN", "reported_support_path": "SUPPORT_PATH_ID_OR_NONE", "independence_status": "determinable|indeterminable", "perceived_independent_roots": "INTEGER_OR_NULL", "evidence_status": "sufficient|insufficient"}}',
+        output_schema_json=f'{{"station": "{station}", "protocol": "PROTOCOL_NAME_OR_UNKNOWN", "reported_support_evidence": ["DOC_01", "DOC_02"], "independence_status": "determinable|indeterminable", "perceived_independent_roots": "INTEGER_OR_NULL", "evidence_status": "sufficient|insufficient"}}',
     )
+
+    path_AB_claims = {f"claim_{st_lower}_nerin_manager", f"claim_{st_lower}_nerin_reports_s1"}
+    path_DE_claims = {f"claim_{st_lower}_vael_sector_lead", f"claim_{st_lower}_vael_reports_s2"}
 
     if eco_type == "eco_entitled":
         premises = {
@@ -77,12 +80,12 @@ def build_track_c_ecology(station: str, eco_type: str) -> tuple[EpistemicState, 
             "occ_E": PremiseNode(occurrence_id="occ_E", semantic_claim_id=f"claim_{st_lower}_vael_reports_s2", predicate="reports_to", subject="Vael", entity=station, target_value="sector lead S2", root_ids=["R2"]),
         }
         envs = [
-            SupportEnvironment(path_id="path_AB", rule_id="rule_1", required_semantic_claim_ids=[f"claim_{st_lower}_nerin_manager", f"claim_{st_lower}_nerin_reports_s1"]),
-            SupportEnvironment(path_id="path_DE", rule_id="rule_2", required_semantic_claim_ids=[f"claim_{st_lower}_vael_sector_lead", f"claim_{st_lower}_vael_reports_s2"]),
+            SupportEnvironment(path_id="path_AB", rule_id="rule_1", required_semantic_claim_ids=list(path_AB_claims)),
+            SupportEnvironment(path_id="path_DE", rule_id="rule_2", required_semantic_claim_ids=list(path_DE_claims)),
         ]
         state = EpistemicState(premises=premises, rules=rules, support_environments=envs)
         EpistemicRenderer.render_state(state)
-        return state, query, "PROTO_X7", ["path_AB", "path_DE"], None
+        return state, query, "PROTO_X7", [path_AB_claims, path_DE_claims], None
 
     elif eco_type == "eco_pruned":
         premises = {
@@ -90,13 +93,14 @@ def build_track_c_ecology(station: str, eco_type: str) -> tuple[EpistemicState, 
             "occ_B": PremiseNode(occurrence_id="occ_B", semantic_claim_id=f"claim_{st_lower}_nerin_reports_s1", predicate="reports_to", subject="Nerin", entity=station, target_value="sector lead S1", root_ids=["R1"]),
         }
         envs = [
-            SupportEnvironment(path_id="path_AB", rule_id="rule_1", required_semantic_claim_ids=[f"claim_{st_lower}_nerin_manager", f"claim_{st_lower}_nerin_reports_s1"]),
+            SupportEnvironment(path_id="path_AB", rule_id="rule_1", required_semantic_claim_ids=list(path_AB_claims)),
         ]
         state = EpistemicState(premises=premises, rules=rules, support_environments=envs)
         EpistemicRenderer.render_state(state)
-        return state, query, "PROTO_X7", ["path_AB"], None
+        return state, query, "PROTO_X7", [path_AB_claims], None
 
-    elif eco_type == "eco_4copy":
+    elif eco_type == "eco_copy_multiplication":
+        # Exact duplicate copy multiplication (4 identical copies of A under shared root R1)
         premises = {
             "occ_A1": PremiseNode(occurrence_id="occ_A1", semantic_claim_id=f"claim_{st_lower}_nerin_manager", predicate="has_role", subject="Nerin", entity=station, role="manager", root_ids=["R1"]),
             "occ_A2": PremiseNode(occurrence_id="occ_A2", semantic_claim_id=f"claim_{st_lower}_nerin_manager", predicate="has_role", subject="Nerin", entity=station, role="manager", root_ids=["R1"]),
@@ -105,11 +109,11 @@ def build_track_c_ecology(station: str, eco_type: str) -> tuple[EpistemicState, 
             "occ_B": PremiseNode(occurrence_id="occ_B", semantic_claim_id=f"claim_{st_lower}_nerin_reports_s1", predicate="reports_to", subject="Nerin", entity=station, target_value="sector lead S1", root_ids=["R1"]),
         }
         envs = [
-            SupportEnvironment(path_id="path_AB", rule_id="rule_1", required_semantic_claim_ids=[f"claim_{st_lower}_nerin_manager", f"claim_{st_lower}_nerin_reports_s1"]),
+            SupportEnvironment(path_id="path_AB", rule_id="rule_1", required_semantic_claim_ids=list(path_AB_claims)),
         ]
         state = EpistemicState(premises=premises, rules=rules, support_environments=envs)
         EpistemicRenderer.render_state(state)
-        return state, query, "PROTO_X7", ["path_AB"], 1
+        return state, query, "PROTO_X7", [path_AB_claims], 1
 
     elif eco_type == "eco_unentitled":
         premises = {
@@ -128,7 +132,7 @@ def run_track_c(client: Any, db_path: str, max_calls: int | None = None) -> list
     """Execute Track C experimental design."""
     init_round4_db(db_path)
     stations = ["VELORA", "KESTREL"]
-    ecologies = ["eco_entitled", "eco_pruned", "eco_4copy", "eco_unentitled"]
+    ecologies = ["eco_entitled", "eco_pruned", "eco_copy_multiplication", "eco_unentitled"]
     pipelines = [
         PrivilegeLevel.RAW_SERIALIZATION,
         PrivilegeLevel.TOPOLOGY_AWARE_GROUPING,
@@ -162,8 +166,8 @@ def run_track_c(client: Any, db_path: str, max_calls: int | None = None) -> list
                 result = client.chat(spec)
                 parsed = parse_round4_model_output(result.raw_response_text)
 
-                k_a = evaluate_conformance_k_a(parsed.protocol, expected_proto)
-                k_s = evaluate_conformance_k_s(parsed.reported_support_path, gold_paths) if gold_paths else None
+                k_a = evaluate_conformance_k_a(parsed.protocol, expected_proto, is_valid_json=parsed.is_valid_json)
+                k_s = evaluate_conformance_k_s_neutral(parsed.reported_support_evidence, ctx.evidence_tag_to_claim_map, gold_paths) if gold_paths else None
                 is_det, k_l = evaluate_conformance_k_l(parsed.independence_status, parsed.perceived_independent_roots, expected_roots)
 
                 call_spec_sha = hashlib.sha256(spec.model_dump_json().encode("utf-8")).hexdigest()
@@ -189,9 +193,10 @@ def run_track_c(client: Any, db_path: str, max_calls: int | None = None) -> list
                     station=station,
                     expected_protocol=expected_proto,
                     predicted_protocol=parsed.protocol,
-                    reported_support_path=parsed.reported_support_path,
+                    reported_support_evidence=parsed.reported_support_evidence,
                     independence_status=parsed.independence_status,
                     perceived_independent_roots=parsed.perceived_independent_roots,
+                    is_valid_json=1 if parsed.is_valid_json else 0,
                     k_a=k_a,
                     k_s=k_s,
                     k_l=k_l,

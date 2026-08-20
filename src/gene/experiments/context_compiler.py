@@ -1,7 +1,7 @@
-"""Epistemic Context Compiler (v2.3).
+"""Epistemic Context Compiler (v3).
 
 Compiles an EpistemicState into a CompiledContext with complete pass-level provenance,
-state vs typed equivalence hashing, and full-pass provenance conservation.
+state vs typed equivalence hashing, full-pass provenance conservation, and backend-neutral evidence tagging.
 """
 
 from __future__ import annotations
@@ -29,6 +29,7 @@ class CompiledContext(BaseModel):
     included_semantic_claim_ids: list[str]
     represented_root_ids: list[str]
     surviving_support_environment_ids: list[str]
+    evidence_tag_to_claim_map: dict[str, str] = Field(default_factory=dict)
     merged_occurrence_groups: dict[str, list[str]] = Field(default_factory=dict)
     dropped_occurrence_ids: list[str] = Field(default_factory=list)
     drop_or_merge_reasons: dict[str, str] = Field(default_factory=dict)
@@ -51,7 +52,6 @@ class CompiledContext(BaseModel):
         all_accounted = emitted_set | merged_non_primaries | dropped_set
         source_set = set(self.source_occurrence_ids)
 
-        # Check exact partition: pairwise disjoint and fully covering
         has_no_overlap = len(emitted_set & merged_non_primaries) == 0 and len(emitted_set & dropped_set) == 0 and len(merged_non_primaries & dropped_set) == 0
         covers_all = (all_accounted == source_set)
         return has_no_overlap and covers_all
@@ -74,7 +74,6 @@ class EpistemicContextCompiler:
         state_h = state.compute_state_hash()
         equiv_h = state.compute_permutation_equiv_hash()
         
-        # Track ALL input occurrences before any filtering
         all_input_occ_ids = sorted(list(state.premises.keys()))
         
         # Pass 1: Validity Filter
@@ -94,7 +93,6 @@ class EpistemicContextCompiler:
 
         surviving_envs = state.get_surviving_support_environments()
 
-        # Validate occurrence_order if provided
         if occurrence_order is not None:
             ordered_occ_ids = [occ_id for occ_id in occurrence_order if occ_id in active_premises]
         else:
@@ -123,7 +121,6 @@ class EpistemicContextCompiler:
         else:
             raise ValueError(f"Unknown compiler pipeline: {self.pipeline}")
 
-        # Enforce full-pass conservation invariant
         if not ctx.verify_provenance_conservation():
             raise ValueError(
                 f"Compiler pass violated provenance conservation: "
@@ -155,11 +152,14 @@ class EpistemicContextCompiler:
         lines.append("\nRETRIEVED EPISODIC EVIDENCE:")
         included_claims = set()
         represented_roots = set()
+        tag_map = {}
         for idx, occ_id in enumerate(ordered_occ_ids):
             p = active_premises[occ_id]
-            lines.append(f"- DOC_{idx+1:02d}: {p.rendered_text}")
+            tag = f"DOC_{idx+1:02d}"
+            lines.append(f"- [{tag}]: {p.rendered_text}")
             included_claims.add(p.semantic_claim_id)
             represented_roots.update(p.root_ids)
+            tag_map[tag] = p.semantic_claim_id
 
         lines.append(f"\nQUESTION: {query.query_question}")
         lines.append(f"Return strictly JSON matching this schema: {query.output_schema_json}")
@@ -173,6 +173,7 @@ class EpistemicContextCompiler:
             included_semantic_claim_ids=sorted(list(included_claims)),
             represented_root_ids=sorted(list(represented_roots)),
             surviving_support_environment_ids=[e.path_id for e in surviving_envs],
+            evidence_tag_to_claim_map=tag_map,
             merged_occurrence_groups={},
             dropped_occurrence_ids=dropped_by_validity,
             drop_or_merge_reasons=validity_drop_reasons,
@@ -205,29 +206,36 @@ class EpistemicContextCompiler:
         represented_roots = set()
         dropped_occs = list(dropped_by_validity)
         drop_reasons = dict(validity_drop_reasons)
+        tag_map = {}
+        doc_counter = 1
 
         if not surviving_envs:
             lines.append("No complete, valid derivation pathways exist in active memory.")
             for occ_id in sorted(active_premises.keys()):
                 p = active_premises[occ_id]
-                lines.append(f"- [Unconnected] {p.rendered_text}")
+                tag = f"DOC_{doc_counter:02d}"
+                lines.append(f"- [{tag}] [Unconnected] {p.rendered_text}")
                 included_occs.append(occ_id)
                 included_claims.add(p.semantic_claim_id)
                 represented_roots.update(p.root_ids)
+                tag_map[tag] = p.semantic_claim_id
+                doc_counter += 1
         else:
             for idx, env in enumerate(sorted(surviving_envs, key=lambda e: e.path_id)):
-                lines.append(f"Pathway ({env.path_id}):")
+                lines.append(f"Pathway {idx+1}:")
                 for cid in sorted(env.required_semantic_claim_ids):
                     matching = [p for p in active_premises.values() if p.semantic_claim_id == cid]
                     if matching:
                         primary = matching[0]
-                        lines.append(f"  * {primary.rendered_text}")
+                        tag = f"DOC_{doc_counter:02d}"
+                        lines.append(f"  * [{tag}]: {primary.rendered_text}")
                         if primary.occurrence_id not in included_occs:
                             included_occs.append(primary.occurrence_id)
                         included_claims.add(primary.semantic_claim_id)
                         represented_roots.update(primary.root_ids)
+                        tag_map[tag] = primary.semantic_claim_id
+                        doc_counter += 1
 
-            # Any active occurrence not in included_occs was dropped by path selection
             for occ_id in active_premises.keys():
                 if occ_id not in included_occs:
                     dropped_occs.append(occ_id)
@@ -245,6 +253,7 @@ class EpistemicContextCompiler:
             included_semantic_claim_ids=sorted(list(included_claims)),
             represented_root_ids=sorted(list(represented_roots)),
             surviving_support_environment_ids=[e.path_id for e in surviving_envs],
+            evidence_tag_to_claim_map=tag_map,
             merged_occurrence_groups={},
             dropped_occurrence_ids=dropped_occs,
             drop_or_merge_reasons=drop_reasons,
@@ -274,12 +283,10 @@ class EpistemicContextCompiler:
 
         lines.append("\nGENEALOGICALLY DEDUPLICATED ROOTS:")
         
-        # Deduplication rule: occurrences with UNKNOWN_UNTRACKED are NEVER merged
         dedup_groups: dict[tuple[tuple[str, ...], str, str], list[PremiseNode]] = {}
         for occ_id in ordered_occ_ids:
             p = active_premises[occ_id]
             if p.provenance_status == ProvenanceStatus.UNKNOWN_UNTRACKED:
-                # Unique group key per occurrence so they never merge falsely
                 key = (tuple(), p.semantic_claim_id, p.occurrence_id)
             else:
                 key = (tuple(sorted(p.root_ids)), p.semantic_claim_id, "")
@@ -291,22 +298,27 @@ class EpistemicContextCompiler:
         merged_groups = {}
         dropped_occs = list(dropped_by_validity)
         drop_reasons = dict(validity_drop_reasons)
+        tag_map = {}
+        doc_counter = 1
 
         for (roots_tuple, claim_id, unique_tag), occ_list in sorted(dedup_groups.items(), key=lambda x: (x[0][0], x[0][1], x[0][2])):
             primary = occ_list[0]
             count = len(occ_list)
             root_label = "+".join(roots_tuple) if roots_tuple else "ambient"
+            tag = f"DOC_{doc_counter:02d}"
             if count > 1:
-                lines.append(f"- Root {root_label} ({count} cited occurrences): {primary.rendered_text}")
+                lines.append(f"- [{tag}] Root {root_label} ({count} cited occurrences): {primary.rendered_text}")
                 merged_groups[primary.occurrence_id] = [p.occurrence_id for p in occ_list]
                 for p in occ_list[1:]:
                     drop_reasons[p.occurrence_id] = f"merged_into_{primary.occurrence_id}_same_lineage_claim"
             else:
-                lines.append(f"- Root {root_label}: {primary.rendered_text}")
+                lines.append(f"- [{tag}] Root {root_label}: {primary.rendered_text}")
 
             included_occs.append(primary.occurrence_id)
             included_claims.add(primary.semantic_claim_id)
             represented_roots.update(primary.root_ids)
+            tag_map[tag] = primary.semantic_claim_id
+            doc_counter += 1
 
         return CompiledContext(
             prompt="\n".join(lines + [f"\nQUESTION: {query.query_question}", f"Return strictly JSON matching this schema: {query.output_schema_json}"]),
@@ -317,6 +329,7 @@ class EpistemicContextCompiler:
             included_semantic_claim_ids=sorted(list(included_claims)),
             represented_root_ids=sorted(list(represented_roots)),
             surviving_support_environment_ids=[e.path_id for e in surviving_envs],
+            evidence_tag_to_claim_map=tag_map,
             merged_occurrence_groups=merged_groups,
             dropped_occurrence_ids=dropped_occs,
             drop_or_merge_reasons=drop_reasons,
@@ -357,12 +370,15 @@ class EpistemicContextCompiler:
         lines.append("\nVERIFIED EVIDENCE BASE:")
         included_occs = []
         included_claims = set()
-        for occ_id in sorted(active_premises.keys()):
+        tag_map = {}
+        for idx, occ_id in enumerate(sorted(active_premises.keys())):
             p = active_premises[occ_id]
             roots_str = "+".join(sorted(p.root_ids)) if p.root_ids else "ambient"
-            lines.append(f"- [{p.occurrence_id}] Root={roots_str}: {p.rendered_text}")
+            tag = f"DOC_{idx+1:02d}"
+            lines.append(f"- [{tag}] Root={roots_str}: {p.rendered_text}")
             included_occs.append(p.occurrence_id)
             included_claims.add(p.semantic_claim_id)
+            tag_map[tag] = p.semantic_claim_id
 
         lines.append(f"\nQUESTION: {query.query_question}")
         lines.append(f"Return strictly JSON matching this schema: {query.output_schema_json}")
@@ -376,6 +392,7 @@ class EpistemicContextCompiler:
             included_semantic_claim_ids=sorted(list(included_claims)),
             represented_root_ids=sorted(list(distinct_roots)),
             surviving_support_environment_ids=[e.path_id for e in surviving_envs],
+            evidence_tag_to_claim_map=tag_map,
             merged_occurrence_groups={},
             dropped_occurrence_ids=dropped_by_validity,
             drop_or_merge_reasons=validity_drop_reasons,

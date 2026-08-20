@@ -182,7 +182,7 @@ def run_track_r(client: Any, db_path: str, max_calls: int | None = None) -> tupl
             parsed = parse_round4_model_output(result.raw_response_text)
             condition_preds[cond_id][pt_label] = parsed.protocol
 
-            k_a = evaluate_conformance_k_a(parsed.protocol, expected_proto)
+            k_a = evaluate_conformance_k_a(parsed.protocol, expected_proto, is_valid_json=parsed.is_valid_json)
 
             call_spec_sha = hashlib.sha256(spec.model_dump_json().encode("utf-8")).hexdigest()
             call_rec = CallRecord(
@@ -207,9 +207,10 @@ def run_track_r(client: Any, db_path: str, max_calls: int | None = None) -> tupl
                 station="KESTREL",
                 expected_protocol=expected_proto,
                 predicted_protocol=parsed.protocol,
-                reported_support_path=parsed.reported_support_path,
+                reported_support_evidence=parsed.reported_support_evidence,
                 independence_status=parsed.independence_status,
                 perceived_independent_roots=parsed.perceived_independent_roots,
+                is_valid_json=1 if parsed.is_valid_json else 0,
                 k_a=k_a,
                 prompt_hash=hashlib.sha256(ctx.prompt.encode("utf-8")).hexdigest(),
                 state_hash=ctx.state_hash,

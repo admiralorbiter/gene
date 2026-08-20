@@ -12,10 +12,12 @@ sys.path.insert(0, str(root_dir))
 import pytest
 from gene.ollama_client import CallSpec, ModelCallResult
 from gene.experiments.evaluators_round4 import (
+    evaluate_conformance_k_s_neutral,
     evaluate_track_m_chain,
     evaluate_track_p_panel,
     evaluate_track_r_panel,
     parse_round4_model_output,
+    persist_round4_relational_evaluation,
 )
 from scripts.explore_round4.run_track_r import run_track_r
 from scripts.explore_round4.run_track_p import run_track_p
@@ -34,7 +36,7 @@ class ProductionCompatibleFakeClient:
         response_json = json.dumps({
             "station": "VELORA",
             "protocol": self.fixed_protocol,
-            "reported_support_path": "path_AB",
+            "reported_support_evidence": ["DOC_01", "DOC_02"],
             "independence_status": "determinable",
             "perceived_independent_roots": 1,
             "evidence_status": "sufficient",
@@ -55,10 +57,11 @@ def test_relational_metric_evaluators_synthetic_patterns():
     """Verify that relational metrics K_I, K_mono, and K_role evaluate panel-level properties correctly."""
     # 1. Track P: Invariance violation when 1 of 24 permutations flips to UNKNOWN
     predictions_23_1 = ["PROTO_X7"] * 23 + ["UNKNOWN"]
-    metrics_p = evaluate_track_p_panel(predictions_23_1)
+    metrics_p = evaluate_track_p_panel(predictions_23_1, canonical_replay_predictions=["PROTO_X7", "PROTO_X7", "PROTO_X7", "PROTO_X7"])
     assert metrics_p.disagreement_rate > 0.0, "D_perm failed to detect flip!"
     assert metrics_p.k_i < 1.0, "K_I should be less than 1.0 under disagreement"
     assert metrics_p.flip_count == 1
+    assert metrics_p.canonical_replay_disagreement_rate == 0.0
 
     # Invariance perfect when 24 of 24 are UNKNOWN
     predictions_all_unk = ["UNKNOWN"] * 24
@@ -73,26 +76,45 @@ def test_relational_metric_evaluators_synthetic_patterns():
     assert metrics_m.is_monotonically_preserved is False
     assert metrics_m.k_mono == 0
 
-    # Perfect monotonic chain
-    chain_clean = ["PROTO_X7", "PROTO_X7", "PROTO_X7", "PROTO_X7"]
-    metrics_m_clean = evaluate_track_m_chain(chain_clean)
-    assert metrics_m_clean.success_to_error_count == 0
-    assert metrics_m_clean.is_monotonically_preserved is True
-    assert metrics_m_clean.k_mono == 1
-
-    # 3. Track R: Semantic role inversion classification
-    canonical_preds = {"point_cross_BD": "PROTO_X7", "point_cross_AE": "UNKNOWN"}
-    swapped_preds = {"point_cross_BD": "UNKNOWN", "point_cross_AE": "PROTO_X7"}  # Inverted!
+    # 3. Track R: Guard against classifying when baseline shortcut is not replicated
+    unreplicated_canonical = {"point_cross_BD": "UNKNOWN", "point_cross_AE": "UNKNOWN"}
+    swapped_preds_inv = {"point_cross_BD": "UNKNOWN", "point_cross_AE": "PROTO_X7"}
     opaque_preds = {"point_cross_BD": "UNKNOWN", "point_cross_AE": "UNKNOWN"}
-    metrics_r = evaluate_track_r_panel(canonical_preds, swapped_preds, opaque_preds)
+    metrics_r_unrep = evaluate_track_r_panel(unreplicated_canonical, swapped_preds_inv, opaque_preds)
+    assert metrics_r_unrep.canonical_shortcut_active is False
+    assert metrics_r_unrep.classification == "baseline_shortcut_not_replicated"
+
+    # Semantic role inversion when baseline is active
+    canonical_preds = {"point_cross_BD": "PROTO_X7", "point_cross_AE": "UNKNOWN"}
+    metrics_r = evaluate_track_r_panel(canonical_preds, swapped_preds_inv, opaque_preds)
     assert metrics_r.swapped_shortcut_inverted is True
     assert metrics_r.classification == "semantic_role_driven"
 
     # Graph slot retained classification
-    swapped_slot_preds = {"point_cross_BD": "PROTO_X7", "point_cross_AE": "UNKNOWN"}  # Retained at BD!
+    swapped_slot_preds = {"point_cross_BD": "PROTO_X7", "point_cross_AE": "UNKNOWN"}
     metrics_r_slot = evaluate_track_r_panel(canonical_preds, swapped_slot_preds, opaque_preds)
     assert metrics_r_slot.swapped_slot_retained is True
     assert metrics_r_slot.classification == "graph_slot_driven"
+
+
+def test_backend_neutral_k_s_evidence_mapping():
+    """Verify backend-neutral K_S evaluation via evidence-to-claim mapping."""
+    evidence_to_claims = {
+        "DOC_01": "claim_velora_nerin_manager",
+        "DOC_02": "claim_velora_nerin_reports_s1",
+        "DOC_03": "claim_velora_corin_duty",
+    }
+    gold_paths = [
+        {"claim_velora_nerin_manager", "claim_velora_nerin_reports_s1"},  # path_AB
+    ]
+
+    # Valid reported evidence
+    assert evaluate_conformance_k_s_neutral(["DOC_01", "DOC_02"], evidence_to_claims, gold_paths) == 1
+    assert evaluate_conformance_k_s_neutral(["[DOC_01]", "[DOC_02]"], evidence_to_claims, gold_paths) == 1
+    # Incomplete reported evidence
+    assert evaluate_conformance_k_s_neutral(["DOC_01"], evidence_to_claims, gold_paths) == 0
+    # Irrelevant reported evidence
+    assert evaluate_conformance_k_s_neutral(["DOC_03"], evidence_to_claims, gold_paths) == 0
 
 
 def test_production_callspec_smoke_all_runners_end_to_end():
@@ -106,6 +128,7 @@ def test_production_callspec_smoke_all_runners_end_to_end():
         evals_r, m_r = run_track_r(client, db_path, max_calls=1)
         assert len(evals_r) == 1
         assert evals_r[0].k_a == 1
+        assert evals_r[0].is_valid_json == 1
 
         # Track P
         evals_p, m_p = run_track_p(client, db_path, max_calls=1)
@@ -123,28 +146,35 @@ def test_production_callspec_smoke_all_runners_end_to_end():
         assert evals_c[0].k_a == 1
         assert evals_c[0].k_s == 1
 
-        # Verify SQLite tables (both round4_calls and round4_evaluations)
+        # Test relational evaluations table persistence
+        persist_round4_relational_evaluation(db_path, "track_p", "permutation_invariance", m_p.k_i, "ok", m_p)
+
+        # Verify SQLite tables
         conn = sqlite3.connect(db_path)
         cur = conn.cursor()
         cur.execute("SELECT COUNT(*) FROM round4_calls")
         call_count = cur.fetchone()[0]
         cur.execute("SELECT COUNT(*) FROM round4_evaluations")
         eval_count = cur.fetchone()[0]
+        cur.execute("SELECT COUNT(*) FROM round4_relational_evaluations")
+        rel_count = cur.fetchone()[0]
 
         assert call_count == 4
         assert eval_count == 4
+        assert rel_count == 1
 
         # Verify foreign key / call_id linkage
         cur.execute("""
-            SELECT c.call_id, c.call_spec_sha256, c.model_digest, e.k_a
+            SELECT c.call_id, c.call_spec_sha256, c.model_digest, e.k_a, e.is_valid_json
             FROM round4_calls c
             JOIN round4_evaluations e ON c.call_id = e.call_id
         """)
         rows = cur.fetchall()
         assert len(rows) == 4
         for row in rows:
-            assert row[1] is not None  # call_spec_sha256 present
-            assert row[2] == "fake_sha256_digest_12345"  # model_digest present
+            assert row[1] is not None
+            assert row[2] == "fake_sha256_digest_12345"
             assert row[3] == 1  # k_a == 1
+            assert row[4] == 1  # is_valid_json == 1
 
         conn.close()

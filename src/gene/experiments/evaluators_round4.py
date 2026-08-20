@@ -1,13 +1,10 @@
-"""Round 4 Epistemic Conformance Evaluators and Append-Only SQLite Persistence Layer (v2).
+"""Round 4 Epistemic Conformance Evaluators and Append-Only SQLite Persistence Layer (v3).
 
 Provides:
-1. Production CallSpec & ModelCallResult parsing.
-2. Pointwise evaluators (K_A, K_S, K_L).
-3. Relational panel evaluators:
-   - Track P: Output entropy (H_perm), disagreement rate (D_perm), flip count (N_flip), invariance score (K_I).
-   - Track M: Success-to-Error transitions (S->E), monotonicity preservation (K_mono).
-   - Track R: Role-follow vs slot-follow classification (K_role).
-4. Immutable SQLite schema (round4_calls and round4_evaluations) with strict INSERT.
+1. Backend-neutral evidence support evaluation (K_S) mapping reported DOC/EVID indices to S_F.
+2. Relational panel evaluators with baseline replication guards and epsilon_replay computation.
+3. Schema compliance and strict contract validation.
+4. Relational evaluation persistence table (round4_relational_evaluations).
 """
 
 from __future__ import annotations
@@ -32,7 +29,7 @@ class ParsedModelResponse(BaseModel):
     """Normalized response parsed from model JSON output."""
     station: str = ""
     protocol: str = "UNKNOWN"
-    reported_support_path: str | None = None
+    reported_support_evidence: list[str] = Field(default_factory=list)
     independence_status: str = "indeterminable"  # "determinable" | "indeterminable"
     perceived_independent_roots: int | None = None
     evidence_status: str = "insufficient"
@@ -49,6 +46,8 @@ class TrackPMetrics(BaseModel):
     flip_count: int  # N_flip from modal output
     k_i: float  # Invariance score = 1.0 - D_perm
     worst_case_accuracy: float
+    canonical_replay_sample_size: int = 0
+    canonical_replay_disagreement_rate: float = 0.0  # epsilon_replay
 
 
 class TrackMMetrics(BaseModel):
@@ -68,7 +67,13 @@ class TrackRMetrics(BaseModel):
     swapped_slot_retained: bool      # BD == PROTO_X7 and AE == UNKNOWN (graph slot driven)
     opaque_shortcut_suppressed: bool # BD == UNKNOWN and AE == UNKNOWN (lexical prior suppressed)
     role_follow_ratio: float
-    classification: Literal["semantic_role_driven", "graph_slot_driven", "lexical_prior_suppressed", "unclassified"]
+    classification: Literal[
+        "baseline_shortcut_not_replicated",
+        "semantic_role_driven",
+        "graph_slot_driven",
+        "lexical_prior_suppressed",
+        "mixed_or_unclassified",
+    ]
 
 
 class CallRecord(BaseModel):
@@ -95,11 +100,12 @@ class EvaluationRecord(BaseModel):
     station: str
     expected_protocol: str
     predicted_protocol: str
-    reported_support_path: str | None = None
+    reported_support_evidence: list[str] = Field(default_factory=list)
     independence_status: str = "indeterminable"
     perceived_independent_roots: int | None = None
-    k_a: int  # 1 if predicted == expected else 0
-    k_s: int | None = None  # 1 if reported support matches valid S_F else 0
+    is_valid_json: int = 1
+    k_a: int  # 1 if predicted == expected and is_valid_json == 1 else 0
+    k_s: int | None = None  # 1 if reported evidence satisfies valid S_F else 0
     k_l: int | None = None  # 1 if perceived roots matches ground truth else 0
     prompt_hash: str
     state_hash: str
@@ -107,7 +113,7 @@ class EvaluationRecord(BaseModel):
 
 
 def parse_round4_model_output(raw_text: str) -> ParsedModelResponse:
-    """Parse strict or markdown-fenced JSON output into ParsedModelResponse."""
+    """Parse strict JSON output into ParsedModelResponse."""
     clean_text = raw_text.strip()
     if "```json" in clean_text:
         clean_text = clean_text.split("```json")[1].split("```")[0].strip()
@@ -117,7 +123,6 @@ def parse_round4_model_output(raw_text: str) -> ParsedModelResponse:
     try:
         data = json.loads(clean_text)
         
-        # Parse perceived roots safely
         roots_val = data.get("perceived_independent_roots")
         if isinstance(roots_val, str):
             try:
@@ -125,10 +130,17 @@ def parse_round4_model_output(raw_text: str) -> ParsedModelResponse:
             except ValueError:
                 roots_val = None
 
+        # Parse reported evidence support
+        evid = data.get("reported_support_evidence", [])
+        if isinstance(evid, str):
+            evid = [evid]
+        elif not isinstance(evid, list):
+            evid = []
+
         return ParsedModelResponse(
             station=str(data.get("station", "")).strip(),
             protocol=str(data.get("protocol", "UNKNOWN")).strip(),
-            reported_support_path=data.get("reported_support_path"),
+            reported_support_evidence=[str(x).strip() for x in evid],
             independence_status=str(data.get("independence_status", "indeterminable")).strip(),
             perceived_independent_roots=roots_val,
             evidence_status=str(data.get("evidence_status", "insufficient")).strip(),
@@ -136,73 +148,101 @@ def parse_round4_model_output(raw_text: str) -> ParsedModelResponse:
             is_valid_json=True,
         )
     except Exception:
-        protocol = "UNKNOWN"
-        if "PROTO_X7" in raw_text:
-            protocol = "PROTO_X7"
         return ParsedModelResponse(
-            protocol=protocol,
+            protocol="UNKNOWN",
             raw_text=raw_text,
             is_valid_json=False,
         )
 
 
-def evaluate_conformance_k_a(predicted: str, expected: str) -> int:
-    """K_A: Answer conformance."""
+def evaluate_conformance_k_a(predicted: str, expected: str, is_valid_json: bool = True) -> int:
+    """K_A: Answer conformance (requires strict valid JSON)."""
+    if not is_valid_json:
+        return 0
     return 1 if predicted.strip().upper() == expected.strip().upper() else 0
 
 
-def evaluate_conformance_k_s(reported_path: str | None, valid_paths: list[str]) -> int:
-    """K_S: Support conformance (reported path must belong to valid S_F paths)."""
-    if not reported_path or reported_path.lower() in ["none", "null", "support_path_id_or_none"]:
+def evaluate_conformance_k_s_neutral(
+    reported_evidence: list[str],
+    evidence_to_claim_map: dict[str, str],
+    valid_support_paths_claim_sets: list[set[str]],
+) -> int:
+    """Backend-neutral K_S evaluation:
+    Maps reported evidence tags (e.g. DOC_01, EVID_A) to semantic claims,
+    and checks if the reported claims contain any valid minimal support path.
+    """
+    if not reported_evidence or not valid_support_paths_claim_sets:
         return 0
-    return 1 if reported_path in valid_paths else 0
+
+    reported_claims = set()
+    for tag in reported_evidence:
+        clean_tag = tag.strip("[] ,")
+        if clean_tag in evidence_to_claim_map:
+            reported_claims.add(evidence_to_claim_map[clean_tag])
+
+    # Check if reported claims contain at least one complete minimal support path
+    for path_claims in valid_support_paths_claim_sets:
+        if path_claims.issubset(reported_claims):
+            return 1
+    return 0
 
 
 def evaluate_conformance_k_l(independence_status: str, perceived_roots: int | None, expected_roots: int | None) -> tuple[bool, int | None]:
-    """K_L: Lineage conformance (perceived root count matches ground truth when determinable).
-    
-    Returns: (is_determinable, k_l_score_or_none)
-    """
+    """K_L: Lineage conformance (perceived root count matches ground truth when determinable)."""
     if independence_status == "indeterminable" or perceived_roots is None or expected_roots is None:
         return False, None
     return True, (1 if perceived_roots == expected_roots else 0)
 
 
-def evaluate_track_p_panel(predictions: list[str], expected: str = "PROTO_X7") -> TrackPMetrics:
-    """Evaluate relational permutation metrics across 24 raw flat permutations."""
-    n = len(predictions)
+def evaluate_track_p_panel(
+    raw_predictions: list[str],
+    canonical_replay_predictions: list[str] | None = None,
+    expected: str = "PROTO_X7",
+) -> TrackPMetrics:
+    """Evaluate relational permutation metrics across 24 raw flat permutations + canonical replays."""
+    n = len(raw_predictions)
     if n == 0:
         return TrackPMetrics(sample_size=0, output_distribution={}, output_entropy=0.0, disagreement_rate=0.0, flip_count=0, k_i=1.0, worst_case_accuracy=0.0)
 
     dist: dict[str, int] = {}
-    for p in predictions:
+    for p in raw_predictions:
         dist[p] = dist.get(p, 0) + 1
 
-    # Shannon entropy H_perm
     entropy = 0.0
     for count in dist.values():
         prob = count / n
         entropy -= prob * math.log2(prob)
 
-    # Disagreement rate D_perm
     pairs_count = 0
     disagreements = 0
     for i in range(n):
         for j in range(i + 1, n):
             pairs_count += 1
-            if predictions[i] != predictions[j]:
+            if raw_predictions[i] != raw_predictions[j]:
                 disagreements += 1
 
     d_perm = disagreements / pairs_count if pairs_count > 0 else 0.0
     k_i = 1.0 - d_perm
 
-    # Modal output flips
     modal_output = max(dist.keys(), key=lambda k: dist[k])
-    flips = sum(1 for p in predictions if p != modal_output)
+    flips = sum(1 for p in raw_predictions if p != modal_output)
 
-    # Worst case accuracy
-    accs = [1.0 if p == expected else 0.0 for p in predictions]
+    accs = [1.0 if p == expected else 0.0 for p in raw_predictions]
     worst_acc = min(accs) if accs else 0.0
+
+    # Calculate epsilon_replay for canonical replays
+    eps_replay = 0.0
+    n_rep = 0
+    if canonical_replay_predictions and len(canonical_replay_predictions) > 1:
+        n_rep = len(canonical_replay_predictions)
+        rep_pairs = 0
+        rep_disagreements = 0
+        for i in range(n_rep):
+            for j in range(i + 1, n_rep):
+                rep_pairs += 1
+                if canonical_replay_predictions[i] != canonical_replay_predictions[j]:
+                    rep_disagreements += 1
+        eps_replay = rep_disagreements / rep_pairs if rep_pairs > 0 else 0.0
 
     return TrackPMetrics(
         sample_size=n,
@@ -212,6 +252,8 @@ def evaluate_track_p_panel(predictions: list[str], expected: str = "PROTO_X7") -
         flip_count=flips,
         k_i=round(k_i, 4),
         worst_case_accuracy=worst_acc,
+        canonical_replay_sample_size=n_rep,
+        canonical_replay_disagreement_rate=round(eps_replay, 4),
     )
 
 
@@ -240,7 +282,7 @@ def evaluate_track_r_panel(
     swapped_preds: dict[str, str],
     opaque_preds: dict[str, str],
 ) -> TrackRMetrics:
-    """Evaluate relational role equivariance dissection across conditions."""
+    """Evaluate relational role equivariance dissection across conditions with baseline replication guard."""
     can_bd = canonical_preds.get("point_cross_BD", "UNKNOWN")
     can_ae = canonical_preds.get("point_cross_AE", "UNKNOWN")
 
@@ -255,17 +297,21 @@ def evaluate_track_r_panel(
     swp_retained = (swp_bd == "PROTO_X7" and swp_ae == "UNKNOWN")
     opq_suppressed = (opq_bd == "UNKNOWN" and opq_ae == "UNKNOWN")
 
-    if swp_inverted:
+    # Guard: Require canonical shortcut replication before declaring mechanisms!
+    if not can_shortcut:
+        classification = "baseline_shortcut_not_replicated"
+        ratio = 0.0
+    elif swp_inverted and not swp_retained:
         classification = "semantic_role_driven"
         ratio = 1.0
-    elif swp_retained:
+    elif swp_retained and not swp_inverted:
         classification = "graph_slot_driven"
         ratio = 0.0
     elif opq_suppressed:
         classification = "lexical_prior_suppressed"
         ratio = 0.5
     else:
-        classification = "unclassified"
+        classification = "mixed_or_unclassified"
         ratio = 0.0
 
     return TrackRMetrics(
@@ -307,9 +353,10 @@ def init_round4_db(db_path: str) -> None:
             station TEXT NOT NULL,
             expected_protocol TEXT NOT NULL,
             predicted_protocol TEXT NOT NULL,
-            reported_support_path TEXT,
+            reported_support_evidence TEXT,
             independence_status TEXT NOT NULL,
             perceived_independent_roots INTEGER,
+            is_valid_json INTEGER NOT NULL,
             k_a INTEGER NOT NULL,
             k_s INTEGER,
             k_l INTEGER,
@@ -318,6 +365,17 @@ def init_round4_db(db_path: str) -> None:
             compiler_pipeline TEXT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (call_id) REFERENCES round4_calls(call_id)
+        )
+    """)
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS round4_relational_evaluations (
+            track TEXT NOT NULL,
+            metric_name TEXT NOT NULL,
+            metric_value_numeric REAL,
+            metric_value_text TEXT,
+            payload_json TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (track, metric_name)
         )
     """)
     conn.commit()
@@ -346,15 +404,36 @@ def persist_round4_call_and_evaluation(
     cur.execute("""
         INSERT INTO round4_evaluations (
             call_id, track, condition_id, station, expected_protocol, predicted_protocol,
-            reported_support_path, independence_status, perceived_independent_roots,
-            k_a, k_s, k_l, prompt_hash, state_hash, compiler_pipeline
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            reported_support_evidence, independence_status, perceived_independent_roots,
+            is_valid_json, k_a, k_s, k_l, prompt_hash, state_hash, compiler_pipeline
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         eval_rec.call_id, eval_rec.track, eval_rec.condition_id, eval_rec.station,
-        eval_rec.expected_protocol, eval_rec.predicted_protocol, eval_rec.reported_support_path,
+        eval_rec.expected_protocol, eval_rec.predicted_protocol, json.dumps(eval_rec.reported_support_evidence),
         eval_rec.independence_status, eval_rec.perceived_independent_roots,
-        eval_rec.k_a, eval_rec.k_s, eval_rec.k_l, eval_rec.prompt_hash,
+        eval_rec.is_valid_json, eval_rec.k_a, eval_rec.k_s, eval_rec.k_l, eval_rec.prompt_hash,
         eval_rec.state_hash, eval_rec.compiler_pipeline
     ))
+    conn.commit()
+    conn.close()
+
+
+def persist_round4_relational_evaluation(
+    db_path: str,
+    track: str,
+    metric_name: str,
+    metric_value_numeric: float | None,
+    metric_value_text: str | None,
+    payload: BaseModel | dict[str, Any],
+) -> None:
+    """Persist an immutable relational evaluation record to SQLite."""
+    conn = sqlite3.connect(db_path)
+    cur = conn.cursor()
+    payload_str = payload.model_dump_json() if isinstance(payload, BaseModel) else json.dumps(payload)
+    cur.execute("""
+        INSERT OR REPLACE INTO round4_relational_evaluations (
+            track, metric_name, metric_value_numeric, metric_value_text, payload_json
+        ) VALUES (?, ?, ?, ?, ?)
+    """, (track, metric_name, metric_value_numeric, metric_value_text, payload_str))
     conn.commit()
     conn.close()

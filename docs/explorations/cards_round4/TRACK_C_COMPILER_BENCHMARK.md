@@ -1,7 +1,7 @@
 # Experiment Card — Track C: Epistemic Context Compiler Conformance Benchmark
 
 ## 1. Core Systems Hypothesis & Privilege Audit
-- **Systems Hypothesis:** An Epistemic Context Compiler translating explicit Intermediate Representations (`EpistemicState`) into structured neural contexts can eliminate permutation spread, preserve root counts, and prevent authority amplification without retraining frozen models.
+- **Systems Hypothesis:** An Epistemic Context Compiler translating explicit Intermediate Representations (`EpistemicState`) into structured neural contexts can eliminate permutation spread, preserve root counts, and prevent duplicate authority amplification without retraining frozen models.
 - **Privilege-Audited Pipeline Spectrum:**
 
 ```
@@ -21,13 +21,13 @@
 
 ---
 
-## 2. Non-Leaking Output Schema & Conformance Applicability
-The model is presented with a non-leaking generic schema allowing abstention/indeterminacy:
+## 2. Non-Leaking Backend-Neutral Output Schema & Conformance Applicability
+The model is presented with a backend-neutral generic schema indexing retrieved evidence lines (`DOC_01`, `DOC_02`, etc.):
 ```json
 {
   "station": "STATION_NAME",
   "protocol": "PROTOCOL_NAME_OR_UNKNOWN",
-  "reported_support_path": "SUPPORT_PATH_ID_OR_NONE",
+  "reported_support_evidence": ["DOC_01", "DOC_02"],
   "independence_status": "determinable|indeterminable",
   "perceived_independent_roots": "INTEGER_OR_NULL",
   "evidence_status": "sufficient|insufficient"
@@ -37,20 +37,21 @@ The model is presented with a non-leaking generic schema allowing abstention/ind
 ```
                             CONFORMANCE APPLICABILITY MATRIX
                             
-┌──────────────────────────────┬─────────────────┬─────────────────┬───────────────────────────────┬─────────────────┐
-│ Evaluation Ecology           │ K_A (Answer)    │ K_S (Support)   │ K_L (Lineage | Determinable)  │ K_I (Invariance)│
-├──────────────────────────────┼─────────────────┼─────────────────┼───────────────────────────────┼─────────────────┤
-│ 1. Entitled Proof (AB+DE)    │ Evaluated (X7)  │ Evaluated (S_F) │ N/A                           │ Evaluated (P)   │
-│ 2. Pruned Support (AB only)  │ Evaluated (X7)  │ Evaluated (AB)  │ N/A                           │ Evaluated (P)   │
-│ 3. 4-Copy Laundering (4x A)  │ Evaluated (X7)  │ N/A             │ Evaluated (N_root=1)          │ Evaluated (P)   │
-│ 4. Unentitled Null (Ø / Foil)│ Evaluated (UNK) │ N/A             │ N/A                           │ Evaluated (P)   │
-└──────────────────────────────┴─────────────────┴─────────────────┴───────────────────────────────┴─────────────────┘
+┌─────────────────────────────────┬─────────────────┬─────────────────┬───────────────────────────────┬─────────────────┐
+│ Evaluation Ecology              │ K_A (Answer)    │ K_S (Support)   │ K_L (Lineage | Determinable)  │ K_I (Invariance)│
+├─────────────────────────────────┼─────────────────┼─────────────────┼───────────────────────────────┼─────────────────┤
+│ 1. Entitled Proof (AB+DE)       │ Evaluated (X7)  │ Evaluated (S_F) │ N/A                           │ Evaluated (P)   │
+│ 2. Pruned Support (AB only)     │ Evaluated (X7)  │ Evaluated (AB)  │ N/A                           │ Evaluated (P)   │
+│ 3. Exact-Copy Multiplication    │ Evaluated (X7)  │ N/A             │ Evaluated (N_root=1)          │ Evaluated (P)   │
+│    (4 identical copies of A)    │                 │                 │                               │                 │
+│ 4. Unentitled Null (Ø / Distr.) │ Evaluated (UNK) │ N/A             │ N/A                           │ Evaluated (P)   │
+└─────────────────────────────────┴─────────────────┴─────────────────┴───────────────────────────────┴─────────────────┘
 ```
 
 ### Dimensional Definitions:
-1. **$K_A$ (Answer Conformance):** Does output match the formal entitlement status of the state?
-2. **$K_S$ (Support Conformance):** Does reported evidence match a valid minimal proof pathway?
-3. **$K_L$ (Lineage Conformance):** Under 4-copy paraphrase reproduction, does the compiler prevent root count inflation ($\widehat{N}=1$ vs $\widehat{N}=4$)?
+1. **$K_A$ (Answer Conformance):** Does strict JSON output match the formal entitlement status of the state?
+2. **$K_S$ (Support Conformance):** Does reported evidence (mapped from `DOC_xx` tags back to semantic claims) contain a valid minimal proof pathway in $S_F$?
+3. **$K_L$ (Lineage Conformance):** Under exact-copy reproduction ($1A \to 4A$ with shared root $R1$), does the compiler preserve root count truth ($\widehat{N}=1$ vs $\widehat{N}=4$)?
 4. **$K_I$ (Invariance Conformance):** Measured in Track P across 24 permutations ($K_I = 1.0 - \mathcal{D}_{\text{perm}}$).
 
 ---
@@ -60,5 +61,5 @@ We evaluate 4 Compiler Pipelines $\times$ 4 Ecologies $\times$ 2 Stations (`VELO
 
 ## 4. Measurable Endpoints & Analysis
 - **Structured Vector Conformance:** Evaluated as a structured vector $(K_A, K_S, K_L)$ per pipeline.
-- **Lineage Inflation Suppression:** Perceived root counts under `RAW_SERIALIZATION` vs `GENEALOGICAL_NORMALIZATION`.
+- **Copy Multiplication Suppression:** Perceived root counts under `RAW_SERIALIZATION` vs `GENEALOGICAL_NORMALIZATION`.
 - **Unsupported Concrete Rate:** Frequency of emitting concrete answers when $S_F(c) = \emptyset$.
