@@ -34,6 +34,55 @@ class InterventionSpec(BaseModel):
     description: str = ""
 
 
+def apply_intervention(world: World, intervention: InterventionSpec) -> World:
+    """Apply an individual biological intervention to a world to yield a new world state."""
+    itype = intervention.intervention_type
+    target_ids = set(intervention.target_node_ids)
+    mutated_slots = {(mf.subject, mf.predicate) for mf in intervention.mutated_facts}
+
+    cf_facts: list[Fact] = []
+    cf_rules: list[Rule] = []
+
+    # 1. Filter facts
+    for f in world.facts:
+        if itype in (InterventionType.MUTATION, InterventionType.RESCUE) and (f.subject, f.predicate) in mutated_slots:
+            continue
+        if f.fact_id in target_ids or any(t.endswith(f.fact_id) for t in target_ids):
+            if itype in (InterventionType.KNOCKOUT, InterventionType.EPISTASIS, InterventionType.CONTROL_DISTRACTOR):
+                continue
+            elif itype in (InterventionType.MUTATION, InterventionType.RESCUE):
+                continue
+        cf_facts.append(f)
+
+    # 2. Add mutated facts
+    for mf in intervention.mutated_facts:
+        cf_facts.append(mf)
+
+    # 3. Filter rules
+    for r in world.rules:
+        if r.rule_id in target_ids or any(t.endswith(r.rule_id) for t in target_ids):
+            if itype in (InterventionType.KNOCKOUT, InterventionType.EPISTASIS, InterventionType.CONTROL_DISTRACTOR):
+                continue
+        cf_rules.append(r)
+
+    return World(
+        world_id=f"{world.world_id}_cf_{intervention.intervention_id}",
+        world_seed=world.world_seed,
+        world_version=world.world_version,
+        facts=cf_facts,
+        rules=cf_rules,
+        mutation=None,
+    )
+
+
+def compose_interventions(base_world: World, interventions: list[InterventionSpec]) -> World:
+    """Sequentially apply a sequence of biological interventions (e.g. S0 -> S1 -> S2)."""
+    current_world = base_world
+    for iv in interventions:
+        current_world = apply_intervention(current_world, iv)
+    return current_world
+
+
 class CounterfactualOracle:
     """Computes ground truth in both the original and counterfactually intervened worlds."""
 
@@ -41,46 +90,8 @@ class CounterfactualOracle:
         self.base_world = base_world
         self.intervention = intervention
         self.base_oracle = Oracle(base_world)
-        self.counterfactual_world = self._build_counterfactual_world()
+        self.counterfactual_world = apply_intervention(base_world, intervention)
         self.counterfactual_oracle = Oracle(self.counterfactual_world)
-
-    def _build_counterfactual_world(self) -> World:
-        """Construct the counterfactual world resulting from the intervention."""
-        itype = self.intervention.intervention_type
-        target_ids = set(self.intervention.target_node_ids)
-
-        # Start with base facts and rules
-        cf_facts: list[Fact] = []
-        cf_rules: list[Rule] = []
-
-        # 1. Filter facts
-        for f in self.base_world.facts:
-            if f.fact_id in target_ids or any(t.endswith(f.fact_id) for t in target_ids):
-                if itype in (InterventionType.KNOCKOUT, InterventionType.EPISTASIS):
-                    continue
-                elif itype in (InterventionType.MUTATION, InterventionType.RESCUE):
-                    continue
-            cf_facts.append(f)
-
-        # 2. Add mutated facts if present
-        for mf in self.intervention.mutated_facts:
-            cf_facts.append(mf)
-
-        # 3. Filter rules
-        for r in self.base_world.rules:
-            if r.rule_id in target_ids or any(t.endswith(r.rule_id) for t in target_ids):
-                if itype in (InterventionType.KNOCKOUT, InterventionType.EPISTASIS):
-                    continue
-            cf_rules.append(r)
-
-        return World(
-            world_id=f"{self.base_world.world_id}_cf_{self.intervention.intervention_id}",
-            world_seed=self.base_world.world_seed,
-            world_version=self.base_world.world_version,
-            facts=cf_facts,
-            rules=cf_rules,
-            mutation=None,
-        )
 
     def evaluate(self, subject: str, predicate: str, object_val: str) -> tuple[TruthStatus, TruthStatus]:
         """Evaluate claim against (original_world_truth, counterfactual_world_truth)."""

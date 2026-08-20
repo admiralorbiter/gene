@@ -30,7 +30,10 @@ class EvaluatedClaim(BaseModel):
     subject: str
     predicate: str
     object: str
+    raw_object: str = ""
+    raw_evidence_status: str = "sufficient"
     evidence_status: Literal["sufficient", "insufficient", "conflicting"] = "sufficient"
+    is_contract_consistent: bool = True
     parse_status: Literal["success", "malformed_json", "missing_fields", "unparseable"]
     truth_status: TruthStatus
     infection_status: Literal["clean", "infected", "repaired", "de_novo", "unresolved"]
@@ -62,7 +65,7 @@ class ClaimEvaluator:
         oracle: Oracle,
         condition: str = "clean",
     ) -> EvaluatedClaim:
-        """Parse structured model response, normalize strings, and evaluate against oracle."""
+        """Parse structured model response, normalize strings lexically, and evaluate against oracle without mutating model output."""
         if not parsed_json:
             try:
                 parsed_json = json.loads(raw_text)
@@ -75,7 +78,10 @@ class ClaimEvaluator:
                 subject="UNKNOWN",
                 predicate="unknown",
                 object="UNKNOWN",
+                raw_object="UNKNOWN",
+                raw_evidence_status="insufficient",
                 evidence_status="insufficient",
+                is_contract_consistent=True,
                 parse_status="malformed_json",
                 truth_status=TruthStatus.UNSUPPORTED,
                 infection_status="unresolved",
@@ -91,7 +97,10 @@ class ClaimEvaluator:
                 subject="UNKNOWN",
                 predicate="unknown",
                 object="UNKNOWN",
+                raw_object="UNKNOWN",
+                raw_evidence_status="insufficient",
                 evidence_status="insufficient",
+                is_contract_consistent=True,
                 parse_status="missing_fields",
                 truth_status=TruthStatus.UNSUPPORTED,
                 infection_status="unresolved",
@@ -99,10 +108,11 @@ class ClaimEvaluator:
                 raw_response_text=raw_text,
             )
 
-        # Normalize subject, predicate, object
+        raw_obj_str = structured.answer.object
+        # Lexical normalization ONLY (e.g. "Proto X7" -> "PROTO_X7")
         norm_subj = structured.answer.subject.strip().upper().replace(" ", "_")
         norm_pred = structured.answer.predicate.strip().lower().replace(" ", "_")
-        norm_obj = structured.answer.object.strip().upper().replace(" ", "_")
+        norm_obj = raw_obj_str.strip().upper().replace(" ", "_")
 
         # Determine evidence_status
         evidence_status = structured.evidence_status
@@ -112,13 +122,14 @@ class ClaimEvaluator:
             else:
                 evidence_status = "sufficient"
 
-        # Enforce consistency: if evidence_status != 'sufficient', normalized object is UNKNOWN
-        if evidence_status != "sufficient":
-            norm_obj = "UNKNOWN"
-            truth_status = TruthStatus.UNSUPPORTED
+        # Calculate contract consistency (detection vs action)
+        if evidence_status in ("insufficient", "conflicting"):
+            is_contract_consistent = (norm_obj in ("UNKNOWN", "UNKNOWN_OR_UNSUPPORTED", ""))
         else:
-            truth_status = oracle.evaluate_triple(norm_subj, norm_pred, norm_obj)
+            is_contract_consistent = (norm_obj not in ("UNKNOWN", "UNKNOWN_OR_UNSUPPORTED", ""))
 
+        # Evaluate against oracle based on actual normalized triple
+        truth_status = oracle.evaluate_triple(norm_subj, norm_pred, norm_obj)
         claim_id = compute_fact_id(norm_subj, norm_pred, norm_obj)
 
         # Determine initial infection status
@@ -134,7 +145,10 @@ class ClaimEvaluator:
             subject=norm_subj,
             predicate=norm_pred,
             object=norm_obj,
+            raw_object=raw_obj_str,
+            raw_evidence_status=evidence_status,
             evidence_status=evidence_status,
+            is_contract_consistent=is_contract_consistent,
             parse_status="success",
             truth_status=truth_status,
             infection_status=infection_status,
