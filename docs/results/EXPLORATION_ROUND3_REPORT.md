@@ -11,18 +11,18 @@ Exploration Round 3 evaluated the operational relationships between **formal jus
 │ Track    │ Experimental Focus          │ Calls (N) │ Post-Review Classification        │ Key Empirical Observation                              │
 ├──────────┼─────────────────────────────┼───────────┼───────────────────────────────────┼────────────────────────────────────────────────────────┤
 │ Track H  │ Coalition Causality         │ 32 calls  │ PROMISING DISCOVERY —             │ Full 16-pt lattice exposes shortcut coalitions         │
-│          │ (Overdetermination Lattice) │           │ ROLE REPLICATION REQUIRED         │ (S_C != S_F) with context-dependent non-monotonicity.   │
+│          │ (Overdetermination Lattice) │           │ ROLE + REPRESENTATION REQUIRED    │ and context-dependent non-monotonicity (Φ_V != Φ_K).    │
 ├──────────┼─────────────────────────────┼───────────┼───────────────────────────────────┼────────────────────────────────────────────────────────┤
 │ Track G2 │ Non-Destructive Immunity    │ 20 calls  │ VALIDATED SYNTHETIC MECHANISM     │ 20/20 behavioral compatibility: support-aware filter   │
 │          │ (Clean Governance Policies) │           │                                   │ retains unaffected paths & collapses shared roots.     │
 ├──────────┼─────────────────────────────┼───────────┼───────────────────────────────────┼────────────────────────────────────────────────────────┤
-│ Track B3 │ Monoculture Multiverse      │ 24 calls  │ CLEAN NULL SIGNAL —               │ Delta_root = +0.000; conflict abstention governed      │
-│          │ (Factorial Multiverse)      │           │ NO ROOT-TOKEN EFFECT              │ 100% by document ordering (Delta_order = +1.000).      │
+│ Track B3 │ Monoculture Multiverse      │ 24 calls  │ CLEAN NULL ROOT SIGNAL +          │ Delta_root = +0.000; presentation order completely     │
+│          │ (Factorial Multiverse)      │           │ STRONG ORDER EFFECT               │ separates conflict abstention (Delta_order = +1.000).  │
 ├──────────┼─────────────────────────────┼───────────┼───────────────────────────────────┼────────────────────────────────────────────────────────┤
 │ Track S  │ Support Acquisition         │  0 calls  │ VALIDATED FORMAL PROTOTYPE        │ Formally verified OR-of-AND trace compiler prototype.  │
 ├──────────┼─────────────────────────────┼───────────┼───────────────────────────────────┼────────────────────────────────────────────────────────┤
-│ Track L  │ Independence Laundering     │ 20 calls  │ PROMISING MIXED PHENOTYPE —       │ Provenance loss triggers 50/50 bifurcation between     │
-│          │ (Epistemic Observability)   │           │ BIFURCATION & RESISTANCE          │ false 4-source certainty and epistemic resistance.     │
+│ Track L  │ Independence Laundering     │ 20 calls  │ PROMISING CONTEXT-CONDITIONED     │ Provenance loss yields station-conditioned split:      │
+│          │ (Epistemic Observability)   │           │ MIXED PHENOTYPE                   │ false 4-source certainty in VELORA vs resistance in K. │
 └──────────┴─────────────────────────────┴───────────┴───────────────────────────────────┴────────────────────────────────────────────────────────┘
 ```
 
@@ -59,20 +59,22 @@ Exploration Round 3 evaluated the operational relationships between **formal jus
 └────────────────────┴────────────────────┴──────────────────────┴──────────────────────┴─────────────────┘
 ```
 
-- **Recovered Minimal Behavioral Support ($S_C$):**
-  - $\text{VELORA}: S_C = \{\{E\}, \{B,D\}, \{A,D\}, \{A,B\}\}$
-  - $\text{KESTREL}: S_C = \{\{D,E\}, \{B,D\}, \{A,D\}, \{A,B\}\}$
-- **Key Discoveries:**
-  1. **Single-Parent Blindspot (Overdetermination):** All 4 single knockouts ($\{A\}, \{B\}, \{D\}, \{E\}$) left output invariant at `PROTO_X7` in both stations ($P(\text{Target}) = 1.0$). A standard single-parent but-for causal test concludes that none of the premises are causally necessary.
-  2. **Divergence of $S_C$ from $S_F$:** The model behaviorally sustains the claim on illegitimate cross-premise combinations ($\{A,D\}$ and $\{B,D\}$) that do not satisfy either formal rule.
-  3. **Role Asymmetry ($D = \text{sector\_lead}$):** $D$ appears in 3/4 minimal coalitions in KESTREL. The sector lead role functions as an asymmetric authority cue allowing premature inference.
-  4. **Context-Dependent Non-Monotonicity:** In VELORA, $\{E\} \implies \text{PROTO\_X7}$, but adding $A$ or $B$ suppresses the output to `UNKNOWN` (2 non-monotonic regressions). In KESTREL, the landscape is strictly monotonic.
+- **Separating Known Causal Overdetermination from Empirical Anomaly:**
+  1. **Known Theoretical Overdetermination:** Surviving every single knockout ($\{A\}, \{B\}, \{D\}, \{E\} \implies \text{PROTO\_X7}$) is expected under multi-support $AB+DE \to C$. This establishes that single-parent but-for causal interventions are structurally blind to overdetermined dependencies.
+  2. **Empirical Shortcut Discovery:** In both stations, the model sustained `PROTO_X7` on cross-path combinations ($\{A,D\}$: manager + sector lead, and $\{B,D\}$: reports_to + sector lead) that do not constitute any formal rule proof.
+  3. **Role Asymmetry ($D = \text{sector\_lead}$):** $D$ appears in 3 of 4 minimal positive environments in KESTREL. The "sector lead" role functions as an asymmetric lexical/semantic authority anchor.
+  4. **Monotone vs Non-Monotone Realization:**
+     - **KESTREL:** Realizes a monotone Boolean function:
+       $$\Phi_K(A,B,D,E) = AB \lor AD \lor BD \lor DE$$
+     - **VELORA:** Realizes a non-monotone Boolean function containing negative enabling conditions:
+       $$\Phi_V(A,B,D,E) = AB \lor AD \lor BD \lor DE \lor (E \land \neg A \land \neg B \land \neg D)$$
+       In VELORA, active premise $\{E\}$ alone emits `PROTO_X7`, but adding $A$ or $B$ suppresses output back to `UNKNOWN` (2 non-monotonic regressions).
 
 ---
 
 ### Track G2: Non-Destructive Support Immunity ($N=20$)
 - **Two Distinct Components:**
-  1. **Deterministic Retained Support Property:** `apply_governance_retrieval()` mathematically preserves unaffected support paths during ancestor revocation while inactivating claims whose paths all share the retracted root.
+  1. **Deterministic Retained Support Property:** `apply_governance_retrieval()` mathematically isolates and preserves valid independent derivations while inactivating claims when all paths share a retracted root.
   2. **Downstream Behavioral Compatibility:** Gemma 3:12B correctly produced the intended output across all 20 policy contexts (**20/20 = 100.0%**):
      - `baseline_independent`: 4/4 (100%) $\implies$ `PROTO_X7`
      - `baseline_shared`: 4/4 (100%) $\implies$ `PROTO_X7`
@@ -98,10 +100,10 @@ Exploration Round 3 evaluated the operational relationships between **formal jus
 └──────────────────┴─────────────────────────────┴───────────────────────────┴──────────────┴───────────────────┘
 ```
 
-- **Replay & Seed Stability:**
-  - Exact CallSpec Replay Instability: $\epsilon_{\text{replay}} = 0/4 \quad (0.0\%)$
-  - Seed Perturbation Sensitivity: $\epsilon_{\text{seed}} = 0/4 \quad (0.0\%)$
-- **Key Takeaway:** Raw root tokens (`root_R1`) produced **zero marginal effect** ($\Delta_{\text{root}} = +0.000$). Instead, document order completely governed conflict behavior: forward clustering of majority documents triggered 100% UNKNOWN abstention, whereas interleaving eliminated abstention (50% majority / 50% minority).
+- **Replay & Seed Probes:**
+  - Exact CallSpec Replay: $0/4$ disagreements ($\epsilon_{\text{replay}} = 0.0\%$).
+  - Seed Perturbation: $0/4$ disagreements ($\epsilon_{\text{seed}} = 0.0\%$).
+- **Key Takeaway:** In these 16 balanced cells, changing strictly root tokens produced **no detected marginal effect** ($\Delta_{\text{root}} = +0.000$). In contrast, presentation order completely separated conflict behavior: forward clustering of majority documents triggered 100% UNKNOWN abstention, whereas interleaving collapsed abstention to 0% (50% majority / 50% minority).
 
 ---
 
@@ -117,23 +119,50 @@ Exploration Round 3 evaluated the operational relationships between **formal jus
 │ G0 (True 1-Root Observation) │ 1          │ 4/4 (100.0%)                │ 1.00                   │ Ground Truth Baseline│
 │ G1 (4 Cited Paraphrases)     │ 1          │ 0/4 (0.0%)                  │ N/A (4/4 Indeterm.)    │ Strict Abstention    │
 │ G2 (Partial Laundering)      │ 1          │ 3/4 (75.0%)                 │ 2.33                   │ Emerging Inflation   │
-│ G3 (Fully Laundered Consensus│ 1          │ 2/4 (50.0%)                 │ 4.00                   │ 50/50 Bifurcation    │
+│ G3 (Fully Laundered Consensus│ 1          │ 2/4 (50.0%)                 │ 4.00                   │ Context-Split Fork   │
 │ G_ctrl (True 4-Root Control) │ 4          │ 3/4 (75.0%)                 │ 4.00                   │ True Consensus CTL   │
 └──────────────────────────────┴────────────┴─────────────────────────────┴────────────────────────┴──────────────────────┘
 ```
 
-- **Epistemic Bifurcation at $G_3$:**
-  - In `VELORA`: Both runs declared independence **determinable** with $\widehat{N} = 4$ (**False Multi-Source Certainty**).
-  - In `KESTREL`: Both runs declared independence **indeterminable** with $\widehat{N} = \text{null}$ (**Epistemic Resistance**).
-  - Rather than a uniform inflation curve, provenance loss creates an epistemic fork between manufactured certainty and conservative resistance.
+- **Context-Conditioned Fork at $G_3$:**
+  - In `VELORA`: 2/2 (100%) declared **determinable** with $\widehat{N} = 4$ (**False Multi-Source Certainty**).
+  - In `KESTREL`: 2/2 (100%) declared **indeterminable** with $\widehat{N} = \text{null}$ (**Epistemic Resistance**).
+  - Cross-Track Resonance: In both Track H and Track L, the `VELORA` context is associated with more permissive/shortcut behavior, while `KESTREL` exhibits strict monotonic conservation and resistance.
 
 ---
 
-## 3. Epistemic Hierarchy Synthesis
+## 3. Epistemic Synthesis & Architectural Implications
 
-Round 3 demonstrates that formal support, behavioral sufficiency, and historical lineage are **operationally distinct objects** that can diverge in multi-agent memory systems:
-1. **$S_F(C)$ (Formal Support):** Hypergraph of deductively sufficient root assumption sets.
-2. **$S_C(C)$ (Behavioral Exposure Environments):** Minimal sets of visible premises that empirically sustain model output under intervention.
-3. **$G_{\text{lineage}}$ (Ancestral History):** Directed acyclic graph of physical generation events and citation edges.
+Round 3 demonstrates that formal justification, neural realization, and ancestral lineage are **operationally distinct objects**:
+1. **$S_F(C)$ (Formal Support):** A hypergraph of deductively sufficient premise sets.
+2. **$\Phi(c, \sigma)$ (Neural Realization Function):** A sequence-to-behavior mapping over ordered prompts $\sigma = (x_1, \dots, x_n)$.
+3. **$G_{\text{lineage}}$ (Ancestral History):** A directed acyclic graph of physical generation events.
 
-When claims are multiply justified, single-parent lineage interventions cannot detect causal dependency, and neural models may rely on illicit shortcuts outside $S_F(C)$. Support-aware governance resolves this tension by tracking proof paths deterministically rather than relying on neural introspection.
+### The Serialization Discovery & The Context Compiler
+Formal knowledge naturally lives in **unordered sets and graphs**. Neural reasoners naturally operate over **linear sequences**. The translation $\text{Hypergraph} \to \text{Sequence}$ does not preserve semantics by default:
+- Adding evidence can non-monotonically destroy conclusions (Track H).
+- Reordering identical evidence can collapse abstention (Track B3).
+- Context identity alters epistemic confidence (Track L & H).
+
+This motivates the architecture of the **Epistemic Context Compiler**:
+
+```
+          EPISTEMIC KERNEL
+      formal support / lineage
+                │
+                ▼
+        CONTEXT COMPILER
+   selection • ordering • formatting
+   invariance / robustness checks
+                │
+                ▼
+          NEURAL REASONER
+                │
+                ▼
+         CANDIDATE OUTPUT
+                │
+                ▼
+        ADMISSION / PROOFREADER
+```
+
+The next frontier for GENE is mapping the conditions under which epistemic structure survives serialization into neural context.

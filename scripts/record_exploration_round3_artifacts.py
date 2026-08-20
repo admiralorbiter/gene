@@ -1,4 +1,4 @@
-"""Record Exploration Round 3 Artifacts and Governance Provenance.
+"""Record Exploration Round 3 Artifacts and Hardened Governance Provenance.
 
 Computes SHA256 checksums, call counts, evaluation counts, and governance metadata
 for all Round 3 databases and records them into data/exploration_round3_artifacts.json.
@@ -34,7 +34,8 @@ def inspect_db(db_path: Path) -> dict:
         "total_calls": n_calls,
         "total_evaluations": n_evals,
         "evaluation_parity": (n_calls == n_evals),
-        "model_digest": digest_val,
+        "db_model_digest": digest_val,
+        "ollama_model_id": "f4031aab637d",
     }
 
 
@@ -44,9 +45,16 @@ def main():
         "evidence_class": "exploratory_local",
         "base_tag": "gene-exploration-round3-base",
         "base_commit": "4c16d3f822a1ce0a5b28a9b3d09e86cb8140db7f",
-        "preexecution_commit": "dd7dd87",
-        "results_commit": "06b9c33",
-        "model": "gemma3:12b",
+        "design_freeze_commit": "dd7dd87",
+        "execution_commit": "0117b05",
+        "raw_results_commit": "06b9c33",
+        "post_review_commit": "07aa50c",
+        "model": {
+            "name": "gemma3:12b",
+            "ollama_id": "f4031aab637d",
+            "architecture": "gemma3 (12.2B parameters, Q4_K_M quantization)",
+            "adapter_digest_logging_note": "Ollama adapter recorded placeholder 'unknown' in DB rows; verified local Ollama ID is f4031aab637d"
+        },
         "tracks": {
             "track_h": inspect_db(Path("runs/explore_round3/track_h_coalition.db")),
             "track_g2": inspect_db(Path("runs/explore_round3/track_g2_immunity.db")),
@@ -58,7 +66,7 @@ def main():
         "evaluation_parity": True,
         "promotion_lifecycle": {
             "phase11_status": "not_earned",
-            "promotion_rule": "Exploratory results are local research evidence. Claims require deterministic replication, release asset checksums, and role-counterbalanced verification before canonical core promotion."
+            "promotion_rule": "Exploratory results are local research evidence. Claims require deterministic replication, release asset checksums, and role/representation-counterbalanced verification before canonical core promotion."
         }
     }
 
