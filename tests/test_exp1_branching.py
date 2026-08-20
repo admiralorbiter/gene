@@ -245,3 +245,32 @@ def test_next_gen_matrix_partial_identifiability():
     assert summary.progeny_matrix["semantic"]["semantic"] == 2.0
     assert summary.progeny_matrix["semantic"]["epistemic"] == 0.0
     assert summary.progeny_matrix["semantic"]["control"] == 0.0
+
+
+def test_exp1_mira_mutated_founder_closure():
+    """Verify that Mira founder allele produces consistent local derivability and global falsification."""
+    bundle_mira = generate_exp1_branching_world(world_seed=42, rotation_idx=0, mutated_supervisor="MIRA")
+    clean_oracle = Oracle(bundle_mira.clean_world)
+    mut_oracle = Oracle(bundle_mira.mutated_world)
+    station = bundle_mira.station
+
+    # Mira -> PROTO_M9, CLEARANCE_DELTA, ROUTE_DIRECT_VECTOR, TIER_RESTRICTED, AUDIT_QUARTERLY, ACCESS_ISOLATED
+    assert mut_oracle.evaluate_triple(station, "uses_protocol", "PROTO_M9") == TruthStatus.TRUE
+    assert clean_oracle.evaluate_triple(station, "uses_protocol", "PROTO_M9") == TruthStatus.FALSE
+
+    assert mut_oracle.evaluate_triple(station, "transit_route", "ROUTE_DIRECT_VECTOR") == TruthStatus.TRUE
+    assert clean_oracle.evaluate_triple(station, "transit_route", "ROUTE_DIRECT_VECTOR") == TruthStatus.FALSE
+
+
+def test_exp1_rule_permutations_stability():
+    """Verify that all 6 rule-order permutations preserve identical deductive closures."""
+    for perm_idx in range(6):
+        bundle = generate_exp1_branching_world(world_seed=42, rotation_idx=0, rule_perm_idx=perm_idx)
+        clean_oracle = Oracle(bundle.clean_world)
+        mut_oracle = Oracle(bundle.mutated_world)
+        station = bundle.station
+
+        # Closure invariant under permutation
+        assert clean_oracle.evaluate_triple(station, "uses_protocol", "PROTO_X7") == TruthStatus.TRUE
+        assert mut_oracle.evaluate_triple(station, "uses_protocol", "PROTO_Q2") == TruthStatus.TRUE
+

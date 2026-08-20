@@ -36,8 +36,8 @@ class NextGenMatrixSummary(BaseModel):
     epistemic_transmissibility_tau_S: float
     
     # Ancestral Allele Fidelities
-    fidelity_G1_F1: float
-    fidelity_G2_F2: float
+    fidelity_G1_F1: float | None = None
+    fidelity_G2_F2: float | None = None
     
     # Next-Generation / Progeny Matrix
     row_status: dict[str, Literal["observed", "unobserved"]]
@@ -171,10 +171,10 @@ class NextGenMatrixEngine:
 
         # 3. Ancestral Allele Fidelities F_1, F_2
         g1_fidelities = [e.ancestral_allele_fidelity for e in g1_events if e.ancestral_allele_fidelity is not None]
-        f1 = sum(g1_fidelities) / len(g1_fidelities) if g1_fidelities else 1.0
+        f1 = (sum(g1_fidelities) / len(g1_fidelities)) if g1_fidelities else None
 
         g2_fidelities = [e.ancestral_allele_fidelity for e in g2_events if e.ancestral_allele_fidelity is not None]
-        f2 = sum(g2_fidelities) / len(g2_fidelities) if g2_fidelities else 1.0
+        f2 = (sum(g2_fidelities) / len(g2_fidelities)) if g2_fidelities else None
 
         return NextGenMatrixSummary(
             founder_reproduction_R_F=r_f,

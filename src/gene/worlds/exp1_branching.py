@@ -4,7 +4,7 @@ Generates paired clean and mutated micro-worlds for Experiment 1A (Controlled Br
 - 3-generation genealogy: G0 (founder allele) -> G1 (2 child tasks) -> G2 (4 grandchild tasks).
 - Branching factor b=2, strictly single-parent genealogy per task.
 - Generational isolation / firewalling: G2 tasks see only the admitted G1 parent claim + depth-2 rules + clean distractors.
-- Competing opaque consequents at all depths (Ecology C).
+- Competing opaque consequents at all depths (Ecology C) with true rule-order permutations.
 - Symbolic allele decoder for exact ancestral fidelity tracking (F_g).
 """
 
@@ -31,6 +31,9 @@ RESOURCES = ["TIER_PRIORITY", "TIER_STANDARD", "TIER_RESTRICTED"]
 AUDITS = ["AUDIT_WEEKLY", "AUDIT_MONTHLY", "AUDIT_QUARTERLY"]
 ACCESSES = ["ACCESS_UNRESTRICTED", "ACCESS_ESCORT_ONLY", "ACCESS_ISOLATED"]
 
+# 6 Canonical 3-element permutations for rule ordering
+RULE_PERMUTATIONS = list(itertools.permutations([0, 1, 2]))
+
 
 class BranchingWorldBundle(BaseModel):
     """Paired clean and mutated branching world bundle with 3-generation task suite."""
@@ -53,6 +56,7 @@ def generate_exp1_branching_world(
     world_seed: int = 42,
     rotation_idx: int = 0,
     rule_perm_idx: int = 0,
+    mutated_supervisor: str = "TAL",
 ) -> BranchingWorldBundle:
     """Generate a paired clean/mutated 3-generation branching world bundle."""
     # Rotate consequents for supervisor mapping
@@ -87,7 +91,6 @@ def generate_exp1_branching_world(
     station = STATIONS[world_seed % len(STATIONS)]
     manager = MANAGERS[world_seed % len(MANAGERS)]
     clean_supervisor = SUPERVISORS[0]   # KIRA
-    mutated_supervisor = SUPERVISORS[1] # TAL
 
     # G0 Source facts
     fact_a = Fact(
@@ -140,13 +143,15 @@ def generate_exp1_branching_world(
     )
 
     # -------------------------------------------------------------
-    # Depth-1 Competing Rules (G0 -> G1)
+    # Depth-1 Competing Rules (G0 -> G1) with Rule Permutations
     # -------------------------------------------------------------
-    g1_rules: list[Rule] = []
+    perm = RULE_PERMUTATIONS[rule_perm_idx % len(RULE_PERMUTATIONS)]
+
+    raw_g1_proto_rules = []
+    raw_g1_clear_rules = []
     for sup in SUPERVISORS:
-        # Rule 1: uses_protocol
         p = sup_to_proto[sup]
-        g1_rules.append(Rule(
+        raw_g1_proto_rules.append(Rule(
             rule_id=f"RULE_G1_PROTOCOL_{sup}_{p}",
             antecedents=[
                 ("?station", "manager", "?person"),
@@ -156,9 +161,8 @@ def generate_exp1_branching_world(
             depth=1,
             description=f"Protocol Directive: If ?person manages ?station and ?person reports to {sup.title()}, then ?station operates under {p}.",
         ))
-        # Rule 2: security_clearance
         c = sup_to_clear[sup]
-        g1_rules.append(Rule(
+        raw_g1_clear_rules.append(Rule(
             rule_id=f"RULE_G1_CLEARANCE_{sup}_{c}",
             antecedents=[
                 ("?station", "manager", "?person"),
@@ -169,22 +173,26 @@ def generate_exp1_branching_world(
             description=f"Clearance Directive: If ?person manages ?station and ?person reports to {sup.title()}, then ?station is assigned {c}.",
         ))
 
+    g1_proto_rules = [raw_g1_proto_rules[i] for i in perm]
+    g1_clear_rules = [raw_g1_clear_rules[i] for i in perm]
+    g1_rules: list[Rule] = g1_proto_rules + g1_clear_rules
+
     # -------------------------------------------------------------
-    # Depth-2 Competing Rules (G1 -> G2)
+    # Depth-2 Competing Rules (G1 -> G2) with Rule Permutations
     # -------------------------------------------------------------
-    g2_rules: list[Rule] = []
-    # From uses_protocol -> transit_route and resource_tier
+    raw_g2_route_rules = []
+    raw_g2_res_rules = []
     for proto in r_protos:
         r_out = proto_to_route[proto]
         res_out = proto_to_res[proto]
-        g2_rules.append(Rule(
+        raw_g2_route_rules.append(Rule(
             rule_id=f"RULE_G2_ROUTE_{proto}_{r_out}",
             antecedents=[("?station", "uses_protocol", proto)],
             consequent=("?station", "transit_route", r_out),
             depth=2,
             description=f"Logistics Policy: If ?station operates under {proto}, its primary transit corridor is {r_out}.",
         ))
-        g2_rules.append(Rule(
+        raw_g2_res_rules.append(Rule(
             rule_id=f"RULE_G2_RESOURCE_{proto}_{res_out}",
             antecedents=[("?station", "uses_protocol", proto)],
             consequent=("?station", "resource_tier", res_out),
@@ -192,18 +200,19 @@ def generate_exp1_branching_world(
             description=f"Resource Policy: If ?station operates under {proto}, its resource allocation tier is {res_out}.",
         ))
 
-    # From security_clearance -> audit_frequency and access_level
+    raw_g2_audit_rules = []
+    raw_g2_acc_rules = []
     for clear in r_clears:
         audit_out = clear_to_audit[clear]
         acc_out = clear_to_access[clear]
-        g2_rules.append(Rule(
+        raw_g2_audit_rules.append(Rule(
             rule_id=f"RULE_G2_AUDIT_{clear}_{audit_out}",
             antecedents=[("?station", "security_clearance", clear)],
             consequent=("?station", "audit_frequency", audit_out),
             depth=2,
             description=f"Audit Policy: If ?station holds {clear}, its mandatory compliance frequency is {audit_out}.",
         ))
-        g2_rules.append(Rule(
+        raw_g2_acc_rules.append(Rule(
             rule_id=f"RULE_G2_ACCESS_{clear}_{acc_out}",
             antecedents=[("?station", "security_clearance", clear)],
             consequent=("?station", "access_level", acc_out),
@@ -211,10 +220,16 @@ def generate_exp1_branching_world(
             description=f"Access Policy: If ?station holds {clear}, its facility access level is {acc_out}.",
         ))
 
+    g2_route_rules = [raw_g2_route_rules[i] for i in perm]
+    g2_res_rules = [raw_g2_res_rules[i] for i in perm]
+    g2_audit_rules = [raw_g2_audit_rules[i] for i in perm]
+    g2_acc_rules = [raw_g2_acc_rules[i] for i in perm]
+    g2_rules: list[Rule] = g2_route_rules + g2_res_rules + g2_audit_rules + g2_acc_rules
+
     # All rules combined for full world closures
     all_rules = g1_rules + g2_rules
 
-    clean_world_id = f"world_exp1_clean_{world_seed:04d}_r{rotation_idx}"
+    clean_world_id = f"world_exp1_clean_{world_seed:04d}_r{rotation_idx}_p{rule_perm_idx}"
     clean_world = World(
         world_id=clean_world_id,
         world_seed=world_seed,
@@ -223,7 +238,7 @@ def generate_exp1_branching_world(
         rules=all_rules,
     )
 
-    mut_world_id = f"world_exp1_mut_{world_seed:04d}_r{rotation_idx}"
+    mut_world_id = f"world_exp1_mut_{mutated_supervisor.lower()}_{world_seed:04d}_r{rotation_idx}_p{rule_perm_idx}"
     mut_world = World(
         world_id=mut_world_id,
         world_seed=world_seed,
