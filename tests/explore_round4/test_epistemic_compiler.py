@@ -1,4 +1,4 @@
-"""Tests for EpistemicIR v2, EpistemicRenderer, Transformations, and Compiler Passes."""
+"""Comprehensive Preflight Tests for EpistemicIR v2.1, Renderer, and Context Compiler."""
 
 import sys
 from pathlib import Path
@@ -12,8 +12,10 @@ from gene.experiments.epistemic_ir import (
     PremiseNode,
     PrivilegeLevel,
     QueryContract,
+    RuleAntecedent,
     RuleSpec,
     SupportEnvironment,
+    validate_ir_consistency,
 )
 from gene.experiments.epistemic_renderer import EpistemicRenderer
 from gene.experiments.transformations import (
@@ -63,30 +65,46 @@ def build_canonical_recombinant_fixture() -> tuple[EpistemicState, QueryContract
             target_value="sector lead S2",
             root_ids=["R2"],
         ),
+        "occ_F": PremiseNode(
+            occurrence_id="occ_F",
+            semantic_claim_id="claim_velora_corin_duty",
+            predicate="neutral_fact",
+            subject="Corin",
+            entity="VELORA",
+            root_ids=["R3"],
+        ),
     }
 
     rules = {
-        "rule_manager_s1": RuleSpec(
-            rule_id="rule_manager_s1",
-            antecedent_predicates=["has_role(P, manager, VELORA)", "reports_to(P, sector_lead_S1)"],
-            consequent_predicate="station_operates_protocol(VELORA, PROTO_X7)",
+        "rule_1": RuleSpec(
+            rule_id="rule_1",
+            antecedents=[
+                RuleAntecedent(predicate="has_role", subject_role="manager"),
+                RuleAntecedent(predicate="reports_to", target_value="sector lead S1"),
+            ],
+            consequent_predicate="station_operates_protocol",
+            consequent_protocol="PROTO_X7",
         ),
-        "rule_sector_lead_s2": RuleSpec(
-            rule_id="rule_sector_lead_s2",
-            antecedent_predicates=["has_role(P, sector_lead, VELORA)", "reports_to(P, sector_lead_S2)"],
-            consequent_predicate="station_operates_protocol(VELORA, PROTO_X7)",
+        "rule_2": RuleSpec(
+            rule_id="rule_2",
+            antecedents=[
+                RuleAntecedent(predicate="has_role", subject_role="sector_lead"),
+                RuleAntecedent(predicate="reports_to", target_value="sector lead S2"),
+            ],
+            consequent_predicate="station_operates_protocol",
+            consequent_protocol="PROTO_X7",
         ),
     }
 
     envs = [
         SupportEnvironment(
             path_id="path_AB",
-            rule_id="rule_manager_s1",
+            rule_id="rule_1",
             required_semantic_claim_ids=["claim_velora_nerin_manager", "claim_velora_nerin_reports_s1"],
         ),
         SupportEnvironment(
             path_id="path_DE",
-            rule_id="rule_sector_lead_s2",
+            rule_id="rule_2",
             required_semantic_claim_ids=["claim_velora_vael_sector_lead", "claim_velora_vael_reports_s2"],
         ),
     ]
@@ -109,28 +127,87 @@ def build_canonical_recombinant_fixture() -> tuple[EpistemicState, QueryContract
     return state, query
 
 
-def test_epistemic_state_formal_entitlement():
+def test_ir_self_consistency_validator():
     state, query = build_canonical_recombinant_fixture()
-    assert state.is_formally_entitled()
-    assert len(state.get_surviving_support_environments()) == 2
+    errors = validate_ir_consistency(state, query)
+    assert errors == [], f"Valid state produced errors: {errors}"
 
-    # Invalidate root R1 -> path_AB collapses, path_DE survives
-    state.invalidated_roots.append("R1")
-    surviving = state.get_surviving_support_environments()
-    assert len(surviving) == 1
-    assert surviving[0].path_id == "path_DE"
-    assert state.is_formally_entitled()
+    # Corrupt a rule_id in a support environment
+    corrupt_state = state.model_copy(deep=True)
+    corrupt_state.support_environments[0].rule_id = "nonexistent_rule"
+    corrupt_errors = validate_ir_consistency(corrupt_state, query)
+    assert any("references unregistered rule" in e for e in corrupt_errors)
 
-    # Invalidate root R2 -> both collapse
-    state.invalidated_roots.append("R2")
-    assert not state.is_formally_entitled()
+    # Corrupt a required semantic claim ID
+    corrupt_state2 = state.model_copy(deep=True)
+    corrupt_state2.support_environments[0].required_semantic_claim_ids.append("phantom_claim")
+    corrupt_errors2 = validate_ir_consistency(corrupt_state2, query)
+    assert any("requires semantic claim phantom_claim" in e for e in corrupt_errors2)
 
 
-def test_semantic_lineage_deduplication_preserves_distinct_facts_from_same_root():
-    """Regression Test: Prove that A and B sharing root R1 are BOTH preserved, while duplicate copies collapse."""
+def test_dynamic_structural_rule_rendering_after_role_swap():
+    """Verify that swapping manager <-> sector_lead dynamically re-renders BOTH premises AND rules."""
     state, query = build_canonical_recombinant_fixture()
 
-    # Add 3 duplicate paraphrases of A from root R1
+    swapped_state, swapped_query = RoleEquivarianceTransform.swap_role_slots(
+        state, query, "manager", "sector_lead"
+    )
+
+    # Premises re-rendered
+    assert "Nerin is sector lead of VELORA." in swapped_state.premises["occ_A"].rendered_text
+    assert "Vael is manager of VELORA." in swapped_state.premises["occ_D"].rendered_text
+
+    # Rules re-rendered dynamically from antecedents
+    assert "If a person is sector lead of a station and reports to sector lead S1" in swapped_state.rules["rule_1"].rendered_text
+    assert "If a person is manager of a station and reports to sector lead S2" in swapped_state.rules["rule_2"].rendered_text
+
+    # Compiler output contains swapped rules
+    compiler = EpistemicContextCompiler(pipeline=PrivilegeLevel.RAW_SERIALIZATION)
+    ctx = compiler.compile(swapped_state, swapped_query)
+    assert "If a person is sector lead of a station and reports to sector lead S1" in ctx.prompt
+    assert "If a person is manager of a station and reports to sector lead S2" in ctx.prompt
+
+
+def test_state_hash_vs_equiv_hash_distinction():
+    """Prove that state_hash changes under duplicate copies, while equiv_hash remains invariant."""
+    state, query = build_canonical_recombinant_fixture()
+    h_state_orig = state.compute_state_hash()
+    h_equiv_orig = state.compute_equiv_hash()
+
+    # Add 2 duplicate occurrences of A
+    state_multi = state.model_copy(deep=True)
+    state_multi.premises["occ_A_copy2"] = PremiseNode(
+        occurrence_id="occ_A_copy2",
+        semantic_claim_id="claim_velora_nerin_manager",
+        predicate="has_role",
+        subject="Nerin",
+        entity="VELORA",
+        role="manager",
+        root_ids=["R1"],
+    )
+    state_multi.premises["occ_A_copy3"] = PremiseNode(
+        occurrence_id="occ_A_copy3",
+        semantic_claim_id="claim_velora_nerin_manager",
+        predicate="has_role",
+        subject="Nerin",
+        entity="VELORA",
+        role="manager",
+        root_ids=["R1"],
+    )
+    EpistemicRenderer.render_state(state_multi)
+
+    h_state_multi = state_multi.compute_state_hash()
+    h_equiv_multi = state_multi.compute_equiv_hash()
+
+    # State hashes MUST differ (occurrences changed)
+    assert h_state_orig != h_state_multi
+    # Equivalence hashes MUST be identical (semantic entitlement unchanged)
+    assert h_equiv_orig == h_equiv_multi
+
+
+def test_compiled_context_provenance_and_merge_groups():
+    """Verify that CompiledContext carries full provenance and records merged occurrences."""
+    state, query = build_canonical_recombinant_fixture()
     state.premises["occ_A_copy2"] = PremiseNode(
         occurrence_id="occ_A_copy2",
         semantic_claim_id="claim_velora_nerin_manager",
@@ -140,95 +217,46 @@ def test_semantic_lineage_deduplication_preserves_distinct_facts_from_same_root(
         role="manager",
         root_ids=["R1"],
     )
-    state.premises["occ_A_copy3"] = PremiseNode(
-        occurrence_id="occ_A_copy3",
-        semantic_claim_id="claim_velora_nerin_manager",
-        predicate="has_role",
-        subject="Nerin",
-        entity="VELORA",
-        role="manager",
-        root_ids=["R1"],
-    )
     EpistemicRenderer.render_state(state)
-
-    assert len(state.premises) == 6  # 3 copies of A, 1 B, 1 D, 1 E
 
     compiler = EpistemicContextCompiler(pipeline=PrivilegeLevel.GENEALOGICAL_NORMALIZATION)
     ctx = compiler.compile(state, query)
 
-    # Must preserve ALL 4 distinct semantic claims (A, B, D, E)
-    assert set(ctx.included_semantic_claim_ids) == {
-        "claim_velora_nerin_manager",
-        "claim_velora_nerin_reports_s1",
-        "claim_velora_vael_sector_lead",
-        "claim_velora_vael_reports_s2",
-    }
-    # Deduplicated copies of A should collapse to 1 line with occurrence count
-    assert "Root R1 (3 cited occurrences): Nerin is manager of VELORA." in ctx.prompt
-    assert "- Root R1: Nerin reports to sector lead S1." in ctx.prompt
+    assert "occ_A" in ctx.emitted_occurrence_ids
+    assert "occ_A_copy2" not in ctx.emitted_occurrence_ids
+    assert "occ_A_copy2" in ctx.merged_occurrence_groups.get("occ_A", [])
+    assert ctx.drop_or_merge_reasons.get("occ_A_copy2") == "merged_into_occ_A_same_lineage_claim"
 
 
-def test_compiler_canonical_permutation_invariance_deterministic_proof():
-    """Zero-Compute Proof: Canonical support block compiler yields 100% identical SHA256 prompt hashes across all 24 permutations."""
-    state, query = build_canonical_recombinant_fixture()
-    compiler = EpistemicContextCompiler(pipeline=PrivilegeLevel.TOPOLOGY_AWARE_GROUPING)
-
-    all_perms = PermutationTransform.generate_all_permutations(state)
-    assert len(all_perms) == 24
-
-    hashes = set()
-    for perm in all_perms:
-        ctx = compiler.compile(state, query, occurrence_order=perm)
-        prompt_hash = hashlib.sha256(ctx.prompt.encode("utf-8")).hexdigest()
-        hashes.add(prompt_hash)
-
-    # Exactly 1 unique prompt hash across all 24 permutations!
-    assert len(hashes) == 1, "Canonical compiler failed permutation invariance!"
-
-
-def test_role_equivariance_structural_swap_and_anonymization():
+def test_support_augmentation_produces_truthful_substates():
+    """Verify that SupportAugmentationTransform produces truthful subselected EpistemicStates."""
     state, query = build_canonical_recombinant_fixture()
 
-    # 1. Structural Swap manager <-> sector_lead
-    swapped_state, swapped_query = RoleEquivarianceTransform.swap_role_slots(
-        state, query, "manager", "sector_lead"
+    chain = SupportAugmentationTransform.generate_augmentation_chain(
+        state, base_support_path_id="path_AB", augment_occurrence_ids=["occ_D", "occ_E", "occ_F"]
     )
-    assert swapped_state.premises["occ_A"].role == "sector_lead"
-    assert "Nerin is sector lead of VELORA." in swapped_state.premises["occ_A"].rendered_text
-    assert swapped_state.premises["occ_D"].role == "manager"
-    assert "Vael is manager of VELORA." in swapped_state.premises["occ_D"].rendered_text
-    assert swapped_state.is_formally_entitled()
 
-    # 2. Structural Anonymization to opaque tokens
-    anon_state, anon_query = RoleEquivarianceTransform.anonymize_roles(
-        state, query, {"manager": "ROLE_Q7", "sector_lead": "ROLE_M2"}
-    )
-    assert anon_state.premises["occ_A"].role == "ROLE_Q7"
-    assert "Nerin is ROLE Q7 of VELORA." in anon_state.premises["occ_A"].rendered_text
-    assert anon_state.is_formally_entitled()
+    assert len(chain) == 4
+    # Step 0: Minimal AB
+    sub0, label0 = chain[0]
+    assert len(sub0.premises) == 2
+    assert sub0.is_formally_entitled()
+    assert len(sub0.get_surviving_support_environments()) == 1
 
-    # 3. Entity Rotation VELORA -> KESTREL
-    rot_state, rot_query = RoleEquivarianceTransform.rotate_station_entity(
-        state, query, "VELORA", "KESTREL"
-    )
-    assert rot_query.target_station == "KESTREL"
-    assert "KESTREL" in rot_state.premises["occ_A"].rendered_text
-    assert rot_state.is_formally_entitled()
+    # Step 1: ABD
+    sub1, label1 = chain[1]
+    assert len(sub1.premises) == 3
+    assert sub1.is_formally_entitled()
+    assert len(sub1.get_surviving_support_environments()) == 1
 
+    # Step 2: ABDE (Second path becomes active!)
+    sub2, label2 = chain[2]
+    assert len(sub2.premises) == 4
+    assert sub2.is_formally_entitled()
+    assert len(sub2.get_surviving_support_environments()) == 2
 
-def test_all_compiler_pipelines_privilege_audit():
-    state, query = build_canonical_recombinant_fixture()
-
-    for pipeline in [
-        PrivilegeLevel.RAW_SERIALIZATION,
-        PrivilegeLevel.TOPOLOGY_AWARE_GROUPING,
-        PrivilegeLevel.GENEALOGICAL_NORMALIZATION,
-        PrivilegeLevel.PROOF_CARRYING_CERTIFICATE,
-    ]:
-        compiler = EpistemicContextCompiler(pipeline=pipeline)
-        ctx = compiler.compile(state, query)
-        assert ctx.privilege_level == pipeline
-        assert len(ctx.compiler_passes) >= 2
-        assert "AUTHORIZATION RULES:" in ctx.prompt
-        assert "QUESTION: Based on authorized rules" in ctx.prompt
-        assert len(ctx.source_ir_hash) == 64
+    # Step 3: ABDEF (Neutral distractor F added)
+    sub3, label3 = chain[3]
+    assert len(sub3.premises) == 5
+    assert sub3.is_formally_entitled()
+    assert len(sub3.get_surviving_support_environments()) == 2

@@ -5,12 +5,14 @@
 - **Deterministic Compiler Invariance vs Live Neural Measurement:**
   - A structured context compiler operating at `TOPOLOGY_AWARE_GROUPING` canonically groups premises into deterministic proof pathways. We prove **100% hash-identical prompt invariance deterministically with 0 live compute** ($\forall \pi_1, \pi_2 \in \Pi, \text{SHA256}(\mathcal{C}_{\text{blocks}}(\pi_1)) = \text{SHA256}(\mathcal{C}_{\text{blocks}}(\pi_2))$).
   - Live LLM calls are deployed strictly to measure the **unmitigated neural serialization spread** under raw flat serialization ($\mathcal{C}_{\text{flat}}$), contrasted with the stability of the canonical compiled context.
+- **Scope Preregistration:** This assay evaluates a clean positive-support recombinant ecology ($S_F = \{\{A,B\}, \{D,E\}\}$). A low serialization spread on this non-conflicting ecology would indicate baseline stability under redundancy, but does not imply general permutation invariance under conflicting evidence (as observed in Round 3 Track B3).
 
 ## 2. Experimental Design & Permutation Allocation
 For the recombinant support state $S_F = \{\{A,B\}, \{D,E\}\}$:
 1. **Raw Flat Serialization Panel ($N=24$ calls):** Evaluate all $4! = 24$ permutations of premise presentation order $[A,B,D,E]$ under `raw_flat` compilation.
 2. **Canonical Compiled Baseline ($N=1$ call):** Evaluate the canonical `canonical_support_blocks` compiled context.
-3. **Exact Replay Stability Panel ($N=4$ calls):** 4 exact CallSpec replays on the canonical compiled prompt to establish baseline stochasticity ($\epsilon_{\text{replay}}$).
+3. **Exact Replay Stability Panel ($N=3$ calls):** 3 exact CallSpec replays on the canonical compiled prompt to establish baseline stochasticity ($\epsilon_{\text{replay}}$) across 4 total canonical observations.
+- **Total Budget:** $24 + 1 + 3 =$ **28 calls**.
 
 ## 3. Measurable Endpoints & Categorical Metrics
 - **Permutation Output Entropy ($H_{\text{perm}}$):** Shannon entropy of categorical model predictions across the 24 permutations.

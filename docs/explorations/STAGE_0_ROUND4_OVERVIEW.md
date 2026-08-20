@@ -30,7 +30,7 @@ Exploration Round 3 revealed a fundamental representational gap:
 
 ---
 
-## 3. Four Parallel Research Threads (Round 4 Portfolio)
+## 3. Four Parallel Research Threads (Round 4 Portfolio — Total 116 Calls)
 
 ```
                             ROUND 4 PARALLEL RESEARCH PORTFOLIO
@@ -42,7 +42,7 @@ Exploration Round 3 revealed a fundamental representational gap:
 │          │ (Semantic Dissection)       │           │ {A,E} (role-driven) or stay at {B,D} (graph slot)?     │
 ├──────────┼─────────────────────────────┼───────────┼────────────────────────────────────────────────────────┤
 │ Track P  │ Permutation Invariance      │ 28 calls  │ 24 raw flat permutations (neural spread) vs 1 compiled │
-│          │ (Serialization Spread)      │           │ canonical prompt + 4 exact replays (0 calls for hash). │
+│          │ (Serialization Spread)      │           │ canonical prompt + 3 exact replays (0 calls for hash). │
 ├──────────┼─────────────────────────────┼───────────┼────────────────────────────────────────────────────────┤
 │ Track M  │ Support-Preserving          │ 32 calls  │ Mirror AB & DE chains with insertion counterbalancing: │
 │          │ Monotonicity                │           │ measure Success-to-Error flips under valid augments.   │
@@ -72,7 +72,7 @@ Exploration Round 3 revealed a fundamental representational gap:
                 │
                 ▼
         COMPILED CONTEXT
-   prompt • source_hash • passes • privilege
+   prompt • state_hash • equiv_hash • passes
                 │
                 ▼
          NEURAL REASONER

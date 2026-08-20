@@ -1,6 +1,6 @@
-"""Semantic Transformations for Epistemic Invariance & Conformance Testing (v2).
+"""Semantic Transformations for Epistemic Invariance & Conformance Testing (v2.1).
 
-Transforms underlying data structures first, then renders natural language second.
+Transforms typed data structures first, then renders natural language second.
 """
 
 from __future__ import annotations
@@ -12,6 +12,7 @@ from gene.experiments.epistemic_ir import (
     EpistemicState,
     PremiseNode,
     QueryContract,
+    RuleAntecedent,
     RuleSpec,
     SupportEnvironment,
 )
@@ -55,17 +56,13 @@ class RoleEquivarianceTransform:
         for p in new_state.premises.values():
             p.semantic_claim_id = p.semantic_claim_id.replace("__TEMP__", role_b)
 
-        # 2. Swap rule antecedent predicates
+        # 2. Swap rule antecedent roles
         for r in new_state.rules.values():
-            new_ants = []
-            for ant in r.antecedent_predicates:
-                if role_a in ant:
-                    new_ants.append(ant.replace(role_a, role_b))
-                elif role_b in ant:
-                    new_ants.append(ant.replace(role_b, role_a))
-                else:
-                    new_ants.append(ant)
-            r.antecedent_predicates = new_ants
+            for ant in r.antecedents:
+                if ant.subject_role == role_a:
+                    ant.subject_role = role_b
+                elif ant.subject_role == role_b:
+                    ant.subject_role = role_a
 
         # 3. Swap required claim IDs in support environments
         for env in new_state.support_environments:
@@ -98,16 +95,10 @@ class RoleEquivarianceTransform:
                     p.semantic_claim_id = p.semantic_claim_id.replace(orig, opaque)
 
         for r in new_state.rules.values():
-            new_ants = []
-            for ant in r.antecedent_predicates:
+            for ant in r.antecedents:
                 for orig, opaque in mapping.items():
-                    ant = ant.replace(orig, opaque)
-                new_ants.append(ant)
-            r.antecedent_predicates = new_ants
-            if "rule_manager_s1" in r.rule_id:
-                r.rule_id = "rule_opaque_q7_s1"
-            elif "rule_sector_lead_s2" in r.rule_id:
-                r.rule_id = "rule_opaque_m2_s2"
+                    if ant.subject_role == orig:
+                        ant.subject_role = opaque
 
         for env in new_state.support_environments:
             new_reqs = []
@@ -153,16 +144,16 @@ class SupportAugmentationTransform:
         state: EpistemicState,
         base_support_path_id: str,
         augment_occurrence_ids: list[str],
-    ) -> list[tuple[list[str], str]]:
-        """Generates a sequence of occurrence ID subsets [Base] -> [Base + A1] -> [Base + A1 + A2] ...
+    ) -> list[tuple[EpistemicState, str]]:
+        """Generates a sequence of truthful subselected EpistemicStates:
+        [Base] -> [Base + A1] -> [Base + A1 + A2] ...
         
-        Returns list of (active_occurrence_ids, stage_description).
+        Returns list of (sub_state, stage_description).
         """
         base_env = next((e for e in state.support_environments if e.path_id == base_support_path_id), None)
         if not base_env:
             raise ValueError(f"Base support path {base_support_path_id} not found in EpistemicState")
 
-        # Find occurrences satisfying the base required semantic claims
         base_occs = []
         for cid in base_env.required_semantic_claim_ids:
             matching = [p.occurrence_id for p in state.premises.values() if p.semantic_claim_id == cid]
@@ -171,13 +162,15 @@ class SupportAugmentationTransform:
             base_occs.append(matching[0])
 
         chain = []
-        current_active = list(base_occs)
-        chain.append((list(current_active), f"Minimal Support [{base_support_path_id}]"))
+        current_occs = list(base_occs)
+        sub_0 = state.subselect_occurrences(current_occs)
+        chain.append((sub_0, f"Minimal Support [{base_support_path_id}]"))
 
         for aug_id in augment_occurrence_ids:
-            if aug_id not in current_active and aug_id in state.premises:
-                current_active.append(aug_id)
+            if aug_id not in current_occs and aug_id in state.premises:
+                current_occs.append(aug_id)
+                sub_k = state.subselect_occurrences(current_occs)
                 p = state.premises[aug_id]
-                chain.append((list(current_active), f"Augment +{aug_id} ({p.rendered_text})"))
+                chain.append((sub_k, f"Augment +{aug_id} ({p.rendered_text})"))
 
         return chain
