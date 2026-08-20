@@ -1,0 +1,67 @@
+{
+  "manifest_version": "1.0.0",
+  "round": "Exploration Round 2",
+  "base_commit": "2685987",
+  "artifacts": {
+    "track_a2_dynamic_repair.db": {
+      "file_path": "runs/explore_round2/track_a2_dynamic_repair.db",
+      "sha256": "e0a720690433b7154e243eda3f9e528d03fe063d31146d1a913948f77eb0c2ed",
+      "size_bytes": 65536,
+      "tables": [
+        "exploration_runs",
+        "exploration_calls",
+        "exploration_evaluations"
+      ],
+      "row_counts": {
+        "exploration_runs": 1,
+        "exploration_calls": 12,
+        "exploration_evaluations": 0
+      }
+    },
+    "track_b2_monoculture.db": {
+      "file_path": "runs/explore_round2/track_b2_monoculture.db",
+      "sha256": "8e90e54ff12659df8f850e02fab37bda3f6fda01621c9870c71c181ab76b8fde",
+      "size_bytes": 65536,
+      "tables": [
+        "exploration_runs",
+        "exploration_calls",
+        "exploration_evaluations"
+      ],
+      "row_counts": {
+        "exploration_runs": 1,
+        "exploration_calls": 16,
+        "exploration_evaluations": 0
+      }
+    },
+    "track_g_multi_justification.db": {
+      "file_path": "runs/explore_round2/track_g_multi_justification.db",
+      "sha256": "4700b6b13fcd7bdee2950ca4f6cf05a2b45d6f39c4520ae570c911118c91e090",
+      "size_bytes": 65536,
+      "tables": [
+        "exploration_runs",
+        "exploration_calls",
+        "exploration_evaluations"
+      ],
+      "row_counts": {
+        "exploration_runs": 1,
+        "exploration_calls": 12,
+        "exploration_evaluations": 0
+      }
+    },
+    "track_m_calibration.db": {
+      "file_path": "runs/explore_round2/track_m_calibration.db",
+      "sha256": "15f462c5869a9cf1ba181e9b77612fed3c30f2b4b7bd218239e35327ceb41fc4",
+      "size_bytes": 53248,
+      "tables": [
+        "exploration_runs",
+        "exploration_calls",
+        "exploration_evaluations"
+      ],
+      "row_counts": {
+        "exploration_runs": 1,
+        "exploration_calls": 8,
+        "exploration_evaluations": 0
+      }
+    }
+  }
+}

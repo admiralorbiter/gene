@@ -6,8 +6,12 @@ to establish measurement invariance before experimental admission.
 
 from __future__ import annotations
 
-import json
+import sys
 from pathlib import Path
+sys.path.insert(0, str(Path.cwd() / "src"))
+sys.path.insert(0, str(Path.cwd()))
+
+import json
 from typing import Any
 
 from gene.experiments.exploration_harness import ExplorationHarness
@@ -119,6 +123,14 @@ def run_track_m_calibration(
                 "expected": expected,
                 "is_pass": is_pass,
             })
+            print(f"[{calls_spent+1}/{len(models)*len(cases)}] {call_id} -> {rec.emitted_claim} (expected={expected}, pass={is_pass})", flush=True)
             calls_spent += 1
 
     return {"calls_spent": calls_spent, "results": results}
+
+
+if __name__ == "__main__":
+    db = Path("runs/explore_round2/track_m_calibration.db")
+    print("Running Track M: Model Calibration Gateway across Qwen 2.5:3B & Llama 3.2:3B...", flush=True)
+    res = run_track_m_calibration(db, models=["qwen2.5:3b", "llama3.2:3b"], contract_variant="generic_placeholder")
+    print(f"Completed {res['calls_spent']} live calls.", flush=True)

@@ -6,8 +6,12 @@ when one ancestral derivation path is discredited.
 
 from __future__ import annotations
 
-import json
+import sys
 from pathlib import Path
+sys.path.insert(0, str(Path.cwd() / "src"))
+sys.path.insert(0, str(Path.cwd()))
+
+import json
 from typing import Any
 
 from gene.experiments.exploration_harness import ExplorationHarness
@@ -117,6 +121,14 @@ def run_track_g_live(
                     "expected": expected,
                     "is_correct": is_correct,
                 })
+                print(f"[{calls_spent+1}/{max_calls}] {call_id} -> {rec.emitted_claim} (expected={expected}, correct={is_correct})", flush=True)
                 calls_spent += 1
 
     return {"calls_spent": calls_spent, "results": results}
+
+
+if __name__ == "__main__":
+    db = Path("runs/explore_round2/track_g_multi_justification.db")
+    print("Running Track G: Multi-Justification & Epistemic Recombination (12 calls on gemma3:12b)...", flush=True)
+    res = run_track_g_live(db, max_calls=12)
+    print(f"Completed {res['calls_spent']} live calls.", flush=True)

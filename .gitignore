@@ -32,6 +32,7 @@ data/*
 !data/claim_ledger.json
 !data/artifacts.json
 !data/exploration_artifacts.json
+!data/exploration_round2_artifacts.json
 
 # IDEs and Editors
 .vscode/

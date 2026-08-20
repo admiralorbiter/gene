@@ -6,8 +6,13 @@ and records empirical inspection, recomputation, and accuracy metrics.
 
 from __future__ import annotations
 
-import json
+import sys
 from pathlib import Path
+sys.path.insert(0, str(Path.cwd() / "src"))
+sys.path.insert(0, str(Path.cwd()))
+
+import json
+import sqlite3
 import time
 from typing import Any
 
@@ -154,9 +159,17 @@ def run_track_a2_live(
                     "is_recovered": is_recovered,
                     "is_stale": is_stale,
                 })
+                print(f"[{calls_spent+1}/{max_calls}] {call_id} -> {rec.emitted_claim} (recovered={is_recovered}, stale={is_stale})", flush=True)
                 calls_spent += 1
 
             if temp_store_db.exists():
                 temp_store_db.unlink()
 
     return {"calls_spent": calls_spent, "results": results}
+
+
+if __name__ == "__main__":
+    db = Path("runs/explore_round2/track_a2_dynamic_repair.db")
+    print("Running Track A2: Dynamic Memory Repair & Lazy Revalidation (12 calls on gemma3:12b)...", flush=True)
+    res = run_track_a2_live(db, max_calls=12)
+    print(f"Completed {res['calls_spent']} live calls.", flush=True)
