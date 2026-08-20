@@ -137,13 +137,13 @@ $$\kappa(c) = \min_{C \subseteq \mathcal{A}} \{|C| : \forall S_i \in S(c), S_i \
 
 ---
 
-## 4. The Seven Invariants of an Epistemic Kernel
+## 4. Seven Candidate Invariants of an Epistemic Kernel
 
-Analogous to the ACID properties in relational database transactions, an Epistemic Kernel enforces seven core invariants:
+Analogous to the ACID properties in relational database transactions, we propose seven **Candidate Epistemic Invariants** to be evaluated, challenged, and refined through counterfactual experimentation:
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
-│                        THE SEVEN EPISTEMIC INVARIANTS                                  │
+│                   SEVEN CANDIDATE EPISTEMIC INVARIANTS                                 │
 ├──────────────────────────┬─────────────────────────────────────────────────────────────┤
 │ 1. Provenance            │ A descendant cannot gain evidential authority merely by     │
 │    Preservation          │ being summarized, repeated, or reformatted.                 │
@@ -152,7 +152,7 @@ Analogous to the ACID properties in relational database transactions, an Epistem
 │    and Grounding         │ unretracted minimal support set in S(c).                    │
 ├──────────────────────────┼─────────────────────────────────────────────────────────────┤
 │ 3. Independent-Support   │ Ten repetitions descended from one observation do not       │
-│    Accounting            │ constitute ten independent observations (Neff <= Nvisible). │
+│    Accounting            │ constitute ten independent observations (candidate Neff).   │
 ├──────────────────────────┼─────────────────────────────────────────────────────────────┤
 │ 4. Revision Closure      │ If an assumption changes, all dependent beliefs are either  │
 │                          │ justified by surviving paths, marked dirty, or inactivated. │

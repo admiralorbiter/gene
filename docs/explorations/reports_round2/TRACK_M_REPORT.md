@@ -1,12 +1,12 @@
-# Provisional Result Report — Track M: Measurement Invariance & Model Calibration Gateway
+# Post-Review Result Report — Track M: Measurement Invariance & Model Calibration Gateway
 
 ## 1. Executive Summary
-- **Probe Status:** SUCCESSFUL CALIBRATION GATEWAY (Measurement Non-Invariance Confirmed)
+- **Probe Status:** VALIDATED METHODOLOGY RESULT
 - **Total Calls Spent:** 8 (4 on `qwen2.5:3b`, 4 on `llama3.2:3b`)
-- **Primary Finding:** Both sub-7B open-weight models failed the 4-case zero-shot calibration gateway, confirming that **assay prompts calibrated on Gemma 3:12B cannot be ported to other model families without specialized model adapters**.
-- **Model Failure Modes:**
-  - `qwen2.5:3b`: Passed complete valid derivation (`PROTO_X7`), but on missing premise copied the prompt placeholder literally (`"PROTOCOL_NAME_OR_UNKNOWN"`), on directional mutation emitted `"PROTOCOL_X7"`, and on entity mismatch hallucinated `"PROTO_X7"` ($1/4$ pass).
-  - `llama3.2:3b`: Emitted `"PROTO_Q2"` or `"PROTO_X7"` irrespective of whether premises were missing or entity-mismatched ($1/4$ pass).
+- **Verified Empirical Finding:** Both sub-7B open-weight models failed the 4-case zero-shot calibration gateway ($1/4$ pass rate on both Qwen and Llama), confirming that **prompts calibrated on Gemma 3:12B cannot be ported across model families without specialized model adapters**.
+- **Observed Failure Modes:**
+  - `qwen2.5:3b`: Passed complete derivation (`PROTO_X7`), but on missing premise copied the prompt placeholder string literally (`"PROTOCOL_NAME_OR_UNKNOWN"`), on directional mutation emitted `"PROTOCOL_X7"`, and on entity mismatch hallucinated `"PROTO_X7"`.
+  - `llama3.2:3b`: Emitted arbitrary hard-coded tokens (`"PROTO_Q2"` or `"PROTO_X7"`) regardless of premise completeness or entity binding.
 
 ## 2. Experimental Data Matrix ($N = 8$ Calls)
 | Model | Calibration Case | Expected Value | Emitted Value | Pass Gate? | Observed Error Mode |
@@ -20,5 +20,7 @@
 | `llama3.2:3b` | `directional_mutation` | `PROTO_Q2` | `PROTO_Q2` | **YES** | Coincidental Mutation Match |
 | `llama3.2:3b` | `entity_mismatch` | `UNKNOWN` | `PROTO_Q2` | NO | Entity Blindness / Hallucination |
 
-## 3. Scientific Significance & Model Gateway Policy
-Neither `qwen2.5:3b` nor `llama3.2:3b` is currently admitted to GENE substantive phenotypic experiments under zero-shot prompting. Future multi-model scaling requires building formal grammar-constrained JSON adapters (`ModelAdapter_v1`) before cross-model phenotypic comparisons are valid.
+## 3. Revised Conclusion & Methodological Policy
+Before comparing epistemic behavior across models, researchers must establish **measurement invariance of the response interface**.
+
+Crucially, the solution is not simply imposing rigid grammar constraints (which recent literature shows can introduce a "constraint tax" on semantic accuracy). Rather, **a model-specific calibration adapter must be developed and validated for both structural compliance and semantic fidelity** before admitting any model to phenotypic experiments.

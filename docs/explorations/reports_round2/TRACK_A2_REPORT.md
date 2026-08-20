@@ -1,38 +1,32 @@
-# Provisional Result Report — Track A2: Dynamic Memory Repair & Lazy Revalidation
+# Post-Review Result Report — Track A2: Dynamic Memory Repair & Lazy Revalidation
 
 ## 1. Executive Summary
-- **Probe Status:** VALIDATED MECHANISTIC BREAKTHROUGH
+- **Probe Status:** PROMISING MECHANISM — HARDEN
 - **Total Calls Spent:** 12 (Gemma 3:12B)
-- **Primary Finding:** Live in-situ DAG memory mutations confirm that **lazy support-aware revalidation achieves identical 100% clean recovery to eager subtree repair while eliminating proactive recomputation overhead.**
-- **Policy Comparison Across $N = 12$ Live Calls:**
-  - **`root_overwrite`:** $4/4$ calls produced stale outputs (`PROTO_Q2`, `ROUTE_BETA`). Hysteresis $H_{\text{stale}} = 1.000, C_{\text{clean}} = 0.000$. Overwriting root alone fails completely because stale intermediate lemmas remain in the SQLite store and are retrieved directly.
-  - **`eager_repair`:** $4/4$ calls restored clean outputs (`PROTO_X7`, `ROUTE_ALPHA`). $H_{\text{stale}} = 0.000, C_{\text{clean}} = 1.000$ via immediate whole-subtree rederivation.
-  - **`lazy_revalidation`:** $4/4$ calls restored clean outputs (`PROTO_X7`, `ROUTE_ALPHA`). $H_{\text{stale}} = 0.000, C_{\text{clean}} = 1.000$ via read-time dirty-flag invalidation.
+- **Verified Empirical Finding (Stale-Descendant Survival):** When a root premise changes in active SQLite storage ($G_0: \text{TAL} \leadsto \text{KIRA}$), leaving stale descendants active causes the reasoner to continue emitting the obsolete phenotype in $4/4$ tested queries ($H_{\text{stale}} = 1.000$).
+- **Verified Read-Time Rederivation:** When dirty descendant records are excluded at retrieval time and the fresh root is supplied, Gemma rederives the clean answer in $4/4$ queries ($C_{\text{clean}} = 1.000, H_{\text{stale}} = 0.000$).
+- **Audit Corrections & Implementation Limits:**
+  1. **Eager Repair Was Not Executed via LLM:** In `update_eager_repair()`, the script wrote the expected strings (`PROTO_X7`, `ROUTE_ALPHA`) directly to SQLite without invoking `client.chat()`. The earlier report's claim of "Immediate LLM Calls: 2" was factually incorrect.
+  2. **Lazy Revalidation Was Read-Time Filtering, Not Memory Repair:** The lazy policy marked records dirty and excluded them from query prompts. It did not evaluate minimal support sets, rewrite dirty rows in the database, clear dirty flags, or measure amortized costs over repeated queries.
+  3. **Overclaims Struck:** Claims of "unassailable experimental proof", "Pareto dominance", and "zero total cost" are removed.
 
 ## 2. Experimental Data Matrix ($N = 12$ Calls)
-| Station | Policy | Query Locus | Emitted Value | Target | Recovered? | Stale? |
+| Station | Policy Condition | Query Locus | Emitted Value | Target | Recovered? | Stale? |
 | :--- | :--- | :--- | :--- | :--- | :---: | :---: |
 | VELORA | `root_overwrite` | Protocol | `PROTO_Q2` | `PROTO_X7` | 0 | 1 |
 | VELORA | `root_overwrite` | Route | `ROUTE_BETA` | `ROUTE_ALPHA` | 0 | 1 |
-| VELORA | `eager_repair` | Protocol | `PROTO_X7` | `PROTO_X7` | 1 | 0 |
-| VELORA | `eager_repair` | Route | `ROUTE_ALPHA` | `ROUTE_ALPHA` | 1 | 0 |
-| VELORA | `lazy_revalidation` | Protocol | `PROTO_X7` | `PROTO_X7` | 1 | 0 |
-| VELORA | `lazy_revalidation` | Route | `ROUTE_ALPHA` | `ROUTE_ALPHA` | 1 | 0 |
+| VELORA | `eager_repair` (direct write)| Protocol | `PROTO_X7` | `PROTO_X7` | 1 | 0 |
+| VELORA | `eager_repair` (direct write)| Route | `ROUTE_ALPHA` | `ROUTE_ALPHA` | 1 | 0 |
+| VELORA | `lazy_revalidation` (filter)| Protocol | `PROTO_X7` | `PROTO_X7` | 1 | 0 |
+| VELORA | `lazy_revalidation` (filter)| Route | `ROUTE_ALPHA` | `ROUTE_ALPHA` | 1 | 0 |
 | KESTREL | `root_overwrite` | Protocol | `PROTO_Q2` | `PROTO_X7` | 0 | 1 |
 | KESTREL | `root_overwrite` | Route | `ROUTE_BETA` | `ROUTE_ALPHA` | 0 | 1 |
-| KESTREL | `eager_repair` | Protocol | `PROTO_X7` | `PROTO_X7` | 1 | 0 |
-| KESTREL | `eager_repair` | Route | `ROUTE_ALPHA` | `ROUTE_ALPHA` | 1 | 0 |
-| KESTREL | `lazy_revalidation` | Protocol | `PROTO_X7` | `PROTO_X7` | 1 | 0 |
-| KESTREL | `lazy_revalidation` | Route | `ROUTE_ALPHA` | `ROUTE_ALPHA` | 1 | 0 |
+| KESTREL | `eager_repair` (direct write)| Protocol | `PROTO_X7` | `PROTO_X7` | 1 | 0 |
+| KESTREL | `eager_repair` (direct write)| Route | `ROUTE_ALPHA` | `ROUTE_ALPHA` | 1 | 0 |
+| KESTREL | `lazy_revalidation` (filter)| Protocol | `PROTO_X7` | `PROTO_X7` | 1 | 0 |
+| KESTREL | `lazy_revalidation` (filter)| Route | `ROUTE_ALPHA` | `ROUTE_ALPHA` | 1 | 0 |
 
-## 3. Real Measured Performance & Cost Summary
-| Policy Metric | Root Overwrite | Eager Subtree Repair | Lazy Revalidation |
-| :--- | :---: | :---: | :---: |
-| **Nodes Inspected at Mutation** | 1 node | 3 nodes | 3 nodes |
-| **Support Sets Invalidation** | 0 | 2 | 2 |
-| **Immediate LLM Calls at Mutation** | 0 | 2 | **0** |
-| **Query-Time Accuracy ($C_{\text{clean}}$)** | 0.000 (Stale) | 1.000 (Clean) | **1.000 (Clean)** |
-| **Stale Output Rate ($H_{\text{stale}}$)** | **1.000 (Failure)**| 0.000 | **0.000 (Success)**|
+## 3. Revised Conclusion & Hardening Roadmap
+Stale descendants survive root correction and continue driving downstream inference. Filtering dirty records and supplying fresh root context allows read-time behavioral rederivation. 
 
-## 4. Scientific Significance
-This provides unassailable experimental proof: simply writing a new root premise is structurally insufficient for persistent memory. Tracking support dependencies and lazily invalidating dirty descendants is essential for sound, cost-effective belief maintenance.
+However, genuine support-aware dynamic repair (evaluating whether a dirty node still possesses alternative valid support sets in $S(c)$, recomputing only when all paths fail, and persisting refreshed state) remains to be implemented and measured.

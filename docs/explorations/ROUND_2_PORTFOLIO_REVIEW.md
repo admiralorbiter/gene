@@ -1,59 +1,80 @@
-# GENE Exploration Round 2 — Portfolio Review & Phase 11 Synthesis
+# GENE Exploration Round 2 — Portfolio Batch Review & Post-Execution Audit
 
-## 1. Executive Portfolio Scorecard
-Executed under strict substrate freeze (`gene-exploration-round2-base` at commit `2685987`) with a total budget cap of $\le 90$ live calls. Total live compute spent across Round 2: **48 live calls**.
+## 1. Executive Portfolio Scorecard (Post-Review Audit)
+Executed off the frozen substrate base (`gene-exploration-round2-base` at commit `2685987`) with a total budget cap of $\le 90$ live calls. Total live compute spent: **48 live calls**.
 
 ```
-                              ROUND 2 PORTFOLIO SCORECARD
+                              ROUND 2 POST-REVIEW SCORECARD
                               
 ┌──────────┬──────────────────────┬───────┬───────────────────────────┬────────────────────────────────────────┐
-│ Track    │ Focus Area           │ Calls │ Final Status              │ Core Empirical Finding                 │
+│ Track    │ Focus Area           │ Calls │ Final Post-Review Status  │ Core Finding / Confound Identified     │
 ├──────────┼──────────────────────┼───────┼───────────────────────────┼────────────────────────────────────────┤
-│ Track G  │ Multi-Justification  │   12  │ PROMISING FRONTIER        │ Deterministic S(c) & κ(c) validated;   │
-│          │                      │       │                           │ model requires explicit kernel filter. │
+│ Track A2 │ Dynamic Memory       │   12  │ PROMISING — HARDEN        │ Stale descendants survive overwrite;   │
+│          │                      │       │                           │ read-time rederivation works on filter.│
 ├──────────┼──────────────────────┼───────┼───────────────────────────┼────────────────────────────────────────┤
-│ Track B2 │ Monoculture Hardened │   16  │ VALIDATED DISCOVERY       │ Unsteered models count surface votes;  │
-│          │                      │       │                           │ blind to root-sharing without kernel.  │
+│ Track B2 │ Monoculture Hardened │   16  │ PROMISING — HARDEN        │ Models don't spontaneously discount;   │
+│          │                      │       │                           │ residual token/position bias remains.  │
 ├──────────┼──────────────────────┼───────┼───────────────────────────┼────────────────────────────────────────┤
-│ Track A2 │ Dynamic Repair       │   12  │ VALIDATED BREAKTHROUGH    │ In-situ lazy revalidation matches 100% │
-│          │                      │       │                           │ clean coverage at zero proactive cost. │
+│ Track G  │ Multi-Justification  │   12  │ G-Formal: VALIDATED       │ Minimal support algebra S(c) verified; │
+│          │                      │       │ G-Live: CONFOUNDED        │ live run had schema count leak & no CTL│
 ├──────────┼──────────────────────┼───────┼───────────────────────────┼────────────────────────────────────────┤
-│ Track M  │ Model Calibration    │    8  │ GATEWAY CONFIRMED         │ Qwen/Llama fail zero-shot gateway;     │
-│          │                      │       │                           │ formal ModelAdapter required for scale.│
+│ Track M  │ Model Calibration    │    8  │ VALIDATED METHODOLOGY     │ Qwen/Llama fail zero-shot gateway;     │
+│          │                      │       │                           │ model-specific adapters required.      │
 └──────────┴──────────────────────┴───────┴───────────────────────────┴────────────────────────────────────────┘
 ```
 
 ---
 
-## 2. Synthesis of Discoveries Across Round 2
+## 2. Detailed Track-by-Track Post-Review Audits
 
-### 1. Track A2: The Necessity of Dynamic Belief Maintenance
-- **Root Overwrite Fails Structurally ($H_{\text{stale}} = 1.000$):** In an active database store, updating the root record alone leaves cached intermediate lemmas untouched, causing downstream reasoners to continue emitting obsolete conclusions.
-- **Lazy Revalidation Achieves Pareto Dominance:** Marking downstream nodes dirty upon upstream mutation and revalidating only upon query retrieval achieves identical $100\%$ clean recovery ($C_{\text{clean}} = 1.000$) while reducing proactive LLM mutation calls to zero ($K = 0$).
+### Track A2: Dynamic Memory Repair & Lazy Revalidation
+- **What Survives:** Root overwrite fails completely ($H_{\text{stale}} = 4/4$) in active SQLite storage because stale intermediate lemmas remain retrievable. Excluding dirty records and supplying clean root context allows read-time rederivation ($4/4$ clean).
+- **What Was Overextended / Corrected:** Eager repair wrote hard-coded values directly to SQLite without issuing LLM calls (`llm_calls = 0`). Lazy revalidation did not evaluate minimal support sets or rewrite persistent records; it operated as read-time dirty-state filtering.
+- **Status:** **PROMISING — HARDEN.**
 
-### 2. Track B2: The Vulnerability to Epistemic Monoculture
-- **Ancestral Blindness Under Neutral Prompts:** When prompt steering is removed, document count is fixed ($N=5$), and root tokens are opaque, language models act as pure repetition counters. A $3:2$ raw surface count completely dominates a $1:2$ root disadvantage ($P(Y) = 1.000$).
-- **Architectural Implication:** Autonomous agents cannot compute effective sample size ($N_{\text{eff}}$) spontaneously in context. The **Epistemic Kernel must track root diversity externally** to prevent manufactured consensus.
+### Track B2: Monoculture Hardening
+- **What Survives:** Under matched $N=5$ documents and opaque roots, Gemma did not spontaneously discount repeated reports when told they shared `root_R1` (abstained in both `concur_X` and `conflict_roots_Y`).
+- **What Was Overextended / Corrected:** The initial conclusion that models are "pure repetition counters" was contradicted by $P(X) = 0.000$ on $X$-majority vs $P(Y) = 0.750$ on $Y$-majority. There was an un-counterbalanced positional coupling (majority claims placed in earlier slots) and token preference asymmetry (`PROTO_X` vs `PROTO_Y`).
+- **Status:** **PROMISING — HARDEN.**
 
-### 3. Track G: Multi-Justification & The Epistemic Kernel Frontier
-- **Mathematical Soundness:** Minimal support sets $S(c)$ and hitting set cut resilience $\kappa(c)$ cleanly represent non-destructive alternative survival ($AB + CD$) and shared-root collapse ($AX + AY$).
-- **Cognitive Boundary:** When faced with raw revocation clauses in context, neural models default to conservative global abstention. The Epistemic Kernel must resolve minimal support sets deterministically and present only surviving, pruned premises to the reasoner.
+### Track G: Multi-Justification & Epistemic Recombination
+- **G-Formal Engine:** `MinimalSupportEngine` is mathematically validated across all 4 canonical geometries ($AB \to C$, $AB + DE \to C$, $AX + AY \to C$, $AI + BH \to C$).
+- **G-Live Assay:** Confounded. The prompt schema contained `"surviving_paths_count": 0` in both conditions, giving the wrong expected value ($0$ instead of $1$) for `independent_survival`. No positive control arm without revocation was tested.
+- **Status:** **G-Formal: VALIDATED FORMAL PROTOTYPE; G-Live: CONFOUNDED.**
 
-### 4. Track M: Measurement Invariance as Gating Infrastructure
-- **Sub-7B Models Require Adapters:** Zero-shot prompts calibrated on Gemma 3:12B do not transfer to `qwen2.5:3b` or `llama3.2:3b`. Both models fail the 4-case calibration gateway (copying schema placeholders or hallucinating).
+### Track M: Measurement Invariance & Model Calibration Gateway
+- **What Survives:** Both `qwen2.5:3b` and `llama3.2:3b` failed the 4-case zero-shot gateway ($1/4$ pass), demonstrating that response-contract calibration is strictly model-dependent.
+- **Status:** **VALIDATED METHODOLOGY RESULT.**
 
 ---
 
-## 3. The Definitive Phase 11 Recommendation
+## 3. Meta-Scientific & Process Lessons
 
-All three scientific tracks (G, B2, A2) converge upon the foundational moonshot abstraction:
+### 1. The Evaluation Layer Gap
+The `ExplorationHarness` was upgraded to support structured `exploration_evaluations` records, but none of the four runners invoked `record_evaluation()`, resulting in 0 evaluation records across all 48 calls. Future batches must enforce $N_{\text{evaluations}} = N_{\text{calls}}$ in CI.
 
-### **Phase 11: Support-Aware Epistemic Maintenance (The Epistemic Kernel)**
+### 2. Stage-1 Adversarial Review Iteration
+The Stage-1 preflight review successfully eliminated several Round-1 confounds, but missed three subtle assay-level errors:
+- Track G: Auxiliary schema answer count leak (`"surviving_paths_count": 0`).
+- Track B2: Un-counterbalanced document position coupling.
+- Track A2: Simulated eager repair LLM costs.
 
-Rather than treating "Recovery" and "Monoculture" as separate ad-hoc phases, **Phase 11 unifies them under the algebra of Minimal Epistemic Support Sets $S(c)$ and Cut Sets $\kappa(c)$**:
+Future Stage-1 reviews must execute **mechanical contrast audits**:
+1. Does every schema field vary correctly across conditions?
+2. Are document presentation positions independently permuted from claim majority?
+3. Does every claimed cost metric correspond to an executed, logged operation?
+4. Does an un-manipulated positive control pass in the exact prompt syntax?
 
-1. **Kernel Primitive 1 (Support-Aware Dynamic Repair):** When an ancestor changes, the kernel invalidates broken support sets in $S(c)$. Claims with surviving alternative support paths ($P(c)|_{A=0} > 0$) remain active without recomputation.
-2. **Kernel Primitive 2 (Effective Root Diversity $N_{\text{eff}}$):** During retrieval ranking, candidate evidence sets are discounted by root overlap:
-   $$N_{\text{eff}} = \frac{1}{\sum_{r} p_r^2}$$
-   preventing monoculture echo chambers from hijacking downstream adjudication.
-3. **Kernel Primitive 3 (Non-Destructive Lineage Immunity):** Upstream quarantine prunes infected derivation paths without destroying multiply-supported valid knowledge, eliminating epistemic autoimmunity.
+---
+
+## 4. Current State & Next Steps
+
+Phase 11 has **not** been earned yet.
+
+However, the four exploratory tracks converge upon a clear next research frontier:
+
+> **From Lineage Trees to Minimal Support Environments:**
+> A descendant's relationship to an invalidated ancestor is insufficient to determine whether the descendant should survive. Durable belief maintenance requires evaluating whether any valid independent justification remains in $S(c)$.
+
+The single highest-value experiment on the board is now:
+Testing **non-destructive lineage survival ($AB + DE \to C$) vs shared-root collapse ($AX + AY \to C$)** under a clean, un-confounded live assay without schema count leaks and with an un-manipulated positive control baseline.

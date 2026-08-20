@@ -5,7 +5,7 @@
   "artifacts": {
     "track_a2_dynamic_repair.db": {
       "file_path": "runs/explore_round2/track_a2_dynamic_repair.db",
-      "sha256": "e0a720690433b7154e243eda3f9e528d03fe063d31146d1a913948f77eb0c2ed",
+      "sha256": "d2ac19dfb0c4cb4e4b810c9643f752a847925aa5ee947eac018c120198e6841d",
       "size_bytes": 65536,
       "tables": [
         "exploration_runs",
@@ -15,12 +15,12 @@
       "row_counts": {
         "exploration_runs": 1,
         "exploration_calls": 12,
-        "exploration_evaluations": 0
+        "exploration_evaluations": 12
       }
     },
     "track_b2_monoculture.db": {
       "file_path": "runs/explore_round2/track_b2_monoculture.db",
-      "sha256": "8e90e54ff12659df8f850e02fab37bda3f6fda01621c9870c71c181ab76b8fde",
+      "sha256": "ed9ee90cf6eab5d7008dda5558daa516761790aba6a81d7667f1a60c0b221e86",
       "size_bytes": 65536,
       "tables": [
         "exploration_runs",
@@ -30,12 +30,12 @@
       "row_counts": {
         "exploration_runs": 1,
         "exploration_calls": 16,
-        "exploration_evaluations": 0
+        "exploration_evaluations": 16
       }
     },
     "track_g_multi_justification.db": {
       "file_path": "runs/explore_round2/track_g_multi_justification.db",
-      "sha256": "4700b6b13fcd7bdee2950ca4f6cf05a2b45d6f39c4520ae570c911118c91e090",
+      "sha256": "9b905ce349c0281fa4186607d98fa15ea2781106fabb938272d1658e42de1e1d",
       "size_bytes": 65536,
       "tables": [
         "exploration_runs",
@@ -45,12 +45,12 @@
       "row_counts": {
         "exploration_runs": 1,
         "exploration_calls": 12,
-        "exploration_evaluations": 0
+        "exploration_evaluations": 12
       }
     },
     "track_m_calibration.db": {
       "file_path": "runs/explore_round2/track_m_calibration.db",
-      "sha256": "15f462c5869a9cf1ba181e9b77612fed3c30f2b4b7bd218239e35327ceb41fc4",
+      "sha256": "9b597e48f95feab44f9929129e4d06df35b451cf779128d1b388b269fe101f6e",
       "size_bytes": 53248,
       "tables": [
         "exploration_runs",
@@ -60,7 +60,7 @@
       "row_counts": {
         "exploration_runs": 1,
         "exploration_calls": 8,
-        "exploration_evaluations": 0
+        "exploration_evaluations": 8
       }
     }
   }
