@@ -1,12 +1,9 @@
 # GENE Experimental Protocol
 
-## Status
-
-**Phase:** Experiment 0 FROZEN & CALIBRATED (`gene-exp0-freeze-v1`) | Experiment 1 READY FOR IMPLEMENTATION
-
-**Scope:**
-- **Experiment 0 (Lineage Observability & Causal Assay):** Complete & Frozen. 100.0% calibration achieved across counterbalanced factorial micro-worlds. Full report: `docs/EXPERIMENT_0_FINAL_REPORT.md`.
-- **Experiment 1 (Single Mutation Dynamics):** Protocol defined in `docs/EXPERIMENT_1_PROTOCOL.md`. Ready to introduce initial mutated allele.
+> [!NOTE]
+> **STATUS: HISTORICAL FROZEN FOUNDATIONAL PROTOCOL**  
+> This protocol documents the early architecture through Experiment 0 / 1A. All subsequent research phases (Phase 8 through Phase 10.5) have been completed and frozen into canonical reports and schemas.  
+> See [`docs/ARCHITECTURE.md`](file:///C:/Users/admir/Github/gene/docs/ARCHITECTURE.md), [`docs/DEVELOPMENT_PLAN.md`](file:///C:/Users/admir/Github/gene/docs/DEVELOPMENT_PLAN.md), and [`docs/results/`](file:///C:/Users/admir/Github/gene/docs/results/) for current execution status.
 
 ---
 

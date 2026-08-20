@@ -11,27 +11,27 @@
 
 ---
 
-## 1. Executive Summary & Core Mechanistic Discoveries
+### 1. Executive Summary & Core Mechanistic Discoveries
 
-Experiment 1B-C2b was designed to resolve the precise mechanism of pseudo-path formation and evaluate a mechanical **Layer 2 Epistemic Proofreader** (structural unification filter) operating on top of Layer 1 Memory Governance.
+Experiment 1B-C2b was designed to resolve the precise mechanism of pseudo-path formation and evaluate a mechanical **Layer 2 Structural Epistemic Proofreader** (support-certificate validator) operating on top of Layer 1 Memory Governance.
 
 ### Key Mechanistic Discoveries:
 
 1. **Mapping the Pseudo-Path Trigger Surface**:
-   - **Mismatched Routes Induce 100% Deterministic Abstention ($12 / 12 = 1.000$)**:
-     When a mismatched neutral route was explicitly provided—whether attached to the target station (`target_station_wrong_route`) or the foreign station (`foreign_station_wrong_route`)—the model recognized that the rule antecedent was not satisfied and produced **100% clean abstentions** ($(\emptyset, 0, 1, 1, 1)$, `clean_abstention`).
+   - **Mismatched Routes Elicit Clean Abstention ($12 / 12 = 1.000$ in this panel)**:
+     When a mismatched neutral route was explicitly provided—whether attached to the target station (`target_station_wrong_route`) or the foreign station (`foreign_station_wrong_route`)—the model recognized that the rule antecedent was not satisfied and produced **12 / 12 observed clean abstentions** ($(\emptyset, 0, 1, 1, 1)$, `clean_abstention`).
    - **Zero-Route Contexts Induce Single-Premise Jumping ($6 / 6 = 1.000$)**:
-     When route facts were completely absent (`no_route`), the model saw only the facility grid and jumped to the rule conclusion across both ecologies, producing unsupported concrete claims ($(1, 0, 0, 0, 1)$, `epistemic`).
-   - **Foreign Exact-Route Matches Exacerbate Cross-Binding in Asymmetric Roles**:
-     When the foreign station carried the target's required route (`foreign_station_target_route`), the swapped ecology suffered **3/3 cross-entity variable binding errors**, whereas the forward ecology produced **3/3 clean abstentions**.
+     When route facts were completely absent (`no_route`), the model observed only the facility grid and jumped to the rule conclusion across both ecologies, producing unsupported concrete claims ($(1, 0, 0, 0, 1)$, `epistemic`).
+   - **Foreign Exact-Route Matches Elicit Asymmetric Cross-Binding**:
+     When the foreign station carried the target's required route (`foreign_station_target_route`), a foreign exact-match route was sufficient to trigger cross-entity binding in the swapped configuration (**3 / 3 active errors**), whereas the role-swapped forward configuration produced **3 / 3 clean abstentions**.
 
 2. **Validation of the Two-Layer Epistemic Defense Architecture**:
    - **Layer 1 (Memory Governance)** successfully removed legitimate support paths in all 24 broken-path calls ($X_{\text{path}} = 0$).
-   - **Layer 2 (Structural Epistemic Proofreader / Support-Certificate Validator)** mechanically verified whether cited parent memories unified into valid rule instantiations (verifying subject and predicate alignment against rule antecedents).
+   - **Layer 2 (Structural Epistemic Proofreader / Support-Certificate Validator)** mechanically verified whether cited parent memories unified into valid rule instantiations (verifying subject and predicate alignment against rule antecedents via first-order substitution).
    - **Evolutionary Transmission Metrics (Expression vs. Heritability)**:
-     - **Expression Rate**: $\mu_{\text{expression}} = P(\text{unsupported output}) = 12 / 30 = \mathbf{0.400}$ (and $12 / 12 = \mathbf{1.000}$ under broken-path opportunities).
-     - **Heritable Mutation Rate**: $\mu_{\text{heritable}} = P(\text{unsupported claim admitted to memory}) = \mathbf{0 / 30 = 0.000}$ (and $\mathbf{0 / 12 = 0.000}$ under broken-path opportunities).
-     - **Support-Certificate Verification**: $6 / 6 = \mathbf{100.0\%}$ legitimate derivations admitted (`PASS_VALID_DERIVATION`); $12 / 12 = \mathbf{100.0\%}$ clean abstentions maintained as inactive (`PASS_ABSTENTION`); $12 / 12 = \mathbf{100.0\%}$ invalid claims rejected (`REJECT_UNIFICATION_FAILURE`).
+     - **Phenotypic Expression Rate**: $\mu_{\text{expression}} = P(\text{unsupported claim emitted}) = \frac{9}{30} = \mathbf{0.300}$ (and $\frac{9}{24} = \mathbf{0.375}$ under broken-path opportunities).
+     - **Heritable Mutation Rate**: $\mu_{\text{heritable}} = P(\text{unsupported claim admitted to persistent memory}) = \frac{0}{30} = \mathbf{0.000}$ (and $\frac{0}{24} = \mathbf{0.000}$ under broken-path opportunities).
+     - **Support-Certificate Verification**: $6 / 6 = \mathbf{100.0\%}$ legitimate derivations admitted (`PASS_VALID_DERIVATION`); $15 / 15 = \mathbf{100.0\%}$ clean abstentions maintained as inactive (`PASS_ABSTENTION`); $9 / 9 = \mathbf{100.0\%}$ unsupported concrete outputs rejected (`REJECT_UNIFICATION_FAILURE`).
      - **Boundary Note**: The structural proofreader verifies that a valid structural certificate was provided; it does *not* prove causal derivation ($P_{\text{reported}} \neq P_{\text{causal}}$).
 
 ---
@@ -64,49 +64,49 @@ Experiment 1B-C2b was designed to resolve the precise mechanism of pseudo-path f
 
 | Call # | Role | Condition | Rep | Target Station | Path State | Emitted Object | Phenotype | Proofreader Verdict | Proofreader Reason |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **01** | `swapped` | `no_route` | 0 | KESTREL | **BROKEN** | `AUTH_ALPHA_KESTREL` | `epistemic` | `REJECT_UNIFICATION_FAILURE` | Missing valid route 'ROUTE_SWIFT_KESTREL' for KESTREL |
-| **02** | `swapped` | `no_route` | 1 | KESTREL | **BROKEN** | `AUTH_ALPHA_KESTREL` | `epistemic` | `REJECT_UNIFICATION_FAILURE` | Missing valid route 'ROUTE_SWIFT_KESTREL' for KESTREL |
-| **03** | `swapped` | `no_route` | 2 | KESTREL | **BROKEN** | `AUTH_ALPHA_KESTREL` | `epistemic` | `REJECT_UNIFICATION_FAILURE` | Missing valid route 'ROUTE_SWIFT_KESTREL' for KESTREL |
-| **04** | `swapped` | `foreign_wrong` | 0 | KESTREL | **BROKEN** | `UNKNOWN` | `clean_abstention` | `PASS_ABSTENTION` | Clean abstention |
-| **05** | `swapped` | `foreign_wrong` | 1 | KESTREL | **BROKEN** | `UNKNOWN` | `clean_abstention` | `PASS_ABSTENTION` | Clean abstention |
-| **06** | `swapped` | `foreign_wrong` | 2 | KESTREL | **BROKEN** | `UNKNOWN` | `clean_abstention` | `PASS_ABSTENTION` | Clean abstention |
-| **07** | `swapped` | `target_wrong` | 0 | KESTREL | **BROKEN** | `UNKNOWN` | `clean_abstention` | `PASS_ABSTENTION` | Clean abstention |
-| **08** | `swapped` | `target_wrong` | 1 | KESTREL | **BROKEN** | `UNKNOWN` | `clean_abstention` | `PASS_ABSTENTION` | Clean abstention |
-| **09** | `swapped` | `target_wrong` | 2 | KESTREL | **BROKEN** | `UNKNOWN` | `clean_abstention` | `PASS_ABSTENTION` | Clean abstention |
-| **10** | `swapped` | `foreign_target` | 0 | KESTREL | **BROKEN** | `AUTH_ALPHA_KESTREL` | `epistemic` | `REJECT_UNIFICATION_FAILURE` | Missing valid route 'ROUTE_SWIFT_KESTREL' for KESTREL |
-| **11** | `swapped` | `foreign_target` | 1 | KESTREL | **BROKEN** | `AUTH_ALPHA_KESTREL` | `epistemic` | `REJECT_UNIFICATION_FAILURE` | Missing valid route 'ROUTE_SWIFT_KESTREL' for KESTREL |
-| **12** | `swapped` | `foreign_target` | 2 | KESTREL | **BROKEN** | `AUTH_ALPHA_KESTREL` | `epistemic` | `REJECT_UNIFICATION_FAILURE` | Missing valid route 'ROUTE_SWIFT_KESTREL' for KESTREL |
-| **13** | `swapped` | `valid_target` | 0 | KESTREL | **COMPLETE** | `AUTH_ALPHA_KESTREL` | `healthy` | `PASS_VALID_DERIVATION` | All antecedents structurally unified |
-| **14** | `swapped` | `valid_target` | 1 | KESTREL | **COMPLETE** | `AUTH_ALPHA_KESTREL` | `healthy` | `PASS_VALID_DERIVATION` | All antecedents structurally unified |
-| **15** | `swapped` | `valid_target` | 2 | KESTREL | **COMPLETE** | `AUTH_ALPHA_KESTREL` | `healthy` | `PASS_VALID_DERIVATION` | All antecedents structurally unified |
-| **16** | `forward` | `no_route` | 0 | VELORA | **BROKEN** | `AUTH_ALPHA_VELORA` | `epistemic` | `REJECT_UNIFICATION_FAILURE` | Missing valid route 'ROUTE_SWIFT_VELORA' for VELORA |
-| **17** | `forward` | `no_route` | 1 | VELORA | **BROKEN** | `AUTH_ALPHA_VELORA` | `epistemic` | `REJECT_UNIFICATION_FAILURE` | Missing valid route 'ROUTE_SWIFT_VELORA' for VELORA |
-| **18** | `forward` | `no_route` | 2 | VELORA | **BROKEN** | `AUTH_ALPHA_VELORA` | `epistemic` | `REJECT_UNIFICATION_FAILURE` | Missing valid route 'ROUTE_SWIFT_VELORA' for VELORA |
-| **19** | `forward` | `foreign_wrong` | 0 | VELORA | **BROKEN** | `UNKNOWN` | `clean_abstention` | `PASS_ABSTENTION` | Clean abstention |
-| **20** | `forward` | `foreign_wrong` | 1 | VELORA | **BROKEN** | `UNKNOWN` | `clean_abstention` | `PASS_ABSTENTION` | Clean abstention |
-| **21** | `forward` | `foreign_wrong` | 2 | VELORA | **BROKEN** | `UNKNOWN` | `clean_abstention` | `PASS_ABSTENTION` | Clean abstention |
-| **22** | `forward` | `target_wrong` | 0 | VELORA | **BROKEN** | `UNKNOWN` | `clean_abstention` | `PASS_ABSTENTION` | Clean abstention |
-| **23** | `forward` | `target_wrong` | 1 | VELORA | **BROKEN** | `UNKNOWN` | `clean_abstention` | `PASS_ABSTENTION` | Clean abstention |
-| **24** | `forward` | `target_wrong` | 2 | VELORA | **BROKEN** | `UNKNOWN` | `clean_abstention` | `PASS_ABSTENTION` | Clean abstention |
-| **25** | `forward` | `foreign_target` | 0 | VELORA | **BROKEN** | `UNKNOWN` | `clean_abstention` | `PASS_ABSTENTION` | Clean abstention |
-| **26** | `forward` | `foreign_target` | 1 | VELORA | **BROKEN** | `UNKNOWN` | `clean_abstention` | `PASS_ABSTENTION` | Clean abstention |
-| **27** | `forward` | `foreign_target` | 2 | VELORA | **BROKEN** | `UNKNOWN` | `clean_abstention` | `PASS_ABSTENTION` | Clean abstention |
-| **28** | `forward` | `valid_target` | 0 | VELORA | **COMPLETE** | `AUTH_ALPHA_VELORA` | `healthy` | `PASS_VALID_DERIVATION` | All antecedents structurally unified |
-| **29** | `forward` | `valid_target` | 1 | VELORA | **COMPLETE** | `AUTH_ALPHA_VELORA` | `healthy` | `PASS_VALID_DERIVATION` | All antecedents structurally unified |
-| **30** | `forward` | `valid_target` | 2 | VELORA | **COMPLETE** | `AUTH_ALPHA_VELORA` | `healthy` | `PASS_VALID_DERIVATION` | All antecedents structurally unified |
+| **01** | `swapped` | `no_route` | 0 | KESTREL | **BROKEN** | `AUTH_ALPHA_KESTREL` | `epistemic` | `REJECT_UNIFICATION_FAILURE` | Unsatisfied antecedents: (KESTREL, transit_route, ROUTE_SWIFT_KESTREL) |
+| **02** | `swapped` | `no_route` | 1 | KESTREL | **BROKEN** | `AUTH_ALPHA_KESTREL` | `epistemic` | `REJECT_UNIFICATION_FAILURE` | Unsatisfied antecedents: (KESTREL, transit_route, ROUTE_SWIFT_KESTREL) |
+| **03** | `swapped` | `no_route` | 2 | KESTREL | **BROKEN** | `AUTH_ALPHA_KESTREL` | `epistemic` | `REJECT_UNIFICATION_FAILURE` | Unsatisfied antecedents: (KESTREL, transit_route, ROUTE_SWIFT_KESTREL) |
+| **04** | `swapped` | `foreign_wrong` | 0 | KESTREL | **BROKEN** | `UNKNOWN` | `clean_abstention` | `PASS_ABSTENTION` | Clean contract-consistent abstention |
+| **05** | `swapped` | `foreign_wrong` | 1 | KESTREL | **BROKEN** | `UNKNOWN` | `clean_abstention` | `PASS_ABSTENTION` | Clean contract-consistent abstention |
+| **06** | `swapped` | `foreign_wrong` | 2 | KESTREL | **BROKEN** | `UNKNOWN` | `clean_abstention` | `PASS_ABSTENTION` | Clean contract-consistent abstention |
+| **07** | `swapped` | `target_wrong` | 0 | KESTREL | **BROKEN** | `UNKNOWN` | `clean_abstention` | `PASS_ABSTENTION` | Clean contract-consistent abstention |
+| **08** | `swapped` | `target_wrong` | 1 | KESTREL | **BROKEN** | `UNKNOWN` | `clean_abstention` | `PASS_ABSTENTION` | Clean contract-consistent abstention |
+| **09** | `swapped` | `target_wrong` | 2 | KESTREL | **BROKEN** | `UNKNOWN` | `clean_abstention` | `PASS_ABSTENTION` | Clean contract-consistent abstention |
+| **10** | `swapped` | `foreign_target` | 0 | KESTREL | **BROKEN** | `AUTH_ALPHA_KESTREL` | `epistemic` | `REJECT_UNIFICATION_FAILURE` | Unsatisfied antecedents: (KESTREL, transit_route, ROUTE_SWIFT_KESTREL) |
+| **11** | `swapped` | `foreign_target` | 1 | KESTREL | **BROKEN** | `AUTH_ALPHA_KESTREL` | `epistemic` | `REJECT_UNIFICATION_FAILURE` | Unsatisfied antecedents: (KESTREL, transit_route, ROUTE_SWIFT_KESTREL) |
+| **12** | `swapped` | `foreign_target` | 2 | KESTREL | **BROKEN** | `AUTH_ALPHA_KESTREL` | `epistemic` | `REJECT_UNIFICATION_FAILURE` | Unsatisfied antecedents: (KESTREL, transit_route, ROUTE_SWIFT_KESTREL) |
+| **13** | `swapped` | `valid_target` | 0 | KESTREL | **COMPLETE** | `AUTH_ALPHA_KESTREL` | `healthy` | `PASS_VALID_DERIVATION` | All rule antecedents unified under ?s=KESTREL |
+| **14** | `swapped` | `valid_target` | 1 | KESTREL | **COMPLETE** | `AUTH_ALPHA_KESTREL` | `healthy` | `PASS_VALID_DERIVATION` | All rule antecedents unified under ?s=KESTREL |
+| **15** | `swapped` | `valid_target` | 2 | KESTREL | **COMPLETE** | `AUTH_ALPHA_KESTREL` | `healthy` | `PASS_VALID_DERIVATION` | All rule antecedents unified under ?s=KESTREL |
+| **16** | `forward` | `no_route` | 0 | VELORA | **BROKEN** | `AUTH_ALPHA_VELORA` | `epistemic` | `REJECT_UNIFICATION_FAILURE` | Unsatisfied antecedents: (VELORA, transit_route, ROUTE_SWIFT_VELORA) |
+| **17** | `forward` | `no_route` | 1 | VELORA | **BROKEN** | `AUTH_ALPHA_VELORA` | `epistemic` | `REJECT_UNIFICATION_FAILURE` | Unsatisfied antecedents: (VELORA, transit_route, ROUTE_SWIFT_VELORA) |
+| **18** | `forward` | `no_route` | 2 | VELORA | **BROKEN** | `AUTH_ALPHA_VELORA` | `epistemic` | `REJECT_UNIFICATION_FAILURE` | Unsatisfied antecedents: (VELORA, transit_route, ROUTE_SWIFT_VELORA) |
+| **19** | `forward` | `foreign_wrong` | 0 | VELORA | **BROKEN** | `UNKNOWN` | `clean_abstention` | `PASS_ABSTENTION` | Clean contract-consistent abstention |
+| **20** | `forward` | `foreign_wrong` | 1 | VELORA | **BROKEN** | `UNKNOWN` | `clean_abstention` | `PASS_ABSTENTION` | Clean contract-consistent abstention |
+| **21** | `forward` | `foreign_wrong` | 2 | VELORA | **BROKEN** | `UNKNOWN` | `clean_abstention` | `PASS_ABSTENTION` | Clean contract-consistent abstention |
+| **22** | `forward` | `target_wrong` | 0 | VELORA | **BROKEN** | `UNKNOWN` | `clean_abstention` | `PASS_ABSTENTION` | Clean contract-consistent abstention |
+| **23** | `forward` | `target_wrong` | 1 | VELORA | **BROKEN** | `UNKNOWN` | `clean_abstention` | `PASS_ABSTENTION` | Clean contract-consistent abstention |
+| **24** | `forward` | `target_wrong` | 2 | VELORA | **BROKEN** | `UNKNOWN` | `clean_abstention` | `PASS_ABSTENTION` | Clean contract-consistent abstention |
+| **25** | `forward` | `foreign_target` | 0 | VELORA | **BROKEN** | `UNKNOWN` | `clean_abstention` | `PASS_ABSTENTION` | Clean contract-consistent abstention |
+| **26** | `forward` | `foreign_target` | 1 | VELORA | **BROKEN** | `UNKNOWN` | `clean_abstention` | `PASS_ABSTENTION` | Clean contract-consistent abstention |
+| **27** | `forward` | `foreign_target` | 2 | VELORA | **BROKEN** | `UNKNOWN` | `clean_abstention` | `PASS_ABSTENTION` | Clean contract-consistent abstention |
+| **28** | `forward` | `valid_target` | 0 | VELORA | **COMPLETE** | `AUTH_ALPHA_VELORA` | `healthy` | `PASS_VALID_DERIVATION` | All rule antecedents unified under ?s=VELORA |
+| **29** | `forward` | `valid_target` | 1 | VELORA | **COMPLETE** | `AUTH_ALPHA_VELORA` | `healthy` | `PASS_VALID_DERIVATION` | All rule antecedents unified under ?s=VELORA |
+| **30** | `forward` | `valid_target` | 2 | VELORA | **COMPLETE** | `AUTH_ALPHA_VELORA` | `healthy` | `PASS_VALID_DERIVATION` | All rule antecedents unified under ?s=VELORA |
 
 ---
 
 ## 4. Scientific Synthesis & Architectural Conclusions
 
 1. **The Mechanism of Pseudo-Path Formation**:
-   - Neural reasoners do not fail randomly; they exhibit structured failure modes when evidence paths are broken.
-   - When evidence is partially present (e.g. facility grid present, route missing), the model jumps to a rule conclusion if no competing route fact is visible.
-   - When a mismatched route fact is present, the attention mechanism successfully attends to it, recognizes the mismatch with the rule, and halts with clean abstention.
+   - Neural reasoners exhibit structured failure modes when evidence paths are broken.
+   - When evidence is partially present (e.g. facility grid present, route missing), the model jumped to a rule conclusion across the tested prompts when zero competing route facts were visible.
+   - When explicit mismatching route evidence was present, the model consistently abstained with clean, contract-consistent `UNKNOWN` outputs.
 2. **The Power of Two-Layer Defense**:
-   - **Layer 1 (Memory Governance)** successfully reduces path availability and stops legitimate transmission of mutated lineages.
-   - **Layer 2 (Epistemic Proofreading)** acts as a post-generation semantic firewall, verifying that cited premises structurally satisfy the deductive antecedents before admitting new occurrence nodes into shared memory.
-   - Combined, Layer 1 + Layer 2 achieve **100% containment of both lineage mutations and pseudo-path errors** without losing valid healthy deductions.
+   - **Layer 1 (Memory Governance)** successfully reduces path availability and stops legitimate transmission of mutated lineages ($X_{\text{path}} = 0$).
+   - **Layer 2 (Structural Epistemic Proofreader / Support-Certificate Validator)** acts as a post-generation semantic firewall, verifying that cited premises structurally unify under substitution $\sigma = \{?s \mapsto \text{target\_station}\}$ before admitting new occurrence nodes into shared memory.
+   - Combined, Layer 1 + Layer 2 achieve **100% containment of both lineage mutations and pseudo-path errors** ($\mu_{\text{heritable}} = 0.000$) without losing valid healthy deductions.
 
 ---
 

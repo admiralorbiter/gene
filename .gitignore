@@ -28,6 +28,7 @@ runs/*
 !runs/.gitkeep
 data/*
 !data/.gitkeep
+!data/canonical_results_manifest.json
 
 # IDEs and Editors
 .vscode/

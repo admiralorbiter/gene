@@ -565,11 +565,20 @@ Epistemic reliability in multi-agent and reasoning ecologies requires two struct
    - **Failure Mode**: Transient pseudo-path formation, cross-entity variable binding shortcuts, and single-premise conclusion jumping.
 
 ### 17.3 Evolutionary Transmission Dynamics: Expression vs. Heritability
-The integration of Layer 1 memory governance and Layer 2 structural proofreading transforms the transmission equation:
+The integration of Layer 1 memory governance and Layer 2 structural proofreading transforms the general multi-generation branching reproduction equation:
 \[
-R_{\text{bad}} \approx X_{\text{path}} \times \tau \times W_{\text{proofread}}
+q_{\text{bad}} = X_{\text{path}} \times \tau \times W_{\text{proofread}}
 \]
-Where we distinguish:
+\[
+R_{\text{bad}} \approx b \cdot q_{\text{bad}} = b \cdot X_{\text{path}} \cdot \tau \cdot W_{\text{proofread}}
+\]
+where:
+- $b$ is the expected branching factor / reproductive opportunity capacity per parent node;
+- $X_{\text{path}}$ is the retrieval support-path availability ($X_{\text{path}} = P(\text{full support retrieved})$), modulated by Layer 1 Lineage Governance;
+- $\tau$ is local transmission fidelity ($\tau = P(\text{descendant derived} \mid \text{full support})$);
+- $W_{\text{proofread}}$ is the selective write admission rate ($W_{\text{proofread}} = P(\text{claim admitted to memory} \mid \text{claim generated})$), governed by the Layer 2 Structural Proofreader.
+
+We formally separate:
 - **Phenotypic Expression Rate**:
   \[
   \mu_{\text{expression}} = P(\text{unsupported concrete claim emitted})
@@ -578,6 +587,14 @@ Where we distinguish:
   \[
   \mu_{\text{heritable}} = P(\text{unsupported claim admitted to persistent memory}) = \mu_{\text{expression}} \times W_{\text{proofread}}
   \]
+
+In Experiment 1B-C2b on Gemma 3:12B, across 30 invocations:
+\[
+\mu_{\text{expression}} = \frac{9}{30} = 0.300 \quad \left(\frac{9}{24} = 0.375 \text{ on broken-path opportunities}\right)
+\]
+\[
+\mu_{\text{heritable}} = \frac{0}{30} = \mathbf{0.000} \quad \left(\frac{0}{24} = \mathbf{0.000} \text{ on broken-path opportunities}\right)
+\]
 
 Transient reasoning errors may occur phenotypically ($\mu_{\text{expression}} > 0$) without entering the germline ($\mu_{\text{heritable}} = 0$) when protected by a structural proofreading firewall.
 
@@ -593,6 +610,32 @@ Reproductive outcome is formally decoupled from epistemic state:
   - `de_novo_error`: $(0, 0, 0, 0, 1)$ — Locally underivable ($D_{\text{ctx}}=0$) and globally false ($T^*=0$).
   - `clean_abstention`: $(\emptyset, 0, 1, 1, 1)$ — Locally underivable ($D_{\text{ctx}}=0$), model correctly abstains with UNKNOWN and claims insufficient evidence ($T^* = \emptyset$).
   - `contract_failure`: $(\emptyset, 0, 1, 0, 0)$ or $(\emptyset, 0, 1, 0, 1)$ — Model abstains with UNKNOWN but claims sufficient evidence or violates schema contract.
+
+---
+
+# 18. Lineage Integrity Assumption & 2026 Literature Positioning
+
+### 18.1 The Lineage Integrity Assumption
+> **GENE currently studies what lineage can accomplish when ancestry metadata is faithfully recorded and preserved by the experimental substrate.**
+The framework proves that if lineage edges $(u \to v)$ are recorded upon generation and remain tamper-proof, delayed distrust signals can reach transitive descendants to achieve selective containment ($S = \text{TPR} - \text{FPR}$). GENE does *not* yet establish that open-world agent systems can maintain trustworthy provenance under adversarial rewriting, lossy recursive summarization, or ungrounded multi-agent tool echoes. Measuring and mitigating provenance decay across deep multi-generation transformations ($G_5+$) forms the scientific objective of subsequent experimental phases.
+
+### 18.2 Positioning Relative to 2026 Literature
+
+1. **Persistent-Memory Contagion & Poisoning**:
+   - *Hidden in Memory* (2025/2026) and *Remembering More, Risking More* (2026) demonstrate that memory poisoning persists across extended sessions and scales safety risks as deployment trajectories lengthen.
+   - *Memory Contagion* (2026) highlights cross-agent propagation from poisoned shared memory.
+   - *GENE's Contribution*: Rather than measuring black-box attack success, GENE analytically and interventionally decomposes the transmission pipeline into exact constituent probabilities ($R \approx b \cdot X_{\text{path}} \cdot \tau \cdot W$), separating local deductive validity from global truth.
+
+2. **Provenance-Aware Memory Governance**:
+   - *MemLineage* (2025/2026) and *MAP-Graph* (2026) introduce derivation DAGs and operational graph structures into agent memory.
+   - *PPMF* (2026) studies provenance consolidation and source-authority binding.
+   - *GENE's Contribution*: GENE proves the mathematical limit of memory governance—demonstrating that even under exact lineage quarantine, downstream inference engines can manufacture unsupported pseudo-paths from surviving fragments ($X_{\text{path}} = 0 \centernot\implies P(\text{unsupported}) = 0$), mandating a second structural proofreading layer.
+
+3. **Write-Time Memory Admission & Origin Binding**:
+   - *ConsistencyGate* (2025/2026) and *MemGuard* (2026) propose gating candidate memories prior to persistent storage.
+   - *Louck's Origin-Binding Analysis* (2026) demonstrates that unstructured provenance can be laundered through summarization, arguing for strict origin authority.
+   - *GENE's Contribution*: GENE operationalizes write-time defense as an evolutionary filter ($W_{\text{proofread}}$) that separates phenotypic reasoning errors ($\mu_{\text{expression}} = 0.300$) from germline memory corruption ($\mu_{\text{heritable}} = 0.000$) via first-order support-certificate validation.
+
 
 
 

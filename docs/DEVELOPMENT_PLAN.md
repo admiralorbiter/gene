@@ -67,7 +67,7 @@ The plan is strictly gated:
   - Validated the **Two-Layer Epistemic Defense Architecture**:
     - Layer 1 (Memory Governance) removes transmission paths ($X_{\text{path}} = 0$).
     - Layer 2 (Structural Epistemic Proofreader / Support-Certificate Validator) mechanically verifies rule antecedent unification from cited memories.
-    - Measured Evolutionary Admission Dynamics: $\mu_{\text{expression}} = 0.400$ ($1.000$ on broken paths) reduced to $\mu_{\text{heritable}} = \mathbf{0.000}$ ($0 / 12$ false admissions).
+    - Measured Evolutionary Admission Dynamics: $\mu_{\text{expression}} = 0.300$ ($0.375$ on broken paths, 9/24) reduced to $\mu_{\text{heritable}} = \mathbf{0.000}$ ($0 / 24$ false admissions).
 
 ---
 

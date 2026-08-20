@@ -1,10 +1,9 @@
 # Experiment 1 Protocol — Single Mutation Propagation & Epidemiological Dynamics
 
-**Project:** GENE (Genealogical Epistemic Network Experiments)  
-**Experiment:** Experiment 1 (Single Mutation Dynamics & Multi-Generation Branching)  
-**Status:** **APPROVED & SPECIFIED — READY FOR IMPLEMENTATION**  
-**Baseline Instrument Freeze:** `gene-exp0-freeze-v1`  
-**Prerequisites:** Experiment 0 Lineage Observability & Causal Assay Passed ($C_{\text{nec}}=100\%, H_D=0\%$)  
+> [!NOTE]
+> **STATUS: HISTORICAL FROZEN PROTOCOL (Phases 7–8 Completed)**  
+> Experiment 1A (Single Mutation Cascades), Experiment 1B-A (Branching Dynamics), and Experiment 1B-B (Multi-Hop Retrieval) have been completed and validated.  
+> See [`docs/ARCHITECTURE.md`](file:///C:/Users/admir/Github/gene/docs/ARCHITECTURE.md) and [`docs/results/`](file:///C:/Users/admir/Github/gene/docs/results/) for current execution reports and Phase 10/10.5 immunity and proofreading results.
 
 ---
 

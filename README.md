@@ -1,150 +1,96 @@
-# GENE
+# GENE: Genealogical Epistemic Network Experiments
 
-**Genealogical Epistemic Network Experiments**
+**An Experimental Instrument for the Inheritance, Retrieval Dynamics, and Selective Governance of Persistent LLM Memory**
 
-GENE is an experimental testbed for studying how information changes, reproduces, persists, repairs, and dies inside persistent LLM memory systems.
+---
 
-The initial research question is deliberately narrow:
+## Executive Overview
 
-> When a single erroneous claim enters an otherwise controlled memory system, what descendants does it produce, and can we causally trace that lineage?
+GENE is a scientific research instrument designed to study how information changes, reproduces, persists, evades governance, and dies inside persistent language-model memory ecologies. 
 
-GENE begins with local/open models through Ollama and synthetic worlds with exact machine-readable ground truth. The goal is not to build a production memory framework. The goal is to build instrumentation reliable enough that later experiments about misinformation propagation, epistemic reproduction, error thresholds, senescence, repair, monoculture, and multi-agent networks can be interpreted confidently.
+Rather than treating memory failures simply as transient hallucinations or black-box attack rates, GENE experimentally decomposes the informational transmission pipeline:
+$$\text{Ancestry} \longrightarrow \text{Retrieval Exposure} \longrightarrow \text{Local Reasoning} \longrightarrow \text{Reproduction} \longrightarrow \text{Lineage Governance} \longrightarrow \text{Structural Admission}$$
 
-## Core idea
-
-Most LLM memory evaluations ask whether an agent remembers correctly or whether contaminated state changes later behavior. GENE treats persistent information as a lineage.
-
-A stored claim may be:
-
-- retrieved by later generations,
-- cited as support,
-- transformed into a descendant claim,
-- repaired,
-- mutated,
-- propagated into additional descendants,
-- or retired from reproduction.
-
-GENE records these events so we can distinguish three kinds of ancestry:
-
-1. **Exposure lineage** — which memory nodes were actually placed in the model context.
-2. **Reported-support lineage** — which memory nodes the model says support a new claim.
-3. **Causal lineage** — which parent nodes demonstrably change the descendant when removed or counterfactually replaced.
-
-The first development milestone is to prove that this instrumentation works before testing more ambitious biological interventions.
-
-## Initial research program
-
-### Experiment 0 — Lineage observability
-
-Can GENE correctly observe information ancestry?
-
-Use synthetic worlds with mechanically known derivation chains. Models create derived claims while returning structured parent IDs. Compare reported lineage with known valid support and causal ablation tests.
-
-### Experiment 1 — Single mutation
-
-What happens when exactly one fact is corrupted?
-
-Create paired clean and mutated versions of the same world. Hold model, prompts, world structure, generation schedule, and decoding settings constant. Track whether the mutation:
-
-- disappears,
-- remains isolated,
-- is repaired,
-- changes form,
-- or generates descendants.
-
-The planned primary endpoint for the first serious pilot is:
-
-> **Cumulative causally infected descendants through generation 8.**
-
-## Project principles
-
-- **Ground truth before realism.** Begin with fictional, procedurally generated worlds whose truth is exactly known.
-- **Lineage before intervention.** Do not test senescence, apoptosis, source anchoring, or multi-agent topologies until lineage measurement is trustworthy.
-- **Causality over self-report.** Model-provided citations are useful observations, not proof of influence.
-- **Append-only raw evidence.** Preserve source facts, prompts, model outputs, and evaluation results exactly as generated.
-- **Paired experiments by default.** Clean and mutated worlds should differ only in the intended treatment.
-- **World is the experimental unit.** Descendants from a shared world are correlated and must not be treated as independent samples.
-- **Freeze before scaling.** Pilot for bugs and variance; freeze the protocol before confirmatory runs.
-- **Reproducibility is part of the result.** Record model digest, Ollama version, quantization, prompt hash, context size, seed, world seed, and policy version.
-
-## Suggested repository layout
-
-```text
-GENE/
-├── README.md
-├── pyproject.toml
-├── src/
-│   └── gene/
-│       ├── config.py
-│       ├── ollama_client.py
-│       ├── worlds/
-│       │   ├── generator.py
-│       │   ├── schema.py
-│       │   └── oracle.py
-│       ├── memory/
-│       │   ├── store.py
-│       │   ├── retrieval.py
-│       │   └── lineage.py
-│       ├── experiments/
-│       │   ├── exp0_lineage.py
-│       │   └── exp1_single_mutation.py
-│       ├── evaluation/
-│       │   ├── claims.py
-│       │   ├── causality.py
-│       │   └── metrics.py
-│       └── persistence/
-│           └── db.py
-├── tests/
-├── configs/
-│   ├── exp0.yaml
-│   └── exp1.yaml
-├── data/
-│   └── .gitkeep
-├── runs/
-│   └── .gitkeep
-└── docs/
-    ├── EXPERIMENTAL_PROTOCOL.md
-    ├── ARCHITECTURE.md
-    ├── DEVELOPMENT_PLAN.md
-    └── RESULTS_TEMPLATE.md
+```
+                                      THE GENE TRANSMISSION PIPELINE
+                                      
+  [ Ancestral Root Node ] 
+            │
+            ▼
+  ┌───────────────────┐    Layer 1: Memory Governance (Lineage Immunity)
+  │ Retrieval Filter  │ ──► Prunes discredited ancestry branches (Modulates X_path)
+  └───────────────────┘
+            │ (Retrieved Context)
+            ▼
+  ┌───────────────────┐
+  │ Neural Reasoner   │ ──► Executes multi-hop deduction (May generate pseudo-paths)
+  └───────────────────┘
+            │ (Candidate Output Claim)
+            ▼
+  ┌───────────────────┐    Layer 2: Structural Epistemic Proofreader
+  │ Support Validator │ ──► Formally unifies cited premises against rules (Modulates W_proofread)
+  └───────────────────┘
+            │
+            ▼ (Admitted if Valid)
+  [ Persistent Occurrence Node ] ──► Eligible for future generation inheritance (R ≈ b · X_path · τ · W_proofread)
 ```
 
-## First runnable definition of done
+---
 
-GENE v0 is ready for feedback when it can:
+## The Six Core Discoveries of GENE
 
-1. deterministically create a synthetic world from a `world_seed`;
-2. export canonical ground-truth triples and derivation rules;
-3. generate a clean/mutated paired world differing in exactly one atomic fact;
-4. query one Ollama model with structured JSON output;
-5. persist every call, retrieved memory node, created claim, and lineage edge;
-6. mechanically classify a generated atomic claim as true, false, unsupported, or unparseable;
-7. rerun a selected generation with one parent removed/replaced;
-8. produce a lineage DAG and a small run summary;
-9. reproduce the same world and configuration from stored metadata.
+1. **Exposure Is Not Ancestry (Experiment 0)**:
+   Informational ancestry cannot be treated as a single observable. GENE formally separates **exposure lineage** (what was in context), **reported-support lineage** (what the model claimed to cite), and **causal lineage** (what counterfactually changed the output). Model self-reports are never causal ground truth.
 
-At that point, run a tiny plumbing test and return the results before adding biological defenses.
+2. **Bad Reasoning Is Not Required for Falsehood Propagation (Experiment 1A)**:
+   A corrupted ancestral premise can be transformed across multiple semantic forms (e.g. *false supervisor* $\to$ *protocol* $\to$ *transit route* $\to$ *terminal authorization*) while each intermediate step remains locally logically valid. Globally false information reproduces through locally correct reasoning without requiring repeated hallucinations.
 
-## What GENE is not yet
+3. **Retrieval Regulates Reproductive Contact (Experiment 1B-B)**:
+   Memory existence does not imply reproductive opportunity. Full multi-premise support-path retrieval availability ($X_{\text{path}}$) governs branching reproduction. Retrieval surface area scales subcritical/supercritical branching thresholds.
 
-Do **not** initially build:
+4. **Lineage Enables Selective Delayed Quarantine (Experiment 1B-C1b)**:
+   When an ancestor is discredited after it has already reproduced, lineage-blind forgetting is bound by $C_H = C_I$ (it cannot reduce corrupted availability without destroying healthy coverage at the same rate). Lineage-aware quarantine breaks this symmetry, delivering selective containment $S = C_H - C_I = \text{TPR} - \text{FPR}$. Genealogy preserves the target of a trust judgment across semantic transformation.
 
-- a general-purpose agent framework;
-- embeddings/vector databases unless exact retrieval becomes a limitation;
-- a web UI;
-- multi-agent societies;
-- real-world fact checking;
-- senescence/apoptosis policies;
-- automatic research-paper generation;
-- a complex ontology;
-- dozens of model backends.
+5. **Memory Containment Is Not Behavioral Containment (Experiment 1B-C2 / C2a)**:
+   Removing the legitimate support path ($X_{\text{path}} = 0$) does not guarantee behavioral suppression ($P(\text{unsupported expression}) = 0$). Neural reasoners can manufacture unsupported pseudo-paths from surviving fragments. Memory Governance (Layer 1) requires an independent Inference Integrity layer (Layer 2).
 
-Those are later experiments, not prerequisites for Experiment 0.
+6. **Structural Proofreading Prevents Phenotypic Errors from Becoming Heritable (Experiment 1B-C2b)**:
+   A mechanical first-order support-certificate validator checks whether cited memories structurally unify with deductive rule antecedents. In 30 live calls on Gemma 3:12B, the validator reduced a phenotypic expression rate of $\mu_{\text{expression}} = 0.300$ ($0.375$ on broken paths) to a heritable mutation rate of $\mu_{\text{heritable}} = \mathbf{0.000}$ ($0 / 24$ false admissions), admitting 100% of valid derivations. Transient reasoning errors are prevented from entering the germline.
 
-## Working terminology
+---
 
-See `docs/EXPERIMENTAL_PROTOCOL.md` for frozen operational definitions and metrics.
+## Frozen Milestone Roadmap Status
 
-## Immediate next step
+| Phase | Milestone Name | Key Objective | Status | Execution Commit |
+| :--- | :--- | :--- | :--- | :--- |
+| **Phase 0–4** | Instrumentation & Invariants | Deterministic SQLite persistence, dual oracles, causal interventions | **FROZEN** | `3b59368` |
+| **Phase 5–6** | Experiment 0 | Lineage Observability, Causal Parentage, & Ecological Contracts | **FROZEN** | `3b59368` |
+| **Phase 7** | Experiment 1A | Multi-Generational Mutation Cascades ($G_0 \to G_2$) | **FROZEN** | `68c3447` |
+| **Phase 8** | Experiment 1B-A / B1 | Allele Fidelity, Multi-Hop Retrieval Dynamics ($X_{\text{path}}$), & Causal Rescue | **FROZEN** | `f6d6cbe` |
+| **Phase 9 / 9.5** | Preflight & Matched Expression | Shape Map, Persistence Hardening, & 16-Call Live Matched Assay | **FROZEN** | `b7182d3` |
+| **Phase 10** | Experiment 1B-C0 / C1b | Analytic Calibration & 12-Ecology Delayed Adjudication Sandbox | **FROZEN** | `15abd87` |
+| **Phase 10.5** | Experiment 1B-C2 / C2a / C2b | Live Behavioral Immunity, Replay Stability, & Support-Certificate Validator | **FROZEN** | [`1f62908`](file:///C:/Users/admir/Github/gene/scripts/run_exp1b_c2b_binding_assay.py) / [`acd6660`](file:///C:/Users/admir/Github/gene/docs/ARCHITECTURE.md) |
 
-Implement only the path needed for **Experiment 0** and a minimal **Experiment 1** paired run. When the first runs exist, use `docs/RESULTS_TEMPLATE.md` to package results for review.
+---
+
+## Primary Documentation & Results Artifacts
+
+- **Authoritative Metrics Manifest:** [`data/canonical_results_manifest.json`](file:///C:/Users/admir/Github/gene/data/canonical_results_manifest.json) (Machine-generated from frozen SQLite databases)
+- **Canonical Scientific Narrative:** [`docs/GENE_STORY_MEMO.md`](file:///C:/Users/admir/Github/gene/docs/GENE_STORY_MEMO.md)
+- **System Architecture & Formalisms:** [`docs/ARCHITECTURE.md`](file:///C:/Users/admir/Github/gene/docs/ARCHITECTURE.md)
+- **Phase Reports:**
+  - [Exp 0 Assay Report](file:///C:/Users/admir/Github/gene/docs/results/EXP0_FINAL_AUDIT_REPORT.md)
+  - [Exp 1B-C1b Shared Ecology Report](file:///C:/Users/admir/Github/gene/docs/results/EXP1B_C1B_SHARED_ECOLOGY_REPORT.md)
+  - [Exp 1B-C2a Live Behavioral Report](file:///C:/Users/admir/Github/gene/docs/results/EXP1B_C2A_LIVE_ASSAY_REPORT.md)
+  - [Exp 1B-C2b Binding & Proofreading Report](file:///C:/Users/admir/Github/gene/docs/results/EXP1B_C2B_BINDING_REPORT.md)
+
+---
+
+## Test Suite Execution
+
+All experimental fixtures, oracle closures, statistical analyzers, and proofreaders run under pytest:
+
+```bash
+pytest
+```
+*Current test health: 97 passed in 22.23s (Zero warnings/errors).*

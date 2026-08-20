@@ -106,13 +106,13 @@ def build_c2b_prompt_and_worlds(
         expected_answer=auth_target_req,
     )
 
-    # Memories
-    mem_target_grid = {"memory_id": f"mem_{target_station.lower()}_facility_grid", "text": f"Station {target_station} is assigned to facility grid {grid_target}."}
-    mem_foreign_grid = {"memory_id": f"mem_{foreign_station.lower()}_facility_grid", "text": f"Station {foreign_station} is assigned to facility grid {grid_foreign}."}
-    m_dist_0 = {"memory_id": "mem_distractor_0", "text": "Sector outpost 0 was commissioned in standard epoch 2180."}
-    m_dist_1 = {"memory_id": "mem_distractor_1", "text": "Sector outpost 1 was commissioned in standard epoch 2181."}
-    m_dist_2 = {"memory_id": "mem_distractor_2", "text": "Sector outpost 2 was commissioned in standard epoch 2182."}
-    m_dist_3 = {"memory_id": "mem_distractor_3", "text": "Sector outpost 3 was commissioned in standard epoch 2183."}
+    # Memories with underlying structured Facts
+    mem_target_grid = {"memory_id": f"mem_{target_station.lower()}_facility_grid", "text": f"Station {target_station} is assigned to facility grid {grid_target}.", "fact": f_target_grid}
+    mem_foreign_grid = {"memory_id": f"mem_{foreign_station.lower()}_facility_grid", "text": f"Station {foreign_station} is assigned to facility grid {grid_foreign}.", "fact": f_foreign_grid}
+    m_dist_0 = {"memory_id": "mem_distractor_0", "text": "Sector outpost 0 was commissioned in standard epoch 2180.", "fact": dist_0}
+    m_dist_1 = {"memory_id": "mem_distractor_1", "text": "Sector outpost 1 was commissioned in standard epoch 2181.", "fact": dist_1}
+    m_dist_2 = {"memory_id": "mem_distractor_2", "text": "Sector outpost 2 was commissioned in standard epoch 2182.", "fact": dist_2}
+    m_dist_3 = {"memory_id": "mem_distractor_3", "text": "Sector outpost 3 was commissioned in standard epoch 2183.", "fact": dist_3}
 
     # Factorial Route Condition Slot
     if condition == "no_route":
@@ -122,28 +122,28 @@ def build_c2b_prompt_and_worlds(
         path_is_supported = False
     elif condition == "foreign_station_wrong_route":
         # Foreign station with neutral route
-        mem_f_wrong = {"memory_id": f"mem_{foreign_station.lower()}_transit_route", "text": f"Station {foreign_station} operates along transit route {route_neutral}."}
         f_f_wrong = Fact(subject=foreign_station, predicate="transit_route", object=route_neutral)
+        mem_f_wrong = {"memory_id": f"mem_{foreign_station.lower()}_transit_route", "text": f"Station {foreign_station} operates along transit route {route_neutral}.", "fact": f_f_wrong}
         memories = [m_dist_0, mem_target_grid, mem_f_wrong, mem_foreign_grid, m_dist_1, m_dist_2]
         ctx_facts = [dist_0, f_target_grid, f_f_wrong, f_foreign_grid, dist_1, dist_2]
         path_is_supported = False
     elif condition == "target_station_wrong_route":
         # Target station with neutral route
-        mem_t_wrong = {"memory_id": f"mem_{target_station.lower()}_transit_route", "text": f"Station {target_station} operates along transit route {route_neutral}."}
         f_t_wrong = Fact(subject=target_station, predicate="transit_route", object=route_neutral)
+        mem_t_wrong = {"memory_id": f"mem_{target_station.lower()}_transit_route", "text": f"Station {target_station} operates along transit route {route_neutral}.", "fact": f_t_wrong}
         memories = [mem_t_wrong, mem_target_grid, m_dist_3, mem_foreign_grid, m_dist_1, m_dist_2]
         ctx_facts = [f_t_wrong, f_target_grid, dist_3, f_foreign_grid, dist_1, dist_2]
         path_is_supported = False
     elif condition == "foreign_station_target_route":
         # Foreign station with target station's required route!
-        mem_f_req = {"memory_id": f"mem_{foreign_station.lower()}_transit_route", "text": f"Station {foreign_station} operates along transit route {route_target_req}."}
         f_f_req = Fact(subject=foreign_station, predicate="transit_route", object=route_target_req)
+        mem_f_req = {"memory_id": f"mem_{foreign_station.lower()}_transit_route", "text": f"Station {foreign_station} operates along transit route {route_target_req}.", "fact": f_f_req}
         memories = [m_dist_0, mem_target_grid, mem_f_req, mem_foreign_grid, m_dist_1, m_dist_2]
         ctx_facts = [dist_0, f_target_grid, f_f_req, f_foreign_grid, dist_1, dist_2]
         path_is_supported = False
     elif condition == "valid_target_route":
         # Positive control: Target station with valid required route
-        mem_t_req = {"memory_id": f"mem_{target_station.lower()}_transit_route", "text": f"Station {target_station} operates along transit route {route_target_req}."}
+        mem_t_req = {"memory_id": f"mem_{target_station.lower()}_transit_route", "text": f"Station {target_station} operates along transit route {route_target_req}.", "fact": f_target_route_true}
         memories = [mem_t_req, mem_target_grid, m_dist_3, mem_foreign_grid, m_dist_1, m_dist_2]
         ctx_facts = [f_target_route_true, f_target_grid, dist_3, f_foreign_grid, dist_1, dist_2]
         path_is_supported = True
@@ -169,12 +169,12 @@ def build_c2b_prompt_and_worlds(
 
 def evaluate_epistemic_proofreading(
     parsed_json: dict[str, Any] | None,
-    memories: list[dict[str, str]],
+    memories: list[dict[str, Any]],
     target_station: str,
     expected_auth: str,
     rules: list[Rule],
 ) -> dict[str, Any]:
-    """Layer 2 Epistemic Proofreader: Mechanically verify structural unification of cited evidence."""
+    """Layer 2 Structural Epistemic Proofreader: Formally verify first-order unification of cited support certificates."""
     if not parsed_json or not isinstance(parsed_json, dict):
         return {"proofreader_verdict": "REJECT_MALFORMED", "is_proofread_admitted": False, "reason": "Malformed JSON"}
 
@@ -194,7 +194,7 @@ def evaluate_epistemic_proofreading(
         else:
             return {"proofreader_verdict": "REJECT_CONTRACT_FAILURE", "is_proofread_admitted": False, "reason": f"Abstention object UNKNOWN emitted with contradictory evidence_status '{raw_ev}'"}
 
-    # Find the rule corresponding to emitted auth code
+    # 1. Match Rule Consequent against Emitted Claim
     target_rule = None
     for r in rules:
         if r.consequent[2].upper() == obj:
@@ -202,33 +202,39 @@ def evaluate_epistemic_proofreading(
             break
 
     if not target_rule:
-        return {"proofreader_verdict": "REJECT_UNKNOWN_RULE", "is_proofread_admitted": False, "reason": f"No rule for consequent {obj}"}
+        return {"proofreader_verdict": "REJECT_UNKNOWN_RULE", "is_proofread_admitted": False, "reason": f"No domain rule entails consequent object '{obj}'"}
 
-    # Extract text of cited memories
-    mem_lookup = {m["memory_id"]: m["text"] for m in memories}
-    cited_texts = [mem_lookup.get(cid, "") for cid in cited_ids if cid in mem_lookup]
+    # 2. Extract Structured Facts corresponding to Cited Memory IDs
+    mem_fact_lookup = {m["memory_id"]: m.get("fact") for m in memories if "fact" in m}
+    cited_facts: list[Fact] = [mem_fact_lookup[cid] for cid in cited_ids if cid in mem_fact_lookup and mem_fact_lookup[cid] is not None]
 
-    # Verify unification: Check if cited memories instantiate all rule antecedents for target_station
-    # Rule antecedent 0: transit_route
-    req_route = target_rule.antecedents[0][2]
-    # Rule antecedent 1: facility_grid
-    req_grid = target_rule.antecedents[1][2]
+    if not cited_facts:
+        return {"proofreader_verdict": "REJECT_UNIFICATION_FAILURE", "is_proofread_admitted": False, "reason": "No valid structured facts cited"}
 
-    has_route_match = any((f"Station {target_station}" in txt and req_route in txt) for txt in cited_texts)
-    has_grid_match = any((f"Station {target_station}" in txt and req_grid in txt) for txt in cited_texts)
+    # 3. First-Order Triple Unification under substitution ?s = target_station
+    unmet_antecedents = []
+    for var_s, req_pred, req_obj in target_rule.antecedents:
+        # Check if any cited fact satisfies (?s -> target_station, req_pred, req_obj)
+        fact_matched = any(
+            (f.subject.upper() == target_station.upper() and
+             f.predicate.lower() == req_pred.lower() and
+             f.object.upper() == req_obj.upper())
+            for f in cited_facts
+        )
+        if not fact_matched:
+            unmet_antecedents.append(f"({target_station}, {req_pred}, {req_obj})")
 
-    if has_route_match and has_grid_match:
-        return {"proofreader_verdict": "PASS_VALID_DERIVATION", "is_proofread_admitted": True, "reason": "All antecedents structurally unified"}
+    if not unmet_antecedents:
+        return {
+            "proofreader_verdict": "PASS_VALID_DERIVATION",
+            "is_proofread_admitted": True,
+            "reason": f"All rule antecedents unified under ?s={target_station}",
+        }
     else:
-        reasons = []
-        if not has_route_match:
-            reasons.append(f"Missing valid route '{req_route}' for {target_station}")
-        if not has_grid_match:
-            reasons.append(f"Missing valid grid '{req_grid}' for {target_station}")
         return {
             "proofreader_verdict": "REJECT_UNIFICATION_FAILURE",
             "is_proofread_admitted": False,
-            "reason": "; ".join(reasons),
+            "reason": f"Unsatisfied antecedents: {', '.join(unmet_antecedents)}",
         }
 
 
