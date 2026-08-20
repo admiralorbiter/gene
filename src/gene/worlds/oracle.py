@@ -57,6 +57,11 @@ class Oracle:
         "opened_in",
         "uses_protocol",
         "team_lead",
+        "security_clearance",
+        "transit_route",
+        "resource_tier",
+        "audit_frequency",
+        "access_level",
     }
 
     def __init__(self, world: World):

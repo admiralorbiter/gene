@@ -108,12 +108,50 @@ CREATE TABLE IF NOT EXISTS memory_nodes (
     node_type TEXT NOT NULL,
     natural_text TEXT NOT NULL,
     structured_json TEXT,
+    locus_id TEXT,
+    allele_id TEXT,
+    is_active INTEGER DEFAULT 1,
+    parent_generation INTEGER,
     reproductive_status TEXT DEFAULT 'active',
     created_by_call_id TEXT,
     created_at TEXT NOT NULL,
     FOREIGN KEY(run_id) REFERENCES runs(run_id),
     FOREIGN KEY(world_id) REFERENCES worlds(world_id),
     FOREIGN KEY(created_by_call_id) REFERENCES calls(call_id)
+);
+
+CREATE TABLE IF NOT EXISTS dual_oracle_evaluations (
+    evaluation_id TEXT PRIMARY KEY,
+    call_id TEXT NOT NULL,
+    node_id TEXT,
+    generation INTEGER NOT NULL,
+    task_id TEXT NOT NULL,
+    target_subject TEXT NOT NULL,
+    target_predicate TEXT NOT NULL,
+    derived_object TEXT,
+    canonical_truth_status TEXT NOT NULL,
+    local_derivability_status TEXT NOT NULL,
+    A_correct INTEGER NOT NULL,
+    E_correct INTEGER NOT NULL,
+    K_consistent INTEGER NOT NULL,
+    phenotype TEXT NOT NULL,
+    state_vector_json TEXT NOT NULL,
+    ancestral_allele_fidelity REAL,
+    created_at TEXT NOT NULL,
+    FOREIGN KEY(call_id) REFERENCES calls(call_id)
+);
+
+CREATE TABLE IF NOT EXISTS lineage_transmissions (
+    transmission_id TEXT PRIMARY KEY,
+    parent_node_id TEXT NOT NULL,
+    child_node_id TEXT NOT NULL,
+    parent_generation INTEGER NOT NULL,
+    child_generation INTEGER NOT NULL,
+    parent_phenotype TEXT NOT NULL,
+    child_phenotype TEXT NOT NULL,
+    transition_type TEXT NOT NULL,
+    ancestral_allele_transmitted INTEGER NOT NULL,
+    created_at TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS claims (
@@ -221,6 +259,16 @@ class Database:
             ):
                 if col not in causal_cols:
                     self.conn.execute(f"ALTER TABLE causal_tests ADD COLUMN {col} {col_type}")
+
+            mem_cols = {row["name"] for row in self.conn.execute("PRAGMA table_info(memory_nodes)").fetchall()}
+            for col, col_type in (
+                ("locus_id", "TEXT"),
+                ("allele_id", "TEXT"),
+                ("is_active", "INTEGER DEFAULT 1"),
+                ("parent_generation", "INTEGER"),
+            ):
+                if col not in mem_cols:
+                    self.conn.execute(f"ALTER TABLE memory_nodes ADD COLUMN {col} {col_type}")
 
     def close(self) -> None:
         """Close database connection."""
