@@ -16,7 +16,8 @@ class StructuredAnswer(BaseModel):
 
 
 class StructuredResponse(BaseModel):
-    """Schema for model responses."""
+    """Schema for model responses (supports both v1 and v2)."""
+    evidence_status: Literal["sufficient", "insufficient", "conflicting"] | None = None
     answer: StructuredAnswer
     parent_memory_ids: list[str] = Field(default_factory=list)
     confidence: float | None = 1.0
@@ -29,6 +30,7 @@ class EvaluatedClaim(BaseModel):
     subject: str
     predicate: str
     object: str
+    evidence_status: Literal["sufficient", "insufficient", "conflicting"] = "sufficient"
     parse_status: Literal["success", "malformed_json", "missing_fields", "unparseable"]
     truth_status: TruthStatus
     infection_status: Literal["clean", "infected", "repaired", "de_novo", "unresolved"]
@@ -73,6 +75,7 @@ class ClaimEvaluator:
                 subject="UNKNOWN",
                 predicate="unknown",
                 object="UNKNOWN",
+                evidence_status="insufficient",
                 parse_status="malformed_json",
                 truth_status=TruthStatus.UNSUPPORTED,
                 infection_status="unresolved",
@@ -88,6 +91,7 @@ class ClaimEvaluator:
                 subject="UNKNOWN",
                 predicate="unknown",
                 object="UNKNOWN",
+                evidence_status="insufficient",
                 parse_status="missing_fields",
                 truth_status=TruthStatus.UNSUPPORTED,
                 infection_status="unresolved",
@@ -100,14 +104,27 @@ class ClaimEvaluator:
         norm_pred = structured.answer.predicate.strip().lower().replace(" ", "_")
         norm_obj = structured.answer.object.strip().upper().replace(" ", "_")
 
+        # Determine evidence_status
+        evidence_status = structured.evidence_status
+        if evidence_status is None:
+            if norm_obj in ("UNKNOWN", "UNKNOWN_OR_UNSUPPORTED"):
+                evidence_status = "insufficient"
+            else:
+                evidence_status = "sufficient"
+
+        # Enforce consistency: if evidence_status != 'sufficient', normalized object is UNKNOWN
+        if evidence_status != "sufficient":
+            norm_obj = "UNKNOWN"
+            truth_status = TruthStatus.UNSUPPORTED
+        else:
+            truth_status = oracle.evaluate_triple(norm_subj, norm_pred, norm_obj)
+
         claim_id = compute_fact_id(norm_subj, norm_pred, norm_obj)
-        truth_status = oracle.evaluate_triple(norm_subj, norm_pred, norm_obj)
 
         # Determine initial infection status
         if truth_status == TruthStatus.TRUE:
             infection_status = "clean"
         elif truth_status in (TruthStatus.FALSE, TruthStatus.CONTRADICTION):
-            # In clean condition or prior to causal tracing, unexpected false claim is de novo
             infection_status = "de_novo"
         else:
             infection_status = "unresolved"
@@ -117,6 +134,7 @@ class ClaimEvaluator:
             subject=norm_subj,
             predicate=norm_pred,
             object=norm_obj,
+            evidence_status=evidence_status,
             parse_status="success",
             truth_status=truth_status,
             infection_status=infection_status,

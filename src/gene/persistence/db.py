@@ -92,6 +92,9 @@ CREATE TABLE IF NOT EXISTS calls (
     prompt_tokens INTEGER,
     completion_tokens INTEGER,
     latency_ms REAL,
+    load_duration_ms REAL DEFAULT 0.0,
+    prompt_eval_duration_ms REAL DEFAULT 0.0,
+    eval_duration_ms REAL DEFAULT 0.0,
     created_at TEXT NOT NULL,
     FOREIGN KEY(run_id) REFERENCES runs(run_id)
 );
@@ -158,6 +161,12 @@ CREATE TABLE IF NOT EXISTS causal_tests (
     outcome TEXT NOT NULL,
     score REAL,
     comparison_json TEXT,
+    target_node_ids_json TEXT,
+    mutation_spec_json TEXT,
+    original_truth_status TEXT,
+    counterfactual_truth_status TEXT,
+    evidence_status TEXT,
+    rescue_source_call_id TEXT,
     FOREIGN KEY(child_node_id) REFERENCES memory_nodes(node_id),
     FOREIGN KEY(original_call_id) REFERENCES calls(call_id),
     FOREIGN KEY(counterfactual_call_id) REFERENCES calls(call_id)
@@ -188,9 +197,26 @@ class Database:
         self.init_schema()
 
     def init_schema(self) -> None:
-        """Initialize all schema tables."""
+        """Initialize all schema tables and apply non-destructive migrations."""
         with self.conn:
             self.conn.executescript(SCHEMA_SQL)
+            # Safe column migrations for existing databases
+            call_cols = {row["name"] for row in self.conn.execute("PRAGMA table_info(calls)").fetchall()}
+            for col in ("load_duration_ms", "prompt_eval_duration_ms", "eval_duration_ms"):
+                if col not in call_cols:
+                    self.conn.execute(f"ALTER TABLE calls ADD COLUMN {col} REAL DEFAULT 0.0")
+
+            causal_cols = {row["name"] for row in self.conn.execute("PRAGMA table_info(causal_tests)").fetchall()}
+            for col, col_type in (
+                ("target_node_ids_json", "TEXT"),
+                ("mutation_spec_json", "TEXT"),
+                ("original_truth_status", "TEXT"),
+                ("counterfactual_truth_status", "TEXT"),
+                ("evidence_status", "TEXT"),
+                ("rescue_source_call_id", "TEXT"),
+            ):
+                if col not in causal_cols:
+                    self.conn.execute(f"ALTER TABLE causal_tests ADD COLUMN {col} {col_type}")
 
     def close(self) -> None:
         """Close database connection."""

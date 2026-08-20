@@ -31,7 +31,7 @@ class CallSpec(BaseModel):
     temperature: float = 0.0
     num_ctx: int = 4096
     seed: int | None = 42
-    format: str = "json"
+    format: str | dict[str, Any] = "json"
     options: dict[str, Any] = Field(default_factory=dict)
 
     def to_request_payload(self) -> dict[str, Any]:

@@ -42,6 +42,60 @@ Target Predicate: {target_predicate}
 Provide your structured JSON response:"""
 
 
+PROMPT_V2_SYSTEM = """You are an epistemic reasoning agent operating in a strictly controlled information environment.
+Your task is to answer questions about entities, locations, protocols, and organizational structures using ONLY the provided memory records.
+
+You MUST respond with a valid JSON object matching this exact schema:
+{
+  "evidence_status": "sufficient" | "insufficient" | "conflicting",
+  "answer": {
+    "subject": "<ENTITY_SUBJECT>",
+    "predicate": "<RELATION_PREDICATE>",
+    "object": "<ENTITY_OBJECT_OR_UNKNOWN>"
+  },
+  "parent_memory_ids": ["<MEM_ID_1>", "<MEM_ID_2>"]
+}
+
+STRICT EPISTEMIC RULES:
+1. "evidence_status":
+   - Set to "sufficient" ONLY IF the provided memories provide a complete, unbroken derivation chain supporting the answer with 100% certainty.
+   - Set to "insufficient" IF ANY required premise, link, or rule is missing, unstated, or incomplete.
+   - Set to "conflicting" IF the provided memories contain contradictory assertions.
+2. "answer":
+   - "subject": MUST match the exact "Target Subject" specified in the prompt.
+   - "predicate": MUST match the exact "Target Predicate" specified in the prompt.
+   - "object": IF "evidence_status" is "sufficient", provide the exact entity or value. IF "evidence_status" is "insufficient" or "conflicting", you MUST set "object": "UNKNOWN".
+3. "parent_memory_ids":
+   - If "evidence_status" is "sufficient", list ONLY the memory IDs directly used to derive the answer.
+   - If "evidence_status" is "insufficient", list an empty array [].
+4. Output ONLY the JSON object. Do not include markdown codeblocks or extra text.
+"""
+
+SCHEMA_V2_JSON = {
+    "type": "object",
+    "properties": {
+        "evidence_status": {
+            "type": "string",
+            "enum": ["sufficient", "insufficient", "conflicting"],
+        },
+        "answer": {
+            "type": "object",
+            "properties": {
+                "subject": {"type": "string"},
+                "predicate": {"type": "string"},
+                "object": {"type": "string"},
+            },
+            "required": ["subject", "predicate", "object"],
+        },
+        "parent_memory_ids": {
+            "type": "array",
+            "items": {"type": "string"},
+        },
+    },
+    "required": ["evidence_status", "answer", "parent_memory_ids"],
+}
+
+
 class PromptTemplate:
     """Versioned prompt builder with SHA256 template hashing."""
 
@@ -50,6 +104,11 @@ class PromptTemplate:
         if version == "v1":
             self.system_prompt = PROMPT_V1_SYSTEM
             self.user_template = PROMPT_V1_USER_TEMPLATE
+            self.format_schema: str | dict[str, Any] = "json"
+        elif version == "v2":
+            self.system_prompt = PROMPT_V2_SYSTEM
+            self.user_template = PROMPT_V1_USER_TEMPLATE
+            self.format_schema = SCHEMA_V2_JSON
         else:
             raise ValueError(f"Unknown prompt version: {version}")
 
