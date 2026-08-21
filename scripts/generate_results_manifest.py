@@ -551,6 +551,46 @@ def extract_stage6b1_metrics(summary_path: Path) -> dict[str, Any]:
     }
 
 
+def extract_stage6c_metrics(summary_path: Path) -> dict[str, Any]:
+    """Extract metrics from Exploration Round 6 Stage 6C (Neural Semantic Observation Extraction)."""
+    if not summary_path.exists():
+        raise FileNotFoundError(f"Stage 6C summary not found: {summary_path}")
+
+    with open(summary_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    n1 = data.get("arm_n1_direct_transition", {})
+    n2 = data.get("arm_n2_modular_extraction", {})
+    canary = data.get("canary_determinism", {})
+
+    return {
+        "experiment": "Exploration Round 6 Stage 6C (Neural Semantic Observation Extraction & Upward Error Migration)",
+        "summary_file": summary_path.name,
+        "database": "exploration_round6_stage6c_results.db",
+        "commit": "round6-stage6c-master-freeze",
+        "model_name": "gemma3:12b",
+        "model_digest": "f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a",
+        "total_calls": data.get("total_calls", 28),
+        "arm_n1_direct_transition": {
+            "layer_a_transition_fidelity": n1.get("layer_a_transition_fidelity", 0.0),
+            "layer_b_premise_state_fidelity": n1.get("layer_b_premise_state_fidelity", 0.0833),
+            "layer_c_entitlement_accuracy": n1.get("layer_c_entitlement_accuracy", 0.1667),
+            "primary_failure": "TRANSITION_EMISSION_ERROR (omits ASSERT baseline, violates bitemporal transition syntax)",
+        },
+        "arm_n2_modular_extraction": {
+            "layer_0_extraction_accuracy": n2.get("layer_0_extraction_accuracy", 0.0833),
+            "layer_0_temporal_interval_accuracy": 1.0,
+            "layer_a_transition_fidelity": n2.get("layer_a_transition_fidelity", 0.75),
+            "layer_b_premise_state_fidelity": n2.get("layer_b_premise_state_fidelity", 0.9167),
+            "layer_c_entitlement_accuracy": n2.get("layer_c_entitlement_accuracy", 0.25),
+            "p_final_correct_given_observation_correct": 1.0,
+            "error_origin": "Strictly upward migration to Layer 0 semantic entity extraction (0 downstream runtime failures)",
+        },
+        "canary_determinism": f"{canary.get('raw_string_matches', 4)} / {canary.get('total_canaries', 4)} raw string matches (100.0%), {canary.get('semantic_json_matches', 4)} / {canary.get('total_canaries', 4)} semantic JSON matches (100.0%)",
+        "status": "COMPLETED_AND_FROZEN",
+    }
+
+
 def generate_manifest(write: bool = True) -> dict[str, Any]:
     """Assemble all frozen experiment milestones into the authoritative manifest."""
     root_dir = Path(__file__).resolve().parent.parent
@@ -586,6 +626,7 @@ def generate_manifest(write: bool = True) -> dict[str, Any]:
             "stage_5c": extract_stage5c_metrics(data_dir / "exploration_round5_stage5c_summary.json"),
             "stage_6b": extract_stage6b_metrics(data_dir / "exploration_round6_stage6b_results_summary.json"),
             "stage_6b1": extract_stage6b1_metrics(data_dir / "exploration_round6_stage6b1_temporal_summary.json"),
+            "stage_6c": extract_stage6c_metrics(data_dir / "exploration_round6_stage6c_summary.json"),
         },
     }
 

@@ -214,6 +214,75 @@ class BitemporalEngine:
 
         return True
 
+    def get_fact_intervals(self, fact_id: str, t_k: int) -> list[tuple[float, float]]:
+        """Return all effective valid-time intervals [start, end) for a fact as known at t_k."""
+        events = self.get_events_up_to(t_k)
+        assert_intervals: list[tuple[float, float]] = []
+        for ev in events:
+            if ev.target_fact_id == fact_id and ev.event_type == EventType.ASSERT:
+                start = ev.t_valid_start
+                end = ev.t_valid_end if ev.t_valid_end is not None else float("inf")
+                assert_intervals.append((start, end))
+
+        if not assert_intervals:
+            return []
+
+        effective: list[tuple[float, float]] = []
+        for (s, e) in assert_intervals:
+            cur_s, cur_e = s, e
+            for ev in events:
+                if ev.event_type in (EventType.RETRACT, EventType.EXPIRES) and ev.target_fact_id == fact_id:
+                    cut_t = ev.t_valid_start
+                    if cur_s <= cut_t < cur_e:
+                        cur_e = cut_t
+                elif ev.event_type == EventType.SUPERSEDES and ev.secondary_fact_id == fact_id:
+                    cut_t = ev.t_valid_start
+                    if cur_s <= cut_t < cur_e:
+                        cur_e = cut_t
+            if cur_s < cur_e:
+                effective.append((cur_s, cur_e))
+        return effective
+
+    def get_relevant_occurrences(
+        self,
+        subject: str,
+        predicate: str,
+        t_v: float,
+        t_k: int,
+    ) -> dict[str, list[BitemporalFact]]:
+        """Query occurrences matching (subject, predicate) known at t_k, categorized by relation to t_v."""
+        active_fids = {f.fact_id for f in self.get_active_facts(t_v, t_k)}
+        events_up_to = self.get_events_up_to(t_k)
+        known_fids = {
+            ev.target_fact_id for ev in events_up_to if ev.event_type == EventType.ASSERT
+        }
+
+        matching = [
+            f for f in self.facts.values()
+            if f.subject == subject and f.predicate == predicate and f.fact_id in known_fids
+        ]
+
+        res: dict[str, list[BitemporalFact]] = {
+            "active": [],
+            "preceding": [],
+            "overlapping": [],
+            "all_known": matching,
+        }
+
+        for f in matching:
+            if f.fact_id in active_fids:
+                res["active"].append(f)
+            intervals = self.get_fact_intervals(f.fact_id, t_k)
+            for (s, e) in intervals:
+                if e <= t_v:
+                    if f not in res["preceding"]:
+                        res["preceding"].append(f)
+                if s <= t_v < e:
+                    if f not in res["overlapping"]:
+                        res["overlapping"].append(f)
+
+        return res
+
     def get_active_facts(
         self,
         t_v: float,
@@ -519,3 +588,150 @@ class BitemporalEngine:
                     active_conflicts.discard(pair)
 
         return [{"fact_a": sorted(list(p))[0], "fact_b": sorted(list(p))[1]} for p in sorted(active_conflicts, key=lambda x: sorted(list(x)))]
+
+
+@dataclass(frozen=True)
+class Observation:
+    """Canonical structured factual observation tuple produced by semantic extraction or sensors."""
+    subject: str
+    predicate: str
+    obj: str
+    t_valid_start: float
+    t_valid_end: float | None = None
+    t_knowledge: int = 1
+    source_id: str = "source_default"
+    origin_id: str = "origin_sensor_1"
+    lineage_roots: frozenset[str] = field(default_factory=frozenset)
+    observation_id: str = "obs_0"
+
+
+@dataclass(frozen=True)
+class PredicateContract:
+    """Normative predicate ontology contract declaring cardinality, temporal mode, and conflict policies."""
+    predicate: str
+    cardinality: str  # "SINGLE" | "MULTI"
+    temporal_mode: str  # "TIME_VARYING" | "ADDITIVE" | "EPISODIC" | "INTERVAL_BOUNDED"
+    conflict_policy: str = "ISOLATE_CONTEMPORANEOUS_DISPUTES"
+    default_duration: float | None = None
+
+
+def adjudicate_observation(
+    obs: Observation,
+    engine: BitemporalEngine,
+    contract: PredicateContract,
+    new_fact_id: str | None = None,
+) -> list[TemporalEvent]:
+    """Pure, standalone state-aware contract adjudicator mapping (Observation, EngineState, Contract) -> EventBatch."""
+    cardinality = contract.cardinality
+    temporal_mode = contract.temporal_mode
+    conflict_policy = contract.conflict_policy
+
+    t_v_in = obs.t_valid_start
+    t_v_end_in = obs.t_valid_end
+    t_k_in = obs.t_knowledge
+    fid = new_fact_id or f"occ_{obs.observation_id}"
+
+    events: list[TemporalEvent] = []
+    seq = 0
+
+    rel = engine.get_relevant_occurrences(obs.subject, obs.predicate, t_v_in, t_k_in)
+    active_matching = rel["active"]
+    preceding_matching = rel["preceding"]
+
+    if cardinality == "SINGLE" and temporal_mode == "TIME_VARYING":
+        events.append(TemporalEvent(
+            event_id=f"ev_adj_{obs.observation_id}_{seq}",
+            event_type=EventType.ASSERT,
+            t_knowledge=t_k_in,
+            event_seq=seq,
+            t_valid_start=t_v_in,
+            target_fact_id=fid,
+        ))
+        seq += 1
+
+        targets = active_matching if active_matching else (preceding_matching[:1] if preceding_matching else (rel["all_known"][:1] if rel["all_known"] else []))
+        for f in targets:
+            if f.obj != obs.obj:
+                f_ass_ev = next((e for e in engine.events if e.target_fact_id == f.fact_id and e.event_type == EventType.ASSERT), None)
+                is_contemporaneous = (f_ass_ev is not None and f_ass_ev.t_valid_start == t_v_in)
+
+                if is_contemporaneous and obs.source_id != f.source_id and conflict_policy == "ISOLATE_CONTEMPORANEOUS_DISPUTES":
+                    events.append(TemporalEvent(
+                        event_id=f"ev_adj_{obs.observation_id}_{seq}",
+                        event_type=EventType.CONTRADICTS,
+                        t_knowledge=t_k_in,
+                        event_seq=seq,
+                        t_valid_start=t_v_in,
+                        t_valid_end=float("inf"),
+                        target_fact_id=fid,
+                        secondary_fact_id=f.fact_id,
+                    ))
+                    seq += 1
+                else:
+                    events.append(TemporalEvent(
+                        event_id=f"ev_adj_{obs.observation_id}_{seq}",
+                        event_type=EventType.SUPERSEDES,
+                        t_knowledge=t_k_in,
+                        event_seq=seq,
+                        t_valid_start=t_v_in,
+                        target_fact_id=fid,
+                        secondary_fact_id=f.fact_id,
+                    ))
+                    seq += 1
+
+    elif cardinality == "MULTI" and temporal_mode in ("ADDITIVE", "EPISODIC"):
+        events.append(TemporalEvent(
+            event_id=f"ev_adj_{obs.observation_id}_{seq}",
+            event_type=EventType.ASSERT,
+            t_knowledge=t_k_in,
+            event_seq=seq,
+            t_valid_start=t_v_in,
+            t_valid_end=t_v_end_in,
+            target_fact_id=fid,
+        ))
+        seq += 1
+
+    elif cardinality == "SINGLE" and temporal_mode == "INTERVAL_BOUNDED":
+        duration = contract.default_duration or 5.0
+        eff_end = t_v_end_in if t_v_end_in is not None else (t_v_in + duration)
+        events.append(TemporalEvent(
+            event_id=f"ev_adj_{obs.observation_id}_{seq}",
+            event_type=EventType.ASSERT,
+            t_knowledge=t_k_in,
+            event_seq=seq,
+            t_valid_start=t_v_in,
+            t_valid_end=eff_end,
+            target_fact_id=fid,
+        ))
+        seq += 1
+
+        targets = active_matching if active_matching else (preceding_matching[:1] if preceding_matching else [])
+        for f in targets:
+            if f.obj != obs.obj:
+                f_ass_ev = next((e for e in engine.events if e.target_fact_id == f.fact_id and e.event_type == EventType.ASSERT), None)
+                is_contemporaneous = (f_ass_ev is not None and f_ass_ev.t_valid_start == t_v_in)
+                if is_contemporaneous and obs.source_id != f.source_id:
+                    events.append(TemporalEvent(
+                        event_id=f"ev_adj_{obs.observation_id}_{seq}",
+                        event_type=EventType.CONTRADICTS,
+                        t_knowledge=t_k_in,
+                        event_seq=seq,
+                        t_valid_start=t_v_in,
+                        t_valid_end=float("inf"),
+                        target_fact_id=fid,
+                        secondary_fact_id=f.fact_id,
+                    ))
+                    seq += 1
+                else:
+                    events.append(TemporalEvent(
+                        event_id=f"ev_adj_{obs.observation_id}_{seq}",
+                        event_type=EventType.SUPERSEDES,
+                        t_knowledge=t_k_in,
+                        event_seq=seq,
+                        t_valid_start=t_v_in,
+                        target_fact_id=fid,
+                        secondary_fact_id=f.fact_id,
+                    ))
+                    seq += 1
+
+    return events

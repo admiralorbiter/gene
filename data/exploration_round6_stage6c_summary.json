@@ -1,0 +1,34 @@
+{
+  "stage": "Exploration Round 6 Stage 6C",
+  "run_id": "run_stage6c_1787288709",
+  "total_calls": 28,
+  "canary_determinism": {
+    "total_canaries": 4,
+    "raw_string_matches": 4,
+    "raw_determinism_rate": 1.0,
+    "semantic_json_matches": 4,
+    "semantic_determinism_rate": 1.0
+  },
+  "arm_n1_direct_transition": {
+    "total_cases": 12,
+    "layer_0_extraction_accuracy": 0.0,
+    "layer_a_transition_fidelity": 0.0,
+    "layer_b_premise_state_fidelity": 0.1667,
+    "layer_c_support_fidelity": 0.1667,
+    "layer_c_entitlement_accuracy": 0.1667,
+    "error_origin_breakdown": {
+      "TRANSITION_EMISSION_ERROR": 10
+    }
+  },
+  "arm_n2_modular_extraction": {
+    "total_cases": 12,
+    "layer_0_extraction_accuracy": 0.0833,
+    "layer_a_transition_fidelity": 0.8333,
+    "layer_b_premise_state_fidelity": 0.9167,
+    "layer_c_support_fidelity": 0.25,
+    "layer_c_entitlement_accuracy": 0.25,
+    "error_origin_breakdown": {
+      "OBSERVATION_EXTRACTION_ERROR": 9
+    }
+  }
+}
