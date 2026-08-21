@@ -5,7 +5,7 @@ proposed_by: antigravity
 design_review: APPROVED
 reviewed_by: chatgpt-pro
 authorized_by: human
-base_sha: 3861de935a8f4c2e6840004ff41c59bb79bc6102
+base_sha: 3861de9474f685bc92f0372f6bb72d43b198f0b7
 execution_base_sha: null
 resource_class: gpu
 long_running: false
