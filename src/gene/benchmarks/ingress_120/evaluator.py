@@ -1,4 +1,4 @@
-"""Stateful 120-World 4-Probe Benchmark Evaluator (Stage 7A.1).
+"""Stateful 120-World 4-Probe Benchmark Evaluator (Stage 7A.2).
 
 Evaluates Arms A0, A1, A2, A3, A4 against seeded prior bitemporal state.
 Exercises true downstream Q1 (Bitemporal state), Q2 (Antichain support S_t via why_t),
@@ -24,6 +24,7 @@ from gene.ingress.ontology import (
     CapabilityPolicyRegistry,
     EntityDefinition,
     IngressOntology,
+    LineageIndependenceRegistry,
 )
 from gene.ingress.policies import (
     A0Top1BlindWritePolicy,
@@ -54,17 +55,32 @@ def get_benchmark_ontology() -> IngressOntology:
 
 
 def get_benchmark_capability_registry() -> CapabilityPolicyRegistry:
+    # Principal-bound capability policies
     policies = {
-        "sensor": CapabilityPolicy("sensor", frozenset(["*"]), ClaimPrivilege.ROOT_FACT, "HIGH_PRECISION_SENSOR", "ROOT_NET_1"),
-        "guest": CapabilityPolicy("guest", frozenset(["feedback_only"]), ClaimPrivilege.ATTESTATION_ONLY, "UNTRUSTED_WEB", "ROOT_GUEST"),
+        "sensor_policy": CapabilityPolicy("sensor_policy", frozenset(["*"]), ClaimPrivilege.ROOT_FACT, "HIGH_PRECISION_SENSOR"),
+        "guest_policy": CapabilityPolicy("guest_policy", frozenset(["feedback_only"]), ClaimPrivilege.ATTESTATION_ONLY, "UNTRUSTED_WEB"),
     }
-    return CapabilityPolicyRegistry(policies)
+    bindings = {
+        "sensor_alpha": "sensor_policy",
+        "sensor_baseline": "sensor_policy",
+        "guest_unverified": "guest_policy",
+    }
+    return CapabilityPolicyRegistry(policies, bindings)
+
+
+def get_benchmark_independence_registry() -> LineageIndependenceRegistry:
+    return LineageIndependenceRegistry({
+        "sensor_alpha": "ROOT_NET_1_sensor_alpha",
+        "sensor_baseline": "ROOT_NET_1_sensor_baseline",
+        "guest_unverified": "ROOT_GUEST_guest_unverified",
+    })
 
 
 def evaluate_arm(policy: IngressPolicy, cases: list[IngressTestCase]) -> dict[str, Any]:
     """Evaluate an ingress policy across all 120 stateful cases feeding the bitemporal engine."""
     ontology = get_benchmark_ontology()
     capability_registry = get_benchmark_capability_registry()
+    independence_registry = get_benchmark_independence_registry()
 
     world_vectors: list[tuple[int, int, int, int]] = []
     world_passes: list[bool] = []
@@ -114,7 +130,7 @@ def evaluate_arm(policy: IngressPolicy, cases: list[IngressTestCase]) -> dict[st
             )
         )
 
-        engine = IngressEngine(ontology, capability_registry, policy, b_engine)
+        engine = IngressEngine(ontology, capability_registry, policy, b_engine, independence_registry)
 
         contract = PredicateContract(
             predicate=case.predicate_name,
@@ -209,41 +225,32 @@ def evaluate_arm(policy: IngressPolicy, cases: list[IngressTestCase]) -> dict[st
         active_facts_now = b_engine.get_active_facts(case.t_valid_start, 2)
         if oracle_exp.is_admissible_ground_truth:
             if is_dispute_mode:
-                # Under contemporaneous dispute of single-cardinality facts, cautious isolation inactivates both facts
                 q1 = 1 if len(active_facts_now) == 0 else 0
             else:
                 q1 = 1 if any(f.fact_id == cand_fact_id for f in active_facts_now) else 0
         else:
-            # Inadmissible candidate must not be active
             q1 = 1 if not any(f.fact_id == cand_fact_id for f in active_facts_now) else 0
 
         # Q2: Structured Premise Challenge Probe via why_t
         why_res = b_engine.why_t(query_triple, case.t_valid_start, 2)
         if oracle_exp.is_admissible_ground_truth:
             if is_dispute_mode:
-                # Under dispute, entitlement is cleanly blocked (cautious abstention)
                 q2 = 1 if not why_res["is_entitled"] else 0
             else:
-                # Entitled with non-empty minimal antichain support S_t
                 q2 = 1 if (why_res["is_entitled"] and len(why_res["support_sets_S_t"]) >= 1) else 0
         else:
-            # Inadmissible query must NOT be entitled
             q2 = 1 if not why_res["is_entitled"] else 0
 
         # Q3: Action Policy Authority Probe via Auth(S_L)
         if oracle_exp.is_admissible_ground_truth:
             if is_dispute_mode:
-                # Disputed state has 0 authority to act
                 q3 = 1 if why_res["bounded_authority"] == 0.0 else 0
             else:
-                # Entitled state has full authority (1.0) with authentic lineage
                 q3 = 1 if (why_res["bounded_authority"] == 1.0 and any("ROOT_NET_1" in "".join(s) for s in why_res["lineage_sets_S_L_t"])) else 0
         else:
-            # Inadmissible input must have 0.0 bounded authority
             q3 = 1 if why_res["bounded_authority"] == 0.0 else 0
 
         # Q4: Causal Invalidation Probe via what_if_t
-        # Simulate counterfactual retraction of candidate fact: does it restore or preserve baseline state?
         if cand_fact_id in b_engine.facts:
             cf_event = TemporalEvent(
                 event_id=f"cf_retract_{case.case_id}",
@@ -255,10 +262,8 @@ def evaluate_arm(policy: IngressPolicy, cases: list[IngressTestCase]) -> dict[st
             )
             eval_tv = 2.5 if (case.predicate_mode == "INTERVAL_BOUNDED" and case.temporal_relation == "FORWARD_UPDATE") else case.t_valid_start
             what_if_res = b_engine.what_if_t(base_triple, cf_event, eval_tv, 2)
-            # Retracting candidate fact cleanly restores baseline or preserves clean state
             q4 = 1 if what_if_res["hypothetical_entitled"] or case.predicate_mode in ("ADDITIVE", "EPISODIC") else 0
         else:
-            # When candidate was not admitted, baseline remains unperturbed
             q4 = 1
 
         p_vector = (q1, q2, q3, q4)

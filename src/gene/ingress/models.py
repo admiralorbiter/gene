@@ -40,7 +40,7 @@ class CaptureProvenance:
 
 @dataclass(frozen=True)
 class ClaimedOrigin:
-    """Origin entity claimed inside the textual payload."""
+    """Origin entity claimed inside the textual payload (UNTRUSTED / INFORMATIONAL ONLY)."""
     claimed_source_name: str
     claimed_role: str = "reporter"
 
@@ -71,7 +71,7 @@ class TrustedSourceContext:
     CRITICAL SECURITY INVARIANT:
     TrustedSourceContext is NEVER supplied by an external caller or model.
     It is deterministically derived by the platform kernel from:
-    SourceRecord + AuthenticatedOrigin + CapabilityPolicyRegistry.
+    SourceRecord + AuthenticatedOrigin (verified_id) + CapabilityPolicyRegistry + LineageIndependenceRegistry.
     """
     authenticity: str  # "CRYPTOGRAPHIC_VERIFIED" | "PLATFORM_LOCAL" | "UNVERIFIED"
     authorization_scope: frozenset[str]
@@ -162,3 +162,25 @@ class AdmissionCertificate:
     rejection_cause: Optional[str] = None
     candidates_remaining: Optional[tuple[str, ...]] = None
     evidence_needed: Optional[str] = None
+
+
+@dataclass(frozen=True)
+class ResolutionCertificate:
+    """Proof-carrying witness emitted for resolving a DeferredBinding."""
+    deferred_id: str
+    chosen_subject_id: str
+    chosen_object_id: str
+    disambiguating_source_record_id: str
+    resolution_witness: str
+    lineage_roots: frozenset[str] = field(default_factory=frozenset)
+
+
+@dataclass(frozen=True)
+class PromotionCertificate:
+    """Proof-carrying witness emitted for promoting a ProvisionalEntity to canonical status."""
+    provisional_id: str
+    canonical_entity_id: str
+    canonical_name: str
+    entity_type: str
+    promotion_authority_record_id: str
+    authority_witness: str

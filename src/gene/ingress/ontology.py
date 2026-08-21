@@ -1,4 +1,4 @@
-"""Ontology and Capability Policy Registries for Epistemic Ingress (Round 7)."""
+"""Ontology, Capability Policy, and Lineage Independence Registries for Epistemic Ingress (Round 7)."""
 
 from __future__ import annotations
 
@@ -26,45 +26,89 @@ class EntityDefinition:
 
 @dataclass(frozen=True)
 class CapabilityPolicy:
-    """Defines domain authorization rules for a source role or origin class."""
-    source_role: str
+    """Defines domain authorization rules for a verified principal or principal role."""
+    principal_id_or_role: str
     authorized_predicates: frozenset[str]
     max_claim_privilege: ClaimPrivilege = ClaimPrivilege.ROOT_FACT
     reliability_class: str = "HIGH_PRECISION_SENSOR"
-    default_independence_prefix: str = "ROOT"
+    is_ontology_admin: bool = False
 
 
 class CapabilityPolicyRegistry:
-    """Pure registry mapping source identities / roles to authorization policies."""
+    """Pure registry mapping authenticated principal identities / roles to authorization policies.
+    
+    SECURITY INVARIANT:
+    Keyed by AuthenticatedOrigin.verified_id (or principal role mapping in registry).
+    Never keyed by untrusted textually ClaimedOrigin.claimed_role.
+    """
 
-    def __init__(self, policies: Optional[dict[str, CapabilityPolicy]] = None):
+    def __init__(
+        self,
+        policies: Optional[dict[str, CapabilityPolicy]] = None,
+        principal_role_bindings: Optional[dict[str, str]] = None,
+    ):
         self._policies = dict(policies or {})
+        self._principal_role_bindings = dict(principal_role_bindings or {})
 
     def register(self, policy: CapabilityPolicy) -> None:
-        self._policies[policy.source_role] = policy
+        self._policies[policy.principal_id_or_role] = policy
 
-    def get_policy(self, source_role: str) -> Optional[CapabilityPolicy]:
-        return self._policies.get(source_role)
+    def bind_principal_role(self, verified_id: str, role_name: str) -> None:
+        self._principal_role_bindings[verified_id] = role_name
 
-    def is_authorized(self, source_role: str, predicate: str) -> bool:
-        pol = self.get_policy(source_role)
+    def get_policy(self, verified_id: str) -> Optional[CapabilityPolicy]:
+        # 1. Direct principal policy match
+        if verified_id in self._policies:
+            return self._policies[verified_id]
+        # 2. Bound principal role match
+        role = self._principal_role_bindings.get(verified_id)
+        if role and role in self._policies:
+            return self._policies[role]
+        return None
+
+    def is_authorized(self, verified_id: str, predicate: str) -> bool:
+        pol = self.get_policy(verified_id)
         if not pol:
             return False
         return predicate in pol.authorized_predicates or "*" in pol.authorized_predicates
+
+    def is_ontology_admin(self, verified_id: str) -> bool:
+        pol = self.get_policy(verified_id)
+        return pol.is_ontology_admin if pol else False
+
+
+class LineageIndependenceRegistry:
+    """Pure registry mapping authenticated origins to defensible independence classes.
+    
+    SECURITY INVARIANT:
+    OriginIdentity != DerivationLineage != IndependenceClass.
+    Verified identity alone does NOT establish epistemic independence.
+    Unmapped origins default to explicit unverified classes.
+    """
+
+    def __init__(self, mappings: Optional[dict[str, str]] = None):
+        self._mappings = dict(mappings or {})
+
+    def register_independence_class(self, verified_id: str, independence_class: str) -> None:
+        self._mappings[verified_id] = independence_class
+
+    def get_independence_class(self, verified_id: str) -> str:
+        return self._mappings.get(verified_id, f"ROOT_UNVERIFIED_INDEPENDENCE_{verified_id}")
 
 
 def derive_trusted_source_context(
     source_record: SourceRecord,
     capability_registry: CapabilityPolicyRegistry,
+    independence_registry: Optional[LineageIndependenceRegistry] = None,
 ) -> TrustedSourceContext:
-    """Derive authentic TrustedSourceContext from platform record and capability policy.
+    """Derive authentic TrustedSourceContext from platform record and principal capability policy.
     
-    Enforces origin verification and prevents spoofed claimed origins.
+    Enforces origin verification and prevents spoofed claimed origins or claimed roles.
     """
     claimed = source_record.claimed_origin
     auth = source_record.authenticated_origin
 
-    # Cross-check: If claimed source does not match authenticated identity, flag spoofing
+    # 1. Cross-check: Claimed name must match authenticated identity
     is_spoofed = (auth.is_authenticated and claimed.claimed_source_name != auth.verified_id)
     if is_spoofed:
         return TrustedSourceContext(
@@ -86,17 +130,20 @@ def derive_trusted_source_context(
             is_spoofed_origin=False,
         )
 
-    # Lookup capability policy for authenticated role
-    policy = capability_registry.get_policy(claimed.claimed_role)
+    # 2. Lookup capability policy strictly by AuthenticatedOrigin.verified_id (NEVER claimed_role)
+    policy = capability_registry.get_policy(auth.verified_id)
     if not policy:
         return TrustedSourceContext(
             authenticity="PLATFORM_LOCAL" if "LOCAL" in auth.auth_method else "CRYPTOGRAPHIC_VERIFIED",
             authorization_scope=frozenset(),
             max_claim_privilege=ClaimPrivilege.ATTESTATION_ONLY,
-            reliability_class="UNREGISTERED_ROLE",
-            independence_class=f"ROOT_{auth.verified_id}",
+            reliability_class="UNREGISTERED_PRINCIPAL",
+            independence_class=f"ROOT_UNMAPPED_{auth.verified_id}",
             is_spoofed_origin=False,
         )
+
+    # 3. Derive independence class from explicit registry (decoupled from identity)
+    ind_class = independence_registry.get_independence_class(auth.verified_id) if independence_registry else f"ROOT_NET_1_{auth.verified_id}"
 
     auth_type = "PLATFORM_LOCAL" if "LOCAL" in auth.auth_method else "CRYPTOGRAPHIC_VERIFIED"
     return TrustedSourceContext(
@@ -104,7 +151,7 @@ def derive_trusted_source_context(
         authorization_scope=policy.authorized_predicates,
         max_claim_privilege=policy.max_claim_privilege,
         reliability_class=policy.reliability_class,
-        independence_class=f"{policy.default_independence_prefix}_{auth.verified_id}",
+        independence_class=ind_class,
         is_spoofed_origin=False,
     )
 

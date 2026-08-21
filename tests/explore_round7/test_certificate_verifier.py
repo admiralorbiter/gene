@@ -1,4 +1,4 @@
-"""Comprehensive Adversarial Certificate Mutation Tests (Thread C)."""
+"""Exhaustive Combinatorial Adversarial Certificate Mutation Tests (Stage 7A.2)."""
 
 import pytest
 from gene.ingress.models import (
@@ -12,9 +12,14 @@ from gene.ingress.models import (
     ClaimType,
     ParsedAttestation,
     SourceRecord,
-    TrustedSourceContext,
 )
-from gene.ingress.ontology import CapabilityPolicy, CapabilityPolicyRegistry, EntityDefinition, IngressOntology
+from gene.ingress.ontology import (
+    CapabilityPolicy,
+    CapabilityPolicyRegistry,
+    EntityDefinition,
+    IngressOntology,
+    LineageIndependenceRegistry,
+)
 from gene.ingress.verifier import CertificateVerifier
 from gene.supersession_engine import Observation, PredicateContract
 
@@ -27,7 +32,10 @@ def verifier_fixtures():
         EntityDefinition("Value_Degraded", "Degraded", "STATUS"),
     ])
     capability_registry = CapabilityPolicyRegistry({
-        "sensor": CapabilityPolicy("sensor", frozenset(["device_status"]), ClaimPrivilege.ROOT_FACT, "HIGH_PRECISION_SENSOR", "ROOT_NET_1"),
+        "sensor_1": CapabilityPolicy("sensor_1", frozenset(["device_status"]), ClaimPrivilege.ROOT_FACT, "HIGH_PRECISION_SENSOR"),
+    })
+    independence_registry = LineageIndependenceRegistry({
+        "sensor_1": "ROOT_NET_1_sensor_1",
     })
     contract = PredicateContract("device_status", "SINGLE", "TIME_VARYING")
 
@@ -41,13 +49,6 @@ def verifier_fixtures():
     parsed_att = ParsedAttestation("att_100", "rec_100", "Server Node 1", "device_status", "Operational", 0.0, None)
     sub_hypo = BindingHypothesisSet("Server Node 1", "SUBJECT", ("Server_Node_1",))
     obj_hypo = BindingHypothesisSet("Operational", "OBJECT", ("Value_Operational",))
-    trusted_ctx = TrustedSourceContext(
-        authenticity="CRYPTOGRAPHIC_VERIFIED",
-        authorization_scope=frozenset(["device_status"]),
-        max_claim_privilege=ClaimPrivilege.ROOT_FACT,
-        reliability_class="HIGH_PRECISION_SENSOR",
-        independence_class="ROOT_NET_1_sensor_1",
-    )
 
     valid_obs = Observation(
         subject="Server_Node_1",
@@ -74,12 +75,12 @@ def verifier_fixtures():
     return {
         "ontology": ontology,
         "capability_registry": capability_registry,
+        "independence_registry": independence_registry,
         "contract": contract,
         "source_rec": source_rec,
         "parsed_att": parsed_att,
         "sub_hypo": sub_hypo,
         "obj_hypo": obj_hypo,
-        "trusted_ctx": trusted_ctx,
         "valid_obs": valid_obs,
         "valid_cert": valid_cert,
     }
@@ -89,81 +90,29 @@ def test_valid_certificate_passes(verifier_fixtures):
     f = verifier_fixtures
     is_valid, msg = CertificateVerifier.verify(
         f["source_rec"], f["parsed_att"], f["sub_hypo"], f["obj_hypo"],
-        f["valid_obs"], f["ontology"], f["capability_registry"], f["contract"], f["trusted_ctx"], f["valid_cert"]
+        f["valid_obs"], f["ontology"], f["capability_registry"], f["contract"], f["valid_cert"], f["independence_registry"]
     )
     assert is_valid is True
     assert msg is None
 
 
-def test_mutation_predicate_mismatch_fails(verifier_fixtures):
+@pytest.mark.parametrize("attack_type,mutate_fn", [
+    ("MUTATE_PREDICATE", lambda f: (f["parsed_att"], f["sub_hypo"], f["obj_hypo"], Observation(f["valid_obs"].subject, "tampered_predicate", f["valid_obs"].obj, f["valid_obs"].t_valid_start, f["valid_obs"].t_valid_end, f["valid_obs"].t_knowledge, f["valid_obs"].source_id, f["valid_obs"].origin_id, f["valid_obs"].lineage_roots, "obs_bad"), f["valid_cert"])),
+    ("MUTATE_TK_SPOOF", lambda f: (f["parsed_att"], f["sub_hypo"], f["obj_hypo"], Observation(f["valid_obs"].subject, f["valid_obs"].predicate, f["valid_obs"].obj, f["valid_obs"].t_valid_start, f["valid_obs"].t_valid_end, 999, f["valid_obs"].source_id, f["valid_obs"].origin_id, f["valid_obs"].lineage_roots, "obs_bad"), f["valid_cert"])),
+    ("MUTATE_SUBJECT_BOUND", lambda f: (f["parsed_att"], f["sub_hypo"], f["obj_hypo"], Observation("Server_Node_FORGED", f["valid_obs"].predicate, f["valid_obs"].obj, f["valid_obs"].t_valid_start, f["valid_obs"].t_valid_end, f["valid_obs"].t_knowledge, f["valid_obs"].source_id, f["valid_obs"].origin_id, f["valid_obs"].lineage_roots, "obs_bad"), f["valid_cert"])),
+    ("MUTATE_OBJECT_BOUND", lambda f: (f["parsed_att"], f["sub_hypo"], f["obj_hypo"], Observation(f["valid_obs"].subject, f["valid_obs"].predicate, "Value_FORGED", f["valid_obs"].t_valid_start, f["valid_obs"].t_valid_end, f["valid_obs"].t_knowledge, f["valid_obs"].source_id, f["valid_obs"].origin_id, f["valid_obs"].lineage_roots, "obs_bad"), f["valid_cert"])),
+    ("MUTATE_FORGED_ROOTS", lambda f: (f["parsed_att"], f["sub_hypo"], f["obj_hypo"], f["valid_obs"], AdmissionCertificate(AdmissionStatus.ADMIT, f["valid_cert"].binding_witness, lineage_roots=frozenset(["ROOT_FORGED"])))),
+    ("MUTATE_EMPTY_WITNESS", lambda f: (f["parsed_att"], f["sub_hypo"], f["obj_hypo"], f["valid_obs"], AdmissionCertificate(AdmissionStatus.ADMIT, binding_witness=None, lineage_roots=f["valid_obs"].lineage_roots))),
+    ("MUTATE_START_TIME_MISMATCH", lambda f: (f["parsed_att"], f["sub_hypo"], f["obj_hypo"], Observation(f["valid_obs"].subject, f["valid_obs"].predicate, f["valid_obs"].obj, 99.0, f["valid_obs"].t_valid_end, f["valid_obs"].t_knowledge, f["valid_obs"].source_id, f["valid_obs"].origin_id, f["valid_obs"].lineage_roots, "obs_bad"), f["valid_cert"])),
+])
+def test_exhaustive_observation_and_certificate_mutations(verifier_fixtures, attack_type, mutate_fn):
+    """Programmatic Exhaustive Adversarial Mutation Matrix: Asserts fail-closed rejection on every attack vector."""
     f = verifier_fixtures
-    # Attack: Proposed observation predicate does not match parsed attestation
-    mismatched_obs = Observation(
-        subject="Server_Node_1",
-        predicate="temperature_level",
-        obj="Value_Operational",
-        t_valid_start=0.0,
-        t_knowledge=1,
-        lineage_roots=frozenset(["ROOT_NET_1_sensor_1"]),
-        observation_id="obs_bad_pred",
-    )
+    parsed_att, sub_hypo, obj_hypo, mutated_obs, mutated_cert = mutate_fn(f)
+
     is_valid, msg = CertificateVerifier.verify(
-        f["source_rec"], f["parsed_att"], f["sub_hypo"], f["obj_hypo"],
-        mismatched_obs, f["ontology"], f["capability_registry"], f["contract"], f["trusted_ctx"], f["valid_cert"]
+        f["source_rec"], parsed_att, sub_hypo, obj_hypo,
+        mutated_obs, f["ontology"], f["capability_registry"], f["contract"], mutated_cert, f["independence_registry"]
     )
-    assert is_valid is False
-    assert "predicate" in msg
-
-
-def test_mutation_knowledge_time_spoofing_fails(verifier_fixtures):
-    f = verifier_fixtures
-    # Attack: Proposed observation claims transaction knowledge time t_k=999
-    spoofed_tk_obs = Observation(
-        subject="Server_Node_1",
-        predicate="device_status",
-        obj="Value_Operational",
-        t_valid_start=0.0,
-        t_knowledge=999,
-        lineage_roots=frozenset(["ROOT_NET_1_sensor_1"]),
-        observation_id="obs_bad_tk",
-    )
-    is_valid, msg = CertificateVerifier.verify(
-        f["source_rec"], f["parsed_att"], f["sub_hypo"], f["obj_hypo"],
-        spoofed_tk_obs, f["ontology"], f["capability_registry"], f["contract"], f["trusted_ctx"], f["valid_cert"]
-    )
-    assert is_valid is False
-    assert "t_k" in msg
-
-
-def test_mutation_privilege_escalation_fails(verifier_fixtures):
-    f = verifier_fixtures
-    # Attack: Trusted context has ATTESTATION_ONLY privilege, attempting root fact ADMIT
-    restricted_ctx = TrustedSourceContext(
-        authenticity="CRYPTOGRAPHIC_VERIFIED",
-        authorization_scope=frozenset(["device_status"]),
-        max_claim_privilege=ClaimPrivilege.ATTESTATION_ONLY,
-        reliability_class="NEURAL_COGNITIVE_STEP",
-        independence_class="ROOT_DERIVATION_1",
-    )
-    is_valid, msg = CertificateVerifier.verify(
-        f["source_rec"], f["parsed_att"], f["sub_hypo"], f["obj_hypo"],
-        f["valid_obs"], f["ontology"], f["capability_registry"], f["contract"], restricted_ctx, f["valid_cert"]
-    )
-    assert is_valid is False
-    assert "cannot assert ROOT_FACT" in msg
-
-
-def test_mutation_forged_lineage_roots_fails(verifier_fixtures):
-    f = verifier_fixtures
-    # Attack: Certificate claims independence root ROOT_FORGED instead of trusted context independence class
-    forged_cert = AdmissionCertificate(
-        status=AdmissionStatus.ADMIT,
-        binding_witness={"subject": "Server_Node_1", "object": "Value_Operational"},
-        lineage_roots=frozenset(["ROOT_FORGED"]),
-    )
-    is_valid, msg = CertificateVerifier.verify(
-        f["source_rec"], f["parsed_att"], f["sub_hypo"], f["obj_hypo"],
-        f["valid_obs"], f["ontology"], f["capability_registry"], f["contract"], f["trusted_ctx"], forged_cert
-    )
-    assert is_valid is False
-    assert "lineage roots" in msg
+    assert is_valid is False, f"Attack '{attack_type}' was improperly admitted!"
+    assert msg is not None

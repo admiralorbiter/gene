@@ -1,4 +1,4 @@
-"""Candidate Miss vs True Novelty Sidecar (Stage 7A.1)."""
+"""Candidate Miss vs True Novelty Sidecar (Stage 7A.2)."""
 
 from typing import Any
 from gene.ingress.models import (
@@ -17,18 +17,12 @@ from gene.supersession_engine import BitemporalEngine, PredicateContract
 
 
 def run_candidate_miss_assay() -> dict[str, Any]:
-    """Evaluate system behavior under True Novelty vs Candidate Retrieval Miss.
-    
-    1. NOVEL_TRUE: Entity absent from global ontology -> Creates ProvisionalEntity.
-    2. KNOWN_BUT_CANDIDATE_MISS: Entity exists in ontology, but candidate generator missed it.
-       The gate fails closed (REJECT / ZERO_CANDIDATES_RESOLVED), avoiding spurious duplicate entity creation.
-    """
     global_ontology = IngressOntology([
         EntityDefinition("Server_Node_77", "Server Node 77", "SERVER", aliases=("Server 77",)),
         EntityDefinition("Value_Operational", "Operational", "STATUS"),
     ])
     capability_registry = CapabilityPolicyRegistry({
-        "sensor": CapabilityPolicy("sensor", frozenset(["device_status"]), ClaimPrivilege.ROOT_FACT, "HIGH_PRECISION_SENSOR", "ROOT_NET_1"),
+        "sensor_1": CapabilityPolicy("sensor_1", frozenset(["device_status"]), ClaimPrivilege.ROOT_FACT, "HIGH_PRECISION_SENSOR"),
     })
     contract = PredicateContract("device_status", "SINGLE", "TIME_VARYING")
 

@@ -1,4 +1,4 @@
-"""Epistemic Ingress Engine (Round 7)."""
+"""Epistemic Ingress Engine with Proof-Carrying Lifecycle Transitions (Round 7)."""
 
 from __future__ import annotations
 
@@ -12,8 +12,10 @@ from gene.ingress.models import (
     ClaimType,
     DeferredBinding,
     ParsedAttestation,
+    PromotionCertificate,
     ProvisionalEntity,
     ProvisionalRelation,
+    ResolutionCertificate,
     SourceRecord,
     TrustedSourceContext,
 )
@@ -21,6 +23,7 @@ from gene.ingress.ontology import (
     CapabilityPolicyRegistry,
     EntityDefinition,
     IngressOntology,
+    LineageIndependenceRegistry,
     derive_trusted_source_context,
 )
 from gene.ingress.policies import A4FullGENEIngressPolicy, IngressPolicy
@@ -36,7 +39,7 @@ from gene.supersession_engine import (
 
 
 class IngressEngine:
-    """Master runtime coordinator for Epistemic Ingress & Write Admission."""
+    """Master runtime coordinator for Epistemic Ingress & Lifecycle Operations."""
 
     def __init__(
         self,
@@ -44,9 +47,11 @@ class IngressEngine:
         capability_registry: CapabilityPolicyRegistry,
         policy: Optional[IngressPolicy] = None,
         bitemporal_engine: Optional[BitemporalEngine] = None,
+        independence_registry: Optional[LineageIndependenceRegistry] = None,
     ):
         self.ontology = ontology
         self.capability_registry = capability_registry
+        self.independence_registry = independence_registry or LineageIndependenceRegistry()
         self.policy: IngressPolicy = policy or A4FullGENEIngressPolicy()
         self.bitemporal_engine: BitemporalEngine = bitemporal_engine or BitemporalEngine()
 
@@ -70,7 +75,7 @@ class IngressEngine:
         self.source_records[source_record.record_id] = source_record
         self.parsed_attestations[parsed_attestation.attestation_id] = parsed_attestation
 
-        cert, obs, deferred, prov, prov_rel, trusted_ctx = self.policy.evaluate(
+        cert, obs, deferred, prov_list, prov_rel, trusted_ctx = self.policy.evaluate(
             source_record=source_record,
             parsed_attestation=parsed_attestation,
             subject_hypotheses=subject_hypotheses,
@@ -78,6 +83,7 @@ class IngressEngine:
             ontology=self.ontology,
             capability_registry=self.capability_registry,
             contract=contract,
+            independence_registry=self.independence_registry,
         )
 
         self.certificates[source_record.record_id] = cert
@@ -93,12 +99,11 @@ class IngressEngine:
                 ontology=self.ontology,
                 capability_registry=self.capability_registry,
                 contract=contract,
-                trusted_context=trusted_ctx,
                 certificate=cert,
+                independence_registry=self.independence_registry,
             )
 
             if not is_valid:
-                # Certificate verification failed -> Fail-Closed Rejection
                 rejection_cert = AdmissionCertificate(
                     status=AdmissionStatus.REJECT,
                     rejection_cause=f"CERTIFICATE_VERIFICATION_FAILED: {failure_msg}",
@@ -139,7 +144,7 @@ class IngressEngine:
         elif cert.status == AdmissionStatus.DEFER:
             if deferred:
                 self.deferred_bindings[deferred.deferred_id] = deferred
-            if prov:
+            for prov in prov_list:
                 self.provisional_entities[prov.provisional_id] = prov
             if prov_rel:
                 self.provisional_relations[prov_rel.relation_id] = prov_rel
@@ -165,14 +170,19 @@ class IngressEngine:
     def resolve_deferred_binding(
         self,
         deferred_id: str,
-        resolved_subject_id: Optional[str] = None,
-        resolved_object_id: Optional[str] = None,
-        t_knowledge_resolution: int = 2,
+        chosen_subject_id: str,
+        chosen_object_id: str,
+        disambiguating_record: SourceRecord,
+        resolution_certificate: ResolutionCertificate,
         contract: Optional[PredicateContract] = None,
     ) -> dict[str, Any]:
-        """Resolve an existing DeferredBinding under subsequent evidence without reparsing the raw text.
+        """Resolve an existing DeferredBinding under proof-carrying evidence.
         
-        Preserves original SourceRecord capture provenance and independence roots.
+        SECURITY INVARIANTS:
+        1. chosen_subject_id in deferred.subject_hypotheses.candidate_entity_ids
+        2. chosen_object_id in deferred.object_hypotheses.candidate_entity_ids
+        3. Independently verified via CertificateVerifier.verify_resolution()
+        4. Preserves original SourceRecord capture provenance roots without manufacturing arbitrary roots.
         """
         if deferred_id not in self.deferred_bindings:
             raise KeyError(f"DeferredBinding '{deferred_id}' not found in store.")
@@ -181,42 +191,45 @@ class IngressEngine:
         if deferred.is_resolved:
             raise ValueError(f"DeferredBinding '{deferred_id}' is already resolved.")
 
+        # Store disambiguating source record
+        self.source_records[disambiguating_record.record_id] = disambiguating_record
+
+        # 1. Independent Certificate Verification for Resolution
+        is_valid, msg = CertificateVerifier.verify_resolution(
+            deferred=deferred,
+            chosen_subject_id=chosen_subject_id,
+            chosen_object_id=chosen_object_id,
+            disambiguating_record=disambiguating_record,
+            capability_registry=self.capability_registry,
+            ontology=self.ontology,
+            certificate=resolution_certificate,
+            independence_registry=self.independence_registry,
+        )
+
+        if not is_valid:
+            return {
+                "status": AdmissionStatus.REJECT.value,
+                "admitted_fact_id": None,
+                "failure_reason": msg,
+            }
+
         original_source_rec = self.source_records[deferred.source_record_id]
-        original_att = self.parsed_attestations[deferred.attestation_id]
-
-        sub_id = resolved_subject_id or (deferred.subject_hypotheses.candidate_entity_ids[0] if len(deferred.subject_hypotheses.candidate_entity_ids) == 1 else None)
-        obj_id = resolved_object_id or (deferred.object_hypotheses.candidate_entity_ids[0] if len(deferred.object_hypotheses.candidate_entity_ids) == 1 else None)
-
-        if not sub_id or not obj_id:
-            raise ValueError("Resolution requires resolving both subject and object to singleton entity IDs.")
-
-        # Re-derive trusted context from original source record
-        trusted_ctx = derive_trusted_source_context(original_source_rec, self.capability_registry)
+        orig_ctx = derive_trusted_source_context(original_source_rec, self.capability_registry, self.independence_registry)
 
         obs = Observation(
-            subject=sub_id,
+            subject=chosen_subject_id,
             predicate=deferred.predicate,
-            obj=obj_id,
+            obj=chosen_object_id,
             t_valid_start=deferred.t_valid_start,
             t_valid_end=deferred.t_valid_end,
-            t_knowledge=t_knowledge_resolution,
+            t_knowledge=disambiguating_record.t_knowledge,
             source_id=original_source_rec.claimed_origin.claimed_source_name,
             origin_id=original_source_rec.authenticated_origin.verified_id,
-            lineage_roots=frozenset([trusted_ctx.independence_class]),
+            lineage_roots=frozenset([orig_ctx.independence_class]),
             observation_id=f"obs_res_{deferred.deferred_id}",
         )
 
-        cert = AdmissionCertificate(
-            status=AdmissionStatus.ADMIT,
-            binding_witness={"subject": sub_id, "object": obj_id},
-            schema_witness="DEFERRED_BINDING_RESOLVED",
-            temporal_witness=f"[{obs.t_valid_start}, {obs.t_valid_end})",
-            auth_witness=f"ORIGINAL_SCOPE_{deferred.predicate}",
-            lineage_roots=obs.lineage_roots,
-        )
-
         p_contract = contract or PredicateContract(predicate=deferred.predicate, cardinality="SINGLE", temporal_mode="TIME_VARYING")
-
         fid = f"fact_res_{deferred.deferred_id}"
         b_fact = BitemporalFact(
             fact_id=fid,
@@ -238,12 +251,12 @@ class IngressEngine:
             deferred_id=deferred.deferred_id,
             source_record_id=deferred.source_record_id,
             attestation_id=deferred.attestation_id,
-            subject_hypotheses=BindingHypothesisSet(deferred.subject_hypotheses.mention_span, "SUBJECT", (sub_id,)),
+            subject_hypotheses=BindingHypothesisSet(deferred.subject_hypotheses.mention_span, "SUBJECT", (chosen_subject_id,)),
             predicate=deferred.predicate,
-            object_hypotheses=BindingHypothesisSet(deferred.object_hypotheses.mention_span, "OBJECT", (obj_id,)),
+            object_hypotheses=BindingHypothesisSet(deferred.object_hypotheses.mention_span, "OBJECT", (chosen_object_id,)),
             t_valid_start=deferred.t_valid_start,
             t_valid_end=deferred.t_valid_end,
-            t_knowledge=t_knowledge_resolution,
+            t_knowledge=disambiguating_record.t_knowledge,
             reason_deferred="RESOLVED",
             is_resolved=True,
             admitted_fact_id=fid,
@@ -251,10 +264,11 @@ class IngressEngine:
 
         return {
             "status": AdmissionStatus.ADMIT.value,
-            "certificate": cert,
+            "certificate": resolution_certificate,
             "admitted_fact_id": fid,
             "observation": obs,
             "events_recorded": len(events),
+            "failure_reason": None,
         }
 
     def promote_provisional_entity(
@@ -262,14 +276,20 @@ class IngressEngine:
         provisional_id: str,
         canonical_entity_id: str,
         canonical_name: str,
+        promotion_authority_record: SourceRecord,
+        promotion_certificate: PromotionCertificate,
         entity_type: str = "DEVICE",
         aliases: tuple[str, ...] = (),
-        t_knowledge_promotion: int = 2,
         contract: Optional[PredicateContract] = None,
     ) -> dict[str, Any]:
-        """Promote a ProvisionalEntity to canonical status, atomically retargeting relations.
+        """Promote a ProvisionalEntity to canonical status under proof-carrying authority.
         
-        Preserves original SourceRecord provenance and independence roots without manufacturing new roots.
+        SECURITY INVARIANTS:
+        1. Independently verified via CertificateVerifier.verify_promotion()
+        2. No canonical ID collision with existing ontology
+        3. Promotion authority authenticated and holds CANONICAL_ONTOLOGY_ADMIN capability
+        4. Underlying provisional relations from ATTESTATION_ONLY sources cannot become root facts
+        5. Retargets relations where subject, object, or BOTH were provisional.
         """
         if provisional_id not in self.provisional_entities:
             raise KeyError(f"ProvisionalEntity '{provisional_id}' not found in store.")
@@ -278,7 +298,36 @@ class IngressEngine:
         if prov_ent.is_promoted:
             raise ValueError(f"ProvisionalEntity '{provisional_id}' is already promoted.")
 
-        # 1. Register canonical entity in domain ontology
+        self.source_records[promotion_authority_record.record_id] = promotion_authority_record
+
+        # Find associated provisional relations
+        associated_rels = [
+            rel for rel in self.provisional_relations.values()
+            if rel.subject_id == provisional_id or rel.object_id == provisional_id
+        ]
+
+        # 1. Independent Certificate Verification for Promotion
+        is_valid, msg = CertificateVerifier.verify_promotion(
+            provisional=prov_ent,
+            canonical_entity_id=canonical_entity_id,
+            canonical_name=canonical_name,
+            promotion_authority_record=promotion_authority_record,
+            capability_registry=self.capability_registry,
+            ontology=self.ontology,
+            certificate=promotion_certificate,
+            associated_relations=associated_rels,
+            source_records_map=self.source_records,
+            independence_registry=self.independence_registry,
+        )
+
+        if not is_valid:
+            return {
+                "status": AdmissionStatus.REJECT.value,
+                "is_promoted": False,
+                "failure_reason": msg,
+            }
+
+        # 2. Register canonical entity in domain ontology
         canonical_def = EntityDefinition(
             entity_id=canonical_entity_id,
             canonical_name=canonical_name,
@@ -287,46 +336,45 @@ class IngressEngine:
         )
         self.ontology.register_entity(canonical_def)
 
-        # 2. Migrate associated ProvisionalRelations into authoritative BitemporalFacts
+        # 3. Migrate associated ProvisionalRelations into authoritative BitemporalFacts
         migrated_facts: list[str] = []
-        for rel_id, rel in list(self.provisional_relations.items()):
-            if rel.subject_id == provisional_id or rel.object_id == provisional_id:
-                sub = canonical_entity_id if rel.subject_id == provisional_id else rel.subject_id
-                obj = canonical_entity_id if rel.object_id == provisional_id else rel.object_id
-                orig_rec = self.source_records[rel.source_record_id]
+        for rel in associated_rels:
+            sub = canonical_entity_id if rel.subject_id == provisional_id else rel.subject_id
+            obj = canonical_entity_id if rel.object_id == provisional_id else rel.object_id
+            orig_rec = self.source_records[rel.source_record_id]
 
-                obs = Observation(
-                    subject=sub,
-                    predicate=rel.predicate,
-                    obj=obj,
-                    t_valid_start=rel.t_valid_start,
-                    t_valid_end=rel.t_valid_end,
-                    t_knowledge=t_knowledge_promotion,
-                    source_id=orig_rec.claimed_origin.claimed_source_name,
-                    origin_id=orig_rec.authenticated_origin.verified_id,
-                    lineage_roots=rel.lineage_roots,  # Provenance preserved from original sensor record!
-                    observation_id=f"obs_mig_{rel_id}",
-                )
+            obs = Observation(
+                subject=sub,
+                predicate=rel.predicate,
+                obj=obj,
+                t_valid_start=rel.t_valid_start,
+                t_valid_end=rel.t_valid_end,
+                t_knowledge=promotion_authority_record.t_knowledge,
+                source_id=orig_rec.claimed_origin.claimed_source_name,
+                origin_id=orig_rec.authenticated_origin.verified_id,
+                lineage_roots=rel.lineage_roots,  # Original provenance root preserved!
+                observation_id=f"obs_mig_{rel.relation_id}",
+            )
 
-                p_contract = contract or PredicateContract(predicate=rel.predicate, cardinality="SINGLE", temporal_mode="TIME_VARYING")
-                fid = f"fact_prom_{rel_id}"
-                b_fact = BitemporalFact(
-                    fact_id=fid,
-                    subject=obs.subject,
-                    predicate=obs.predicate,
-                    obj=obs.obj,
-                    roots=obs.lineage_roots,
-                    source_id=obs.source_id,
-                    origin_id=obs.origin_id,
-                )
-                self.bitemporal_engine.register_fact(b_fact)
-                evs = adjudicate_observation(obs=obs, engine=self.bitemporal_engine, contract=p_contract, new_fact_id=fid)
-                for ev in evs:
-                    self.bitemporal_engine.record_event(ev)
+            p_contract = contract or PredicateContract(predicate=rel.predicate, cardinality="SINGLE", temporal_mode="TIME_VARYING")
+            fid = f"fact_prom_{rel.relation_id}"
+            b_fact = BitemporalFact(
+                fact_id=fid,
+                subject=obs.subject,
+                predicate=obs.predicate,
+                obj=obs.obj,
+                roots=obs.lineage_roots,
+                source_id=obs.source_id,
+                origin_id=obs.origin_id,
+            )
+            self.bitemporal_engine.register_fact(b_fact)
+            evs = adjudicate_observation(obs=obs, engine=self.bitemporal_engine, contract=p_contract, new_fact_id=fid)
+            for ev in evs:
+                self.bitemporal_engine.record_event(ev)
 
-                migrated_facts.append(fid)
+            migrated_facts.append(fid)
 
-        # 3. Mark provisional entity as promoted
+        # 4. Mark provisional entity as promoted
         self.provisional_entities[provisional_id] = ProvisionalEntity(
             provisional_id=prov_ent.provisional_id,
             first_mention_span=prov_ent.first_mention_span,
@@ -338,8 +386,10 @@ class IngressEngine:
         )
 
         return {
+            "status": AdmissionStatus.ADMIT.value,
             "provisional_id": provisional_id,
             "canonical_entity_id": canonical_entity_id,
             "migrated_fact_ids": migrated_facts,
             "is_promoted": True,
+            "failure_reason": None,
         }

@@ -1,4 +1,4 @@
-"""Role Distractor vs True Linguistic Ambiguity Sidecar (Stage 7A.1)."""
+"""Role Distractor vs True Linguistic Ambiguity Sidecar (Stage 7A.2)."""
 
 from typing import Any
 from gene.ingress.models import (
@@ -17,11 +17,6 @@ from gene.supersession_engine import BitemporalEngine, PredicateContract
 
 
 def run_role_distractor_assay() -> dict[str, Any]:
-    """Test downstream admission correctness given resolved role vs unresolved ambiguity.
-    
-    Case 1: Correctly role-resolved mention -> ADMIT.
-    Case 2: True ambiguity with multiple candidates -> DEFERRED_BINDING.
-    """
     ontology = IngressOntology([
         EntityDefinition("Sensor_Alpha", "Field Sensor Alpha", "SENSOR"),
         EntityDefinition("Server_Node_1", "Server Node 1", "SERVER"),
@@ -30,7 +25,7 @@ def run_role_distractor_assay() -> dict[str, Any]:
         EntityDefinition("Value_Operational", "Operational", "STATUS"),
     ])
     capability_registry = CapabilityPolicyRegistry({
-        "sensor": CapabilityPolicy("sensor", frozenset(["device_status"]), ClaimPrivilege.ROOT_FACT, "HIGH_PRECISION_SENSOR", "ROOT_1"),
+        "sensor_alpha": CapabilityPolicy("sensor_alpha", frozenset(["device_status"]), ClaimPrivilege.ROOT_FACT, "HIGH_PRECISION_SENSOR"),
     })
     contract = PredicateContract("device_status", "SINGLE", "TIME_VARYING")
 
