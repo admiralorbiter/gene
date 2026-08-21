@@ -1,7 +1,7 @@
 # The GENE Scientific Story Memo
-**A Unified Narrative of Error Inheritance, Retrieval Epidemiology, Selective Lineage Immunity, and Structural Proofreading in Persistent LLM Memory**
+**A Unified Narrative of Error Inheritance, Retrieval Epidemiology, Selective Lineage Immunity, Support Algebra, and Action Governance in Persistent AI Memory**
 
-**Document Version:** 1.0 (Canonical Post-Phase 10.5 Release)  
+**Document Version:** 2.0.0 (Support-First Epistemic Runtime & Round 5 Expansion)  
 **Status:** Canonical Scientific Narrative  
 **Authoritative Manifest:** [`data/canonical_results_manifest.json`](../data/canonical_results_manifest.json)  
 **Core Reference Implementation:** [`src/gene/`](../src/gene/)  
@@ -10,15 +10,24 @@
 
 ## Executive Abstract
 
-Modern AI systems increasingly rely on persistent memory to retain knowledge, context, and operational state across sessions and interactions. When an erroneous or poisoned premise enters persistent memory, how does it spread?
+Modern AI systems increasingly rely on persistent memory to retain knowledge, context, and operational state across sessions and interactions. When an erroneous or poisoned premise enters persistent memory, how does it spread, and how can an agent maintain why it is entitled to believe a claim as the world changes?
 
-Standard benchmarks treat memory errors as static retrieval failures or transient model hallucinations. In contrast, the **Genealogical Epistemic Network Experiments (GENE)** project treats persistent memory as an *evolutionary transmission ecology*. Over ten experimental phases, GENE systematically decomposes the lifecycle of a memory mutation:
-$$\text{Ancestral Root} \longrightarrow \text{Retrieval Path Assembly} \longrightarrow \text{Local Reasoning} \longrightarrow \text{Lineage Governance} \longrightarrow \text{Write-Time Admission}$$
+Standard benchmarks treat memory errors as static retrieval failures or transient model hallucinations. In contrast, the **Genealogical Epistemic Network Experiments (GENE)** project treats persistent memory as an *evolutionary epistemic runtime*. Across fifteen experimental phases and five exploratory rounds, GENE systematically decomposes the lifecycle of memory, reasoning, revision, and action:
+$$\text{Ancestral Root} \longrightarrow \text{Retrieval Path Assembly} \longrightarrow \text{Neural Reasoning} \longrightarrow \text{Support Minimization} \longrightarrow \text{Lineage Projection} \longrightarrow \text{Action Governance}$$
 
-This memo synthesizes the **six core discoveries** that define the project's canonical scientific contribution, showing how globally false premises reproduce through locally valid deduction, how lineage metadata enables delayed selective quarantine, why memory governance alone fails to guarantee behavioral containment, and how structural proofreading prevents transient reasoning errors from entering the persistent memory germline.
+This memo synthesizes the **nine core discoveries** that define the project's canonical scientific contribution:
+1. Exposure $\ne$ reported justification $\ne$ causal lineage (Experiment 0).
+2. Globally false premises reproduce through locally valid deduction (Experiment 1A).
+3. Retrieval availability ($X_{\text{path}}$) governs reproductive branching (Experiment 1B-B).
+4. Lineage metadata enables selective delayed quarantine ($S = \text{TPR} - \text{FPR}$) across semantic drift (Experiment 1B-C1b).
+5. Memory containment does not guarantee behavioral containment (Experiment 1B-C2a).
+6. Structural proofreading prevents pseudo-path reasoning from entering the germline (Experiment 1B-C2b).
+7. Neural reported justification exhibits 100% explanatory bloat ($E_S > 0$), and epistemic output decomposes into four independent conformance layers (Round 4).
+8. Flattening alternative support hypergraphs $\mathcal{S}(c)$ causes 100% false retractions on damaged-but-still-entitled states under partial invalidation (Stage 5A).
+9. The Principle of Intervention-Sufficiency: scalar cut-sets ($\kappa$), tuple signatures ($\rho$), and global root counts are lossy representations; action governance requires the lineage-projected minimal support hypergraph $\mathcal{S}_L(c)$ and root resilience $\rho_L(c)$ (Stage 5B).
 
 ```
-                                  THE TWO-LAYER EPISTEMIC ARCHITECTURE
+                                  THE THREE-LAYER EPISTEMIC ARCHITECTURE
                                   
    +───────────────────────────────────+
    │   Ancestral Memory Pool (G_0)     │
@@ -33,19 +42,20 @@ This memo synthesizes the **six core discoveries** that define the project's can
                      ▼ (Retrieved Prompt Context)
    ┌───────────────────────────────────┐
    │     Downstream Neural Reasoner    │  - Executes multi-hop deductive rules
-   │       [ Local Deductive Step ]    │  - May emit spontaneous pseudo-paths (μ_U = 0.375)
+   │       [ Stochastic Proposal ]     │  - Emits candidate answer + reported citation R(c)
    └───────────────────────────────────┘
                      │
                      ▼ (Candidate Claim + Cited Parent IDs)
-   ┌───────────────────────────────────┐  LAYER 2: Structural Epistemic Proofreader
-   │    Support-Certificate Validator  │  - First-order rule antecedent unification
+   ┌───────────────────────────────────┐  LAYER 2: Support Minimizer & Proofreader
+   │    Epistemic Conformance Kernel   │  - Extracts minimal entitling support S(c) from bloat R(c)
    │        [ Controls W_U ]           │  - Rejects underivable pseudo-paths (W_U = 0.000)
    └───────────────────────────────────┘
                      │
                      ▼ (Admitted if Structurally Warranted)
-   +───────────────────────────────────+
-   │   Persistent Occurrence Node (G_3)│  - Total: E[I_g+1] ≈ R_inherited · I_g + Λ_de_novo
-   +───────────────────────────────────+  - Result: μ_U = 0.375 ──► μ_U,heritable = 0.000
+   ┌───────────────────────────────────┐  LAYER 3: Lineage-Projected Action Governance
+   │     Governance Engine (S_L, rho_L)│  - Projects S(c) into root hypergraph S_L(c)
+   │        [ Enforces 7 Axioms ]      │  - Gates high-stakes actions with mathematical proportionality
+   └───────────────────────────────────┘
 ```
 
 ---
@@ -271,40 +281,97 @@ Layer 1 controls $X_{\text{path}} \to 0$ (quarantining inherited falsehoods), an
 
 ---
 
-## 7. Positioning in 2026 Literature & The Lineage Integrity Boundary
+## 7. Discovery 7: The Four-Layer Epistemic Conformance Taxonomy & Explanatory Bloat (Round 4)
 
-### 7.1 Contemporary Literature Matrix
+In Exploration Round 4, GENE connected live neural models (Gemma 3:12B) to complex multi-path support environments. The audit revealed that neural self-reported justification $R(c)$ is fundamentally unfaithful to minimal entitling support $\mathcal{S}(c)$.
+
+Epistemic outputs decompose into four independent layers:
+$$\text{Symbol Realization} \ne \text{Contract Coherence} \ne \text{Justification Precision} \ne \text{Formal Derivability}$$
+
+```
++─────────────────────────────────────────────────────────────────────────────────────────────────────────+
+│                                 FOUR-LAYER CONFORMANCE TAXONOMY (ROUND 4)                               │
++──────────────────────────┬─────────────────────────────────────────────────────────────┬────────────────+
+│ Conformance Layer        │ Failure Surface Modeled                                     │ Observed Rate  │
++──────────────────────────┼─────────────────────────────────────────────────────────────┼────────────────+
+│ 1. Symbol Realization    │ Token-level formatting drift (e.g. PROTOCOL_X7 vs PROTO_X7) │ 6 / 24 (25.0%) │
+│ 2. Contract Coherence    │ Semantic contradiction across JSON fields (det vs N=null)   │ 5 / 24 (20.8%) │
+│ 3. Justification Precise │ Explanatory bloat (citing irrelevant distractors E_S > 0)    │ 24/24 (100.0%) │
+│ 4. Formal Derivability   │ Deriving concrete answers from empty/broken support         │ 0.300 - 0.375  │
++──────────────────────────┴─────────────────────────────────────────────────────────────┴────────────────+
+```
+
+---
+
+## 8. Discovery 8: Loss of Support Algebra Causes 100% Revision Autoimmunity (Stage 5A)
+
+In Stage 5A, GENE evaluated how persistent memory systems update beliefs when an upstream premise is retracted (`WHAT_IF(c, a)`).
+
+When a claim is supported by alternative disjunctive paths (e.g. $\mathcal{S}(C) = \{\{A,B\}, \{D,E\}\}$), invalidating premise $D$ leaves the claim damaged but still entitled via surviving path $\{A,B\}$:
+$$\text{Ent}^*(C, \{D\}) = \mathbf{1}[\{A,B\} \cap \{D\} = \emptyset] \lor \mathbf{1}[\{D,E\} \cap \{D\} = \emptyset] = 1 \lor 0 = 1$$
+
+Across 368 factorial revision scenarios:
+- **Flat Dependency Unions ($R_{\text{union}} = \{A,B,D,E\}$)** falsely retracted **100% of damaged-but-entitled states (104/104)**, destroying beliefs that retained valid alternative support.
+- **Single-Witness Tracking ($R_{\text{single}} = \{D,E\}$)** falsely retracted **57.7% of damaged states (60/104)**.
+- **Explanatory Bloat ($E_S > 0$)** caused **50% false retractions (8/16)** on completely untouched states when an irrelevant distractor was retracted.
+- **Support-First Epistemic Kernel ($\mathcal{S}(c)$)** achieved **100% exact revision accuracy** with **0% autoimmunity**.
+
+---
+
+## 9. Discovery 9: Intervention-Sufficient Representation & Lineage-Projected Action Governance (Stage 5B)
+
+In Stage 5B, GENE investigated: *What information about surviving support is minimally necessary to govern action authority under change?*
+
+The benchmark proved that all existing scalar and tuple summaries suffer from **lossy representation collisions**:
+1. **Binary Entitlement ($\text{Auth} \in \{0, 1\}$)** is blind to degradation, granting 100% full authority ($1.000$) to damaged beliefs.
+2. **Scalar Cut-Set Resilience ($\kappa$)** fails on shared-root degradation ($(2,1) \to (1,1)$), granting full authority ($1.000$) even when an entire alternative path is destroyed.
+3. **Tuple Resilience ($\rho = (|S|, \kappa)$)** fails to distinguish correlated single-root alternative paths from independent multi-root paths.
+4. **Global Root Counts ($|\text{Roots}|$)** fail in shared origin ancestry ($A,D \leftarrow R_1, B,E \leftarrow R_2$): global counting sees 2 roots and 2 paths, but both paths share conjunctive root vulnerability.
+
+**The Resolution:** Projecting premise support into root-lineage space yields the **lineage-projected minimal support hypergraph**:
+$$\mathcal{S}_L(c) = \min_{\subseteq} \{ \{ \mathcal{L}(p) : p \in S_i \} : S_i \in \mathcal{S}(c) \}$$
+Lineage-projected resilience $\rho_L(c) = (|\mathcal{S}_L(c)|, \kappa_L(c))$ resolves all collisions and achieves **100% compliance across 7 formal governance axioms**.
+
+---
+
+## 10. Positioning in 2026 Literature & The Lineage Integrity Boundary
+
+### 10.1 Contemporary Literature Matrix
 
 | Research Area | Recent Key Works (2025–2026) | Existing Focus | GENE's Distinct Contribution |
 | :--- | :--- | :--- | :--- |
 | **Persistent Memory Poisoning** | *Hidden in Memory*, *Remembering More, Risking More*, *Memory Contagion* | Measures attack success rates and downstream task degradation over long sessions. | Analytically decomposes transmission into exact constituent probabilities ($R_{\text{inherited}}$ and $\mu_U$), separating local deductive validity from global truth. |
 | **Provenance-Aware Memory** | *MemLineage*, *MAP-Graph*, *PPMF* | Attaches derivation DAGs and graphs for governance and access control. | Proves the theoretical limits of memory governance, showing that lineage quarantine achieves $S = \text{TPR} - \text{FPR}$ while exposing the pseudo-path reasoning gap. |
 | **Write-Time Defense & Origin Binding** | *ConsistencyGate*, *MemGuard*, *Louck's Origin-Binding Analysis* | Gating candidate memories via model self-reflection or typed boundaries. | Formally operationalizes write defense as an evolutionary filter ($W_U$) that reduces heritable corruption ($\mu_{U, \text{heritable}} = 0$) via first-order certificate unification. |
+| **Epistemic Runtime & Support Maintenance** | *GENE (2026)* | Support-first belief revision, lineage-projected minimal hypergraphs, and action governance under change. | Solves revision autoimmunity via minimal support sets $\mathcal{S}(c)$ and establishes the Principle of Intervention-Sufficiency for persistent agent runtime governance. |
 
-### 7.2 The Lineage Integrity Assumption
+### 10.2 The Lineage Integrity Assumption
 GENE currently evaluates what lineage can achieve under the assumption that ancestry metadata is faithfully recorded by the experimental substrate. It does not yet claim that real-world multi-agent systems maintain trustworthy provenance under adversarial lineage forgery or lossy recursive summarization. Measuring provenance degradation over deep lineages ($G_5+$) defines the primary objective of future work.
 
 ---
 
-## 8. Summary Table of Primary Empirical Results
+## 11. Summary Table of Primary Empirical Results
 
 ```
 +─────────────────────────────────────────────────────────────────────────────────────────────────────────+
-|                                    GENE CANONICAL EXPERIMENTAL SUMMARY                                  |
+│                                    GENE CANONICAL EXPERIMENTAL SUMMARY                                  │
 +────────────+──────+─────────────────────────────────────────+──────────────+────────────+───────────────+
-| Experiment | N    | Primary Quantitative Endpoint           | Metric Value | Baseline   | Status        |
+│ Experiment │ N    │ Primary Quantitative Endpoint           │ Metric Value │ Baseline   │ Status        │
 +────────────+──────+─────────────────────────────────────────+──────────────+────────────+───────────────+
-| Exp 0-B    | 276  | 2x2 Factorial Causal Necessity (Cell 4) | 66/66 (100%) | Uncalib.   | FROZEN        |
-| Exp 1A     | 72   | Multi-Generation Semantic Transmission  | 100.0% (τ=1) | N/A        | FROZEN        |
-| Exp 1B-B1c | 16   | Path-Conditioned Expression Symmetry    | 1.000 / 0.000| N/A        | FROZEN        |
-| Exp 1B-C1b | 1200 | Lineage Quarantine Selectivity (90/10)  | S = +0.800   | Blind: 0.0 | FROZEN        |
-| Exp 1B-C2a | 50   | Live Lineage Containment vs Laundering  | 100% vs 0%   | Node: 0%   | FROZEN        |
-| Exp 1B-C2b | 30   | Structural Proofreader Heritable Rate   | μ_herit = 0.0| μ_U = 0.375| FROZEN        |
+│ Exp 0-B    │ 276  │ 2x2 Factorial Causal Necessity (Cell 4) │ 66/66 (100%) │ Uncalib.   │ FROZEN        │
+│ Exp 1A     │ 72   │ Multi-Generation Semantic Transmission  │ 100.0% (τ=1) │ N/A        │ FROZEN        │
+│ Exp 1B-B1c │ 16   │ Path-Conditioned Expression Symmetry    │ 1.000 / 0.000│ N/A        │ FROZEN        │
+│ Exp 1B-C1b │ 1200 │ Lineage Quarantine Selectivity (90/10)  │ S = +0.800   │ Blind: 0.0 │ FROZEN        │
+│ Exp 1B-C2a │ 50   │ Live Lineage Containment vs Laundering  │ 100% vs 0%   │ Node: 0%   │ FROZEN        │
+│ Exp 1B-C2b │ 30   │ Structural Proofreader Heritable Rate   │ μ_herit = 0.0│ μ_U = 0.375│ FROZEN        │
+│ Round 4    │ 116  │ Four-Layer Conformance & Bloat Assay    │ E_S > 0: 100%│ Zero Bloat │ FROZEN        │
+│ Stage 5A   │ 432  │ Revision Precision & Support Algebra    │ Degraded: 0% │ Flat: 100% │ FROZEN        │
+│ Stage 5B   │ 368  │ Lineage-Projected Action Governance     │ 7/7 Axioms   │ Rho: 6/7   │ FROZEN        │
 +────────────+──────+─────────────────────────────────────────+──────────────+────────────+───────────────+
 ```
 
 ---
 
-## 9. Conclusion & Horizon
+## 12. Conclusion & Horizon
 
-GENE demonstrates that persistent LLM memory systems can be understood and governed as evolutionary ecologies. By combining **Layer 1 Memory Governance** (which prunes reproductive lineage paths based on delayed risk signals) with **Layer 2 Structural Epistemic Proofreading** (which verifies support certificates before write admission), memory ecologies can prevent transient neural reasoning errors from entering the persistent germline.
+GENE demonstrates that persistent AI memory requires an **epistemic runtime for maintaining entitlement under change**. By maintaining minimal entitling support $\mathcal{S}(c)$ and lineage-projected hypergraphs $\mathcal{S}_L(c)$, persistent agents can perform non-destructive belief revision, avoid explanatory bloat autoimmunity, and govern high-stakes actions with mathematical proportionality.

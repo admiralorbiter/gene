@@ -178,6 +178,8 @@ $$\kappa(c) = \min_{C \subseteq \mathcal{A}} \{|C| : \forall S_i \in \mathcal{S}
 
 ---
 
+---
+
 ## 5. The Five Research Pillars: Current Status
 
 ```
@@ -188,30 +190,46 @@ $$\kappa(c) = \min_{C \subseteq \mathcal{A}} \{|C| : \forall S_i \in \mathcal{S}
        • Occurrence identity vs semantic claim identity
        • Resistance to exact-copy & structural provenance laundering
        
-       PILLAR 2: EPISTEMIC SUPPORT & MULTI-JUSTIFICATION [SOLID]
+       PILLAR 2: EPISTEMIC SUPPORT & MULTI-JUSTIFICATION [MATURE]
        • Minimal support sets S(c) and provenance polynomials
        • Epistemic cut sets κ(c) and structural resilience
-       • Discovery of the Epistemic Precision Gap (Round 4)
+       • Four-layer conformance taxonomy: symbol != contract != justification != derivability (Round 4)
        
-       PILLAR 3: EPISTEMIC CHANGE & REVISION [ACTIVE MAINLINE — ROUND 5]
+       PILLAR 3: EPISTEMIC CHANGE & REVISION [SOLID — STAGE 5A VALIDATED]
        • Non-destructive correction (surviving path retention under partial invalidation)
-       • Support bloat vs revision overreach (naïve conjunctive vs minimal S(c))
-       • Dynamic entitlement degradation & resilience tracking
+       • Proved that loss of support algebra causes 100% false retractions on degraded states (Stage 5A)
+       • Eliminates zombie derivations via root-expanded support S_root under stale cache regimes
        
-       PILLAR 4: EPISTEMIC REPRODUCTION & GOVERNANCE [SOLID]
+       PILLAR 4: EPISTEMIC REPRODUCTION & GOVERNANCE [MATURE]
        • Lineage immunity & selective quarantine (Exp 1B-C)
        • Structural proofreading & write certificates (Exp 1B-C2b)
        • Reproductive gating (R0 < 1 containment)
        
-       PILLAR 5: EPISTEMIC ACTION AUTHORITY [EMERGING]
-       • Action eligibility as a function of support resilience κ(c)
-       • Separation of working memory from external actuation
-       • Gating high-stakes actions behind resilient multi-path justification
+       PILLAR 5: EPISTEMIC ACTION AUTHORITY & LINEAGE PROJECTION [SOLID — STAGE 5B VALIDATED]
+       • Hierarchy of epistemic incompleteness: binary -> kappa -> rho -> lineage-projected S_L
+       • Proved that nominal multiplicity masquerades as independence in shared origin ancestry
+       • 100% compliance across 7 formal governance axioms via lineage-projected minimal hypergraphs S_L(c)
 ```
 
 ---
 
-## 6. What GENE Has Established & The Next Scientific Frontier
+## 6. The Foundational Principle: Intervention-Sufficient Epistemic Representation
+
+> **The Principle of Intervention-Sufficiency:**
+> *Whenever two distinct epistemic states collapse to the same stored summary representation, but require different responses to some future causal intervention or external action, that summary is too lossy for the runtime.*
+
+This single principle unifies the entire scientific trajectory of GENE:
+- **Nominal Multiplicity Bias (R1):** Identical memory repetitions collapse independent roots into occurrence counts.
+- **Structural Provenance Laundering (1B-C0):** Node-only forgetting collapses ancestry into flat item records.
+- **Explanatory Bloat (R4):** Neural reported citations collapse minimal support with irrelevant context.
+- **Revision Autoimmunity (5A):** Flat dependency unions collapse alternative disjunctive paths into a single conjunctive cut-set.
+- **Resilience Blindness (5A):** Scalar cut-set $\kappa$ collapses path loss in $(2,1) \to (1,1)$ where $\kappa$ stays constant.
+- **Lineage Independence Blindness (5B):** Tuple $\rho=(|S|, \kappa)$ and global root counts collapse shared origin ancestry into independent alternatives.
+- **The Minimal Resolution:** The Epistemic Kernel must maintain the **lineage-projected minimal support hypergraph** $\mathcal{S}_L(c) = \min_{\subseteq} \{ \{ \mathcal{L}(p) : p \in S_i \} \}$ alongside premise support $\mathcal{S}(c)$.
+
+---
+
+## 7. What GENE Has Established & The Next Scientific Frontier
 
 ```
                                   GENE PROGRESSION MATRIX
@@ -226,28 +244,25 @@ $$\kappa(c) = \min_{C \subseteq \mathcal{A}} \{|C| : \forall S_i \in \mathcal{S}
     ├── Exploration Round 1: Stale-Descendant Hysteresis & Nominal Multiplicity Bias
     ├── Exploration Round 2: Recombinant Support Graphs & Dual-Oracle Epistemic Evaluation
     ├── Exploration Round 3: Multi-Generation Branching Transmission & Cross-Shortcut Discovery
-    └── Exploration Round 4: Epistemic Context Compiler & Four-Layer Conformance Taxonomy
+    ├── Exploration Round 4: Epistemic Context Compiler & Four-Layer Conformance Taxonomy
+    ├── Exploration Round 5 Stage 5A: Revision Precision Assay & Loss of Support Algebra (432 cases)
+    └── Exploration Round 5 Stage 5B: Action Governance & Lineage-Projected Resilience (368 cases)
     
-    [THE ACTIVE SCIENTIFIC MAINLINE — EXPLORATION ROUND 5: ENTITLEMENT UNDER CHANGE]
-    ├── Stage 5A — Revision Precision Assay (0 LLM compute):
-    │   Exhaustively evaluate partial invalidations (do(D=0)) across P_naive-report vs P_lineage-quarantine vs P_S(c).
-    │   Measure false retraction rate, missed retractions, and revision overreach induced by support bloat (E_S > 0).
-    ├── Stage 5B — Entitlement Degradation & Action Resilience (0 LLM compute):
-    │   Demonstrate claim survival with degraded resilience (κ: 2 -> 1) and proportional action authority gating.
-    ├── Stage 5C — Neural Revision Bridge (~12–32 live calls):
-    │   Verify end-to-end that real LLM outputs governed by kernel support minimizers resist downstream retraction.
-    └── Sidecar R2 — Predicate-Level Shortcut Dissection:
-        Anonymized predicate templates to isolate formal predicate-class heuristics from English sentence syntax.
+    [THE ACTIVE SCIENTIFIC MAINLINE — STAGE 5C: NEURAL REVISION BRIDGE]
+    └── Stage 5C — Neural Revision Bridge (~12–32 live calls):
+        Verify end-to-end that real LLM outputs governed by kernel support minimizers resist downstream
+        premise retraction and execute non-destructive revision compared to ungrounded raw memory.
 ```
 
 ---
 
-## 7. Ten-Year Success Criteria
+## 8. Ten-Year Success Criteria
 
 1. **Vocabulary:** AI architects routinely distinguish nominal memory occurrences from independent epistemic roots, and explanatory reported justification from minimal entitling support.
-2. **Runtime Governance:** Persistent agent frameworks evaluate minimal support sets $\mathcal{S}(c)$ and cut sets $\kappa(c)$ before executing high-stakes actions or cascading deletions.
+2. **Runtime Governance:** Persistent agent frameworks evaluate minimal support sets $\mathcal{S}(c)$ and lineage-projected hypergraphs $\mathcal{S}_L(c)$ before executing high-stakes actions or cascading deletions.
 3. **Reproducibility Standard:** Autonomous agent benchmarks evaluate **revision correctness and non-destructive retention under upstream change**.
 4. **Architectural Separation:** Systems cleanly separate the neural reasoner (a stochastic candidate proposal engine) from the epistemic kernel (the deterministic entitlement runtime).
 
 > **Core Research Creed:**
 > *Cheap deterministic measurement $\to$ tiny live mechanism test $\to$ adversarial review $\to$ only then scale.*
+

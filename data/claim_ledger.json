@@ -225,6 +225,75 @@
       ],
       "scope_limitations": "Observed on local Ollama execution stacks running quantized Gemma 3:12B under greedy decoding.",
       "replication_status": "same_model_verified"
+    },
+    {
+      "claim_id": "GENE-C09",
+      "claim_status": "observed",
+      "headline": "The Four-Layer Epistemic Conformance Taxonomy & Explanatory Bloat",
+      "claim_text": "Neural self-reported justification R(c) is not a faithful representation of minimal entitling support S(c). Epistemic outputs decompose into four distinct layers: symbol realization != contract coherence != justification precision != formal derivability. In 116 live Gemma 3:12B calls under multi-path support environments, the model exhibited 100% explanatory bloat (E_S > 0), 20.8% cross-field contract violations, and 25% symbol-form drift under permutation.",
+      "evidence_sources": [
+        {
+          "experiment": "Exploration Round 4 (Epistemic Context Compiler & Four-Layer Assay)",
+          "evidence_class": "live_neural_assay",
+          "artifact": "data/exploration_round4_results.db",
+          "artifact_sha256": "820e574e6d3a0196dfec13ffc392d68d399791b210fd65187795dd834046269e",
+          "execution_commit": "cf472ee41893c52e80718507daee79f53eecf848",
+          "model": "gemma3:12b (Ollama digest: 111a9a8c...)",
+          "n_calls": 116,
+          "n_evaluations": 116,
+          "unit_of_analysis": "call",
+          "formal_report": "docs/results/EXPLORATION_ROUND4_REPORT.md",
+          "primary_metric": "Bloat E_S > 0: 24/24 (100.0%); Contract Violations: 5/24 (20.8%); Symbol Drift: 6/24 (25.0%)"
+        }
+      ],
+      "scope_limitations": "Evaluated on Gemma 3:12B under structured JSON contracts across 24 isomorphic topological permutations.",
+      "replication_status": "same_model_verified"
+    },
+    {
+      "claim_id": "GENE-C10",
+      "claim_status": "mathematically_proven_and_observed",
+      "headline": "Loss of Alternative-Support Algebra Causes 100% False Retractions on Degraded States",
+      "claim_text": "Representing alternative multi-path support environments S(c) = {S_1, ..., S_k} as a flat conjunctive dependency union causes 100% false retractions (104/104) on damaged-but-still-entitled states. Single-witness tracking falsely retracts 57.7% (60/104). Explanatory bloat (E_S > 0) causes 50% false retractions (8/16) on completely untouched states. Minimal entitling support S(c) eliminates 100% of revision errors without live compute.",
+      "evidence_sources": [
+        {
+          "experiment": "Exploration Round 5 Stage 5A (Revision Precision Assay)",
+          "evidence_class": "deterministic_zero_live_llm",
+          "artifact": "data/exploration_round5_stage5a_cases.jsonl",
+          "artifact_sha256": "1499305d197cf53ad624fc65a6626a0d5fc9ea87993184583930ce952692548e",
+          "execution_commit": "aff1baa00d046db413df17f9da9c6f2ee853d9e4",
+          "model": "None (Deterministic Support Algebra)",
+          "n_calls": 0,
+          "n_evaluations": 432,
+          "unit_of_analysis": "revision_scenario",
+          "formal_report": "docs/results/EXPLORATION_ROUND5_STAGE5A_REPORT.md",
+          "primary_metric": "Flat Union Autoimmunity: 104/104 (100.0%); Single Witness: 60/104 (57.7%); S(c) Reference: 0/104 (0.0%)"
+        }
+      ],
+      "scope_limitations": "Evaluated across all powerset invalidation subsets over 4 canonical support hypergraph topologies.",
+      "replication_status": "deterministic_exact"
+    },
+    {
+      "claim_id": "GENE-C11",
+      "claim_status": "mathematically_proven_and_observed",
+      "headline": "Intervention-Sufficient Epistemic Representation & Lineage-Projected Action Governance",
+      "claim_text": "Scalar cut-sets (kappa), tuple signatures (rho), and global root counts (|Roots|) all suffer lossy representation collisions under change. In shared origin ancestry (A,D<-R1, B,E<-R2), nominal multiplicity masquerades as independence while sharing common conjunctive root failure. Action authority governance requires the lineage-projected minimal support hypergraph S_L(c) = min_{subset} {{L(p) : p in S_i}} and root resilience rho_L(c), achieving 100% compliance across 7 formal governance axioms.",
+      "evidence_sources": [
+        {
+          "experiment": "Exploration Round 5 Stage 5B (Action Governance Assay)",
+          "evidence_class": "deterministic_zero_live_llm",
+          "artifact": "data/exploration_round5_stage5b_cases.jsonl",
+          "artifact_sha256": "1ada9c3b29eeb4fa32f6440bec1cfa31622fd4438f1326c806822dea056bf9da",
+          "execution_commit": "316de0291f03ce91501fae5e6e3c983427952e4a",
+          "model": "None (Deterministic Axiomatic Engine)",
+          "n_calls": 0,
+          "n_evaluations": 368,
+          "unit_of_analysis": "governance_scenario",
+          "formal_report": "docs/results/EXPLORATION_ROUND5_STAGE5B_REPORT.md",
+          "primary_metric": "Axiomatic Compliance: P_binary 5/7, P_kappa 5/7, P_rho 6/7, P_lineage (S_L) 7/7 (100.0%)"
+        }
+      ],
+      "scope_limitations": "Evaluated across 368 factorial governance scenarios and 7 formal axiomatic invariants.",
+      "replication_status": "deterministic_exact"
     }
   ]
 }
