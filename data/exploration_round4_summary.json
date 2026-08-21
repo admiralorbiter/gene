@@ -1,16 +1,10 @@
 {
   "experiment": "GENE Exploration Round 4 \u2014 Epistemic Context Compilation",
-  "git_commit": "d13c0a7",
-  "model": {
-    "model_name": "gemma3:12b",
-    "family": "gemma3",
-    "parameter_size": "12.2B",
-    "quantization_level": "Q4_K_M",
-    "digest": "f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a"
-  },
   "provenance": {
-    "database_path": "data/exploration_round4_results.db",
-    "database_sha256": "820e574e6d3a0196dfec13ffc392d68d399791b210fd65187795dd834046269e",
+    "raw_execution_db_sha256": "b07580c52d526efe03d342f257fd776d0210b6b823c4afb9ba898dc356f9401b",
+    "postreview_db_sha256": "820e574e6d3a0196dfec13ffc392d68d399791b210fd65187795dd834046269e",
+    "model_digest": "f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a",
+    "model_digest_timing": "resolved_immediately_post_execution_against_unchanged_ollama_installation",
     "total_calls": 116,
     "total_evaluations": 116,
     "valid_json_rate": 1.0
@@ -18,7 +12,7 @@
   "track_r": {
     "evals_count": 24,
     "phenotype": {
-      "canonical_shortcuts": [
+      "canonical_active": [
         "cross_BD",
         "cross_AD"
       ],
@@ -45,7 +39,8 @@
         "cross_BE",
         "empty"
       ],
-      "heuristic_class": "role_anchored_predicate_class_shortcut (AD v AE v BD with BE=0)"
+      "phenotype_summary": "AD and BD active across all 3 conditions; AE activated under swap and opaque; BE rejected across all 3",
+      "mechanism_status": "truth_table_consistent_with_role_anchored_predicate_class_heuristic"
     },
     "cells": {
       "cond_canonical_point_all_4": {
@@ -198,8 +193,7 @@
       "worst_case_accuracy": 1.0,
       "canonical_replay_sample_size": 4,
       "canonical_replay_disagreement_rate": 0.0
-    },
-    "conclusion": "Premise serialization changes surface token realization (PROTO_X7 vs PROTOCOL_X7; D_perm=0.3913) without altering semantic authorized belief (D_perm,sem=0.0000)."
+    }
   },
   "track_m": {
     "evals_count": 32,
@@ -420,12 +414,69 @@
           "k_mono": 1
         }
       ]
-    },
-    "conclusion": "Appending premises is 100% monotonic. Prepending irrelevant premises (occ_F) induced surface token realization drift at Step 3 without loss of underlying derivation."
+    }
   },
   "track_c": {
     "evals_count": 32,
-    "cells": [
+    "preregistered_support_metrics": {
+      "total_registered_calls": 16,
+      "overall_k_s_suff": 1.0,
+      "overall_k_s_exact": 0.5625,
+      "overall_k_s_exact_fraction": "9/16",
+      "overall_mean_excess": 0.8125,
+      "by_pipeline": {
+        "raw_serialization": {
+          "calls": 4,
+          "k_a": 1.0,
+          "k_s_suff": 1.0,
+          "k_s_exact": 0.5,
+          "exact_count": "2/4",
+          "mean_excess": 1.0
+        },
+        "topology_aware_grouping": {
+          "calls": 4,
+          "k_a": 1.0,
+          "k_s_suff": 1.0,
+          "k_s_exact": 0.5,
+          "exact_count": "2/4",
+          "mean_excess": 1.0
+        },
+        "genealogical_normalization": {
+          "calls": 4,
+          "k_a": 1.0,
+          "k_s_suff": 1.0,
+          "k_s_exact": 0.75,
+          "exact_count": "3/4",
+          "mean_excess": 0.25
+        },
+        "proof_carrying_certificate": {
+          "calls": 4,
+          "k_a": 1.0,
+          "k_s_suff": 1.0,
+          "k_s_exact": 0.5,
+          "exact_count": "2/4",
+          "mean_excess": 1.0
+        }
+      },
+      "entitled_vs_pruned": {
+        "pruned_exactness": "8/8 (100.0%)",
+        "pruned_mean_excess": 0.0,
+        "entitled_exactness": "1/8 (12.5%)",
+        "entitled_mean_excess": 1.625
+      }
+    },
+    "exploratory_copy_multiplication": {
+      "calls": 8,
+      "k_a": 1.0,
+      "k_s_exact": 0.875,
+      "lineage_accounting": {
+        "raw": "P(det)=1.0, N_roots=0 (K_L=0/2)",
+        "topology": "P(det)=1.0, N_roots=1 (1 cell), null (1 cell)",
+        "genealogical": "P(det)=1.0, N_roots=null (2 cells)",
+        "certificate": "P(det)=1.0, N_roots=1 (K_L=2/2)"
+      }
+    },
+    "all_cells": [
       {
         "compiler_pipeline": "genealogical_normalization",
         "ecology": "copy",
