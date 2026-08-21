@@ -1,7 +1,7 @@
 {
   "manifest_version": "2.0.0",
   "project": "GENE (Genealogical Epistemic Network Experiments)",
-  "generated_at": "2026-08-21T13:28:53.857679+00:00",
+  "generated_at": "2026-08-21T14:30:07.839767+00:00",
   "canonical_experiments": {
     "exp0": {
       "experiment": "Experiment 0 (Lineage Observability & Factorial Calibration)",
@@ -327,6 +327,47 @@
         "fault_localization": "Epistemic Error Boundary Externalization: Error origin is localized to Layer 0; deterministic runtime contains error propagation after admission without runtime autoimmunity"
       },
       "canary_determinism": "4 / 4 raw string matches (100.0%), 4 / 4 semantic JSON matches (100.0%)",
+      "status": "COMPLETED_AND_FROZEN"
+    },
+    "stage_7a": {
+      "experiment": "Exploration Round 7 Stage 7A (Proof-Carrying Epistemic Ingress Benchmark)",
+      "artifact": "exploration_round7_stage7a_benchmark_summary.json",
+      "n_worlds": 120,
+      "total_probe_evaluations": 480,
+      "arms": {
+        "a0_top1_blind_write": {
+          "world_pass_rate": 0.5,
+          "fdar_global": 0.7142857142857143,
+          "sac_rate": 1.0,
+          "upr_rate": 0.0
+        },
+        "a1_canonicalize_only": {
+          "world_pass_rate": 0.5,
+          "fdar_global": 0.7142857142857143,
+          "sac_rate": 1.0,
+          "upr_rate": 0.0
+        },
+        "a2_candidate_aware": {
+          "world_pass_rate": 0.7,
+          "fdar_global": 0.42857142857142855,
+          "fdar_authority": 0.6,
+          "sac_rate": 1.0,
+          "upr_rate": 1.0
+        },
+        "a3_authority_aware": {
+          "world_pass_rate": 0.9,
+          "fdar_global": 0.14285714285714285,
+          "fdar_ambiguity": 0.5,
+          "sac_rate": 1.0,
+          "upr_rate": 0.0
+        },
+        "a4_full_gene_ingress": {
+          "world_pass_rate": 1.0,
+          "fdar_global": 0.0,
+          "sac_rate": 1.0,
+          "upr_rate": 1.0
+        }
+      },
       "status": "COMPLETED_AND_FROZEN"
     }
   }

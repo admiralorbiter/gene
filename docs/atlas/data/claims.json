@@ -1,5 +1,5 @@
 {
-  "ledger_version": "2.0.0",
+  "ledger_version": "3.0.0",
   "project": "GENE (Genealogical Epistemic Network Experiments)",
   "description": "Authoritative claim-evidence ledger mapping each core scientific claim in GENE to its empirical evidence sources, SHA-256 database checksums, execution commits, sample sizes, and boundary scope.",
   "claims": [
@@ -420,6 +420,30 @@
       ],
       "scope_limitations": "12 stratified coverage cases on Gemma 3:12B with platform-injected trusted metadata.",
       "replication_status": "same_model_verified"
+    },
+    {
+      "claim_id": "GENE-C16",
+      "claim_status": "formally_specified_and_deterministically_demonstrated",
+      "headline": "Proof-Carrying Epistemic Ingress & The Epistemic Alternative-Preservation Principle",
+      "claim_text": "An epistemic ingress representation must preserve enough information to distinguish unresolved alternatives whenever future interventions can produce different responses under the supported runtime intervention class. Candidate ambiguity (B(x) = {b_1, ..., b_k}) and novel entities must be preserved under DEFERRED_BINDING and PROVISIONAL_ENTITY rather than collapsed to Top-1. In a 120-world factorial benchmark (480 probe evaluations), blind write and canonicalize-only baselines (A0/A1) suffered 71.4% False Durable Admission Rate (FDAR). Candidate-aware only (A2) eliminated ambiguity collapse but suffered 60.0% authority FDAR. Authority-aware only (A3) eliminated unauthorized promotion but collapsed 50.0% of candidate collisions. Full proof-carrying GENE Ingress (A4) achieved 100.0% WorldPass rate (120/120), FDAR = 0.0%, SAC = 100.0%, and UPR = 100.0%.",
+      "evidence_sources": [
+        {
+          "experiment": "Exploration Round 7 Stage 7A (Proof-Carrying Epistemic Ingress Benchmark)",
+          "evidence_class": "deterministic_zero_live_llm",
+          "artifact": "data/exploration_round7_stage7a_benchmark_summary.json",
+          "artifact_sha256": "fb6102d7a8819e6968502a1d9fd6f9e54ba231c347adceae4769a444d4dde7d8",
+          "execution_commit": "round7-stage7a-execution-freeze",
+          "git_tracked": true,
+          "model": "None (Deterministic Ingress Engine)",
+          "n_calls": 0,
+          "n_evaluations": 480,
+          "unit_of_analysis": "case",
+          "formal_report": "docs/results/EXPLORATION_ROUND7_STAGE7A_REPORT.md",
+          "primary_metric": "WorldPass: A0 50.0%, A1 50.0%, A2 70.0%, A3 90.0%, A4 100.0% (120/120); Global FDAR: A0/A1 71.4%, A2 42.9%, A3 14.3%, A4 0.0%; SAC: 100.0%; UPR: 100.0%"
+        }
+      ],
+      "scope_limitations": "Evaluated across 120 balanced synthetic worlds spanning 4 predicate modes, 5 binding conditions, 3 temporal relations, and 2 source role forms.",
+      "replication_status": "deterministic_exact"
     }
   ]
 }

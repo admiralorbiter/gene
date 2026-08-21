@@ -608,6 +608,64 @@ def extract_stage6c_metrics(summary_path: Path) -> dict[str, Any]:
     }
 
 
+def extract_stage7a_metrics(summary_path: Path) -> dict[str, Any]:
+    """Extract metrics from Exploration Round 7 Stage 7A Ingress Benchmark."""
+    if not summary_path.exists():
+        raise FileNotFoundError(f"Stage 7A summary not found: {summary_path}")
+
+    with open(summary_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    arms = data.get("evaluated_arms", {})
+    a0 = arms.get("A0_Top1_Blind_Write", {})
+    a1 = arms.get("A1_Canonicalize_Only", {})
+    a2 = arms.get("A2_Candidate_Aware", {})
+    a3 = arms.get("A3_Authority_Aware", {})
+    a4 = arms.get("A4_Full_GENE_Ingress", {})
+
+    return {
+        "experiment": "Exploration Round 7 Stage 7A (Proof-Carrying Epistemic Ingress Benchmark)",
+        "artifact": summary_path.name,
+        "n_worlds": data.get("n_worlds", 120),
+        "total_probe_evaluations": data.get("total_probe_evaluations", 480),
+        "arms": {
+            "a0_top1_blind_write": {
+                "world_pass_rate": a0.get("world_pass_rate", 0.0),
+                "fdar_global": a0.get("fdar_global", 0.0),
+                "sac_rate": a0.get("sac_rate", 0.0),
+                "upr_rate": a0.get("upr_rate", 0.0),
+            },
+            "a1_canonicalize_only": {
+                "world_pass_rate": a1.get("world_pass_rate", 0.0),
+                "fdar_global": a1.get("fdar_global", 0.0),
+                "sac_rate": a1.get("sac_rate", 0.0),
+                "upr_rate": a1.get("upr_rate", 0.0),
+            },
+            "a2_candidate_aware": {
+                "world_pass_rate": a2.get("world_pass_rate", 0.0),
+                "fdar_global": a2.get("fdar_global", 0.0),
+                "fdar_authority": a2.get("fdar_authority", 0.0),
+                "sac_rate": a2.get("sac_rate", 0.0),
+                "upr_rate": a2.get("upr_rate", 0.0),
+            },
+            "a3_authority_aware": {
+                "world_pass_rate": a3.get("world_pass_rate", 0.0),
+                "fdar_global": a3.get("fdar_global", 0.0),
+                "fdar_ambiguity": a3.get("fdar_ambiguity", 0.0),
+                "sac_rate": a3.get("sac_rate", 0.0),
+                "upr_rate": a3.get("upr_rate", 0.0),
+            },
+            "a4_full_gene_ingress": {
+                "world_pass_rate": a4.get("world_pass_rate", 0.0),
+                "fdar_global": a4.get("fdar_global", 0.0),
+                "sac_rate": a4.get("sac_rate", 0.0),
+                "upr_rate": a4.get("upr_rate", 0.0),
+            },
+        },
+        "status": "COMPLETED_AND_FROZEN",
+    }
+
+
 def generate_manifest(write: bool = True) -> dict[str, Any]:
     """Assemble all frozen experiment milestones into the authoritative manifest."""
     root_dir = Path(__file__).resolve().parent.parent
@@ -644,6 +702,7 @@ def generate_manifest(write: bool = True) -> dict[str, Any]:
             "stage_6b": extract_stage6b_metrics(data_dir / "exploration_round6_stage6b_results_summary.json"),
             "stage_6b1": extract_stage6b1_metrics(data_dir / "exploration_round6_stage6b1_temporal_summary.json"),
             "stage_6c": extract_stage6c_metrics(data_dir / "exploration_round6_stage6c_summary.json"),
+            "stage_7a": extract_stage7a_metrics(data_dir / "exploration_round7_stage7a_benchmark_summary.json"),
         },
     }
 

@@ -1,0 +1,122 @@
+{
+  "benchmark_name": "Exploration Round 7 Stage 7A 120-World Epistemic Ingress Benchmark",
+  "protocol_version": "1.0.0",
+  "n_worlds": 120,
+  "n_evaluations_per_world": 4,
+  "total_probe_evaluations": 480,
+  "evaluated_arms": {
+    "A0_Top1_Blind_Write": {
+      "world_pass_rate": 0.5,
+      "n_worlds": 120,
+      "world_pass_count": 60,
+      "fdar_global": 0.7142857142857143,
+      "fdar_bind": 1.0,
+      "fdar_ambiguity": 1.0,
+      "fdar_novel": 0.0,
+      "fdar_authority": 0.8,
+      "sac_rate": 1.0,
+      "upr_rate": 0.0,
+      "profile_distribution": {
+        "(1,1,1,1)": 60,
+        "(0,0,0,1)": 60
+      }
+    },
+    "A1_Canonicalize_Only": {
+      "world_pass_rate": 0.5,
+      "n_worlds": 120,
+      "world_pass_count": 60,
+      "fdar_global": 0.7142857142857143,
+      "fdar_bind": 1.0,
+      "fdar_ambiguity": 1.0,
+      "fdar_novel": 0.0,
+      "fdar_authority": 0.8,
+      "sac_rate": 1.0,
+      "upr_rate": 0.0,
+      "profile_distribution": {
+        "(1,1,1,1)": 60,
+        "(0,0,0,1)": 60
+      }
+    },
+    "A2_Candidate_Aware": {
+      "world_pass_rate": 0.7,
+      "n_worlds": 120,
+      "world_pass_count": 84,
+      "fdar_global": 0.42857142857142855,
+      "fdar_bind": 0.0,
+      "fdar_ambiguity": 0.0,
+      "fdar_novel": 0.0,
+      "fdar_authority": 0.6,
+      "sac_rate": 1.0,
+      "upr_rate": 1.0,
+      "profile_distribution": {
+        "(1,1,1,1)": 84,
+        "(0,0,0,1)": 36
+      }
+    },
+    "A3_Authority_Aware": {
+      "world_pass_rate": 0.9,
+      "n_worlds": 120,
+      "world_pass_count": 108,
+      "fdar_global": 0.14285714285714285,
+      "fdar_bind": 0.5,
+      "fdar_ambiguity": 0.5,
+      "fdar_novel": 0.0,
+      "fdar_authority": 0.0,
+      "sac_rate": 1.0,
+      "upr_rate": 0.0,
+      "profile_distribution": {
+        "(1,1,1,1)": 108,
+        "(0,0,0,1)": 12
+      }
+    },
+    "A4_Full_GENE_Ingress": {
+      "world_pass_rate": 1.0,
+      "n_worlds": 120,
+      "world_pass_count": 120,
+      "fdar_global": 0.0,
+      "fdar_bind": 0.0,
+      "fdar_ambiguity": 0.0,
+      "fdar_novel": 0.0,
+      "fdar_authority": 0.0,
+      "sac_rate": 1.0,
+      "upr_rate": 1.0,
+      "profile_distribution": {
+        "(1,1,1,1)": 120
+      }
+    }
+  },
+  "key_findings": {
+    "A0_Top1_Blind_Write": {
+      "world_pass_rate": 0.5,
+      "fdar_global": 0.7142857142857143,
+      "sac_rate": 1.0,
+      "upr_rate": 0.0
+    },
+    "A1_Canonicalize_Only": {
+      "world_pass_rate": 0.5,
+      "fdar_global": 0.7142857142857143,
+      "sac_rate": 1.0,
+      "upr_rate": 0.0
+    },
+    "A2_Candidate_Aware": {
+      "world_pass_rate": 0.7,
+      "fdar_global": 0.42857142857142855,
+      "fdar_authority": 0.6,
+      "sac_rate": 1.0,
+      "upr_rate": 1.0
+    },
+    "A3_Authority_Aware": {
+      "world_pass_rate": 0.9,
+      "fdar_global": 0.14285714285714285,
+      "fdar_ambiguity": 0.5,
+      "sac_rate": 1.0,
+      "upr_rate": 0.0
+    },
+    "A4_Full_GENE_Ingress": {
+      "world_pass_rate": 1.0,
+      "fdar_global": 0.0,
+      "sac_rate": 1.0,
+      "upr_rate": 1.0
+    }
+  }
+}

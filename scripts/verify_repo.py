@@ -81,6 +81,7 @@ def verify_git_tracked_artifacts() -> None:
         "data/exploration_round6_stage6c_summary.json",
         "data/exploration_round6_stage6c_results.db",
         "data/exploration_round6_stage6c_raw_calls.jsonl",
+        "data/exploration_round7_stage7a_benchmark_summary.json",
     ]
     for rel_path in required_artifacts:
         res = subprocess.run(["git", "ls-files", "--error-unmatch", rel_path], cwd=root_dir, capture_output=True, text=True)
