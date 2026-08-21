@@ -14,16 +14,23 @@ Read before coding:
 4. `docs/DEVELOPMENT_PLAN.md`
 5. `docs/results/` (All completed experiment reports)
 6. `research/checkpoints/MIGRATION_CHECKPOINT.md`
+7. `research/ACTIVE_CONTRACT.md`
 
 ---
 
-# Operational Research Workflow
+# Operational Research Workflow & Active Contract Discovery
 
 All research experiments, contracts, promotions, and checkpoints are organized under `research/`:
 
+- `research/ACTIVE_CONTRACT.md`: **The single machine-discoverable pointer to currently authorized work.** Agents MUST inspect this file before executing experimental runs. Its operational state vocabulary is:
+  `IDLE | READY | RUNNING | AUDITING | ESCALATED`
+  When `status: IDLE`, no autonomous experimental execution may begin.
 - `research/checkpoints/`: Milestones and migration snapshots (e.g., `MIGRATION_CHECKPOINT.md`).
-- `research/contracts/`: Active and archived research contracts (e.g., `CONTRACT_[ID].md`). When no experiment is actively running, no contract in this directory holds `status: FROZEN`.
-- `research/promotions/`: Completed promotion records capturing empirical results, workflow metrics, and review status (e.g., `PROMOTION_[ID].md`).
+- `research/contracts/`: Active and archived research contracts named `CONTRACT-<ID>.md`. Contracts use an immutable lifecycle:
+  `DRAFT | FROZEN | SUPERSEDED`
+  Historical frozen contracts remain frozen and immutable after execution.
+- `research/promotions/`: Completed promotion records named `PROMOTION-<ID>.md` with status:
+  `CANDIDATE | PROMOTED | REJECTED | REVISED_CONTRACT_REQUIRED | ESCALATED`
 - `research/templates/`: Reusable templates for contracts (`CONTRACT_TEMPLATE.md`) and promotions (`PROMOTION_TEMPLATE.md`).
 
 ### Machine-Readable Contract Frontmatter:
@@ -31,17 +38,15 @@ Every contract in `research/contracts/` must begin with YAML frontmatter specify
 
 ```yaml
 ---
-contract_id: CONTRACT-[ID]
+contract_id: CONTRACT-<ID>
 status: DRAFT | FROZEN | SUPERSEDED
 base_sha: <commit-hash>
-resource_class: cpu | gpu | live_llm
+resource_class: cpu | gpu | hybrid
 long_running: false | true
 exclusive_gpu: false | true
 interruptible: true | false
 ---
 ```
-
-Agents inspect `research/contracts/` for active contracts (`status: FROZEN`) before executing experiments.
 
 ---
 

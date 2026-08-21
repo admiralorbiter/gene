@@ -10,7 +10,7 @@
 - **Repository / Project Name**: GENE (Genealogical Epistemic Network Experiments)
 - **Checkpoint Date**: 2026-08-21
 - **Research Checkpoint SHA / Tag**: `2b0cd7c` ([`round7-stage7b-live-freeze`](https://github.com/admiralorbiter/gene/releases/tag/round7-stage7b-live-freeze)) (where Stage 7B empirical science and research results were frozen)
-- **Workflow Migration Base SHA**: `1a3c87a` (commit introducing the control layer, checkpoint, and templates from which future contracts start)
+- **Workflow Migration Commit**: `1a3c87a` (commit introducing the operational workflow control layer and templates)
 - **Current Research Stage**: Exploration Round 7 Stage 7B (Live Neural Ingress Interface & Candidate Disambiguation Benchmark)
 - **Model Evaluated**: `gemma3:12b` (Ollama digest: `f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a`)
 

@@ -1,11 +1,11 @@
 ---
-contract_id: CONTRACT-[ID]
-status: DRAFT | FROZEN | SUPERSEDED
-base_sha: [insert_base_commit_hash_here]
-resource_class: cpu | gpu | live_llm
-long_running: false | true
-exclusive_gpu: false | true
-interruptible: true | false
+contract_id: CONTRACT-<ID>
+status: DRAFT
+base_sha: [base_commit_sha]
+resource_class: cpu
+long_running: false
+exclusive_gpu: false
+interruptible: true
 ---
 
 # Research Contract: [Experiment / Milestone Name]
@@ -17,7 +17,7 @@ interruptible: true | false
 
 ## 1. Metadata & Lifecycle Status
 
-- **Contract ID**: `CONTRACT-[ID]`
+- **Contract ID**: `CONTRACT-<ID>`
 - **Contract Status**: `DRAFT` | `FROZEN` | `SUPERSEDED`
 - **Base Git Commit (Base SHA)**: `[insert base commit hash here]`
 - **Target Experiment / Phase**: `[e.g., Exploration Round 8 Stage 8A]`
@@ -97,7 +97,8 @@ interruptible: true | false
 
 ## 7. Compute & Resource Budget
 
-- **Estimated LLM Invocations**: `[e.g., 52 calls]`
+- **Resource Class**: `cpu` | `gpu` | `hybrid`
+- **Estimated Invocations**: `[e.g., 52 calls]`
 - **Estimated Execution Time**: `[e.g., 5 minutes]`
 - **Long-Running Process Handling**: `[e.g., daemon Ollama process]`
 
@@ -111,5 +112,5 @@ This contract is declared complete ONLY when all of the following conditions are
 3. All required artifacts (`runs/*.db`, `data/*.jsonl`, `data/*_summary.json`, `docs/results/*_REPORT.md`) are generated, SHA-256 hashed, and actively tracked in git.
 4. The canonical claim ledger (`data/claim_ledger.json`), Atlas claims (`docs/atlas/data/claims.json`), and results manifest (`data/canonical_results_manifest.json`) are updated and deeply synchronized.
 5. The full local verification suite passes cleanly (`python scripts/verify_repo.py` returns exit code 0).
-6. A completed Promotion Record (`PROMOTION_TEMPLATE.md` instance) is filled out and reviewed.
+6. A completed Promotion Record (`PROMOTION_TEMPLATE.md` instance in `research/promotions/PROMOTION-<ID>.md`) is filled out and reviewed.
 7. The final repository state is committed, tagged, and pushed with a clean working tree (zero uncommitted changes or untracked drift).

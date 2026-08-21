@@ -1,4 +1,17 @@
+---
+contract_id: CONTRACT-<ID>
+promotion_id: PROMOTION-<ID>
+status: CANDIDATE
+base_sha: [base_commit_sha]
+candidate_sha: [candidate_commit_sha]
+audit_date: YYYY-MM-DD
+---
+
 # Promotion Record: [Experiment / Milestone Name]
+
+- **Promotion ID**: `PROMOTION-<ID>`
+- **Contract ID**: `CONTRACT-<ID>`
+- **Promotion Status**: `CANDIDATE` | `PROMOTED` | `REJECTED` | `REVISED_CONTRACT_REQUIRED` | `ESCALATED`
 
 ---
 
