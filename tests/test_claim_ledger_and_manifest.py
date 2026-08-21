@@ -26,7 +26,7 @@ def compute_sha256(file_path: Path) -> str:
 
 def test_manifest_generation_and_schema():
     """Verify that manifest generation produces valid data matching the schema."""
-    manifest = generate_manifest()
+    manifest = generate_manifest(write=False)
     assert manifest["manifest_version"] == "2.0.0"
     assert manifest["project"] == "GENE (Genealogical Epistemic Network Experiments)"
     assert "T" in manifest["generated_at"]  # Dynamic ISO timestamp
@@ -126,7 +126,32 @@ def test_claim_ledger_multi_source_integrity():
                 )
                 assert res.returncode == 0, f"Commit {commit_hash} in {claim['claim_id']} does not resolve in Git!"
 
-            # If artifact is a .db file, verify it exists and checksum matches
+            # If artifact is tracked in git at execution_commit, verify exact blob binding
+            commit_hash = src["execution_commit"]
+            if commit_hash and len(commit_hash) == 40 and not commit_hash.startswith("deterministic"):
+                art_git_path = src["artifact"].replace("\\", "/")
+                res = subprocess.run(
+                    ["git", "show", f"{commit_hash}:{art_git_path}"],
+                    cwd=root_dir,
+                    capture_output=True,
+                )
+                if res.returncode == 0:
+                    blob_raw = res.stdout
+                    blob_lf = blob_raw.replace(b"\r\n", b"\n")
+                    blob_crlf = blob_lf.replace(b"\n", b"\r\n")
+                    expected_sha = src["artifact_sha256"].lower()
+                    
+                    raw_sha = hashlib.sha256(blob_raw).hexdigest()
+                    lf_sha = hashlib.sha256(blob_lf).hexdigest()
+                    crlf_sha = hashlib.sha256(blob_crlf).hexdigest()
+                    
+                    matched = expected_sha in [raw_sha, lf_sha, crlf_sha]
+                    assert matched, (
+                        f"Git commit binding mismatch for {claim['claim_id']} ({src['artifact']} at {commit_hash}): "
+                        f"expected {expected_sha}, git show produced (raw={raw_sha}, lf={lf_sha}, crlf={crlf_sha})"
+                    )
+
+            # If artifact is a .db file, verify it exists on disk and checksum matches
             if src["artifact"].endswith(".db"):
                 db_path = root_dir / src["artifact"]
                 assert db_path.exists(), f"Database {src['artifact']} for claim {claim['claim_id']} does not exist"
@@ -154,10 +179,7 @@ def test_atlas_claims_sync() -> None:
     with open(atlas_path, "r", encoding="utf-8") as f:
         atlas_data = json.load(f)
         
-    assert len(ledger_data["claims"]) == len(atlas_data["claims"])
-    for l_claim, a_claim in zip(ledger_data["claims"], atlas_data["claims"]):
-        assert l_claim["claim_id"] == a_claim["claim_id"]
-        assert l_claim["headline"] == a_claim["headline"]
+    assert ledger_data["claims"] == atlas_data["claims"], "docs/atlas/data/claims.json does not deeply match data/claim_ledger.json"
 
 
 def test_epigraphs_file_integrity():

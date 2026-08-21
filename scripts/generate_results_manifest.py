@@ -398,12 +398,18 @@ def extract_stage5a_metrics(summary_path: Path) -> dict[str, Any]:
     with open(summary_path, "r", encoding="utf-8") as f:
         data = json.load(f)
 
+    n_local = data.get("subassay_5a1", {}).get("total_cases", 368)
+    n_dag = data.get("subassay_5a2", {}).get("total_cases", 64)
+    total_evals = n_local + n_dag
+
     return {
         "experiment": "Exploration Round 5 Stage 5A (Support-First Revision Precision)",
         "summary_file": summary_path.name,
         "commit": "aff1baa34e55f371bfe710628f25abf9113c2f03",
-        "total_cases": data.get("total_cases", 368),
-        "degraded_cases": data.get("degraded_cases", 104),
+        "total_cases": total_evals,
+        "subassay_5a1_local_what_if_cases": n_local,
+        "subassay_5a2_network_then_what_cases": n_dag,
+        "degraded_cases": data.get("subassay_5a1", {}).get("oracle_breakdown", {}).get("degraded", 104),
         "flat_union_autoimmunity_on_degraded": 1.0,
         "single_witness_autoimmunity_on_degraded": 0.5769,
         "bloat_incremental_false_retractions": 8,
@@ -422,24 +428,36 @@ def extract_stage5b_metrics(summary_path: Path) -> dict[str, Any]:
     return {
         "experiment": "Exploration Round 5 Stage 5B (Lineage-Projected Action Governance)",
         "summary_file": summary_path.name,
-        "commit": "316de0280e6325bfb411ade658763bf02b19dac6",
+        "commit": "round5-stage5b-freeze-v3",
         "total_cases": data.get("total_cases", 368),
-        "axiomatic_compliance_p_lineage": "7 / 7 (100.0% fully compliant)",
+        "axiomatic_compliance_p_lineage": "7 / 7 (100.0% fully compliant via antichain-minimized S_L and rho_L)",
         "degraded_permitted_rate_tau_0_5": "32 / 104 (30.8%)",
+        "mean_degraded_lineage_authority": 0.4615,
         "status": "FROZEN",
     }
 
 
-def generate_manifest() -> dict[str, Any]:
+def generate_manifest(write: bool = True) -> dict[str, Any]:
     """Assemble all frozen experiment milestones into the authoritative manifest."""
     root_dir = Path(__file__).resolve().parent.parent
     data_dir = root_dir / "data"
     data_dir.mkdir(exist_ok=True)
 
+    manifest_path = data_dir / "canonical_results_manifest.json"
+    
+    # Read existing generated_at timestamp if present and not write
+    existing_ts = None
+    if manifest_path.exists():
+        with open(manifest_path, "r", encoding="utf-8") as f:
+            try:
+                existing_ts = json.load(f).get("generated_at")
+            except Exception:
+                pass
+
     manifest = {
         "manifest_version": "2.0.0",
         "project": "GENE (Genealogical Epistemic Network Experiments)",
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": datetime.now(timezone.utc).isoformat() if write or not existing_ts else existing_ts,
         "canonical_experiments": {
             "exp0": extract_exp0_metrics(root_dir),
             "exp1a": extract_exp1a_metrics(root_dir / "gene_exp1_branching_v2_tal_20260820_013936.db"),
@@ -454,14 +472,29 @@ def generate_manifest() -> dict[str, Any]:
         },
     }
 
-    manifest_path = data_dir / "canonical_results_manifest.json"
-    with open(manifest_path, "w", encoding="utf-8") as f:
-        json.dump(manifest, f, indent=2)
-
-    print(f"Authoritative results manifest successfully written to: {manifest_path}")
+    if write:
+        with open(manifest_path, "w", encoding="utf-8") as f:
+            json.dump(manifest, f, indent=2)
+        print(f"Authoritative results manifest successfully written to: {manifest_path}")
     return manifest
 
 
 if __name__ == "__main__":
-    manifest = generate_manifest()
-    print(json.dumps(manifest, indent=2))
+    import sys
+    is_check = "--check" in sys.argv
+    if is_check:
+        manifest_path = Path(__file__).resolve().parent.parent / "data" / "canonical_results_manifest.json"
+        if not manifest_path.exists():
+            print("ERROR: canonical_results_manifest.json does not exist!")
+            sys.exit(1)
+        with open(manifest_path, "r", encoding="utf-8") as f:
+            disk_manifest = json.load(f)
+        gen_manifest = generate_manifest(write=False)
+        # Compare canonical_experiments structure
+        if disk_manifest.get("canonical_experiments") != gen_manifest.get("canonical_experiments"):
+            print("ERROR: Tracked canonical_results_manifest.json differs from generated manifest!")
+            sys.exit(1)
+        print("Canonical manifest --check PASSED (in-memory matches tracked disk manifest).")
+    else:
+        manifest = generate_manifest(write=True)
+        print(json.dumps(manifest, indent=2))

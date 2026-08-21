@@ -1,0 +1,1012 @@
+{
+  "manifest_version": "1.0.0",
+  "experiment": "Exploration Round 5 Stage 5C: Neural Revision Bridge (32-Call Live Assay)",
+  "target_model": "gemma3:12b",
+  "execution_parameters": {
+    "temperature": 0.0,
+    "seed": 42,
+    "total_calls": 32,
+    "acquisition_calls": 4,
+    "factorial_revision_calls": 24,
+    "replay_canaries": 4
+  },
+  "worlds": {
+    "W_IND": {
+      "world_id": "W_IND",
+      "topology_name": "independent_alternatives",
+      "description": "Two independent 2-premise derivation paths from distinct roots R1, R2.",
+      "query_entity": "Station KESTREL",
+      "target_attribute": "operating_protocol",
+      "ground_truth_answer": "PROTOCOL_OMEGA",
+      "facts": {
+        "FACT_IND_A": "Station KESTREL is located in Sector ALPHA.",
+        "FACT_IND_B": "Sector ALPHA operates under protocol Rule 1 producing PROTOCOL_OMEGA.",
+        "FACT_IND_D": "Station KESTREL carries telemetry beacon BEACON_DELTA.",
+        "FACT_IND_E": "Telemetry beacon BEACON_DELTA authorizes protocol Rule 2 producing PROTOCOL_OMEGA."
+      },
+      "lineage_map": {
+        "FACT_IND_A": "ROOT_R1",
+        "FACT_IND_B": "ROOT_R1",
+        "FACT_IND_D": "ROOT_R2",
+        "FACT_IND_E": "ROOT_R2"
+      },
+      "rules": [
+        "Rule 1: IF (Station in Sector ALPHA) AND (Sector ALPHA operates under Rule 1) THEN Protocol is PROTOCOL_OMEGA",
+        "Rule 2: IF (Station carries BEACON_DELTA) AND (BEACON_DELTA authorizes Rule 2) THEN Protocol is PROTOCOL_OMEGA"
+      ],
+      "initial_support_family": [
+        [
+          "FACT_IND_A",
+          "FACT_IND_B"
+        ],
+        [
+          "FACT_IND_D",
+          "FACT_IND_E"
+        ]
+      ],
+      "initial_root_family": [
+        [
+          "ROOT_R1"
+        ],
+        [
+          "ROOT_R2"
+        ]
+      ],
+      "degraded_intervention": [
+        "FACT_IND_D"
+      ],
+      "retracted_intervention": [
+        "FACT_IND_A",
+        "FACT_IND_D"
+      ]
+    },
+    "W_SHP": {
+      "world_id": "W_SHP",
+      "topology_name": "shared_premise_alternatives",
+      "description": "Two alternative derivation paths sharing premise Fact_A (kappa-blindness boundary).",
+      "query_entity": "Station ORION",
+      "target_attribute": "clearance_tier",
+      "ground_truth_answer": "TIER_SIGMA",
+      "facts": {
+        "FACT_SHP_A": "Station ORION is certified under Central Division.",
+        "FACT_SHP_B": "Central Division with secondary channel BLUE assigns TIER_SIGMA.",
+        "FACT_SHP_D": "Central Division with secondary channel GOLD assigns TIER_SIGMA."
+      },
+      "lineage_map": {
+        "FACT_SHP_A": "ROOT_R1",
+        "FACT_SHP_B": "ROOT_R2",
+        "FACT_SHP_D": "ROOT_R3"
+      },
+      "rules": [
+        "Rule 1: IF (Central Division) AND (Secondary Channel BLUE) THEN Tier is TIER_SIGMA",
+        "Rule 2: IF (Central Division) AND (Secondary Channel GOLD) THEN Tier is TIER_SIGMA"
+      ],
+      "initial_support_family": [
+        [
+          "FACT_SHP_A",
+          "FACT_SHP_B"
+        ],
+        [
+          "FACT_SHP_A",
+          "FACT_SHP_D"
+        ]
+      ],
+      "initial_root_family": [
+        [
+          "ROOT_R1",
+          "ROOT_R2"
+        ],
+        [
+          "ROOT_R1",
+          "ROOT_R3"
+        ]
+      ],
+      "degraded_intervention": [
+        "FACT_SHP_B"
+      ],
+      "retracted_intervention": [
+        "FACT_SHP_A"
+      ]
+    },
+    "W_SHO": {
+      "world_id": "W_SHO",
+      "topology_name": "shared_origin_ancestry",
+      "description": "Two alternative premise paths whose premises share common conjunctive roots R1, R2.",
+      "query_entity": "Station VANGUARD",
+      "target_attribute": "access_code",
+      "ground_truth_answer": "CODE_EPSILON",
+      "facts": {
+        "FACT_SHO_A": "Station VANGUARD connects to Relay NORTH.",
+        "FACT_SHO_B": "Relay NORTH with Port 1 verifies CODE_EPSILON.",
+        "FACT_SHO_D": "Station VANGUARD connects to Relay SOUTH.",
+        "FACT_SHO_E": "Relay SOUTH with Port 2 verifies CODE_EPSILON."
+      },
+      "lineage_map": {
+        "FACT_SHO_A": "ROOT_R1",
+        "FACT_SHO_D": "ROOT_R1",
+        "FACT_SHO_B": "ROOT_R2",
+        "FACT_SHO_E": "ROOT_R2"
+      },
+      "rules": [
+        "Rule 1: IF (Relay NORTH) AND (Port 1 verified) THEN Code is CODE_EPSILON",
+        "Rule 2: IF (Relay SOUTH) AND (Port 2 verified) THEN Code is CODE_EPSILON"
+      ],
+      "initial_support_family": [
+        [
+          "FACT_SHO_A",
+          "FACT_SHO_B"
+        ],
+        [
+          "FACT_SHO_D",
+          "FACT_SHO_E"
+        ]
+      ],
+      "initial_root_family": [
+        [
+          "ROOT_R1",
+          "ROOT_R2"
+        ]
+      ],
+      "degraded_intervention": [
+        "FACT_SHO_D"
+      ],
+      "retracted_intervention": [
+        "FACT_SHO_A",
+        "FACT_SHO_D"
+      ]
+    },
+    "W_REC": {
+      "world_id": "W_REC",
+      "topology_name": "recombinant_tri_path",
+      "description": "Three overlapping alternative derivation paths across four roots.",
+      "query_entity": "Station DRAKE",
+      "target_attribute": "transit_lane",
+      "ground_truth_answer": "LANE_THETA",
+      "facts": {
+        "FACT_REC_A": "Station DRAKE aligns with Beacon 1.",
+        "FACT_REC_B": "Beacon 1 with Corridor X assigns LANE_THETA.",
+        "FACT_REC_C": "Corridor X with Gate 3 assigns LANE_THETA.",
+        "FACT_REC_D": "Gate 3 with Channel 4 assigns LANE_THETA."
+      },
+      "lineage_map": {
+        "FACT_REC_A": "ROOT_R1",
+        "FACT_REC_B": "ROOT_R2",
+        "FACT_REC_C": "ROOT_R3",
+        "FACT_REC_D": "ROOT_R4"
+      },
+      "rules": [
+        "Rule 1: IF (Beacon 1) AND (Corridor X) THEN Lane is LANE_THETA",
+        "Rule 2: IF (Corridor X) AND (Gate 3) THEN Lane is LANE_THETA",
+        "Rule 3: IF (Gate 3) AND (Channel 4) THEN Lane is LANE_THETA"
+      ],
+      "initial_support_family": [
+        [
+          "FACT_REC_A",
+          "FACT_REC_B"
+        ],
+        [
+          "FACT_REC_B",
+          "FACT_REC_C"
+        ],
+        [
+          "FACT_REC_C",
+          "FACT_REC_D"
+        ]
+      ],
+      "initial_root_family": [
+        [
+          "ROOT_R1",
+          "ROOT_R2"
+        ],
+        [
+          "ROOT_R2",
+          "ROOT_R3"
+        ],
+        [
+          "ROOT_R3",
+          "ROOT_R4"
+        ]
+      ],
+      "degraded_intervention": [
+        "FACT_REC_A",
+        "FACT_REC_B"
+      ],
+      "retracted_intervention": [
+        "FACT_REC_B",
+        "FACT_REC_C"
+      ]
+    }
+  },
+  "calls": [
+    {
+      "call_index": 1,
+      "call_id": "CALL_ACQ_W_IND",
+      "phase": "acquisition",
+      "world_id": "W_IND",
+      "arm": "acquisition",
+      "condition": "baseline",
+      "invalidated_facts": [],
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_IND_A",
+          "FACT_IND_B"
+        ],
+        [
+          "FACT_IND_D",
+          "FACT_IND_E"
+        ]
+      ],
+      "expected_surviving_lineage": [
+        [
+          "ROOT_R1"
+        ],
+        [
+          "ROOT_R2"
+        ]
+      ],
+      "expected_oracle_answer": "PROTOCOL_OMEGA",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 2,
+      "call_id": "CALL_ACQ_W_SHP",
+      "phase": "acquisition",
+      "world_id": "W_SHP",
+      "arm": "acquisition",
+      "condition": "baseline",
+      "invalidated_facts": [],
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_SHP_A",
+          "FACT_SHP_B"
+        ],
+        [
+          "FACT_SHP_A",
+          "FACT_SHP_D"
+        ]
+      ],
+      "expected_surviving_lineage": [
+        [
+          "ROOT_R1",
+          "ROOT_R2"
+        ],
+        [
+          "ROOT_R1",
+          "ROOT_R3"
+        ]
+      ],
+      "expected_oracle_answer": "TIER_SIGMA",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 3,
+      "call_id": "CALL_ACQ_W_SHO",
+      "phase": "acquisition",
+      "world_id": "W_SHO",
+      "arm": "acquisition",
+      "condition": "baseline",
+      "invalidated_facts": [],
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_SHO_A",
+          "FACT_SHO_B"
+        ],
+        [
+          "FACT_SHO_D",
+          "FACT_SHO_E"
+        ]
+      ],
+      "expected_surviving_lineage": [
+        [
+          "ROOT_R1",
+          "ROOT_R2"
+        ]
+      ],
+      "expected_oracle_answer": "CODE_EPSILON",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 4,
+      "call_id": "CALL_ACQ_W_REC",
+      "phase": "acquisition",
+      "world_id": "W_REC",
+      "arm": "acquisition",
+      "condition": "baseline",
+      "invalidated_facts": [],
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_REC_A",
+          "FACT_REC_B"
+        ],
+        [
+          "FACT_REC_B",
+          "FACT_REC_C"
+        ],
+        [
+          "FACT_REC_C",
+          "FACT_REC_D"
+        ]
+      ],
+      "expected_surviving_lineage": [
+        [
+          "ROOT_R1",
+          "ROOT_R2"
+        ],
+        [
+          "ROOT_R2",
+          "ROOT_R3"
+        ],
+        [
+          "ROOT_R3",
+          "ROOT_R4"
+        ]
+      ],
+      "expected_oracle_answer": "LANE_THETA",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 5,
+      "call_id": "CALL_REV_W_IND_DEGRADED_arm1_raw_neural",
+      "phase": "revision",
+      "world_id": "W_IND",
+      "arm": "arm1_raw_neural",
+      "condition": "DEGRADED",
+      "invalidated_facts": [
+        "FACT_IND_D"
+      ],
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_IND_A",
+          "FACT_IND_B"
+        ]
+      ],
+      "expected_surviving_lineage": [
+        [
+          "ROOT_R1"
+        ],
+        [
+          "ROOT_R2"
+        ]
+      ],
+      "expected_oracle_answer": "PROTOCOL_OMEGA",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 6,
+      "call_id": "CALL_REV_W_IND_DEGRADED_arm2_naive_reported",
+      "phase": "revision",
+      "world_id": "W_IND",
+      "arm": "arm2_naive_reported",
+      "condition": "DEGRADED",
+      "invalidated_facts": [
+        "FACT_IND_D"
+      ],
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_IND_A",
+          "FACT_IND_B"
+        ]
+      ],
+      "expected_surviving_lineage": [
+        [
+          "ROOT_R1"
+        ],
+        [
+          "ROOT_R2"
+        ]
+      ],
+      "expected_oracle_answer": "PROTOCOL_OMEGA",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 7,
+      "call_id": "CALL_REV_W_IND_DEGRADED_arm3_gene_kernel",
+      "phase": "revision",
+      "world_id": "W_IND",
+      "arm": "arm3_gene_kernel",
+      "condition": "DEGRADED",
+      "invalidated_facts": [
+        "FACT_IND_D"
+      ],
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_IND_A",
+          "FACT_IND_B"
+        ]
+      ],
+      "expected_surviving_lineage": [
+        [
+          "ROOT_R1"
+        ],
+        [
+          "ROOT_R2"
+        ]
+      ],
+      "expected_oracle_answer": "PROTOCOL_OMEGA",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 8,
+      "call_id": "CALL_REV_W_IND_RETRACTED_arm1_raw_neural",
+      "phase": "revision",
+      "world_id": "W_IND",
+      "arm": "arm1_raw_neural",
+      "condition": "RETRACTED",
+      "invalidated_facts": [
+        "FACT_IND_A",
+        "FACT_IND_D"
+      ],
+      "expected_entitled": false,
+      "expected_surviving_support": [],
+      "expected_surviving_lineage": [],
+      "expected_oracle_answer": "UNKNOWN",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 9,
+      "call_id": "CALL_REV_W_IND_RETRACTED_arm2_naive_reported",
+      "phase": "revision",
+      "world_id": "W_IND",
+      "arm": "arm2_naive_reported",
+      "condition": "RETRACTED",
+      "invalidated_facts": [
+        "FACT_IND_A",
+        "FACT_IND_D"
+      ],
+      "expected_entitled": false,
+      "expected_surviving_support": [],
+      "expected_surviving_lineage": [],
+      "expected_oracle_answer": "UNKNOWN",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 10,
+      "call_id": "CALL_REV_W_IND_RETRACTED_arm3_gene_kernel",
+      "phase": "revision",
+      "world_id": "W_IND",
+      "arm": "arm3_gene_kernel",
+      "condition": "RETRACTED",
+      "invalidated_facts": [
+        "FACT_IND_A",
+        "FACT_IND_D"
+      ],
+      "expected_entitled": false,
+      "expected_surviving_support": [],
+      "expected_surviving_lineage": [],
+      "expected_oracle_answer": "UNKNOWN",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 11,
+      "call_id": "CALL_REV_W_SHP_DEGRADED_arm1_raw_neural",
+      "phase": "revision",
+      "world_id": "W_SHP",
+      "arm": "arm1_raw_neural",
+      "condition": "DEGRADED",
+      "invalidated_facts": [
+        "FACT_SHP_B"
+      ],
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_SHP_A",
+          "FACT_SHP_D"
+        ]
+      ],
+      "expected_surviving_lineage": [
+        [
+          "ROOT_R1",
+          "ROOT_R2"
+        ],
+        [
+          "ROOT_R1",
+          "ROOT_R3"
+        ]
+      ],
+      "expected_oracle_answer": "TIER_SIGMA",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 12,
+      "call_id": "CALL_REV_W_SHP_DEGRADED_arm2_naive_reported",
+      "phase": "revision",
+      "world_id": "W_SHP",
+      "arm": "arm2_naive_reported",
+      "condition": "DEGRADED",
+      "invalidated_facts": [
+        "FACT_SHP_B"
+      ],
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_SHP_A",
+          "FACT_SHP_D"
+        ]
+      ],
+      "expected_surviving_lineage": [
+        [
+          "ROOT_R1",
+          "ROOT_R2"
+        ],
+        [
+          "ROOT_R1",
+          "ROOT_R3"
+        ]
+      ],
+      "expected_oracle_answer": "TIER_SIGMA",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 13,
+      "call_id": "CALL_REV_W_SHP_DEGRADED_arm3_gene_kernel",
+      "phase": "revision",
+      "world_id": "W_SHP",
+      "arm": "arm3_gene_kernel",
+      "condition": "DEGRADED",
+      "invalidated_facts": [
+        "FACT_SHP_B"
+      ],
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_SHP_A",
+          "FACT_SHP_D"
+        ]
+      ],
+      "expected_surviving_lineage": [
+        [
+          "ROOT_R1",
+          "ROOT_R2"
+        ],
+        [
+          "ROOT_R1",
+          "ROOT_R3"
+        ]
+      ],
+      "expected_oracle_answer": "TIER_SIGMA",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 14,
+      "call_id": "CALL_REV_W_SHP_RETRACTED_arm1_raw_neural",
+      "phase": "revision",
+      "world_id": "W_SHP",
+      "arm": "arm1_raw_neural",
+      "condition": "RETRACTED",
+      "invalidated_facts": [
+        "FACT_SHP_A"
+      ],
+      "expected_entitled": false,
+      "expected_surviving_support": [],
+      "expected_surviving_lineage": [],
+      "expected_oracle_answer": "UNKNOWN",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 15,
+      "call_id": "CALL_REV_W_SHP_RETRACTED_arm2_naive_reported",
+      "phase": "revision",
+      "world_id": "W_SHP",
+      "arm": "arm2_naive_reported",
+      "condition": "RETRACTED",
+      "invalidated_facts": [
+        "FACT_SHP_A"
+      ],
+      "expected_entitled": false,
+      "expected_surviving_support": [],
+      "expected_surviving_lineage": [],
+      "expected_oracle_answer": "UNKNOWN",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 16,
+      "call_id": "CALL_REV_W_SHP_RETRACTED_arm3_gene_kernel",
+      "phase": "revision",
+      "world_id": "W_SHP",
+      "arm": "arm3_gene_kernel",
+      "condition": "RETRACTED",
+      "invalidated_facts": [
+        "FACT_SHP_A"
+      ],
+      "expected_entitled": false,
+      "expected_surviving_support": [],
+      "expected_surviving_lineage": [],
+      "expected_oracle_answer": "UNKNOWN",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 17,
+      "call_id": "CALL_REV_W_SHO_DEGRADED_arm1_raw_neural",
+      "phase": "revision",
+      "world_id": "W_SHO",
+      "arm": "arm1_raw_neural",
+      "condition": "DEGRADED",
+      "invalidated_facts": [
+        "FACT_SHO_D"
+      ],
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_SHO_A",
+          "FACT_SHO_B"
+        ]
+      ],
+      "expected_surviving_lineage": [
+        [
+          "ROOT_R1",
+          "ROOT_R2"
+        ]
+      ],
+      "expected_oracle_answer": "CODE_EPSILON",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 18,
+      "call_id": "CALL_REV_W_SHO_DEGRADED_arm2_naive_reported",
+      "phase": "revision",
+      "world_id": "W_SHO",
+      "arm": "arm2_naive_reported",
+      "condition": "DEGRADED",
+      "invalidated_facts": [
+        "FACT_SHO_D"
+      ],
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_SHO_A",
+          "FACT_SHO_B"
+        ]
+      ],
+      "expected_surviving_lineage": [
+        [
+          "ROOT_R1",
+          "ROOT_R2"
+        ]
+      ],
+      "expected_oracle_answer": "CODE_EPSILON",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 19,
+      "call_id": "CALL_REV_W_SHO_DEGRADED_arm3_gene_kernel",
+      "phase": "revision",
+      "world_id": "W_SHO",
+      "arm": "arm3_gene_kernel",
+      "condition": "DEGRADED",
+      "invalidated_facts": [
+        "FACT_SHO_D"
+      ],
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_SHO_A",
+          "FACT_SHO_B"
+        ]
+      ],
+      "expected_surviving_lineage": [
+        [
+          "ROOT_R1",
+          "ROOT_R2"
+        ]
+      ],
+      "expected_oracle_answer": "CODE_EPSILON",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 20,
+      "call_id": "CALL_REV_W_SHO_RETRACTED_arm1_raw_neural",
+      "phase": "revision",
+      "world_id": "W_SHO",
+      "arm": "arm1_raw_neural",
+      "condition": "RETRACTED",
+      "invalidated_facts": [
+        "FACT_SHO_A",
+        "FACT_SHO_D"
+      ],
+      "expected_entitled": false,
+      "expected_surviving_support": [],
+      "expected_surviving_lineage": [],
+      "expected_oracle_answer": "UNKNOWN",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 21,
+      "call_id": "CALL_REV_W_SHO_RETRACTED_arm2_naive_reported",
+      "phase": "revision",
+      "world_id": "W_SHO",
+      "arm": "arm2_naive_reported",
+      "condition": "RETRACTED",
+      "invalidated_facts": [
+        "FACT_SHO_A",
+        "FACT_SHO_D"
+      ],
+      "expected_entitled": false,
+      "expected_surviving_support": [],
+      "expected_surviving_lineage": [],
+      "expected_oracle_answer": "UNKNOWN",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 22,
+      "call_id": "CALL_REV_W_SHO_RETRACTED_arm3_gene_kernel",
+      "phase": "revision",
+      "world_id": "W_SHO",
+      "arm": "arm3_gene_kernel",
+      "condition": "RETRACTED",
+      "invalidated_facts": [
+        "FACT_SHO_A",
+        "FACT_SHO_D"
+      ],
+      "expected_entitled": false,
+      "expected_surviving_support": [],
+      "expected_surviving_lineage": [],
+      "expected_oracle_answer": "UNKNOWN",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 23,
+      "call_id": "CALL_REV_W_REC_DEGRADED_arm1_raw_neural",
+      "phase": "revision",
+      "world_id": "W_REC",
+      "arm": "arm1_raw_neural",
+      "condition": "DEGRADED",
+      "invalidated_facts": [
+        "FACT_REC_A",
+        "FACT_REC_B"
+      ],
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_REC_C",
+          "FACT_REC_D"
+        ]
+      ],
+      "expected_surviving_lineage": [],
+      "expected_oracle_answer": "LANE_THETA",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 24,
+      "call_id": "CALL_REV_W_REC_DEGRADED_arm2_naive_reported",
+      "phase": "revision",
+      "world_id": "W_REC",
+      "arm": "arm2_naive_reported",
+      "condition": "DEGRADED",
+      "invalidated_facts": [
+        "FACT_REC_A",
+        "FACT_REC_B"
+      ],
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_REC_C",
+          "FACT_REC_D"
+        ]
+      ],
+      "expected_surviving_lineage": [],
+      "expected_oracle_answer": "LANE_THETA",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 25,
+      "call_id": "CALL_REV_W_REC_DEGRADED_arm3_gene_kernel",
+      "phase": "revision",
+      "world_id": "W_REC",
+      "arm": "arm3_gene_kernel",
+      "condition": "DEGRADED",
+      "invalidated_facts": [
+        "FACT_REC_A",
+        "FACT_REC_B"
+      ],
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_REC_C",
+          "FACT_REC_D"
+        ]
+      ],
+      "expected_surviving_lineage": [],
+      "expected_oracle_answer": "LANE_THETA",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 26,
+      "call_id": "CALL_REV_W_REC_RETRACTED_arm1_raw_neural",
+      "phase": "revision",
+      "world_id": "W_REC",
+      "arm": "arm1_raw_neural",
+      "condition": "RETRACTED",
+      "invalidated_facts": [
+        "FACT_REC_B",
+        "FACT_REC_C"
+      ],
+      "expected_entitled": false,
+      "expected_surviving_support": [],
+      "expected_surviving_lineage": [],
+      "expected_oracle_answer": "UNKNOWN",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 27,
+      "call_id": "CALL_REV_W_REC_RETRACTED_arm2_naive_reported",
+      "phase": "revision",
+      "world_id": "W_REC",
+      "arm": "arm2_naive_reported",
+      "condition": "RETRACTED",
+      "invalidated_facts": [
+        "FACT_REC_B",
+        "FACT_REC_C"
+      ],
+      "expected_entitled": false,
+      "expected_surviving_support": [],
+      "expected_surviving_lineage": [],
+      "expected_oracle_answer": "UNKNOWN",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 28,
+      "call_id": "CALL_REV_W_REC_RETRACTED_arm3_gene_kernel",
+      "phase": "revision",
+      "world_id": "W_REC",
+      "arm": "arm3_gene_kernel",
+      "condition": "RETRACTED",
+      "invalidated_facts": [
+        "FACT_REC_B",
+        "FACT_REC_C"
+      ],
+      "expected_entitled": false,
+      "expected_surviving_support": [],
+      "expected_surviving_lineage": [],
+      "expected_oracle_answer": "UNKNOWN",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 29,
+      "call_id": "CALL_CANARY_29_W_IND_DEGRADED_arm1_raw_neural",
+      "phase": "replay_canary",
+      "world_id": "W_IND",
+      "arm": "arm1_raw_neural",
+      "condition": "DEGRADED",
+      "invalidated_facts": [
+        "FACT_IND_D"
+      ],
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_IND_A",
+          "FACT_IND_B"
+        ]
+      ],
+      "expected_surviving_lineage": [],
+      "expected_oracle_answer": "PROTOCOL_OMEGA",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": "CALL_REV_W_IND_DEGRADED_arm1_raw_neural"
+    },
+    {
+      "call_index": 30,
+      "call_id": "CALL_CANARY_30_W_IND_RETRACTED_arm3_gene_kernel",
+      "phase": "replay_canary",
+      "world_id": "W_IND",
+      "arm": "arm3_gene_kernel",
+      "condition": "RETRACTED",
+      "invalidated_facts": [
+        "FACT_IND_A",
+        "FACT_IND_D"
+      ],
+      "expected_entitled": false,
+      "expected_surviving_support": [],
+      "expected_surviving_lineage": [],
+      "expected_oracle_answer": "UNKNOWN",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": "CALL_REV_W_IND_RETRACTED_arm3_gene_kernel"
+    },
+    {
+      "call_index": 31,
+      "call_id": "CALL_CANARY_31_W_REC_DEGRADED_arm3_gene_kernel",
+      "phase": "replay_canary",
+      "world_id": "W_REC",
+      "arm": "arm3_gene_kernel",
+      "condition": "DEGRADED",
+      "invalidated_facts": [
+        "FACT_REC_A",
+        "FACT_REC_B"
+      ],
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_REC_C",
+          "FACT_REC_D"
+        ]
+      ],
+      "expected_surviving_lineage": [],
+      "expected_oracle_answer": "LANE_THETA",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": "CALL_REV_W_REC_DEGRADED_arm3_gene_kernel"
+    },
+    {
+      "call_index": 32,
+      "call_id": "CALL_CANARY_32_W_REC_RETRACTED_arm1_raw_neural",
+      "phase": "replay_canary",
+      "world_id": "W_REC",
+      "arm": "arm1_raw_neural",
+      "condition": "RETRACTED",
+      "invalidated_facts": [
+        "FACT_REC_B",
+        "FACT_REC_C"
+      ],
+      "expected_entitled": false,
+      "expected_surviving_support": [],
+      "expected_surviving_lineage": [],
+      "expected_oracle_answer": "UNKNOWN",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": "CALL_REV_W_REC_RETRACTED_arm1_raw_neural"
+    }
+  ]
+}

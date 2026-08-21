@@ -206,9 +206,10 @@ $$\kappa(c) = \min_{C \subseteq \mathcal{A}} \{|C| : \forall S_i \in \mathcal{S}
        • Reproductive gating (R0 < 1 containment)
        
        PILLAR 5: EPISTEMIC ACTION AUTHORITY & LINEAGE PROJECTION [SOLID — STAGE 5B VALIDATED]
-       • Hierarchy of epistemic incompleteness: binary -> kappa -> rho -> lineage-projected S_L
+       • Hierarchy of epistemic incompleteness: binary -> kappa -> rho -> |Roots| -> rho_L -> S_L(c)
        • Proved that nominal multiplicity masquerades as independence in shared origin ancestry
-       • 100% compliance across 7 formal governance axioms via lineage-projected minimal hypergraphs S_L(c)
+       • Proved that summary tuple rho_L is itself lossy relative to the canonical hypergraph S_L(c)
+       • 100% compliance across 7 formal governance axioms via antichain-minimized lineage hypergraphs S_L(c)
 ```
 
 ---
@@ -218,6 +219,12 @@ $$\kappa(c) = \min_{C \subseteq \mathcal{A}} \{|C| : \forall S_i \in \mathcal{S}
 > **The Principle of Intervention-Sufficiency:**
 > *Whenever two distinct epistemic states collapse to the same stored summary representation, but require different responses to some future causal intervention or external action, that summary is too lossy for the runtime.*
 
+### Intervention Sufficiency is Intervention-Relative:
+- $\mathcal{S}(c)$ is the **intervention-sufficient normal form for premise-level changes** (`WHAT_IF(premise)`).
+- $\mathcal{S}_L(c)$ is the **canonical intervention-sufficient normal form for root-lineage changes** (`WHAT_IF(root)`).
+- The runtime maintains the explicit typed projection:
+  $$\mathcal{S}(c) \xrightarrow{\mathcal{L}} \mathcal{S}_L(c) = \min_{\subseteq} \{ \{ \mathcal{L}(p) : p \in S_i \} : S_i \in \mathcal{S}(c) \}$$
+
 This single principle unifies the entire scientific trajectory of GENE:
 - **Nominal Multiplicity Bias (R1):** Identical memory repetitions collapse independent roots into occurrence counts.
 - **Structural Provenance Laundering (1B-C0):** Node-only forgetting collapses ancestry into flat item records.
@@ -225,7 +232,8 @@ This single principle unifies the entire scientific trajectory of GENE:
 - **Revision Autoimmunity (5A):** Flat dependency unions collapse alternative disjunctive paths into a single conjunctive cut-set.
 - **Resilience Blindness (5A):** Scalar cut-set $\kappa$ collapses path loss in $(2,1) \to (1,1)$ where $\kappa$ stays constant.
 - **Lineage Independence Blindness (5B):** Tuple $\rho=(|S|, \kappa)$ and global root counts collapse shared origin ancestry into independent alternatives.
-- **The Minimal Resolution:** The Epistemic Kernel must maintain the **lineage-projected minimal support hypergraph** $\mathcal{S}_L(c) = \min_{\subseteq} \{ \{ \mathcal{L}(p) : p \in S_i \} \}$ alongside premise support $\mathcal{S}(c)$.
+- **Lineage Tuple Lossiness (5B):** Summary tuple $\rho_L = (|S_L|, \kappa_L)$ collapses single-root from conjunctive multi-root paths ($\{\{R_1\}\}$ vs $\{\{R_1, R_2\}\}$).
+- **The Canonical Resolution:** The Epistemic Kernel must maintain the **antichain-minimized lineage-projected support hypergraph** $\mathcal{S}_L(c)$ alongside premise support $\mathcal{S}(c)$.
 
 ---
 

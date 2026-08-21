@@ -63,13 +63,13 @@ $$\text{Ancestry} \longrightarrow \text{Retrieval Exposure} \longrightarrow \tex
    A mechanical first-order support-certificate validator checks whether cited memories structurally unify with deductive rule antecedents. In live calls on Gemma 3:12B, the validator reduced phenotypic expression of broken paths ($\mu_U = 0.375$) to zero heritable mutations ($\mu_{U, \text{heritable}} = \mathbf{0.000}$).
 
 7. **Four-Layer Epistemic Conformance Taxonomy & Explanatory Bloat (Round 4)**:
-   Neural reported justification $R(c)$ is not a faithful representation of minimal entitling support $\mathcal{S}(c)$. Epistemic outputs decompose into four independent layers: **symbol realization $\ne$ contract coherence $\ne$ justification precision $\ne$ formal derivability**. Under multi-path support, models exhibit 100% explanatory bloat ($E_S > 0$).
+   Neural reported justification $R(c)$ is not a faithful representation of minimal entitling support $\mathcal{S}(c)$. Epistemic outputs decompose into four independent layers: **symbol realization $\ne$ contract coherence $\ne$ justification precision $\ne$ formal derivability**. In entitled ecologies, models exhibited non-exact bloated support in 7/8 cases (mean excess 1.625) and 20.8% cross-field contract violations.
 
 8. **Loss of Alternative-Support Algebra Causes Revision Autoimmunity (Round 5 Stage 5A)**:
-   Representing alternative support $\mathcal{S}(c) = \{S_1, \dots, S_k\}$ as a flat conjunctive dependency union causes **100% false retractions (104/104)** on damaged-but-still-entitled states. Explanatory bloat causes 50% false retractions on untouched states. Support-first algebra eliminates 100% of revision errors without live compute.
+   Representing alternative support $\mathcal{S}(c) = \{S_1, \dots, S_k\}$ as a flat conjunctive dependency union causes **100% false retractions (104/104)** on damaged-but-still-entitled states. Explanatory bloat causes 50% false retractions on untouched states. Support-first algebra eliminates 100% of revision errors across 432 scenarios without live compute.
 
 9. **Intervention-Sufficient Representation & Lineage-Projected Action Governance (Round 5 Stage 5B)**:
-   Scalar cut-sets ($\kappa$), tuple signatures ($\rho$), and global root counts ($|\text{Roots}|$) all suffer lossy representation collisions under change. In shared origin ancestry ($A,D \leftarrow R_1, B,E \leftarrow R_2$), nominal multiplicity masquerades as independence. Action governance requires the **lineage-projected support hypergraph $\mathcal{S}_L(c)$** and root resilience $\rho_L(c)$, achieving 100% compliance across 7 formal governance axioms.
+   The Hierarchy of Epistemic Incompleteness ($\text{binary} \to \kappa \to \rho \to |\text{Roots}| \to \rho_L \to \mathcal{S}_L(c)$) proves that all scalar and tuple signatures suffer lossy representation collisions under change. In shared origin ancestry ($A,D \leftarrow R_1, B,E \leftarrow R_2$), nominal multiplicity masquerades as independence. Action governance requires the **antichain-minimized lineage-projected support hypergraph $\mathcal{S}_L(c)$**, achieving 100% compliance across 7 formal governance axioms.
 
 ---
 
@@ -80,14 +80,14 @@ $$\text{Ancestry} \longrightarrow \text{Retrieval Exposure} \longrightarrow \tex
 | **Phase 0–4** | Instrumentation & Invariants | Deterministic SQLite persistence, dual oracles, causal interventions | **FROZEN** | `3b59368` |
 | **Phase 5–6** | Experiment 0 | Lineage Observability, Causal Parentage, & 2x2 Factorial Matrix | **FROZEN** | `79b94cd` / `3c102bf` |
 | **Phase 7** | Experiment 1A | Multi-Generational Mutation Cascades ($G_0 \to G_2$) | **FROZEN** | `69d3570` |
-| **Phase 8** | Experiment 1B-A / B1 | Allele Fidelity, Multi-Hop Retrieval Dynamics ($X_{\text{path}}$), & Causal Rescue | **FROZEN** | `f6d6cbe` |
+| **Phase 8** | Experiment 1B-A / B1 | Allele Fidelity, Multi-Hop Retrieval Dynamics ($X_{\text{path}}$), & Causal Rescue | **FROZEN** | `9c9e7ca` |
 | **Phase 9 / 9.5** | Preflight & Matched Expression | Shape Map, Persistence Hardening, & 16-Call Live Matched Assay | **FROZEN** | `b7182d3` |
 | **Phase 10** | Experiment 1B-C0 / C1b | Analytic Calibration & 12-Ecology Delayed Adjudication Sandbox | **FROZEN** | `9f58315` |
 | **Phase 10.5** | Experiment 1B-C2 / C2a / C2b | Live Behavioral Immunity, Replay Stability, & Support-Certificate Validator | **FROZEN** | `a1474d6` / `1f62908` |
 | **Round 4** | Exploration Round 4 | Epistemic Context Compiler & Four-Layer Conformance Assay | **FROZEN** | `cf472ee` |
 | **Round 5A** | Exploration Round 5 Stage 5A | Revision Precision Assay & Loss of Support Algebra (432 cases) | **FROZEN** | `aff1baa` |
-| **Round 5B** | Exploration Round 5 Stage 5B | Action Governance & Lineage-Projected Epistemic Resilience (368 cases) | **FROZEN** | `316de02` |
-| **Round 5C** | Exploration Round 5 Stage 5C | Neural Revision Bridge (Live Model Revision Assay) | **ACTIVE** | Mainline |
+| **Round 5B** | Exploration Round 5 Stage 5B | Action Governance & Lineage-Projected Epistemic Resilience (368 cases) | **FROZEN** | `round5-stage5b-freeze-v3` |
+| **Round 5C** | Exploration Round 5 Stage 5C | Neural Revision Bridge (Live Model Revision Assay) | **PREREGISTERED** | `round5-stage5c-design-freeze` |
 
 ---
 

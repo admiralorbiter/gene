@@ -138,20 +138,10 @@
           "n_evaluations": 1200,
           "unit_of_analysis": "evaluation_cell",
           "formal_report": "docs/results/EXP1B_C1B_SHARED_ECOLOGY_REPORT.md",
-          "primary_metric": "C_I = 1.0000, S = 0.0000 across all budgets under node-only quarantine"
-        }
-      ],
-      "scope_limitations": "Evaluated in multi-hop deductive DAGs where intermediate G1 memories are stored as unflagged occurrences.",
-      "replication_status": "same_model_verified"
-    },
-    {
-      "claim_id": "GENE-C06",
-      "claim_status": "observed",
-      "headline": "Memory Containment Is Insufficient for Behavioral Containment",
-      "claim_text": "Removing legitimate support paths (X_path = 0) does not guarantee behavioral suppression. Under prompt conditions with missing required premises, neural reasoners manufacture unsupported pseudo-paths (mu_U = 0.375, 9/24), producing active epistemic errors despite successful memory-level quarantine. Memory governance (Layer 1) requires structural proofreading (Layer 2).",
-      "evidence_sources": [
+          "primary_metric": "S = +0.8000 at TPR=0.9/FPR=0.1; Node-Only C_I = 1.0000 (0% containment)"
+        },
         {
-          "experiment": "Experiment 1B-C2a (Live Behavioral Immunity Assay)",
+          "experiment": "Experiment 1B-C2a.1 (Live Behavioral Immunity Assay)",
           "evidence_class": "live_neural_assay",
           "artifact": "gene_exp1b_c2a_live_assay_a1474d6.db",
           "artifact_sha256": "69b20662173ff2b9a6abbbea74806fa3175eb246e12ae17deafc5213403c378a",
@@ -161,7 +151,30 @@
           "n_evaluations": 50,
           "unit_of_analysis": "call",
           "formal_report": "docs/results/EXP1B_C2A_LIVE_ASSAY_REPORT.md",
-          "primary_metric": "P(active | broken path in swapped arm) = 2/4 (initial test) and 9/10 (replay stability test)"
+          "primary_metric": "Lineage Quarantine: 100% path elimination vs Node-Only: 0% containment"
+        }
+      ],
+      "scope_limitations": "Assumes tamper-proof lineage graph preservation (Lineage Integrity Assumption).",
+      "replication_status": "same_model_verified"
+    },
+    {
+      "claim_id": "GENE-C06",
+      "claim_status": "observed",
+      "headline": "Memory Containment Is Insufficient for Behavioral Containment",
+      "claim_text": "Quarantining legitimate derivation paths (X_path = 0) is insufficient to guarantee behavioral abstention. Downstream neural reasoners can manufacture unsupported pseudo-paths from surviving fragments via single-premise conclusion jumping or cross-entity variable binding shortcuts.",
+      "evidence_sources": [
+        {
+          "experiment": "Experiment 1B-C2a.1 (Live Behavioral Immunity & Replay Stability)",
+          "evidence_class": "live_neural_assay",
+          "artifact": "gene_exp1b_c2a_live_assay_a1474d6.db",
+          "artifact_sha256": "69b20662173ff2b9a6abbbea74806fa3175eb246e12ae17deafc5213403c378a",
+          "execution_commit": "a1474d66e1434b075ee11c5888bafad9638c9057",
+          "model": "gemma3:12b",
+          "n_calls": 50,
+          "n_evaluations": 50,
+          "unit_of_analysis": "call",
+          "formal_report": "docs/results/EXP1B_C2A_LIVE_ASSAY_REPORT.md",
+          "primary_metric": "X_path = 0 yielded 2/4 behavioral expressions in initial assay; 9/10 epistemic errors on repeated broken prompt"
         }
       ],
       "scope_limitations": "Evaluated on Gemma 3:12B under greedy decoding (T=0, seed=42) on local GPU execution stacks.",
@@ -270,7 +283,7 @@
           "evidence_class": "deterministic_zero_live_llm",
           "artifact": "data/exploration_round5_stage5b_cases.jsonl",
           "artifact_sha256": "d08e1c5d58d430a2e087e4a3318f12ed67193fc80699146a6b27025a2ecefc3d",
-          "execution_commit": "316de0280e6325bfb411ade658763bf02b19dac6",
+          "execution_commit": "round5-stage5b-freeze-v3",
           "model": "None (Deterministic Axiomatic Engine)",
           "n_calls": 0,
           "n_evaluations": 368,

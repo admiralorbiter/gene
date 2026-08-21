@@ -296,7 +296,9 @@ $$\text{Symbol Realization} \ne \text{Contract Coherence} \ne \text{Justificatio
 +──────────────────────────┼─────────────────────────────────────────────────────────────┼────────────────+
 │ 1. Symbol Realization    │ Token-level formatting drift (e.g. PROTOCOL_X7 vs PROTO_X7) │ 6 / 24 (25.0%) │
 │ 2. Contract Coherence    │ Semantic contradiction across JSON fields (det vs N=null)   │ 5 / 24 (20.8%) │
-│ 3. Justification Precise │ Explanatory bloat (citing irrelevant distractors E_S > 0)    │ 24/24 (100.0%) │
+│ 3. Justification Precise │ Non-exact bloated support in entitled environments          │ 7 / 8  (87.5%) │
+│                          │ (Mean excess cited facts E_S = 1.625; 6/8 citing all 4 docs)│                │
+│                          │ Preregistered entitled + pruned exact justification         │ 9 / 16 (56.2%) │
 │ 4. Formal Derivability   │ Deriving concrete answers from empty/broken support         │ 0.300 - 0.375  │
 +──────────────────────────┴─────────────────────────────────────────────────────────────┴────────────────+
 ```
@@ -310,7 +312,7 @@ In Stage 5A, GENE evaluated how persistent memory systems update beliefs when an
 When a claim is supported by alternative disjunctive paths (e.g. $\mathcal{S}(C) = \{\{A,B\}, \{D,E\}\}$), invalidating premise $D$ leaves the claim damaged but still entitled via surviving path $\{A,B\}$:
 $$\text{Ent}^*(C, \{D\}) = \mathbf{1}[\{A,B\} \cap \{D\} = \emptyset] \lor \mathbf{1}[\{D,E\} \cap \{D\} = \emptyset] = 1 \lor 0 = 1$$
 
-Across 368 factorial revision scenarios:
+Across 432 factorial revision scenarios (368 local + 64 network DAG):
 - **Flat Dependency Unions ($R_{\text{union}} = \{A,B,D,E\}$)** falsely retracted **100% of damaged-but-entitled states (104/104)**, destroying beliefs that retained valid alternative support.
 - **Single-Witness Tracking ($R_{\text{single}} = \{D,E\}$)** falsely retracted **57.7% of damaged states (60/104)**.
 - **Explanatory Bloat ($E_S > 0$)** caused **50% false retractions (8/16)** on completely untouched states when an irrelevant distractor was retracted.
@@ -322,15 +324,19 @@ Across 368 factorial revision scenarios:
 
 In Stage 5B, GENE investigated: *What information about surviving support is minimally necessary to govern action authority under change?*
 
-The benchmark proved that all existing scalar and tuple summaries suffer from **lossy representation collisions**:
+The benchmark proved the **Hierarchy of Epistemic Incompleteness**:
+$$\text{Binary Entitlement} \longrightarrow \text{Cut-Set } \kappa \longrightarrow \text{Tuple } \rho \longrightarrow |\text{Roots}| \longrightarrow \text{Lineage Tuple } \rho_L \longrightarrow \mathcal{S}_L(c) \text{ (Canonical Normal Form)}$$
+
+All coarse scalar and tuple summaries suffer from **lossy representation collisions**:
 1. **Binary Entitlement ($\text{Auth} \in \{0, 1\}$)** is blind to degradation, granting 100% full authority ($1.000$) to damaged beliefs.
 2. **Scalar Cut-Set Resilience ($\kappa$)** fails on shared-root degradation ($(2,1) \to (1,1)$), granting full authority ($1.000$) even when an entire alternative path is destroyed.
 3. **Tuple Resilience ($\rho = (|S|, \kappa)$)** fails to distinguish correlated single-root alternative paths from independent multi-root paths.
 4. **Global Root Counts ($|\text{Roots}|$)** fail in shared origin ancestry ($A,D \leftarrow R_1, B,E \leftarrow R_2$): global counting sees 2 roots and 2 paths, but both paths share conjunctive root vulnerability.
+5. **Lineage Tuple $\rho_L = (|\mathcal{S}_L|, \kappa_L)$** fails on single-root vs conjunctive multi-root paths ($\mathcal{S}_{L,1} = \{\{R_1\}\}$ vs $\mathcal{S}_{L,2} = \{\{R_1, R_2\}\}$ both produce $\rho_L = (1, 1)$, but $\text{do}(R_2=0)$ severs only the latter).
 
-**The Resolution:** Projecting premise support into root-lineage space yields the **lineage-projected minimal support hypergraph**:
+**The Resolution:** Projecting premise support into root-lineage space and eliminating strict supersets yields the **antichain-minimized lineage-projected support hypergraph**:
 $$\mathcal{S}_L(c) = \min_{\subseteq} \{ \{ \mathcal{L}(p) : p \in S_i \} : S_i \in \mathcal{S}(c) \}$$
-Lineage-projected resilience $\rho_L(c) = (|\mathcal{S}_L(c)|, \kappa_L(c))$ resolves all collisions and achieves **100% compliance across 7 formal governance axioms**.
+$\mathcal{S}_L(c)$ serves as the canonical intervention-sufficient normal form for root-level changes, achieving **100% compliance across 7 formal governance axioms**.
 
 ---
 
@@ -364,7 +370,7 @@ GENE currently evaluates what lineage can achieve under the assumption that ance
 │ Exp 1B-C1b │ 1200 │ Lineage Quarantine Selectivity (90/10)  │ S = +0.800   │ Blind: 0.0 │ FROZEN        │
 │ Exp 1B-C2a │ 50   │ Live Lineage Containment vs Laundering  │ 100% vs 0%   │ Node: 0%   │ FROZEN        │
 │ Exp 1B-C2b │ 30   │ Structural Proofreader Heritable Rate   │ μ_herit = 0.0│ μ_U = 0.375│ FROZEN        │
-│ Round 4    │ 116  │ Four-Layer Conformance & Bloat Assay    │ E_S > 0: 100%│ Zero Bloat │ FROZEN        │
+│ Round 4    │ 116  │ Four-Layer Conformance & Bloat Assay    │ 7/8 Bloated  │ Zero Bloat │ FROZEN        │
 │ Stage 5A   │ 432  │ Revision Precision & Support Algebra    │ Degraded: 0% │ Flat: 100% │ FROZEN        │
 │ Stage 5B   │ 368  │ Lineage-Projected Action Governance     │ 7/7 Axioms   │ Rho: 6/7   │ FROZEN        │
 +────────────+──────+─────────────────────────────────────────+──────────────+────────────+───────────────+

@@ -1,7 +1,7 @@
 {
   "manifest_version": "2.0.0",
   "project": "GENE (Genealogical Epistemic Network Experiments)",
-  "generated_at": "2026-08-21T02:40:45.277894+00:00",
+  "generated_at": "2026-08-21T02:56:47.871953+00:00",
   "canonical_experiments": {
     "exp0": {
       "experiment": "Experiment 0 (Lineage Observability & Factorial Calibration)",
@@ -175,7 +175,9 @@
       "experiment": "Exploration Round 5 Stage 5A (Support-First Revision Precision)",
       "summary_file": "exploration_round5_stage5a_summary.json",
       "commit": "aff1baa34e55f371bfe710628f25abf9113c2f03",
-      "total_cases": 368,
+      "total_cases": 432,
+      "subassay_5a1_local_what_if_cases": 368,
+      "subassay_5a2_network_then_what_cases": 64,
       "degraded_cases": 104,
       "flat_union_autoimmunity_on_degraded": 1.0,
       "single_witness_autoimmunity_on_degraded": 0.5769,
@@ -185,10 +187,11 @@
     "stage_5b": {
       "experiment": "Exploration Round 5 Stage 5B (Lineage-Projected Action Governance)",
       "summary_file": "exploration_round5_stage5b_summary.json",
-      "commit": "316de0280e6325bfb411ade658763bf02b19dac6",
+      "commit": "round5-stage5b-freeze-v3",
       "total_cases": 368,
-      "axiomatic_compliance_p_lineage": "7 / 7 (100.0% fully compliant)",
+      "axiomatic_compliance_p_lineage": "7 / 7 (100.0% fully compliant via antichain-minimized S_L and rho_L)",
       "degraded_permitted_rate_tau_0_5": "32 / 104 (30.8%)",
+      "mean_degraded_lineage_authority": 0.4615,
       "status": "FROZEN"
     }
   }

@@ -283,7 +283,7 @@
           "evidence_class": "deterministic_zero_live_llm",
           "artifact": "data/exploration_round5_stage5b_cases.jsonl",
           "artifact_sha256": "d08e1c5d58d430a2e087e4a3318f12ed67193fc80699146a6b27025a2ecefc3d",
-          "execution_commit": "316de0280e6325bfb411ade658763bf02b19dac6",
+          "execution_commit": "round5-stage5b-freeze-v3",
           "model": "None (Deterministic Axiomatic Engine)",
           "n_calls": 0,
           "n_evaluations": 368,

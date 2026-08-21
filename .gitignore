@@ -41,6 +41,7 @@ data/*
 !data/exploration_round5_stage5a_summary.json
 !data/exploration_round5_stage5b_cases.jsonl
 !data/exploration_round5_stage5b_summary.json
+!data/exploration_round5_stage5c_manifest.json
 
 # IDEs and Editors
 .vscode/
