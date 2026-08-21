@@ -17,7 +17,7 @@ root_dir = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(root_dir / "src"))
 sys.path.insert(0, str(root_dir))
 
-from gene.ollama_client import OllamaClient
+from gene.ollama_client import OllamaClient, CallSpec
 from gene.experiments.neural_revision_bridge import (
     NeuralRevisionBridgeRunner,
     NeuralRevisionBridgeOutput,
@@ -35,19 +35,24 @@ def run_stage5c(
     print("      GENE EXPLORATION ROUND 5 STAGE 5C: NEURAL REVISION BRIDGE (32 CALLS)      ")
     print("================================================================================\n")
 
-    client = OllamaClient(model_name=model_name, temperature=0.0, seed=42)
-    model_digest = client.get_model_digest()
+    client = OllamaClient()
+    model_info = client.get_model_info(model_name)
+    model_digest = model_info.digest
     print(f"Target Model: {model_name} (Digest: {model_digest})")
     print(f"Execution DB: {db_path}")
     print(f"Assay Manifest: {manifest_path}\n")
 
     def client_fn(prompt: str) -> str:
-        # Standard chat invocation
-        resp = client.chat(
-            messages=[{"role": "user", "content": prompt}],
-            options={"temperature": 0.0, "seed": 42},
+        spec = CallSpec(
+            model_name=model_name,
+            system_prompt="You are an epistemic reasoning engine. You must output valid JSON.",
+            user_prompt=prompt,
+            temperature=0.0,
+            seed=42,
+            format="json",
         )
-        return resp.get("message", {}).get("content", "")
+        res = client.chat(spec)
+        return res.raw_response_text
 
     runner = NeuralRevisionBridgeRunner(
         db_path=db_path,
