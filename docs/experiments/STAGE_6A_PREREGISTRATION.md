@@ -1,89 +1,68 @@
-# Exploration Round 6 Stage 6A: Supersession Algebra & Temporal Validity Preregistration
+# Stage 6A Preregistration: Bitemporal Supersession Algebra & Epistemic State Transition Semantics
 
-**Assay Name**: Stage 6A (Temporal State Transition & Supersession Algebra)  
-**Assay Type**: Exact Deterministic Mathematical Specification & Closed-Form Oracle  
-**Compute Allocation**: 0 Live Model Compute (Pure Python Deterministic Assay)  
-**Parent Milestone**: `round5-stage5c-postreview-freeze` (`28a897b`)  
-**Target Module**: `src/gene/supersession_engine.py`  
-**Test Suite**: `tests/test_supersession_algebra.py`
+**Document URI**: `docs/experiments/STAGE_6A_PREREGISTRATION.md`  
+**Milestone**: Exploration Round 6 (Stage 6A-v2)  
+**Parent Freeze**: `round5-stage5c-postreview-freeze` (`28a897b`)  
+**Status**: Formally Specified & Verified  
 
 ---
 
-## 1. Research Motivation & Problem Statement
+## 1. Mathematical & Architectural Specification
 
-In Exploration Rounds 1 through 5, upstream change was provided to the Epistemic Kernel via an explicit, pre-classified retraction marker: $\text{do}(x = 0)$. In real-world persistent agent environments, however, knowledge updates arrive as **new natural information** rather than explicit retractions.
+Stage 6A-v2 formalizes persistent epistemic state transitions under world evolution, retroactive corrections, expiration, and multi-pair contradictions using a **bitemporal event-sourced model**.
 
-For example, an agent receiving the new observation `"Alice moved to Chicago at t=5"` must determine that:
-1. `"Alice lives in Kansas City"` is **superseded** at $t=5$.
-2. Dependent conclusions (e.g. `"Alice's commute is 20 minutes"`) lose their Kansas City support path.
-3. If an independent alternative derivation exists (e.g. Alice has a second home with a 20-minute train route in Chicago), the conclusion **survives non-destructively**.
+### 1.1 The Bitemporal Coordinate System
+Persistent beliefs exist in a 2-dimensional temporal coordinate space:
+1. **Valid Time ($t_v \in \mathbb{R}$)**: The time at which a factual proposition or relation holds true in the target world.
+2. **Knowledge Time ($t_k \in \mathbb{N}_0$)**: The transaction time when the agent learned, recorded, or revised the event.
 
-Stage 6A establishes the **deterministic formal foundation** for temporal validity, implicit supersession, expiration, and unresolved conflict without requiring live LLM compute.
-
----
-
-## 2. Formal Temporal State Model
-
-Let $\mathcal{E}$ be an append-only timeline of discrete temporal events $e_1, e_2, \dots, e_N$ occurring at integer timestamps $t \in \mathbb{N}_0$.
-
-### 2.1 Fact & Rule Representations
-- **Fact**: $f = (\text{id}, \text{predicate}, \text{arguments}, t_{\text{asserted}}, \mathcal{L}(f))$ where $\mathcal{L}(f) \subseteq \text{Roots}$.
-- **Rule**: $r = (\text{id}, \text{head}, \text{body})$, where $\text{body} = \{p_1, \dots, p_k\}$.
-
-### 2.2 Discrete Event Types
-1. **`ADD(fact, t)`**: Asserts a new fact at timestamp $t$.
-2. **`SUPERSEDES(new_fact_id, old_fact_id, t)`**: Declares that `new_fact` replaces `old_fact` at timestamp $t$. The validity window of `old_fact` terminates at $t$.
-3. **`RETRACT(fact_id, t)`**: Explicitly revokes `fact_id` at timestamp $t$.
-4. **`EXPIRES(fact_id, t_expire)`**: Declares a finite validity horizon $[t_{\text{asserted}}, t_{\text{expire}})$.
-5. **`CONTRADICTS(fact_a_id, fact_b_id, t)`**: Declares an unresolved conflict between `fact_a` and `fact_b` at timestamp $t$. In the default cautious mode, both facts become inactive until resolved; in optimistic mode, both remain marked pending adjudication.
-
-### 2.3 Temporal Validity State $\mathcal{V}_t$
-A fact $f$ is **active and valid at timestamp $t$** ($f \in \mathcal{F}_t$) if and only if:
-1. $t_{\text{asserted}} \le t$,
-2. $\neg \exists e = \text{SUPERSEDES}(f', f, t') \in \mathcal{E}$ such that $t' \le t$,
-3. $\neg \exists e = \text{RETRACT}(f, t') \in \mathcal{E}$ such that $t' \le t$,
-4. If $f$ has an expiration $t_{\text{expire}}$, then $t < t_{\text{expire}}$,
-5. $\neg \exists e = \text{CONTRADICTS}(f, f'', t') \in \mathcal{E}$ with $t' \le t$ (under cautious conflict resolution).
+Queries ask either:
+- **$\text{STATE}(c, t_v)$**: *What is true in the world at time $t_v$?*
+- **$\text{BELIEVED\_STATE}(c, t_v \mid t_k)$**: *What did the agent believe held at valid time $t_v$, as known at transaction time $t_k$?*
 
 ---
 
-## 3. Temporal Epistemic Support & Lineage Projection
+## 2. Formal Event Algebra
 
-At any timestamp $t$:
-1. **Active Premise Universe**: $\mathcal{F}_t = \{ f \in \mathcal{F} : \text{is\_valid}(f, t) \}$.
-2. **Temporal Entitling Support $\mathcal{S}_t(c)$**:
-   $$\mathcal{S}_t(c) = \min_{\subseteq} \{ S_i \subseteq \mathcal{F}_t : S_i \cup \mathcal{R} \vdash c \}$$
-   where $\min_{\subseteq}$ enforces antichain minimality across active premise sets.
-3. **Temporal Lineage-Projected Hypergraph $\mathcal{S}_{L,t}(c)$**:
-   $$\mathcal{S}_{L,t}(c) = \min_{\subseteq} \{ \{ \mathcal{L}(p) : p \in S_i \} : S_i \in \mathcal{S}_t(c) \}$$
-4. **Temporal Action Authority $\text{Auth}_t(c)$**:
-   $$\text{Auth}_t(c) = \frac{1}{2} \left( \frac{\kappa_{L,t}}{\kappa_{\text{init}}} + \frac{|\mathcal{S}_{L,t}|}{|\mathcal{S}_{L,\text{init}}|} \right)$$
+The state of persistent memory is governed by an immutable, append-only event log $\mathcal{E} = [e_1, \dots, e_N]$. Each event carries a transaction timestamp $t_k$ and a valid-time interval $[t_{v,\text{start}}, t_{v,\text{end}})$:
 
----
-
-## 4. First-Order Temporal Query Interfaces
-
-The `SupersessionEngine` exposes five deterministic queries:
-
-1. **`WHY_t(c)`**:
-   Returns the current active support family $\mathcal{S}_t(c)$, lineage hypergraph $\mathcal{S}_{L,t}(c)$, and authority score $\text{Auth}_t(c)$.
-2. **`WHAT_IF_t(c, event)`**:
-   Computes counterfactual support $\mathcal{S}_{t+1}(c \mid \text{event})$ without mutating persistent state.
-3. **`THEN_WHAT_t(event)`**:
-   Returns the complete set of downstream propositions $\{c\}$ whose entitlement status (ACTIVE vs INACTIVE) or authority score changes upon applying `event`.
-4. **`TIMELINE(c)`**:
-   Returns the chronological history of entitlement transitions for claim $c$ across all recorded timestamps $[0, t_{\max}]$.
-5. **`AUDIT_CONFLICTS(t)`**:
-   Returns all currently unresolved contradiction pairs and ungrounded claims at timestamp $t$.
+1. **`ASSERT(fact_id, t_k, t_v_start, t_v_end=None, occurrence_id=None)`**:
+   Instantiates an occurrence episode for `fact_id` valid in interval $[t_{v,\text{start}}, t_{v,\text{end}})$. Reassertion across disjoint intervals (e.g. $[0, 5)$ and $[10, \infty)$) is natively supported without historical clipping.
+2. **`SUPERSEDES(new_fact_id, old_fact_id, t_k, t_v_start)`**:
+   Truncates the validity of `old_fact_id` at $t_{v,\text{start}}$ and activates `new_fact_id`.
+3. **`RETRACT(fact_id, t_k, t_v_start)`**:
+   Explicitly terminates the validity of `fact_id` for $t_v \ge t_{v,\text{start}}$.
+4. **`EXPIRES(fact_id, t_k, t_v_expire)`**:
+   Caps fact validity at $t_v < t_{v,\text{expire}}$.
+5. **`CONTRADICTS(fact_a_id, fact_b_id, t_k, t_v_start, t_v_end=None)`**:
+   Registers an active contradiction pair $\{f_a, f_b\}$ holding for $t_v \in [t_{v,\text{start}}, t_{v,\text{end}})$. Under cautious conflict resolution, involved facts are disqualified during this window without contaminating earlier undisputed history.
+6. **`RESOLVE_CONFLICT(fact_a_id, fact_b_id, t_k, t_v_start, t_v_end=None)`**:
+   Removes $\{f_a, f_b\}$ from active conflicts. Resolving $\{f_a, f_b\}$ strictly preserves any concurrent conflict $\{f_a, f_c\}$.
 
 ---
 
-## 5. Formal Invariants & Test Specification
+## 3. Epistemic Support & Authority Functions
 
-Stage 6A must satisfy five formal mathematical invariants:
+Given active facts $\mathcal{F}(t_v \mid t_k)$ derived by replaying events where $e.t_k \le t_k$:
 
-1. **Monotonic Event Progression**: Applying events at increasing timestamps strictly preserves historical validity states ($t_1 < t_2 \implies \mathcal{V}_{t_1}$ reproducible exactly).
-2. **Supersession Non-Destructive Survival**: If $c$ has two independent support paths $P_1 = \{A, B\}$ and $P_2 = \{D, E\}$, superseding $D$ with $D'$ (where $D'$ does not support $c$) leaves $c$ active at $t$ via $P_1$ with degraded authority.
-3. **Temporal Expiration Determinism**: An expiring premise $f$ automatically transitions from active to inactive at $t = t_{\text{expire}}$ without requiring an explicit retraction event.
-4. **Unresolved Conflict Isolation**: A contradiction event between two premises isolates the affected branch without contaminating orthogonal derivation paths.
-5. **Antichain Minimality Invariant**: At every timestamp $t$ and for every claim $c$, $\mathcal{S}_t(c)$ and $\mathcal{S}_{L,t}(c)$ contain zero strict supersets.
+1. **Minimal Support Hypergraph $\mathcal{S}_{t_v}(c \mid t_k)$**:
+   $$\mathcal{S}_{t_v}(c \mid t_k) = \min_{\subseteq} \{ S_i \subseteq \mathcal{F}(t_v \mid t_k) : S_i \cup \mathcal{R} \vdash c \}$$
+2. **Lineage-Projected Hypergraph $\mathcal{S}_{L,t_v}(c \mid t_k)$**:
+   $$\mathcal{S}_{L,t_v}(c \mid t_k) = \min_{\subseteq} \{ \{ \mathcal{L}(p) : p \in S_i \} : S_i \in \mathcal{S}_{t_v}(c \mid t_k) \}$$
+3. **Relative Action Authority ($\text{RelAuth}$)**:
+   $$\text{RelAuth}_{t_v \mid t_k}(c) = \frac{1}{2} \left( \frac{\kappa_L(\mathcal{S}_{L,t_v})}{\kappa_L(\mathcal{S}_{L,\text{init}})} + \frac{|\mathcal{S}_{L,t_v}|}{|\mathcal{S}_{L,\text{init}}|} \right)$$
+   *(Relative index where $1.0 = \text{baseline}, < 1.0 = \text{degraded}, > 1.0 = \text{reinforced}$).*
+4. **Bounded Action Authority ($\text{BoundedAuth}$)**:
+   $$\text{BoundedAuth}_{t_v \mid t_k}(c) = \min(1.0, \max(0.0, \text{RelAuth})) \in [0.0, 1.0]$$
+
+---
+
+## 4. Query Contracts & Deep Dirty-State Discovery
+
+- **`WHY(c, t_v, t_k)`**: Returns boolean entitlement, $\mathcal{S}_{t_v}$, $\mathcal{S}_{L,t_v}$, $\kappa_L$, $\text{RelAuth}$, and $\text{BoundedAuth}$.
+- **`WHAT_IF(c, event, t_v, t_k)`**: Evaluates hypothetical entitlement under counterfactual event without state mutation.
+- **`THEN_WHAT(event, t_v, t_k)`**: Automatically discovers all affected downstream propositions in the deductive closure. A proposition is classified as impacted if:
+  $$\Delta \text{Ent} \lor \Delta \mathcal{S} \lor \Delta \mathcal{S}_L \lor \Delta \text{Auth}$$
+  Classifications include `LOST_ENTITLEMENT`, `GAINED_ENTITLEMENT`, `SUPPORT_GEOMETRY_CHANGED`, `LINEAGE_GEOMETRY_CHANGED`, `DEGRADED_AUTHORITY`, `AUGMENTED_AUTHORITY`.
+- **`TIMELINE(c, valid_timestamps, t_k)`**: Computes chronological progression of entitlement states across valid time.
+- **`AUDIT_CONFLICTS(t_v, t_k)`**: Lists active contradiction pairs.

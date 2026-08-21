@@ -91,7 +91,8 @@ $$\text{Ancestry} \longrightarrow \text{Retrieval Exposure} \longrightarrow \tex
 | **Round 5A** | Exploration Round 5 Stage 5A | Revision Precision Assay & Loss of Support Algebra (432 cases) | **FROZEN** | `aff1baa` |
 | **Round 5B** | Exploration Round 5 Stage 5B | Action Governance & Lineage-Projected Epistemic Resilience (368 cases) | **FROZEN** | `round5-stage5b-freeze-v3` |
 | **Round 5C** | Exploration Round 5 Stage 5C | Neural Revision Bridge (32-Call Live Model Revision Assay) | **FROZEN** | `round5-stage5c-postreview-freeze` |
-| **Round 6** | Exploration Round 6 | Epistemic State Under Change (Implicit Supersession & Validity) | **IN DESIGN** | `main` |
+| **Round 6A** | Exploration Round 6 Stage 6A-v2 | Bitemporal Supersession Algebra & State Transition Semantics | **VERIFIED** | `main` |
+| **Round 6B** | Exploration Round 6 Stage 6B | Implicit State Adjudication & Predicate Contract Benchmark | **PREREGISTERED** | `main` |
 
 ---
 
@@ -102,6 +103,11 @@ $$\text{Ancestry} \longrightarrow \text{Retrieval Exposure} \longrightarrow \tex
 - **Foundational Project Vision:** [`docs/GENE_MOONSHOT.md`](docs/GENE_MOONSHOT.md)
 - **Canonical Scientific Narrative:** [`docs/GENE_STORY_MEMO.md`](docs/GENE_STORY_MEMO.md)
 - **Round 5 Retrospective & 2026 Literature Memo:** [`docs/results/EXPLORATION_ROUND5_RETROSPECTIVE.md`](docs/results/EXPLORATION_ROUND5_RETROSPECTIVE.md)
+- **Round 6 Experiments & Reports:**
+  - [Stage 6A-v2 Bitemporal Specification](docs/experiments/STAGE_6A_PREREGISTRATION.md)
+  - [Stage 6B Implicit Adjudication Preregistration](docs/experiments/STAGE_6B_PREREGISTRATION.md)
+  - [Scale Envelope Benchmark Report v1](docs/results/SCALE_ENVELOPE_REPORT.md)
+  - [Lineage Threat Model & Attack Matrix Report v1](docs/results/LINEAGE_INTEGRITY_THREAT_MATRIX.md)
 - **System Architecture & Formalisms:** [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 - **Interactive Research Exhibit:** [`docs/atlas/index.html`](docs/atlas/index.html)
 - **Round 5 Results Reports:**
@@ -119,4 +125,4 @@ All experimental fixtures, oracle closures, statistical analyzers, revision engi
 ```bash
 pytest -v
 ```
-*Current test health: 164 passed in 23.76s (Zero warnings/errors).*
+*Current test health: 172 passed (Zero warnings/errors).*

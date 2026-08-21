@@ -1,6 +1,6 @@
 {
   "benchmark_name": "Scale Envelope Benchmark v1",
-  "timestamp_utc": "2026-08-21T04:15:00Z",
+  "timestamp_utc": "2026-08-21T04:23:00Z",
   "environment": {
     "os": "Windows",
     "os_release": "11",
@@ -8,8 +8,8 @@
     "processor": "AMD64 Family 25 Model 33 Stepping 2, AuthenticAMD"
   },
   "execution_profile": {
-    "total_elapsed_seconds": 25.973,
-    "peak_memory_mb": 11.215,
+    "total_elapsed_seconds": 9.449,
+    "peak_memory_mb": 3.879,
     "typical_cells_count": 36,
     "adversarial_cells_count": 7
   },
@@ -22,11 +22,11 @@
       "trials": 50,
       "mean_support_size": 1.0,
       "max_support_size": 1,
-      "enum_latency_p50_us": 106.3,
-      "enum_latency_p90_us": 231.3,
-      "enum_latency_p99_us": 623.4,
-      "enum_latency_max_us": 623.4,
-      "inv_latency_p50_us": 686.6
+      "enum_latency_p50_us": 22.8,
+      "enum_latency_p90_us": 39.7,
+      "enum_latency_p99_us": 41.4,
+      "enum_latency_max_us": 41.4,
+      "inv_latency_p50_us": 166.5
     },
     {
       "workload": "typical_random_dag",
@@ -36,11 +36,11 @@
       "trials": 50,
       "mean_support_size": 1.16,
       "max_support_size": 2,
-      "enum_latency_p50_us": 112.3,
-      "enum_latency_p90_us": 175.5,
-      "enum_latency_p99_us": 440.8,
-      "enum_latency_max_us": 440.8,
-      "inv_latency_p50_us": 716.4
+      "enum_latency_p50_us": 22.5,
+      "enum_latency_p90_us": 26.9,
+      "enum_latency_p99_us": 87.2,
+      "enum_latency_max_us": 87.2,
+      "inv_latency_p50_us": 167.2
     },
     {
       "workload": "typical_random_dag",
@@ -50,11 +50,11 @@
       "trials": 50,
       "mean_support_size": 1.62,
       "max_support_size": 4,
-      "enum_latency_p50_us": 139.2,
-      "enum_latency_p90_us": 263.2,
-      "enum_latency_p99_us": 909.4,
-      "enum_latency_max_us": 909.4,
-      "inv_latency_p50_us": 843.6
+      "enum_latency_p50_us": 26.3,
+      "enum_latency_p90_us": 38.0,
+      "enum_latency_p99_us": 106.0,
+      "enum_latency_max_us": 106.0,
+      "inv_latency_p50_us": 203.9
     },
     {
       "workload": "typical_random_dag",
@@ -64,11 +64,11 @@
       "trials": 50,
       "mean_support_size": 1.0,
       "max_support_size": 1,
-      "enum_latency_p50_us": 201.9,
-      "enum_latency_p90_us": 333.1,
-      "enum_latency_p99_us": 491.8,
-      "enum_latency_max_us": 491.8,
-      "inv_latency_p50_us": 986.7
+      "enum_latency_p50_us": 36.4,
+      "enum_latency_p90_us": 106.9,
+      "enum_latency_p99_us": 176.8,
+      "enum_latency_max_us": 176.8,
+      "inv_latency_p50_us": 215.3
     },
     {
       "workload": "typical_random_dag",
@@ -78,11 +78,11 @@
       "trials": 50,
       "mean_support_size": 1.26,
       "max_support_size": 3,
-      "enum_latency_p50_us": 276.7,
-      "enum_latency_p90_us": 453.1,
-      "enum_latency_p99_us": 1681.8,
-      "enum_latency_max_us": 1681.8,
-      "inv_latency_p50_us": 1256.7
+      "enum_latency_p50_us": 47.4,
+      "enum_latency_p90_us": 58.0,
+      "enum_latency_p99_us": 144.1,
+      "enum_latency_max_us": 144.1,
+      "inv_latency_p50_us": 274.8
     },
     {
       "workload": "typical_random_dag",
@@ -92,11 +92,11 @@
       "trials": 50,
       "mean_support_size": 1.34,
       "max_support_size": 3,
-      "enum_latency_p50_us": 430.9,
-      "enum_latency_p90_us": 763.9,
-      "enum_latency_p99_us": 1003.2,
-      "enum_latency_max_us": 1003.2,
-      "inv_latency_p50_us": 1940.5
+      "enum_latency_p50_us": 78.4,
+      "enum_latency_p90_us": 152.0,
+      "enum_latency_p99_us": 474.1,
+      "enum_latency_max_us": 474.1,
+      "inv_latency_p50_us": 494.2
     },
     {
       "workload": "typical_random_dag",
@@ -106,11 +106,11 @@
       "trials": 50,
       "mean_support_size": 1.0,
       "max_support_size": 1,
-      "enum_latency_p50_us": 337.3,
-      "enum_latency_p90_us": 535.0,
-      "enum_latency_p99_us": 1568.8,
-      "enum_latency_max_us": 1568.8,
-      "inv_latency_p50_us": 1332.8
+      "enum_latency_p50_us": 58.5,
+      "enum_latency_p90_us": 108.9,
+      "enum_latency_p99_us": 340.3,
+      "enum_latency_max_us": 340.3,
+      "inv_latency_p50_us": 313.3
     },
     {
       "workload": "typical_random_dag",
@@ -120,11 +120,11 @@
       "trials": 50,
       "mean_support_size": 1.1,
       "max_support_size": 2,
-      "enum_latency_p50_us": 477.4,
-      "enum_latency_p90_us": 857.8,
-      "enum_latency_p99_us": 1338.8,
-      "enum_latency_max_us": 1338.8,
-      "inv_latency_p50_us": 1994.0
+      "enum_latency_p50_us": 83.8,
+      "enum_latency_p90_us": 170.7,
+      "enum_latency_p99_us": 391.1,
+      "enum_latency_max_us": 391.1,
+      "inv_latency_p50_us": 438.0
     },
     {
       "workload": "typical_random_dag",
@@ -134,11 +134,11 @@
       "trials": 50,
       "mean_support_size": 1.2,
       "max_support_size": 3,
-      "enum_latency_p50_us": 842.6,
-      "enum_latency_p90_us": 1189.8,
-      "enum_latency_p99_us": 1796.8,
-      "enum_latency_max_us": 1796.8,
-      "inv_latency_p50_us": 3184.1
+      "enum_latency_p50_us": 154.5,
+      "enum_latency_p90_us": 264.5,
+      "enum_latency_p99_us": 454.8,
+      "enum_latency_max_us": 454.8,
+      "inv_latency_p50_us": 818.2
     },
     {
       "workload": "typical_random_dag",
@@ -148,11 +148,11 @@
       "trials": 50,
       "mean_support_size": 1.0,
       "max_support_size": 1,
-      "enum_latency_p50_us": 176.9,
-      "enum_latency_p90_us": 328.1,
-      "enum_latency_p99_us": 486.4,
-      "enum_latency_max_us": 486.4,
-      "inv_latency_p50_us": 1153.4
+      "enum_latency_p50_us": 45.4,
+      "enum_latency_p90_us": 79.8,
+      "enum_latency_p99_us": 375.3,
+      "enum_latency_max_us": 375.3,
+      "inv_latency_p50_us": 372.5
     },
     {
       "workload": "typical_random_dag",
@@ -162,11 +162,11 @@
       "trials": 50,
       "mean_support_size": 1.42,
       "max_support_size": 2,
-      "enum_latency_p50_us": 186.9,
-      "enum_latency_p90_us": 317.9,
-      "enum_latency_p99_us": 475.0,
-      "enum_latency_max_us": 475.0,
-      "inv_latency_p50_us": 1199.4
+      "enum_latency_p50_us": 47.4,
+      "enum_latency_p90_us": 87.8,
+      "enum_latency_p99_us": 179.4,
+      "enum_latency_max_us": 179.4,
+      "inv_latency_p50_us": 410.6
     },
     {
       "workload": "typical_random_dag",
@@ -176,11 +176,11 @@
       "trials": 50,
       "mean_support_size": 1.96,
       "max_support_size": 4,
-      "enum_latency_p50_us": 220.2,
-      "enum_latency_p90_us": 400.3,
-      "enum_latency_p99_us": 674.5,
-      "enum_latency_max_us": 674.5,
-      "inv_latency_p50_us": 1386.5
+      "enum_latency_p50_us": 55.2,
+      "enum_latency_p90_us": 95.9,
+      "enum_latency_p99_us": 134.9,
+      "enum_latency_max_us": 134.9,
+      "inv_latency_p50_us": 463.6
     },
     {
       "workload": "typical_random_dag",
@@ -190,11 +190,11 @@
       "trials": 50,
       "mean_support_size": 1.0,
       "max_support_size": 1,
-      "enum_latency_p50_us": 295.0,
-      "enum_latency_p90_us": 515.0,
-      "enum_latency_p99_us": 832.7,
-      "enum_latency_max_us": 832.7,
-      "inv_latency_p50_us": 1578.7
+      "enum_latency_p50_us": 65.6,
+      "enum_latency_p90_us": 111.7,
+      "enum_latency_p99_us": 148.6,
+      "enum_latency_max_us": 148.6,
+      "inv_latency_p50_us": 477.6
     },
     {
       "workload": "typical_random_dag",
@@ -204,11 +204,11 @@
       "trials": 50,
       "mean_support_size": 1.88,
       "max_support_size": 5,
-      "enum_latency_p50_us": 405.0,
-      "enum_latency_p90_us": 756.1,
-      "enum_latency_p99_us": 1835.2,
-      "enum_latency_max_us": 1835.2,
-      "inv_latency_p50_us": 2045.2
+      "enum_latency_p50_us": 91.8,
+      "enum_latency_p90_us": 187.4,
+      "enum_latency_p99_us": 566.3,
+      "enum_latency_max_us": 566.3,
+      "inv_latency_p50_us": 702.9
     },
     {
       "workload": "typical_random_dag",
@@ -218,11 +218,11 @@
       "trials": 50,
       "mean_support_size": 2.98,
       "max_support_size": 9,
-      "enum_latency_p50_us": 723.7,
-      "enum_latency_p90_us": 1215.2,
-      "enum_latency_p99_us": 2172.1,
-      "enum_latency_max_us": 2172.1,
-      "inv_latency_p50_us": 3706.0
+      "enum_latency_p50_us": 166.7,
+      "enum_latency_p90_us": 257.8,
+      "enum_latency_p99_us": 347.4,
+      "enum_latency_max_us": 347.4,
+      "inv_latency_p50_us": 1115.3
     },
     {
       "workload": "typical_random_dag",
@@ -232,11 +232,11 @@
       "trials": 50,
       "mean_support_size": 1.0,
       "max_support_size": 1,
-      "enum_latency_p50_us": 430.7,
-      "enum_latency_p90_us": 859.8,
-      "enum_latency_p99_us": 1430.8,
-      "enum_latency_max_us": 1430.8,
-      "inv_latency_p50_us": 2140.2
+      "enum_latency_p50_us": 96.5,
+      "enum_latency_p90_us": 139.9,
+      "enum_latency_p99_us": 180.2,
+      "enum_latency_max_us": 180.2,
+      "inv_latency_p50_us": 613.0
     },
     {
       "workload": "typical_random_dag",
@@ -246,11 +246,11 @@
       "trials": 50,
       "mean_support_size": 1.82,
       "max_support_size": 8,
-      "enum_latency_p50_us": 898.4,
-      "enum_latency_p90_us": 1906.0,
-      "enum_latency_p99_us": 2431.5,
-      "enum_latency_max_us": 2431.5,
-      "inv_latency_p50_us": 3774.1
+      "enum_latency_p50_us": 202.6,
+      "enum_latency_p90_us": 421.9,
+      "enum_latency_p99_us": 1898.6,
+      "enum_latency_max_us": 1898.6,
+      "inv_latency_p50_us": 1107.3
     },
     {
       "workload": "typical_random_dag",
@@ -260,11 +260,11 @@
       "trials": 50,
       "mean_support_size": 2.98,
       "max_support_size": 15,
-      "enum_latency_p50_us": 2451.1,
-      "enum_latency_p90_us": 3769.6,
-      "enum_latency_p99_us": 6113.7,
-      "enum_latency_max_us": 6113.7,
-      "inv_latency_p50_us": 9885.1
+      "enum_latency_p50_us": 477.4,
+      "enum_latency_p90_us": 780.2,
+      "enum_latency_p99_us": 1504.9,
+      "enum_latency_max_us": 1504.9,
+      "inv_latency_p50_us": 3060.2
     },
     {
       "workload": "typical_random_dag",
@@ -274,11 +274,11 @@
       "trials": 50,
       "mean_support_size": 1.0,
       "max_support_size": 1,
-      "enum_latency_p50_us": 264.0,
-      "enum_latency_p90_us": 318.2,
-      "enum_latency_p99_us": 567.6,
-      "enum_latency_max_us": 567.6,
-      "inv_latency_p50_us": 1745.3
+      "enum_latency_p50_us": 83.2,
+      "enum_latency_p90_us": 152.9,
+      "enum_latency_p99_us": 297.9,
+      "enum_latency_max_us": 297.9,
+      "inv_latency_p50_us": 745.2
     },
     {
       "workload": "typical_random_dag",
@@ -288,11 +288,11 @@
       "trials": 50,
       "mean_support_size": 1.44,
       "max_support_size": 2,
-      "enum_latency_p50_us": 298.3,
-      "enum_latency_p90_us": 524.3,
-      "enum_latency_p99_us": 1049.3,
-      "enum_latency_max_us": 1049.3,
-      "inv_latency_p50_us": 1905.7
+      "enum_latency_p50_us": 86.5,
+      "enum_latency_p90_us": 181.1,
+      "enum_latency_p99_us": 592.3,
+      "enum_latency_max_us": 592.3,
+      "inv_latency_p50_us": 771.9
     },
     {
       "workload": "typical_random_dag",
@@ -302,11 +302,11 @@
       "trials": 50,
       "mean_support_size": 2.1,
       "max_support_size": 4,
-      "enum_latency_p50_us": 325.5,
-      "enum_latency_p90_us": 563.5,
-      "enum_latency_p99_us": 715.1,
-      "enum_latency_max_us": 715.1,
-      "inv_latency_p50_us": 2070.8
+      "enum_latency_p50_us": 96.3,
+      "enum_latency_p90_us": 209.1,
+      "enum_latency_p99_us": 439.7,
+      "enum_latency_max_us": 439.7,
+      "inv_latency_p50_us": 828.9
     },
     {
       "workload": "typical_random_dag",
@@ -316,11 +316,11 @@
       "trials": 50,
       "mean_support_size": 1.0,
       "max_support_size": 1,
-      "enum_latency_p50_us": 380.3,
-      "enum_latency_p90_us": 518.5,
-      "enum_latency_p99_us": 805.9,
-      "enum_latency_max_us": 805.9,
-      "inv_latency_p50_us": 2092.2
+      "enum_latency_p50_us": 114.9,
+      "enum_latency_p90_us": 200.2,
+      "enum_latency_p99_us": 346.8,
+      "enum_latency_max_us": 346.8,
+      "inv_latency_p50_us": 851.3
     },
     {
       "workload": "typical_random_dag",
@@ -330,11 +330,11 @@
       "trials": 50,
       "mean_support_size": 2.76,
       "max_support_size": 8,
-      "enum_latency_p50_us": 588.4,
-      "enum_latency_p90_us": 826.4,
-      "enum_latency_p99_us": 1115.7,
-      "enum_latency_max_us": 1115.7,
-      "inv_latency_p50_us": 3268.3
+      "enum_latency_p50_us": 160.2,
+      "enum_latency_p90_us": 273.3,
+      "enum_latency_p99_us": 607.9,
+      "enum_latency_max_us": 607.9,
+      "inv_latency_p50_us": 1218.2
     },
     {
       "workload": "typical_random_dag",
@@ -344,11 +344,11 @@
       "trials": 50,
       "mean_support_size": 7.04,
       "max_support_size": 21,
-      "enum_latency_p50_us": 1247.3,
-      "enum_latency_p90_us": 2195.2,
-      "enum_latency_p99_us": 4274.6,
-      "enum_latency_max_us": 4274.6,
-      "inv_latency_p50_us": 7159.7
+      "enum_latency_p50_us": 315.3,
+      "enum_latency_p90_us": 621.4,
+      "enum_latency_p99_us": 3858.3,
+      "enum_latency_max_us": 3858.3,
+      "inv_latency_p50_us": 2456.9
     },
     {
       "workload": "typical_random_dag",
@@ -358,11 +358,11 @@
       "trials": 50,
       "mean_support_size": 1.0,
       "max_support_size": 1,
-      "enum_latency_p50_us": 563.4,
-      "enum_latency_p90_us": 814.2,
-      "enum_latency_p99_us": 896.8,
-      "enum_latency_max_us": 896.8,
-      "inv_latency_p50_us": 2745.7
+      "enum_latency_p50_us": 147.8,
+      "enum_latency_p90_us": 286.5,
+      "enum_latency_p99_us": 397.2,
+      "enum_latency_max_us": 397.2,
+      "inv_latency_p50_us": 1012.4
     },
     {
       "workload": "typical_random_dag",
@@ -372,11 +372,11 @@
       "trials": 50,
       "mean_support_size": 2.98,
       "max_support_size": 9,
-      "enum_latency_p50_us": 1489.0,
-      "enum_latency_p90_us": 2222.9,
-      "enum_latency_p99_us": 4253.8,
-      "enum_latency_max_us": 4253.8,
-      "inv_latency_p50_us": 7244.2
+      "enum_latency_p50_us": 347.2,
+      "enum_latency_p90_us": 501.6,
+      "enum_latency_p99_us": 1065.5,
+      "enum_latency_max_us": 1065.5,
+      "inv_latency_p50_us": 2474.9
     },
     {
       "workload": "typical_random_dag",
@@ -386,11 +386,11 @@
       "trials": 50,
       "mean_support_size": 8.88,
       "max_support_size": 30,
-      "enum_latency_p50_us": 6538.0,
-      "enum_latency_p90_us": 21429.8,
-      "enum_latency_p99_us": 48281.6,
-      "enum_latency_max_us": 48281.6,
-      "inv_latency_p50_us": 28930.8
+      "enum_latency_p50_us": 1492.7,
+      "enum_latency_p90_us": 5649.8,
+      "enum_latency_p99_us": 12716.1,
+      "enum_latency_max_us": 12716.1,
+      "inv_latency_p50_us": 9423.1
     },
     {
       "workload": "typical_random_dag",
@@ -400,11 +400,11 @@
       "trials": 50,
       "mean_support_size": 1.0,
       "max_support_size": 1,
-      "enum_latency_p50_us": 358.2,
-      "enum_latency_p90_us": 516.3,
-      "enum_latency_p99_us": 725.3,
-      "enum_latency_max_us": 725.3,
-      "inv_latency_p50_us": 2432.1
+      "enum_latency_p50_us": 130.9,
+      "enum_latency_p90_us": 239.4,
+      "enum_latency_p99_us": 276.3,
+      "enum_latency_max_us": 276.3,
+      "inv_latency_p50_us": 1147.8
     },
     {
       "workload": "typical_random_dag",
@@ -414,11 +414,11 @@
       "trials": 50,
       "mean_support_size": 1.4,
       "max_support_size": 2,
-      "enum_latency_p50_us": 387.5,
-      "enum_latency_p90_us": 518.4,
-      "enum_latency_p99_us": 1170.1,
-      "enum_latency_max_us": 1170.1,
-      "inv_latency_p50_us": 2526.3
+      "enum_latency_p50_us": 133.4,
+      "enum_latency_p90_us": 144.2,
+      "enum_latency_p99_us": 412.6,
+      "enum_latency_max_us": 412.6,
+      "inv_latency_p50_us": 1121.4
     },
     {
       "workload": "typical_random_dag",
@@ -428,11 +428,11 @@
       "trials": 50,
       "mean_support_size": 2.12,
       "max_support_size": 4,
-      "enum_latency_p50_us": 398.0,
-      "enum_latency_p90_us": 636.7,
-      "enum_latency_p99_us": 836.1,
-      "enum_latency_max_us": 836.1,
-      "inv_latency_p50_us": 2688.4
+      "enum_latency_p50_us": 138.2,
+      "enum_latency_p90_us": 181.7,
+      "enum_latency_p99_us": 275.5,
+      "enum_latency_max_us": 275.5,
+      "inv_latency_p50_us": 1150.2
     },
     {
       "workload": "typical_random_dag",
@@ -442,11 +442,11 @@
       "trials": 50,
       "mean_support_size": 1.0,
       "max_support_size": 1,
-      "enum_latency_p50_us": 508.8,
-      "enum_latency_p90_us": 806.6,
-      "enum_latency_p99_us": 1061.6,
-      "enum_latency_max_us": 1061.6,
-      "inv_latency_p50_us": 3074.0
+      "enum_latency_p50_us": 159.3,
+      "enum_latency_p90_us": 199.2,
+      "enum_latency_p99_us": 350.6,
+      "enum_latency_max_us": 350.6,
+      "inv_latency_p50_us": 1227.3
     },
     {
       "workload": "typical_random_dag",
@@ -456,11 +456,11 @@
       "trials": 50,
       "mean_support_size": 3.46,
       "max_support_size": 12,
-      "enum_latency_p50_us": 670.5,
-      "enum_latency_p90_us": 1057.2,
-      "enum_latency_p99_us": 1395.3,
-      "enum_latency_max_us": 1395.3,
-      "inv_latency_p50_us": 4035.9
+      "enum_latency_p50_us": 229.2,
+      "enum_latency_p90_us": 407.2,
+      "enum_latency_p99_us": 987.7,
+      "enum_latency_max_us": 987.7,
+      "inv_latency_p50_us": 1743.4
     },
     {
       "workload": "typical_random_dag",
@@ -470,11 +470,11 @@
       "trials": 50,
       "mean_support_size": 12.96,
       "max_support_size": 67,
-      "enum_latency_p50_us": 1710.9,
-      "enum_latency_p90_us": 3983.5,
-      "enum_latency_p99_us": 11870.0,
-      "enum_latency_max_us": 11870.0,
-      "inv_latency_p50_us": 10376.2
+      "enum_latency_p50_us": 459.6,
+      "enum_latency_p90_us": 1143.6,
+      "enum_latency_p99_us": 2239.9,
+      "enum_latency_max_us": 2239.9,
+      "inv_latency_p50_us": 3882.0
     },
     {
       "workload": "typical_random_dag",
@@ -484,11 +484,11 @@
       "trials": 50,
       "mean_support_size": 1.0,
       "max_support_size": 1,
-      "enum_latency_p50_us": 767.7,
-      "enum_latency_p90_us": 1113.3,
-      "enum_latency_p99_us": 2750.4,
-      "enum_latency_max_us": 2750.4,
-      "inv_latency_p50_us": 3873.5
+      "enum_latency_p50_us": 240.3,
+      "enum_latency_p90_us": 395.0,
+      "enum_latency_p99_us": 665.1,
+      "enum_latency_max_us": 665.1,
+      "inv_latency_p50_us": 1762.8
     },
     {
       "workload": "typical_random_dag",
@@ -498,11 +498,11 @@
       "trials": 50,
       "mean_support_size": 6.52,
       "max_support_size": 59,
-      "enum_latency_p50_us": 1694.9,
-      "enum_latency_p90_us": 4978.4,
-      "enum_latency_p99_us": 11719.6,
-      "enum_latency_max_us": 11719.6,
-      "inv_latency_p50_us": 8801.1
+      "enum_latency_p50_us": 475.6,
+      "enum_latency_p90_us": 1368.9,
+      "enum_latency_p99_us": 2367.9,
+      "enum_latency_max_us": 2367.9,
+      "inv_latency_p50_us": 3434.8
     },
     {
       "workload": "typical_random_dag",
@@ -512,11 +512,11 @@
       "trials": 50,
       "mean_support_size": 21.72,
       "max_support_size": 78,
-      "enum_latency_p50_us": 18219.6,
-      "enum_latency_p90_us": 80153.8,
-      "enum_latency_p99_us": 528603.4,
-      "enum_latency_max_us": 528603.4,
-      "inv_latency_p50_us": 85305.2
+      "enum_latency_p50_us": 4977.9,
+      "enum_latency_p90_us": 22184.3,
+      "enum_latency_p99_us": 169351.2,
+      "enum_latency_max_us": 169351.2,
+      "inv_latency_p50_us": 29181.7
     }
   ],
   "adversarial_results": [
@@ -525,56 +525,56 @@
       "num_roots": 4,
       "theoretical_max_antichain": 6,
       "actual_support_size": 6,
-      "enum_latency_us": 261.4,
-      "inv_latency_us": 1215.7
+      "enum_latency_us": 53.0,
+      "inv_latency_us": 289.5
     },
     {
       "workload": "adversarial_sperner_antichain",
       "num_roots": 6,
       "theoretical_max_antichain": 20,
       "actual_support_size": 20,
-      "enum_latency_us": 436.9,
-      "inv_latency_us": 3170.1
+      "enum_latency_us": 86.5,
+      "inv_latency_us": 826.2
     },
     {
       "workload": "adversarial_sperner_antichain",
       "num_roots": 8,
       "theoretical_max_antichain": 70,
       "actual_support_size": 70,
-      "enum_latency_us": 1538.2,
-      "inv_latency_us": 11463.9
+      "enum_latency_us": 353.9,
+      "inv_latency_us": 3624.6
     },
     {
       "workload": "adversarial_sperner_antichain",
       "num_roots": 10,
       "theoretical_max_antichain": 252,
       "actual_support_size": 252,
-      "enum_latency_us": 8841.5,
-      "inv_latency_us": 70657.6
+      "enum_latency_us": 2166.9,
+      "inv_latency_us": 27891.6
     },
     {
       "workload": "adversarial_sperner_antichain",
       "num_roots": 12,
       "theoretical_max_antichain": 924,
       "actual_support_size": 924,
-      "enum_latency_us": 39960.9,
-      "inv_latency_us": 555004.6
+      "enum_latency_us": 19609.3,
+      "inv_latency_us": 301469.4
     },
     {
       "workload": "adversarial_sperner_antichain",
       "num_roots": 14,
       "theoretical_max_antichain": 3432,
       "actual_support_size": 2000,
-      "enum_latency_us": 138785.3,
-      "inv_latency_us": 660978.2
+      "enum_latency_us": 97586.8,
+      "inv_latency_us": 670232.8
     },
     {
       "workload": "adversarial_sperner_antichain",
       "num_roots": 16,
       "theoretical_max_antichain": 12870,
       "actual_support_size": 2000,
-      "enum_latency_us": 143071.8,
-      "inv_latency_us": 686944.9
+      "enum_latency_us": 93637.9,
+      "inv_latency_us": 654619.0
     }
   ]
 }

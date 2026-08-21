@@ -1,15 +1,20 @@
 """Bitemporal Supersession and Epistemic State Transition Algebra (Stage 6A-v2).
 
 Implements the deterministic formal engine for bitemporal truth maintenance:
-- Valid Time (t_v): When a fact or relation holds true in the world.
+- Valid Time (t_v): When a fact, interval, or conflict holds true in the world.
 - Knowledge Time (t_k): When the agent learned or committed the fact/event.
 
-Features:
-- Authoritative event log playback (reconstructing state at any t_v given t_k).
-- Multi-pair conflict set tracking (resolving A-B leaves A-C in conflict).
-- Automatic reverse-dependency discovery for THEN_WHAT without caller-supplied candidate lists.
-- Antichain-minimized support hypergraphs S_{t_v}(c | t_k) and lineage S_{L,t_v}(c | t_k).
-- Explicit baseline lineage tracking for action authority governance.
+Key Architectural Invariants:
+1. Occurrence-based interval tracking: Reassertion and recurrent validity intervals
+   (e.g., [0, 5) and [10, inf)) are fully supported without historical clipping.
+2. Bitemporal conflict tracking: Contradiction events carry valid-time bounds [t_v_start, t_v_end),
+   so epistemic disputes at t_v=5 do not falsely invalidate undisputed history at t_v=2.
+3. Multi-pair conflict resolution: Conflicts are maintained as undirected pairs C(t_v | t_k) = {{f_a, f_b}}.
+   Resolving {A, B} preserves active disputes on {A, C}.
+4. Deep THEN_WHAT transition discovery: Detects changes in entitlement, support geometry S(c),
+   lineage geometry S_L(c), and relative/bounded action authority.
+5. Action authority semantics: Separates RelativeAuthority (unbounded robustness index)
+   from BoundedAuthority (strict [0, 1] authorization gating score).
 """
 
 from __future__ import annotations
@@ -56,7 +61,7 @@ class BitemporalRule:
 
 @dataclass(frozen=True)
 class TemporalEvent:
-    """Immutable event recording a state transition at knowledge time t_k with valid time t_v."""
+    """Immutable event recording a state transition at knowledge time t_k with valid time interval [t_v_start, t_v_end)."""
     event_id: str
     event_type: EventType
     t_knowledge: int
@@ -64,6 +69,7 @@ class TemporalEvent:
     t_valid_end: float | None = None
     target_fact_id: str = ""
     secondary_fact_id: str | None = None
+    occurrence_id: str | None = None
     payload: dict[str, Any] = field(default_factory=dict)
 
 
@@ -144,63 +150,71 @@ class BitemporalEngine:
 
         events = self.get_events_up_to(t_k, extra_events)
 
-        # 1. Determine validity intervals from assertions, supersessions, retractions, and expirations
-        is_asserted = False
-        valid_intervals: list[tuple[float, float]] = []
-
+        # 1. Compute valid intervals per assertion occurrence
+        # Each ASSERT event creates an independent assertion occurrence interval [s_i, e_i)
+        occurrences: list[dict[str, Any]] = []
         for ev in events:
-            if ev.target_fact_id == fact_id:
-                if ev.event_type == EventType.ASSERT:
-                    is_asserted = True
-                    start = ev.t_valid_start
-                    end = ev.t_valid_end if ev.t_valid_end is not None else float("inf")
-                    valid_intervals.append((start, end))
+            if ev.target_fact_id == fact_id and ev.event_type == EventType.ASSERT:
+                start = ev.t_valid_start
+                end = ev.t_valid_end if ev.t_valid_end is not None else float("inf")
+                occurrences.append({
+                    "start": start,
+                    "end": end,
+                    "occ_id": ev.occurrence_id or ev.event_id,
+                })
 
-        if not is_asserted:
+        if not occurrences:
             return False
 
-        # Apply truncations from SUPERSEDES, RETRACT, EXPIRES
-        effective_intervals: list[tuple[float, float]] = []
-        for (start, end) in valid_intervals:
-            cur_start = start
-            cur_end = end
+        # Apply truncating events (RETRACT, SUPERSEDES, EXPIRES) to overlapping occurrences
+        active_intervals: list[tuple[float, float]] = []
+        for occ in occurrences:
+            s = occ["start"]
+            e = occ["end"]
 
             for ev in events:
-                # Retraction terminates validity at ev.t_valid_start
+                # Retraction of this fact truncates interval if cut time falls inside [s, e)
                 if ev.event_type == EventType.RETRACT and ev.target_fact_id == fact_id:
-                    if ev.t_valid_start <= cur_end:
-                        cur_end = min(cur_end, ev.t_valid_start)
+                    cut_t = ev.t_valid_start
+                    if s <= cut_t < e:
+                        e = cut_t
 
-                # Supersession: if this fact is superseded (secondary_fact_id), terminate validity at ev.t_valid_start
+                # Supersession of this fact (secondary_fact_id) truncates interval
                 if ev.event_type == EventType.SUPERSEDES and ev.secondary_fact_id == fact_id:
-                    if ev.t_valid_start <= cur_end:
-                        cur_end = min(cur_end, ev.t_valid_start)
+                    cut_t = ev.t_valid_start
+                    if s <= cut_t < e:
+                        e = cut_t
 
                 # Expiration
                 if ev.event_type == EventType.EXPIRES and ev.target_fact_id == fact_id:
-                    exp_t = ev.t_valid_start
-                    if exp_t <= cur_end:
-                        cur_end = min(cur_end, exp_t)
+                    cut_t = ev.t_valid_start
+                    if s <= cut_t < e:
+                        e = cut_t
 
-            if cur_start <= t_v < cur_end:
-                effective_intervals.append((cur_start, cur_end))
+            if s <= t_v < e:
+                active_intervals.append((s, e))
 
-        if not effective_intervals:
+        if not active_intervals:
             return False
 
-        # 2. Check active conflict sets
-        # Track unresolved conflict pairs: set of frozenset([f_a, f_b])
+        # 2. Check bitemporal conflicts active at (t_v, t_k)
+        # Active conflict pair is active if ev.t_valid_start <= t_v < ev.t_valid_end
         active_conflicts: set[frozenset[str]] = set()
         for ev in events:
+            c_start = ev.t_valid_start
+            c_end = ev.t_valid_end if ev.t_valid_end is not None else float("inf")
+
             if ev.event_type == EventType.CONTRADICTS and ev.secondary_fact_id:
-                pair = frozenset([ev.target_fact_id, ev.secondary_fact_id])
-                active_conflicts.add(pair)
+                if c_start <= t_v < c_end:
+                    pair = frozenset([ev.target_fact_id, ev.secondary_fact_id])
+                    active_conflicts.add(pair)
+
             elif ev.event_type == EventType.RESOLVE_CONFLICT and ev.secondary_fact_id:
-                pair = frozenset([ev.target_fact_id, ev.secondary_fact_id])
-                active_conflicts.discard(pair)
+                if c_start <= t_v < c_end:
+                    pair = frozenset([ev.target_fact_id, ev.secondary_fact_id])
+                    active_conflicts.discard(pair)
 
         if self.cautious_conflicts:
-            # Fact is disqualified if it is part of ANY currently active conflict pair
             if any(fact_id in pair for pair in active_conflicts):
                 return False
 
@@ -297,7 +311,7 @@ class BitemporalEngine:
 
         return compute_antichain(lineage_sets)
 
-    def compute_authority(
+    def compute_relative_authority(
         self,
         query: tuple[str, str, str],
         t_v: float,
@@ -305,7 +319,7 @@ class BitemporalEngine:
         init_lineage_sets: set[frozenset[str]] | None = None,
         extra_events: list[TemporalEvent] | None = None,
     ) -> float:
-        """Compute normalized action authority Auth_{t_v | t_k}(query)."""
+        """Compute relative resilience index RelAuth (baseline = 1.0, degraded < 1.0, reinforced > 1.0)."""
         current_l = self.compute_temporal_lineage(query, t_v, t_k, extra_events)
         if not current_l:
             return 0.0
@@ -322,6 +336,18 @@ class BitemporalEngine:
         paths_ratio = (paths_curr / paths_init) if paths_init > 0 else 0.0
 
         return 0.5 * (kappa_ratio + paths_ratio)
+
+    def compute_bounded_authority(
+        self,
+        query: tuple[str, str, str],
+        t_v: float,
+        t_k: int,
+        init_lineage_sets: set[frozenset[str]] | None = None,
+        extra_events: list[TemporalEvent] | None = None,
+    ) -> float:
+        """Compute clamped authorization score Auth in [0.0, 1.0]."""
+        rel_auth = self.compute_relative_authority(query, t_v, t_k, init_lineage_sets, extra_events)
+        return min(1.0, max(0.0, rel_auth))
 
     def get_all_derived_propositions(self) -> set[tuple[str, str, str]]:
         """Discover all possible target conclusions in the deductive rule closure."""
@@ -342,7 +368,8 @@ class BitemporalEngine:
         """Explain why a claim is entitled at valid time t_v as known at transaction time t_k."""
         support = self.compute_temporal_support(query, t_v, t_k)
         lineage = self.compute_temporal_lineage(query, t_v, t_k)
-        auth = self.compute_authority(query, t_v, t_k, init_lineage_sets)
+        rel_auth = self.compute_relative_authority(query, t_v, t_k, init_lineage_sets)
+        bnd_auth = self.compute_bounded_authority(query, t_v, t_k, init_lineage_sets)
 
         return {
             "query": query,
@@ -352,7 +379,8 @@ class BitemporalEngine:
             "support_sets_S_t": [sorted(list(s)) for s in sorted(support, key=lambda x: sorted(list(x)))],
             "lineage_sets_S_L_t": [sorted(list(s)) for s in sorted(lineage, key=lambda x: sorted(list(x)))],
             "lineage_cut_set_kappa_L": compute_cut_set_size(lineage),
-            "authority_score": round(auth, 4),
+            "relative_authority": round(rel_auth, 4),
+            "bounded_authority": round(bnd_auth, 4),
         }
 
     def what_if_t(
@@ -368,7 +396,34 @@ class BitemporalEngine:
         base_state = self.why_t(query, t_v, eval_tk, init_lineage_sets)
         hypo_support = self.compute_temporal_support(query, t_v, eval_tk, extra_events=[event])
         hypo_lineage = self.compute_temporal_lineage(query, t_v, eval_tk, extra_events=[event])
-        hypo_auth = self.compute_authority(query, t_v, eval_tk, init_lineage_sets, extra_events=[event])
+        hypo_rel_auth = self.compute_relative_authority(query, t_v, eval_tk, init_lineage_sets, extra_events=[event])
+        hypo_bnd_auth = self.compute_bounded_authority(query, t_v, eval_tk, init_lineage_sets, extra_events=[event])
+
+        prior_supp = base_state["support_sets_S_t"]
+        hypo_supp_sorted = [sorted(list(s)) for s in sorted(hypo_support, key=lambda x: sorted(list(x)))]
+        prior_lin = base_state["lineage_sets_S_L_t"]
+        hypo_lin_sorted = [sorted(list(s)) for s in sorted(hypo_lineage, key=lambda x: sorted(list(x)))]
+
+        support_changed = prior_supp != hypo_supp_sorted
+        lineage_changed = prior_lin != hypo_lin_sorted
+        auth_changed = base_state["relative_authority"] != round(hypo_rel_auth, 4)
+        ent_changed = base_state["is_entitled"] != (len(hypo_support) > 0)
+
+        # Transition classification
+        if base_state["is_entitled"] and not (len(hypo_support) > 0):
+            transition = "LOST_ENTITLEMENT"
+        elif not base_state["is_entitled"] and (len(hypo_support) > 0):
+            transition = "GAINED_ENTITLEMENT"
+        elif base_state["relative_authority"] > hypo_rel_auth:
+            transition = "DEGRADED_AUTHORITY"
+        elif base_state["relative_authority"] < hypo_rel_auth:
+            transition = "AUGMENTED_AUTHORITY"
+        elif lineage_changed:
+            transition = "LINEAGE_GEOMETRY_CHANGED"
+        elif support_changed:
+            transition = "SUPPORT_GEOMETRY_CHANGED"
+        else:
+            transition = "NO_CHANGE"
 
         return {
             "query": query,
@@ -381,10 +436,15 @@ class BitemporalEngine:
             },
             "prior_entitled": base_state["is_entitled"],
             "hypothetical_entitled": len(hypo_support) > 0,
-            "prior_authority": base_state["authority_score"],
-            "hypothetical_authority": round(hypo_auth, 4),
-            "hypothetical_support_S": [sorted(list(s)) for s in sorted(hypo_support, key=lambda x: sorted(list(x)))],
-            "hypothetical_lineage_S_L": [sorted(list(s)) for s in sorted(hypo_lineage, key=lambda x: sorted(list(x)))],
+            "prior_relative_authority": base_state["relative_authority"],
+            "hypothetical_relative_authority": round(hypo_rel_auth, 4),
+            "prior_bounded_authority": base_state["bounded_authority"],
+            "hypothetical_bounded_authority": round(hypo_bnd_auth, 4),
+            "support_geometry_changed": support_changed,
+            "lineage_geometry_changed": lineage_changed,
+            "transition": transition,
+            "hypothetical_support_S": hypo_supp_sorted,
+            "hypothetical_lineage_S_L": hypo_lin_sorted,
         }
 
     def then_what_t(
@@ -394,7 +454,7 @@ class BitemporalEngine:
         t_k: int,
         baseline_lineage_map: dict[tuple[str, str, str], set[frozenset[str]]] | None = None,
     ) -> dict[str, Any]:
-        """Compute full downstream impact across all derivable propositions using dynamic graph discovery."""
+        """Compute full downstream impact across all derivable propositions using deep dirty-state checking."""
         eval_tk = max(t_k, event.t_knowledge)
         candidate_queries = sorted(list(self.get_all_derived_propositions()))
 
@@ -403,20 +463,14 @@ class BitemporalEngine:
             init_l = baseline_lineage_map.get(q) if baseline_lineage_map else None
             analysis = self.what_if_t(q, event, t_v, eval_tk, init_lineage_sets=init_l)
 
-            if (analysis["prior_entitled"] != analysis["hypothetical_entitled"] or
-                    analysis["prior_authority"] != analysis["hypothetical_authority"]):
+            if analysis["transition"] != "NO_CHANGE":
                 impacted.append({
                     "query": q,
                     "prior_entitled": analysis["prior_entitled"],
                     "post_entitled": analysis["hypothetical_entitled"],
-                    "prior_authority": analysis["prior_authority"],
-                    "post_authority": analysis["hypothetical_authority"],
-                    "transition": (
-                        "LOST_ENTITLEMENT" if analysis["prior_entitled"] and not analysis["hypothetical_entitled"]
-                        else "GAINED_ENTITLEMENT" if not analysis["prior_entitled"] and analysis["hypothetical_entitled"]
-                        else "DEGRADED_AUTHORITY" if analysis["prior_authority"] > analysis["hypothetical_authority"]
-                        else "AUGMENTED_AUTHORITY"
-                    )
+                    "prior_relative_authority": analysis["prior_relative_authority"],
+                    "post_relative_authority": analysis["hypothetical_relative_authority"],
+                    "transition": analysis["transition"],
                 })
 
         return {
@@ -446,23 +500,29 @@ class BitemporalEngine:
                 "t_valid": tv,
                 "t_knowledge": t_k,
                 "entitled": info["is_entitled"],
-                "authority": info["authority_score"],
+                "relative_authority": info["relative_authority"],
+                "bounded_authority": info["bounded_authority"],
                 "support_paths_count": len(info["support_sets_S_t"]),
                 "roots_count": len(info["lineage_sets_S_L_t"]),
             })
         return records
 
-    def audit_conflicts(self, t_k: int) -> list[dict[str, str]]:
-        """List all currently active unresolved contradiction pairs known at t_k."""
+    def audit_conflicts(self, t_v: float, t_k: int) -> list[dict[str, str]]:
+        """List all unresolved contradiction pairs active at (t_v, t_k)."""
         events = self.get_events_up_to(t_k)
         active_conflicts: set[frozenset[str]] = set()
 
         for ev in events:
+            c_start = ev.t_valid_start
+            c_end = ev.t_valid_end if ev.t_valid_end is not None else float("inf")
+
             if ev.event_type == EventType.CONTRADICTS and ev.secondary_fact_id:
-                pair = frozenset([ev.target_fact_id, ev.secondary_fact_id])
-                active_conflicts.add(pair)
+                if c_start <= t_v < c_end:
+                    pair = frozenset([ev.target_fact_id, ev.secondary_fact_id])
+                    active_conflicts.add(pair)
             elif ev.event_type == EventType.RESOLVE_CONFLICT and ev.secondary_fact_id:
-                pair = frozenset([ev.target_fact_id, ev.secondary_fact_id])
-                active_conflicts.discard(pair)
+                if c_start <= t_v < c_end:
+                    pair = frozenset([ev.target_fact_id, ev.secondary_fact_id])
+                    active_conflicts.discard(pair)
 
         return [{"fact_a": sorted(list(p))[0], "fact_b": sorted(list(p))[1]} for p in sorted(active_conflicts, key=lambda x: sorted(list(x)))]
