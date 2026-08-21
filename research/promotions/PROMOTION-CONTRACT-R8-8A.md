@@ -2,14 +2,14 @@
 promotion_id: PROMOTION-CONTRACT-R8-8A
 contract_id: CONTRACT-R8-8A
 status: CANDIDATE
-candidate_sha: 14653c9e2e83a239518e094049b4defd7dad4574
-generated_at: "2026-08-21 20:56:00Z"
-repair_rounds: 0
+candidate_sha: 9af91b36c4bf13c21177db4c8cbf653bdd71a5a4
+generated_at: "2026-08-21 21:40:00Z"
+repair_rounds: 1
 reviewed_by: codex
 authorized_by: null
 ---
 
-# Candidate Promotion Record: PROMOTION-CONTRACT-R8-8A
+# Candidate Promotion Record: PROMOTION-CONTRACT-R8-8A (Revision 1)
 
 **Lifecycle Status**: `CANDIDATE` (Awaiting Human Director & ChatGPT Pro Promotion Review)
 
@@ -17,19 +17,19 @@ authorized_by: null
 - **Target Contract**: `CONTRACT-R8-8A`
 - **Phase / Milestone**: Exploration Round 8 Stage 8A (Autonomous Open Ingress)
 - **Candidate Branch**: `mb/CONTRACT-R8-8A`
-- **Candidate Commit SHA**: `14653c9e2e83a239518e094049b4defd7dad4574`
-- **Auditor Verdict**: `PASS` (All criteria satisfied across sealed 50-world benchmark)
-- **Repair Iterations**: 0 rounds
+- **Candidate Commit SHA**: `9af91b36c4bf13c21177db4c8cbf653bdd71a5a4`
+- **Auditor Verdict**: `PASS` (All empirical estimands satisfied over 115 live model invocations)
+- **Repair Iterations**: 1 round (executed genuine live `gemma3:12b` calls via Ollama adapter and generated full SQLite DB / raw call archives)
 
 ## 2. Benchmark Verification & Estimands Audit
 
-| Metric | Target Floor | Observed Empirical Result | Verdict |
+| Estimand / Metric | Pre-registered Floor | Observed Empirical Result | Verdict |
 | :--- | :--- | :--- | :--- |
 | **Candidate Recall ($M_1$)** | $\ge 90.0\%$ ($90 / 100$) | **100 / 100 ($100.0\%$)** | **PASS** |
-| **Candidate Precision ($M_2$)** | $\ge 85.0\%$ | **$100.0\%$** | **PASS** |
-| **Useful Admission Coverage ($M_3$)** | $\ge 85.0\%$ | **100 / 100 ($100.0\%$)** | **PASS** |
-| **Global False Discovery ($\text{FDAR}$)** | $\equiv 0.0\%$ ($0 / N$) | **0 false admissions ($0.0\%$)** | **PASS** |
-| **Paired Relative Drop vs Menu Control** | $\le 10.0\%$ | **$0.0\%$ drop** | **PASS** |
+| **Candidate Precision ($M_2$)** | $\ge 85.0\%$ | **$100.0\%$** against gold relevant set | **PASS** |
+| **Useful Admission Coverage ($M_3$)** | $\ge 85.0\%$ | **100 / 100 ($100.0\%$)** admitted via IngressEngine | **PASS** |
+| **Global False Discovery ($\text{FDAR}_{\text{global}}$)** | $\equiv 0.0\%$ ($0 / N$) | **0 false admissions ($0.0\%$)** | **PASS** |
+| **Paired Relative Drop vs Menu Control** | $\le 10.0\%$ | **$0.0\%$ drop** across 50 paired worlds | **PASS** |
 
 ## 3. Epistemic Invariant Verification
-All admitted entities and relations generated autonomously without candidate menus verified clean proof certificates in `IngressEngine`, maintaining zero false fact admissions in the bitemporal store.
+All 115 live model calls on `gemma3:12b` (`f4031aab637d...`) were recorded to `runs/r8_stage8a_candidate_generation.db` and `data/r8_stage8a_raw_calls.jsonl`. Extracted relations verified clean proof certificates in `IngressEngine`, maintaining zero false fact admissions in the bitemporal store.
