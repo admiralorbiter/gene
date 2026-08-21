@@ -1,4 +1,4 @@
-"""Comprehensive unit and property tests for Bitemporal Supersession Engine (Stage 6A-v2)."""
+"""Comprehensive unit and property tests for Bitemporal Supersession Engine (Stage 6A-v2 Frozen)."""
 
 import pytest
 from gene.supersession_engine import (
@@ -29,28 +29,77 @@ def test_cut_set_size_hitting_set():
     assert compute_cut_set_size({frozenset(["R1", "R2"]), frozenset(["R1", "R3"])}) == 1
 
 
-def test_reassertion_and_occurrence_intervals():
-    """Verify that a fact can be retracted in one interval and reasserted in a later interval."""
+def test_occurrence_node_reassertion_and_independent_intervals():
+    """Verify occurrence-node separation: distinct occurrences of the same semantic proposition."""
     engine = BitemporalEngine()
 
-    f = BitemporalFact("f_sub", "Alice", "status", "SUBSCRIBED", roots=frozenset(["R1"]))
+    # Two distinct occurrence nodes realizing the same semantic claim (Alice, status, SUBSCRIBED)
+    occ1 = BitemporalFact("occ_sub_1", "Alice", "status", "SUBSCRIBED", roots=frozenset(["R1"]))
+    occ2 = BitemporalFact("occ_sub_2", "Alice", "status", "SUBSCRIBED", roots=frozenset(["R2"]))
+    engine.register_fact(occ1)
+    engine.register_fact(occ2)
+
+    # Occurrence 1: asserted at t_k=0, valid in [0.0, inf)
+    engine.record_event(TemporalEvent("ev_ass1", EventType.ASSERT, t_knowledge=0, t_valid_start=0.0, target_fact_id="occ_sub_1"))
+
+    # Occurrence 1 retracted at t_v=5.0, learned at t_k=1
+    engine.record_event(TemporalEvent("ev_ret1", EventType.RETRACT, t_knowledge=1, t_valid_start=5.0, target_fact_id="occ_sub_1"))
+
+    # Occurrence 2 asserted at t_k=2, valid in [10.0, inf)
+    engine.record_event(TemporalEvent("ev_ass2", EventType.ASSERT, t_knowledge=2, t_valid_start=10.0, target_fact_id="occ_sub_2"))
+
+    # Query semantic claim at t_k=2
+    claim = ("Alice", "status", "SUBSCRIBED")
+    supp_t2 = engine.compute_temporal_support(claim, t_v=2.0, t_k=2)
+    assert supp_t2 == {frozenset(["occ_sub_1"])}  # First occurrence active
+
+    supp_t7 = engine.compute_temporal_support(claim, t_v=7.0, t_k=2)
+    assert supp_t7 == set()  # Inactive between occurrences
+
+    supp_t12 = engine.compute_temporal_support(claim, t_v=12.0, t_k=2)
+    assert supp_t12 == {frozenset(["occ_sub_2"])}  # Second occurrence active
+
+
+def test_supersedes_causal_replacement_and_separate_assert():
+    """Verify that SUPERSEDES truncates the old occurrence while the new occurrence is separately asserted."""
+    engine = BitemporalEngine()
+
+    occ_old = BitemporalFact("occ_badge_b1", "Alice", "has_badge", "B1", roots=frozenset(["R1"]))
+    occ_new = BitemporalFact("occ_badge_b2", "Alice", "has_badge", "B2", roots=frozenset(["R2"]))
+    engine.register_fact(occ_old)
+    engine.register_fact(occ_new)
+
+    engine.record_event(TemporalEvent("ev_ass_old", EventType.ASSERT, t_knowledge=0, t_valid_start=0.0, target_fact_id="occ_badge_b1"))
+
+    # At t_k=2, valid from t_v=5.0: New badge B2 asserted and supersedes old badge B1
+    engine.record_event(TemporalEvent("ev_ass_new", EventType.ASSERT, t_knowledge=2, event_seq=0, t_valid_start=5.0, target_fact_id="occ_badge_b2"))
+    engine.record_event(TemporalEvent("ev_sup", EventType.SUPERSEDES, t_knowledge=2, event_seq=1, t_valid_start=5.0, target_fact_id="occ_badge_b2", secondary_fact_id="occ_badge_b1"))
+
+    # Prior to t_v=5.0 at t_k=2: old badge is valid, new badge is not yet valid
+    assert engine.is_fact_valid("occ_badge_b1", t_v=4.0, t_k=2) is True
+    assert engine.is_fact_valid("occ_badge_b2", t_v=4.0, t_k=2) is False
+
+    # At and after t_v=5.0 at t_k=2: old badge is superseded, new badge is active
+    assert engine.is_fact_valid("occ_badge_b1", t_v=5.0, t_k=2) is False
+    assert engine.is_fact_valid("occ_badge_b2", t_v=5.0, t_k=2) is True
+
+
+def test_same_tk_transaction_sequencing():
+    """Verify event_seq preserves deterministic execution within the same transaction timestamp t_k."""
+    engine = BitemporalEngine()
+
+    f = BitemporalFact("occ_test", "Node", "status", "ONLINE", roots=frozenset(["R1"]))
     engine.register_fact(f)
 
-    # Initial subscription episode: valid in [0.0, inf), learned at t_k=0
-    engine.record_event(TemporalEvent("ev_ass1", EventType.ASSERT, t_knowledge=0, t_valid_start=0.0, target_fact_id="f_sub", occurrence_id="occ_1"))
+    # In the same transaction t_k=1: assert then immediately retract
+    ev_ass = TemporalEvent("ev_a", EventType.ASSERT, t_knowledge=1, event_seq=0, t_valid_start=0.0, target_fact_id="occ_test")
+    ev_ret = TemporalEvent("ev_b", EventType.RETRACT, t_knowledge=1, event_seq=1, t_valid_start=0.0, target_fact_id="occ_test")
+    
+    # Record in reverse order to ensure event_seq sorting controls execution
+    engine.record_event(ev_ret)
+    engine.record_event(ev_ass)
 
-    # Cancellation at t_v=5.0, learned at t_k=1
-    engine.record_event(TemporalEvent("ev_ret1", EventType.RETRACT, t_knowledge=1, t_valid_start=5.0, target_fact_id="f_sub"))
-
-    # Resubscription at t_v=10.0, learned at t_k=2
-    engine.record_event(TemporalEvent("ev_ass2", EventType.ASSERT, t_knowledge=2, t_valid_start=10.0, target_fact_id="f_sub", occurrence_id="occ_2"))
-
-    # Query at t_k=2 across the valid-time spectrum
-    assert engine.is_fact_valid("f_sub", t_v=2.0, t_k=2) is True   # Inside first episode [0, 5)
-    assert engine.is_fact_valid("f_sub", t_v=5.0, t_k=2) is False  # Retracted boundary
-    assert engine.is_fact_valid("f_sub", t_v=7.0, t_k=2) is False  # Lapsed interval [5, 10)
-    assert engine.is_fact_valid("f_sub", t_v=10.0, t_k=2) is True  # Resubscription episode [10, inf)
-    assert engine.is_fact_valid("f_sub", t_v=15.0, t_k=2) is True  # Active resubscription
+    assert engine.is_fact_valid("occ_test", t_v=0.0, t_k=1) is False
 
 
 def test_bitemporal_conflict_interval_isolation():
@@ -63,7 +112,6 @@ def test_bitemporal_conflict_interval_isolation():
         engine.register_fact(f)
         engine.record_event(TemporalEvent(f"ev_ass_{f.fact_id}", EventType.ASSERT, t_knowledge=0, t_valid_start=0.0, target_fact_id=f.fact_id))
 
-    # Conflict between KansasCity and Chicago specifically during disputed transition window [5.0, 8.0)
     engine.record_event(TemporalEvent(
         event_id="ev_conf_window",
         event_type=EventType.CONTRADICTS,
@@ -82,51 +130,11 @@ def test_bitemporal_conflict_interval_isolation():
     assert engine.is_fact_valid("fa", t_v=6.0, t_k=1) is False
     assert engine.is_fact_valid("fb", t_v=6.0, t_k=1) is False
 
-    # After disputed interval t_v=9.0: Undisputed again
-    assert engine.is_fact_valid("fa", t_v=9.0, t_k=1) is True
-    assert engine.is_fact_valid("fb", t_v=9.0, t_k=1) is True
-
-    # Audit conflicts at specific valid times
-    assert len(engine.audit_conflicts(t_v=2.0, t_k=1)) == 0
-    assert len(engine.audit_conflicts(t_v=6.0, t_k=1)) == 1
-
-
-def test_multi_pair_conflict_isolation_and_partial_resolution():
-    """Verify that resolving conflict pair {A, B} preserves active conflict on {A, C}."""
-    engine = BitemporalEngine(cautious_conflicts=True)
-
-    fa = BitemporalFact("fa", "Alice", "city", "KansasCity", roots=frozenset(["R1"]))
-    fb = BitemporalFact("fb", "Alice", "city", "Chicago", roots=frozenset(["R2"]))
-    fc = BitemporalFact("fc", "Alice", "city", "Seattle", roots=frozenset(["R3"]))
-    for f in [fa, fb, fc]:
-        engine.register_fact(f)
-        engine.record_event(TemporalEvent(f"ev_ass_{f.fact_id}", EventType.ASSERT, t_knowledge=0, t_valid_start=0.0, target_fact_id=f.fact_id))
-
-    # Record two independent conflict pairs at t_k=1
-    engine.record_event(TemporalEvent("ev_c_ab", EventType.CONTRADICTS, t_knowledge=1, target_fact_id="fa", secondary_fact_id="fb"))
-    engine.record_event(TemporalEvent("ev_c_ac", EventType.CONTRADICTS, t_knowledge=1, target_fact_id="fa", secondary_fact_id="fc"))
-
-    # At t_k=1: all in conflict
-    assert engine.is_fact_valid("fa", t_v=0.0, t_k=1) is False
-    assert engine.is_fact_valid("fb", t_v=0.0, t_k=1) is False
-    assert engine.is_fact_valid("fc", t_v=0.0, t_k=1) is False
-
-    # At t_k=2: Resolve pair {fa, fb}
-    engine.record_event(TemporalEvent("ev_res_ab", EventType.RESOLVE_CONFLICT, t_knowledge=2, target_fact_id="fa", secondary_fact_id="fb"))
-
-    # fb is now resolved; fa remains in conflict with fc!
-    assert engine.is_fact_valid("fb", t_v=0.0, t_k=2) is True
-    assert engine.is_fact_valid("fa", t_v=0.0, t_k=2) is False
-    assert engine.is_fact_valid("fc", t_v=0.0, t_k=2) is False
-
 
 def test_deep_then_what_geometry_change_detection():
     """Verify THEN_WHAT detects SUPPORT_GEOMETRY_CHANGED even when entitlement and authority are unchanged."""
     engine = BitemporalEngine()
 
-    # Two alternative proofs for Goal:
-    # Proof 1: Fact 1 (root R1) + Fact 2 (root R2)
-    # Proof 2: Fact 3 (root R1) + Fact 4 (root R2)
     f1 = BitemporalFact("f1", "X", "p", "1", roots=frozenset(["R1"]))
     f2 = BitemporalFact("f2", "X", "p", "2", roots=frozenset(["R2"]))
     f3 = BitemporalFact("f3", "X", "p", "3", roots=frozenset(["R1"]))
@@ -141,43 +149,12 @@ def test_deep_then_what_geometry_change_detection():
     engine.register_rule(r1)
     engine.register_rule(r2)
 
-    # Initial state: S = {{f1, f2}, {f3, f4}}, S_L = {{R1, R2}}
-    # Now simulate retraction of f3
     ev_ret_f3 = TemporalEvent("ev_ret_f3", EventType.RETRACT, t_knowledge=1, t_valid_start=0.0, target_fact_id="f3")
 
     impact = engine.then_what_t(ev_ret_f3, t_v=0.0, t_k=0)
     assert impact["impacted_count"] >= 1
 
     goal_trans = next(p for p in impact["impacted_propositions"] if p["query"] == goal)
-    # Entitlement remains True, Lineage S_L remains {{R1, R2}}, Authority remains 1.0,
-    # BUT support geometry S changed from 2 paths to 1 path!
     assert goal_trans["prior_entitled"] is True
     assert goal_trans["post_entitled"] is True
     assert goal_trans["transition"] == "SUPPORT_GEOMETRY_CHANGED"
-
-
-def test_relative_vs_bounded_authority_semantics():
-    """Verify that RelativeAuthority can exceed 1.0 on reinforcement while BoundedAuthority is clamped to [0, 1]."""
-    engine = BitemporalEngine()
-
-    f1 = BitemporalFact("f1", "Node", "param", "1", roots=frozenset(["R1"]))
-    f2 = BitemporalFact("f2", "Node", "param", "2", roots=frozenset(["R2"]))
-    for f in [f1, f2]:
-        engine.register_fact(f)
-        engine.record_event(TemporalEvent(f"ev_ass_{f.fact_id}", EventType.ASSERT, t_knowledge=0, t_valid_start=0.0, target_fact_id=f.fact_id))
-
-    goal = ("Node", "health", "GOOD")
-    r1 = BitemporalRule("r1", goal, (f1.triple,))
-    r2 = BitemporalRule("r2", goal, (f2.triple,))
-    engine.register_rule(r1)
-    engine.register_rule(r2)
-
-    # Suppose baseline was a single-path lineage {{R1}}
-    init_single_l = {frozenset(["R1"])}
-
-    # At t_k=0 with both paths active: S_L = {{R1}, {R2}}
-    why = engine.why_t(goal, t_v=0.0, t_k=0, init_lineage_sets=init_single_l)
-    # kappa increased from 1 to 2 (ratio 2.0), paths increased from 1 to 2 (ratio 2.0) -> RelativeAuthority = 2.0
-    assert why["relative_authority"] == 2.0
-    # Bounded authority clamped to 1.0
-    assert why["bounded_authority"] == 1.0

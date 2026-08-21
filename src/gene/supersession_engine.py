@@ -1,20 +1,13 @@
-"""Bitemporal Supersession and Epistemic State Transition Algebra (Stage 6A-v2).
+"""Bitemporal Supersession and Epistemic State Transition Algebra (Stage 6A-v2 Frozen).
 
 Implements the deterministic formal engine for bitemporal truth maintenance:
-- Valid Time (t_v): When a fact, interval, or conflict holds true in the world.
-- Knowledge Time (t_k): When the agent learned or committed the fact/event.
-
-Key Architectural Invariants:
-1. Occurrence-based interval tracking: Reassertion and recurrent validity intervals
-   (e.g., [0, 5) and [10, inf)) are fully supported without historical clipping.
-2. Bitemporal conflict tracking: Contradiction events carry valid-time bounds [t_v_start, t_v_end),
-   so epistemic disputes at t_v=5 do not falsely invalidate undisputed history at t_v=2.
-3. Multi-pair conflict resolution: Conflicts are maintained as undirected pairs C(t_v | t_k) = {{f_a, f_b}}.
-   Resolving {A, B} preserves active disputes on {A, C}.
-4. Deep THEN_WHAT transition discovery: Detects changes in entitlement, support geometry S(c),
-   lineage geometry S_L(c), and relative/bounded action authority.
-5. Action authority semantics: Separates RelativeAuthority (unbounded robustness index)
-   from BoundedAuthority (strict [0, 1] authorization gating score).
+- Occurrence Identity: fact_id represents an immutable OccurrenceNode carrying provenance,
+  source identity, and valid-time interval. Multiple occurrences may realize the same semantic triple (s, p, o).
+- Transaction Sequencing: Events carry (t_knowledge, event_seq) ensuring deterministic atomic batch playback.
+- Valid-Time Bounded Conflicts: Contradictions are tracked as pairs with valid-time intervals [t_v_start, t_v_end).
+- Multi-Pair Conflict Isolation: Resolving {A, B} strictly preserves active disputes on {A, C}.
+- Deep Transition Detection: THEN_WHAT discovers changes in entitlement, S(c), S_L(c), and authority.
+- Authority Semantics: Standardizes RelativeAuthority (unbounded index) and BoundedAuthority ([0, 1] score).
 """
 
 from __future__ import annotations
@@ -37,12 +30,14 @@ class EventType(str, Enum):
 
 @dataclass(frozen=True)
 class BitemporalFact:
-    """Ground proposition template with permanent identifier and root lineage."""
+    """An Occurrence Node carrying unique occurrence identity, semantic claim, and provenance."""
     fact_id: str
     subject: str
     predicate: str
     obj: str
     roots: frozenset[str] = field(default_factory=frozenset)
+    source_id: str = "default_source"
+    origin_id: str = "default_origin"
     metadata: dict[str, Any] = field(default_factory=dict)
 
     @property
@@ -61,15 +56,15 @@ class BitemporalRule:
 
 @dataclass(frozen=True)
 class TemporalEvent:
-    """Immutable event recording a state transition at knowledge time t_k with valid time interval [t_v_start, t_v_end)."""
+    """Immutable event recording a state transition at (t_knowledge, event_seq) with valid time [t_valid_start, t_valid_end)."""
     event_id: str
     event_type: EventType
     t_knowledge: int
+    event_seq: int = 0
     t_valid_start: float = 0.0
     t_valid_end: float | None = None
     target_fact_id: str = ""
     secondary_fact_id: str | None = None
-    occurrence_id: str | None = None
     payload: dict[str, Any] = field(default_factory=dict)
 
 
@@ -117,7 +112,7 @@ class BitemporalEngine:
         self.events: list[TemporalEvent] = []
 
     def register_fact(self, fact: BitemporalFact) -> None:
-        """Register a fact template."""
+        """Register an occurrence node."""
         self.facts[fact.fact_id] = fact
 
     def register_rule(self, rule: BitemporalRule) -> None:
@@ -127,14 +122,14 @@ class BitemporalEngine:
     def record_event(self, event: TemporalEvent) -> None:
         """Append an event to the authoritative event log."""
         self.events.append(event)
-        self.events.sort(key=lambda e: (e.t_knowledge, e.event_id))
+        self.events.sort(key=lambda e: (e.t_knowledge, e.event_seq, e.event_id))
 
     def get_events_up_to(self, t_k: int, extra_events: list[TemporalEvent] | None = None) -> list[TemporalEvent]:
-        """Return all events known at or before transaction time t_k."""
+        """Return all events known at or before transaction time t_k, ordered by (t_k, event_seq, event_id)."""
         ev_list = [e for e in self.events if e.t_knowledge <= t_k]
         if extra_events:
             ev_list.extend([e for e in extra_events if e.t_knowledge <= t_k])
-        ev_list.sort(key=lambda e: (e.t_knowledge, e.event_id))
+        ev_list.sort(key=lambda e: (e.t_knowledge, e.event_seq, e.event_id))
         return ev_list
 
     def is_fact_valid(
@@ -144,61 +139,54 @@ class BitemporalEngine:
         t_k: int,
         extra_events: list[TemporalEvent] | None = None,
     ) -> bool:
-        """Determine whether fact_id holds true at valid time t_v, as known at transaction time t_k."""
+        """Determine whether occurrence fact_id holds true at valid time t_v, as known at transaction time t_k."""
         if fact_id not in self.facts:
             return False
 
         events = self.get_events_up_to(t_k, extra_events)
 
-        # 1. Compute valid intervals per assertion occurrence
-        # Each ASSERT event creates an independent assertion occurrence interval [s_i, e_i)
-        occurrences: list[dict[str, Any]] = []
+        # 1. Gather ASSERT events for this occurrence node
+        assert_intervals: list[tuple[float, float]] = []
         for ev in events:
             if ev.target_fact_id == fact_id and ev.event_type == EventType.ASSERT:
                 start = ev.t_valid_start
                 end = ev.t_valid_end if ev.t_valid_end is not None else float("inf")
-                occurrences.append({
-                    "start": start,
-                    "end": end,
-                    "occ_id": ev.occurrence_id or ev.event_id,
-                })
+                assert_intervals.append((start, end))
 
-        if not occurrences:
+        if not assert_intervals:
             return False
 
-        # Apply truncating events (RETRACT, SUPERSEDES, EXPIRES) to overlapping occurrences
+        # Apply truncating events targeting this specific occurrence node
         active_intervals: list[tuple[float, float]] = []
-        for occ in occurrences:
-            s = occ["start"]
-            e = occ["end"]
+        for (s, e) in assert_intervals:
+            cur_s, cur_e = s, e
 
             for ev in events:
-                # Retraction of this fact truncates interval if cut time falls inside [s, e)
+                # Direct retraction of this occurrence node
                 if ev.event_type == EventType.RETRACT and ev.target_fact_id == fact_id:
                     cut_t = ev.t_valid_start
-                    if s <= cut_t < e:
-                        e = cut_t
+                    if cur_s <= cut_t < cur_e:
+                        cur_e = cut_t
 
-                # Supersession of this fact (secondary_fact_id) truncates interval
+                # Supersession: this occurrence node is superseded by another
                 if ev.event_type == EventType.SUPERSEDES and ev.secondary_fact_id == fact_id:
                     cut_t = ev.t_valid_start
-                    if s <= cut_t < e:
-                        e = cut_t
+                    if cur_s <= cut_t < cur_e:
+                        cur_e = cut_t
 
                 # Expiration
                 if ev.event_type == EventType.EXPIRES and ev.target_fact_id == fact_id:
                     cut_t = ev.t_valid_start
-                    if s <= cut_t < e:
-                        e = cut_t
+                    if cur_s <= cut_t < cur_e:
+                        cur_e = cut_t
 
-            if s <= t_v < e:
-                active_intervals.append((s, e))
+            if cur_s <= t_v < cur_e:
+                active_intervals.append((cur_s, cur_e))
 
         if not active_intervals:
             return False
 
-        # 2. Check bitemporal conflicts active at (t_v, t_k)
-        # Active conflict pair is active if ev.t_valid_start <= t_v < ev.t_valid_end
+        # 2. Check active bitemporal conflicts involving this occurrence node
         active_conflicts: set[frozenset[str]] = set()
         for ev in events:
             c_start = ev.t_valid_start
@@ -226,7 +214,7 @@ class BitemporalEngine:
         t_k: int,
         extra_events: list[TemporalEvent] | None = None,
     ) -> list[BitemporalFact]:
-        """Return all active facts holding at valid time t_v as known at t_k."""
+        """Return all active occurrence nodes holding at valid time t_v as known at t_k."""
         return [f for f in self.facts.values() if self.is_fact_valid(f.fact_id, t_v, t_k, extra_events)]
 
     def compute_temporal_support(
@@ -409,7 +397,6 @@ class BitemporalEngine:
         auth_changed = base_state["relative_authority"] != round(hypo_rel_auth, 4)
         ent_changed = base_state["is_entitled"] != (len(hypo_support) > 0)
 
-        # Transition classification
         if base_state["is_entitled"] and not (len(hypo_support) > 0):
             transition = "LOST_ENTITLEMENT"
         elif not base_state["is_entitled"] and (len(hypo_support) > 0):

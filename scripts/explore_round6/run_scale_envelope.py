@@ -284,6 +284,11 @@ def write_scale_envelope_v1_report(summary: dict[str, Any]) -> None:
         )
     adv_table = "\n".join(adv_rows)
 
+    adv_8 = next(a for a in summary["adversarial_results"] if a["num_roots"] == 8)
+    adv_12 = next(a for a in summary["adversarial_results"] if a["num_roots"] == 12)
+    adv_16 = next(a for a in summary["adversarial_results"] if a["num_roots"] == 16)
+    deep_case = next(c for c in summary["typical_results"] if c["num_roots"] == 16 and c["depth"] == 5 and c["branching"] == 4)
+
     md = f"""# Exploration Round 6 Scale Envelope Benchmark Report (v1)
 
 **Assay Name**: Exact Support & ATMS Complexity Scale Envelope v1  
@@ -301,8 +306,8 @@ Scale Envelope v1 rigorously profiles the computational complexity of exact anti
 2. **Adversarial Sperner Antichain Workloads**: Bipartite worst-case constructions generating maximal antichains $\\binom{{N}}{{N/2}}$ up to $N=16$ roots.
 
 ### Key Empirical Findings:
-- **Typical Workload Behavior**: Across shallow to moderate hierarchies ($N \\le 12, D \\le 3, B \\le 2$), support sizes remain bounded ($|\\mathcal{{S}}| \\le 3$), with median enumeration latencies under $400\\mu\\text{{s}}$. In deep multi-branching configurations ($N=16, D=5, B=4$), median latencies scale to $6.5\\text{{ms}}$ with p99 reaching tens of milliseconds.
-- **Adversarial Combinatorial Growth Boundary**: Under adversarial Sperner antichains, support size scales exponentially: $N=8 \\implies |\\mathcal{{S}}|=70$ ($0.2\\text{{ms}}$), $N=12 \\implies |\\mathcal{{S}}|=924$ ($4.1\\text{{ms}}$), $N=16 \\implies |\\mathcal{{S}}|=2,000$ capped ($18.8\\text{{ms}}$).
+- **Typical Workload Behavior**: Across shallow to moderate hierarchies ($N \\le 12, D \\le 3, B \\le 2$), support sizes remain bounded ($|\\mathcal{{S}}| \\le 3$), with median enumeration latencies under $400\\mu\\text{{s}}$. In deep multi-branching configurations ($N=16, D=5, B=4$), median latency reaches `{deep_case['enum_latency_p50_us']}\\mu\\text{{s}}` with p99 reaching `{deep_case['enum_latency_p99_us']}\\mu\\text{{s}}`.
+- **Adversarial Combinatorial Growth Boundary**: Under adversarial Sperner antichains, support size scales exponentially: $N=8 \\implies |\\mathcal{{S}}|={adv_8['actual_support_size']}$ (`{adv_8['enum_latency_us']}\\mu\\text{{s}}`), $N=12 \\implies |\\mathcal{{S}}|={adv_12['actual_support_size']}$ (`{adv_12['enum_latency_us'] / 1000.0:.2f}\\text{{ms}}`), $N=16 \\implies |\\mathcal{{S}}|={adv_16['actual_support_size']:,}$ capped (`{adv_16['enum_latency_us'] / 1000.0:.2f}\\text{{ms}}`).
 - **The Epistemic Risk of Lossy Support Pruning**: Scalability is not merely a systems problem. Arbitrarily pruning support families (such as naïve top-$k$ beam selection) recreates Stage 5A **revision autoimmunity**: if all $k$ retained paths are later invalidated while an un-retained $(k+1)$-th path remains valid, the runtime will falsely retract an entitled belief.
 
 ```
@@ -329,9 +334,9 @@ Scale Envelope v1 rigorously profiles the computational complexity of exact anti
 
 ## Architectural Guidance for Scaling Truth Maintenance
 
-1. **Exact Compressed Representations Over Lossy Pruning**: Before resorting to lossy truncation, the Epistemic Kernel should explore exact compressed representations:
+1. **Approximation Integrity & Exact Compressed Representations**: Before resorting to lossy truncation, the Epistemic Kernel should explore exact compressed representations:
    - **Binary/Zero-Suppressed Decision Diagrams (BDD/ZDD)**
-   - **Provenance Circuits**
+   - **Factorized Provenance Circuits**
    - **Lazy Support Enumeration** (computing cuts and entitlement dynamically without materializing all paths).
 2. **Explicit Uncertainty on Approximation**: If memory constraints ever force support truncation, the belief state must be explicitly tagged as `SUPPORT_INCOMPLETE` rather than masquerading as complete ground truth.
 """
