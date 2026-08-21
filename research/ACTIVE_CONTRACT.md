@@ -19,6 +19,7 @@ This document provides the machine-discoverable operational entry point for auto
 - **Execution Base Commit (`execution_base_sha`)**: `b64b67679168335722036d6af22c1fbcd025aea6`
 - **Last Checkpoint**: [`research/checkpoints/MIGRATION_CHECKPOINT.md`](checkpoints/MIGRATION_CHECKPOINT.md)
 - **Candidate Promotion Record**: [`research/promotions/PROMOTION-CONTRACT-R8-8A.md`](promotions/PROMOTION-CONTRACT-R8-8A.md)
-- **Candidate Branch**: `mb/CONTRACT-R8-8A` (SHA: `9af91b36c4bf13c21177db4c8cbf653bdd71a5a4`)
+- **Candidate Branch**: `mb/CONTRACT-R8-8A` (SHA: `c7c9ef641393adf6687f9ce05eda0b8776e2e32d`)
+- **Contract Acceptance Verifier**: `PASS` (`scripts/verify_contract_r8_8a.py` passed cleanly)
 - **Auditor Verdict**: `PASS` (All criteria satisfied over 115 live gemma3:12b invocations)
 - **Governance**: Design Review `APPROVED`, Authorized by `human`. Awaiting Scientific Promotion Review by `chatgpt-pro` and Human Promotion Merge.
