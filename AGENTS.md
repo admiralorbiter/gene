@@ -13,23 +13,59 @@ Read before coding:
 3. `docs/ARCHITECTURE.md`
 4. `docs/DEVELOPMENT_PLAN.md`
 5. `docs/results/` (All completed experiment reports)
+6. `research/checkpoints/MIGRATION_CHECKPOINT.md`
 
 ---
 
-# Current Objective & Roadmap Status
+# Autonomous Repair vs. Epistemic Escalation Boundaries
 
-### Completed & Validated Milestones:
-- **Experiment 0**: Lineage Observability & Causal Parent Interventions.
-- **Experiment 1A**: Single Mutation Propagation & Multi-Generational Cascades.
-- **Experiment 1B-A**: Multi-Generation Branching Transmission, Allele Fidelity, and Analytic Extinction Matrix.
-- **Experiment 1B-B**: Endogenous Multi-Hop Retrieval Dynamics ($X_F, X_A, X_{\text{path}}$), Lexical Competition, Surface-Area Scaling, and Causal Retrieval Rescue.
-- **Phase 9 / 9.5**: Persistence Hardening, Retrieval Boundary Shape Map, 48-Call Live Rescue, and 16-Call Matched Path Expression Assay ($P(\text{active}\mid\text{complete})=1, P(\text{active}\mid\text{broken})=0$).
+### Agents May Autonomously Repair:
+- Implementation bugs and logic defects
+- Test failures and flakiness
+- Missing edge cases and parameter boundary guards
+- Artifact tracking and `.gitignore` exceptions
+- Documentation, ledger, and result synchronization
+- Reproducibility failures and deterministic replay discrepancies
+- Property/invariant-test failures
+- Malformed identifiers, schemas, or manifests
+- Violations of already-frozen implementation requirements
 
-### Current Milestone: Phase 10 — Experiment 1B-C Delayed Adjudication & Lineage Immunity Sandbox
-1. **Epistemic Risk-Signal Principle**: Lineage is a mechanism for *propagating* trust or distrust, not an intrinsic truth detector (topologies are isomorphic). The policy receives ancestry metadata and an external binary risk signal ($S \in \{0, 1\}$); it never receives canonical $T^*$.
-2. **Experiment 1B-C0 (Policy Calibration Engine)**: Exact analytic verification of 6 policies (`baseline`, `uniform_thinning`, `random_family_quarantine`, `node_only_quarantine`, `lineage_quarantine`, `oracle_upper_bound`) across 4 discrete root-signal states $(S_H, S_I)$ weighted by $\text{TPR} \times \text{FPR}$.
-3. **Experiment 1B-C1 (Delayed-Adjudication Retrieval Sandbox, $G_2 \to G_3$)**: Measure post-adjudication path availability ($C_H = X_{\text{path},H}^{\text{post}}, C_I = X_{\text{path},I}^{\text{post}}$), containment ($1 - C_I$), and epistemic autoimmunity ($1 - C_H$) across 6 paired worlds under BM25 retrieval with zero live LLM compute.
-4. **Pareto Frontier Mapping**: Identify non-trivial detector quality regions where lineage quarantine outperforms node-only and topology-matched controls without excessive healthy-path loss.
+### Agents Must Escalate:
+- Hypothesis changes or reformulations
+- Metric or estimand changes
+- Benchmark-design, case-population, or prompt-distribution changes
+- Questionable or tautological oracle definitions
+- Causal or scientific interpretation changes
+- Unexpected results that materially alter the proposed mechanism
+- Claim-ceiling or scope-limitation changes
+- Retraction or replacement of a prior conclusion
+- Roadmap changes or premature progression to unapproved milestones
+- Any repair that would cause an experiment to answer a materially different question
+
+> **Core Research Invariant**:
+> **Agents optimize implementation against the frozen research contract. They do not optimize the research contract until the implementation passes.**
+> If satisfying a contract requires changing the contract, agents MUST STOP and escalate:
+> `ESCALATE — HUMAN EPISTEMIC DECISION REQUIRED`
+
+---
+
+# Repository Test & Verification Commands
+
+Use these exact commands to verify repository state and integrity:
+
+```powershell
+# 1. Full Local Verification & Integrity Preflight Suite (Pytest + Docs + Manifest + Claims + Git Cleanliness)
+python scripts/verify_repo.py
+
+# 2. Pytest Unit & Integration Test Suite
+pytest -v
+
+# 3. Canonical Results Manifest Check
+python scripts/generate_results_manifest.py --check
+
+# 4. Documentation & Asset Links Integrity Check
+python scripts/check_doc_links.py
+```
 
 ---
 
@@ -119,4 +155,3 @@ Every completed run should be understandable without opening the source code:
 - summary report markdown in `docs/results/`
 
 Never overwrite a prior completed run database or directory.
-
