@@ -1,8 +1,8 @@
 {
-  "experiment": "GENE Exploration Round 5 Stage 5A: Revision Precision Assay (Hardened)",
+  "experiment": "GENE Exploration Round 5 Stage 5A: Revision Precision Assay (Corrective Hardening)",
   "evidence_class": "deterministic_zero_live_llm",
   "case_ledger_path": "data\\exploration_round5_stage5a_cases.jsonl",
-  "case_ledger_sha256": "606229a7dc1f6cf507869e67e247755a3f3bb89af1e5c8bb7aead4e5be1dcc8c",
+  "case_ledger_sha256": "1499305d197cf53ad624fc65a6626a0d5fc9ea87993184583930ce952692548e",
   "subassay_5a1": {
     "total_cases": 368,
     "oracle_breakdown": {
@@ -18,7 +18,10 @@
         "correct_entitlement_count": 308,
         "accuracy": 0.8369565217391305,
         "false_retraction_count": 60,
+        "false_retractions_degraded": 60,
+        "false_retractions_unchanged": 0,
         "autoimmunity_rate_on_degraded": 0.5769230769230769,
+        "autoimmunity_rate_on_unchanged": 0.0,
         "autoimmunity_rate_on_entitled": 0.5,
         "missed_retraction_count": 0
       },
@@ -28,7 +31,10 @@
         "correct_entitlement_count": 264,
         "accuracy": 0.717391304347826,
         "false_retraction_count": 104,
+        "false_retractions_degraded": 104,
+        "false_retractions_unchanged": 0,
         "autoimmunity_rate_on_degraded": 1.0,
+        "autoimmunity_rate_on_unchanged": 0.0,
         "autoimmunity_rate_on_entitled": 0.8666666666666667,
         "missed_retraction_count": 0
       },
@@ -38,7 +44,10 @@
         "correct_entitlement_count": 256,
         "accuracy": 0.6956521739130435,
         "false_retraction_count": 112,
-        "autoimmunity_rate_on_degraded": 1.0769230769230769,
+        "false_retractions_degraded": 104,
+        "false_retractions_unchanged": 8,
+        "autoimmunity_rate_on_degraded": 1.0,
+        "autoimmunity_rate_on_unchanged": 0.5,
         "autoimmunity_rate_on_entitled": 0.9333333333333333,
         "missed_retraction_count": 0
       },
@@ -48,7 +57,10 @@
         "correct_entitlement_count": 264,
         "accuracy": 0.717391304347826,
         "false_retraction_count": 104,
+        "false_retractions_degraded": 104,
+        "false_retractions_unchanged": 0,
         "autoimmunity_rate_on_degraded": 1.0,
+        "autoimmunity_rate_on_unchanged": 0.0,
         "autoimmunity_rate_on_entitled": 0.8666666666666667,
         "missed_retraction_count": 0
       }
@@ -63,26 +75,38 @@
         "policy_metrics": {
           "single_witness": {
             "accuracy": 1.0,
-            "false_retractions": 0,
+            "false_retractions_total": 0,
+            "false_retractions_degraded": 0,
+            "false_retractions_unchanged": 0,
             "autoimmunity_on_degraded": 0.0,
+            "autoimmunity_on_unchanged": 0.0,
             "autoimmunity_on_entitled": 0.0
           },
           "flat_union": {
             "accuracy": 1.0,
-            "false_retractions": 0,
+            "false_retractions_total": 0,
+            "false_retractions_degraded": 0,
+            "false_retractions_unchanged": 0,
             "autoimmunity_on_degraded": 0.0,
+            "autoimmunity_on_unchanged": 0.0,
             "autoimmunity_on_entitled": 0.0
           },
           "bloated_union": {
             "accuracy": 0.875,
-            "false_retractions": 2,
+            "false_retractions_total": 2,
+            "false_retractions_degraded": 0,
+            "false_retractions_unchanged": 2,
             "autoimmunity_on_degraded": 0.0,
+            "autoimmunity_on_unchanged": 0.5,
             "autoimmunity_on_entitled": 0.5
           },
           "lineage_quarantine": {
             "accuracy": 1.0,
-            "false_retractions": 0,
+            "false_retractions_total": 0,
+            "false_retractions_degraded": 0,
+            "false_retractions_unchanged": 0,
             "autoimmunity_on_degraded": 0.0,
+            "autoimmunity_on_unchanged": 0.0,
             "autoimmunity_on_entitled": 0.0
           }
         }
@@ -96,26 +120,38 @@
         "policy_metrics": {
           "single_witness": {
             "accuracy": 0.8125,
-            "false_retractions": 12,
+            "false_retractions_total": 12,
+            "false_retractions_degraded": 12,
+            "false_retractions_unchanged": 0,
             "autoimmunity_on_degraded": 0.5,
+            "autoimmunity_on_unchanged": 0.0,
             "autoimmunity_on_entitled": 0.42857142857142855
           },
           "flat_union": {
             "accuracy": 0.625,
-            "false_retractions": 24,
+            "false_retractions_total": 24,
+            "false_retractions_degraded": 24,
+            "false_retractions_unchanged": 0,
             "autoimmunity_on_degraded": 1.0,
+            "autoimmunity_on_unchanged": 0.0,
             "autoimmunity_on_entitled": 0.8571428571428571
           },
           "bloated_union": {
             "accuracy": 0.59375,
-            "false_retractions": 26,
-            "autoimmunity_on_degraded": 1.0833333333333333,
+            "false_retractions_total": 26,
+            "false_retractions_degraded": 24,
+            "false_retractions_unchanged": 2,
+            "autoimmunity_on_degraded": 1.0,
+            "autoimmunity_on_unchanged": 0.5,
             "autoimmunity_on_entitled": 0.9285714285714286
           },
           "lineage_quarantine": {
             "accuracy": 0.625,
-            "false_retractions": 24,
+            "false_retractions_total": 24,
+            "false_retractions_degraded": 24,
+            "false_retractions_unchanged": 0,
             "autoimmunity_on_degraded": 1.0,
+            "autoimmunity_on_unchanged": 0.0,
             "autoimmunity_on_entitled": 0.8571428571428571
           }
         }
@@ -129,26 +165,38 @@
         "policy_metrics": {
           "single_witness": {
             "accuracy": 0.875,
-            "false_retractions": 4,
+            "false_retractions_total": 4,
+            "false_retractions_degraded": 4,
+            "false_retractions_unchanged": 0,
             "autoimmunity_on_degraded": 0.5,
+            "autoimmunity_on_unchanged": 0.0,
             "autoimmunity_on_entitled": 0.3333333333333333
           },
           "flat_union": {
             "accuracy": 0.75,
-            "false_retractions": 8,
+            "false_retractions_total": 8,
+            "false_retractions_degraded": 8,
+            "false_retractions_unchanged": 0,
             "autoimmunity_on_degraded": 1.0,
+            "autoimmunity_on_unchanged": 0.0,
             "autoimmunity_on_entitled": 0.6666666666666666
           },
           "bloated_union": {
             "accuracy": 0.6875,
-            "false_retractions": 10,
-            "autoimmunity_on_degraded": 1.25,
+            "false_retractions_total": 10,
+            "false_retractions_degraded": 8,
+            "false_retractions_unchanged": 2,
+            "autoimmunity_on_degraded": 1.0,
+            "autoimmunity_on_unchanged": 0.5,
             "autoimmunity_on_entitled": 0.8333333333333334
           },
           "lineage_quarantine": {
             "accuracy": 0.75,
-            "false_retractions": 8,
+            "false_retractions_total": 8,
+            "false_retractions_degraded": 8,
+            "false_retractions_unchanged": 0,
             "autoimmunity_on_degraded": 1.0,
+            "autoimmunity_on_unchanged": 0.0,
             "autoimmunity_on_entitled": 0.6666666666666666
           }
         }
@@ -162,26 +210,38 @@
         "policy_metrics": {
           "single_witness": {
             "accuracy": 0.828125,
-            "false_retractions": 44,
+            "false_retractions_total": 44,
+            "false_retractions_degraded": 44,
+            "false_retractions_unchanged": 0,
             "autoimmunity_on_degraded": 0.6111111111111112,
+            "autoimmunity_on_unchanged": 0.0,
             "autoimmunity_on_entitled": 0.5789473684210527
           },
           "flat_union": {
             "accuracy": 0.71875,
-            "false_retractions": 72,
+            "false_retractions_total": 72,
+            "false_retractions_degraded": 72,
+            "false_retractions_unchanged": 0,
             "autoimmunity_on_degraded": 1.0,
+            "autoimmunity_on_unchanged": 0.0,
             "autoimmunity_on_entitled": 0.9473684210526315
           },
           "bloated_union": {
             "accuracy": 0.7109375,
-            "false_retractions": 74,
-            "autoimmunity_on_degraded": 1.0277777777777777,
+            "false_retractions_total": 74,
+            "false_retractions_degraded": 72,
+            "false_retractions_unchanged": 2,
+            "autoimmunity_on_degraded": 1.0,
+            "autoimmunity_on_unchanged": 0.5,
             "autoimmunity_on_entitled": 0.9736842105263158
           },
           "lineage_quarantine": {
             "accuracy": 0.71875,
-            "false_retractions": 72,
+            "false_retractions_total": 72,
+            "false_retractions_degraded": 72,
+            "false_retractions_unchanged": 0,
             "autoimmunity_on_degraded": 1.0,
+            "autoimmunity_on_unchanged": 0.0,
             "autoimmunity_on_entitled": 0.9473684210526315
           }
         }
@@ -204,8 +264,51 @@
   },
   "subassay_5a2": {
     "total_dag_cases": 64,
-    "stale_zombie_survival_count": 48,
-    "stale_zombie_rate_on_retracted": 1.0,
-    "exact_agreement_count": 1
+    "ground_truth_retracted_cases": 48,
+    "staleness_factorial": {
+      "none_stale": {
+        "stale_nodes": [],
+        "total_evaluated": 64,
+        "ground_truth_retractions": 48,
+        "zombie_survival_count": 0,
+        "zombie_rate_on_retracted": 0.0,
+        "exact_agreement_count": 64,
+        "exact_agreement_rate": 1.0
+      },
+      "only_m1_stale": {
+        "stale_nodes": [
+          "M1"
+        ],
+        "total_evaluated": 64,
+        "ground_truth_retractions": 48,
+        "zombie_survival_count": 12,
+        "zombie_rate_on_retracted": 0.25,
+        "exact_agreement_count": 52,
+        "exact_agreement_rate": 0.8125
+      },
+      "only_m2_stale": {
+        "stale_nodes": [
+          "M2"
+        ],
+        "total_evaluated": 64,
+        "ground_truth_retractions": 48,
+        "zombie_survival_count": 12,
+        "zombie_rate_on_retracted": 0.25,
+        "exact_agreement_count": 52,
+        "exact_agreement_rate": 0.8125
+      },
+      "both_stale": {
+        "stale_nodes": [
+          "M1",
+          "M2"
+        ],
+        "total_evaluated": 64,
+        "ground_truth_retractions": 48,
+        "zombie_survival_count": 48,
+        "zombie_rate_on_retracted": 1.0,
+        "exact_agreement_count": 16,
+        "exact_agreement_rate": 0.25
+      }
+    }
   }
 }

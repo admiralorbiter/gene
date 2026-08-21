@@ -261,37 +261,57 @@ class RevisionDAG(BaseModel):
         invalidated_roots: set[str] | list[str],
         stale_cached_nodes: set[str],
     ) -> dict[str, RevisionImpact]:
-        """Evaluate baseline revision where intermediate nodes rely on stale cached status."""
+        """Evaluate revision where intermediate nodes in stale_cached_nodes present stale alive status."""
         inval_set = set(invalidated_roots)
         impact_map: dict[str, RevisionImpact] = {}
         
-        # In a stale-cached policy, intermediate nodes that are stale are treated as valid/alive
+        # 1. Evaluate roots (G0)
         for node_id, node in self.nodes.items():
             if node.is_root:
                 if node_id in inval_set:
                     impact_map[node_id] = RevisionImpact.RETRACTION_REQUIRED
                 else:
                     impact_map[node_id] = RevisionImpact.UNAFFECTED
+                    
+        # 2. Evaluate intermediate and downstream nodes in topological dependency order
+        # For our G0 -> G1 -> G2 DAG:
+        for node_id, node in self.nodes.items():
+            if node.is_root:
                 continue
+                
+            # Compute actual status of this node from its roots
+            root_supports = self.compute_root_supports(node_id)
+            actual_ref = evaluate_reference_entitlement(
+                [sorted(list(s)) for s in root_supports],
+                inval_set,
+                claim_name=node_id,
+            )
             
-            # Non-root node: checks immediate parents only
-            # A parent is available if not retracted; if in stale_cached_nodes, assumed alive!
+            # Non-root nodes check their immediate parents:
+            # A parent p is perceived as available iff:
+            # - p is in stale_cached_nodes (stale cache treats it as alive), OR
+            # - impact_map[p] is not RETRACTION_REQUIRED
             parent_conjuncts = node.direct_parent_supports
-            surviving_conjuncts = 0
+            perceived_surviving_conjuncts = 0
             for conj in parent_conjuncts:
                 conj_valid = True
                 for p in conj:
-                    if p in inval_set and p not in stale_cached_nodes:
+                    parent_actual_impact = impact_map.get(p, RevisionImpact.UNAFFECTED)
+                    parent_is_retracted = (parent_actual_impact == RevisionImpact.RETRACTION_REQUIRED)
+                    parent_is_stale = (p in stale_cached_nodes)
+                    
+                    # If parent is retracted and NOT stale-cached, conjunct is broken!
+                    if parent_is_retracted and not parent_is_stale:
                         conj_valid = False
                         break
                 if conj_valid:
-                    surviving_conjuncts += 1
+                    perceived_surviving_conjuncts += 1
                     
-            if surviving_conjuncts == len(parent_conjuncts):
-                impact_map[node_id] = RevisionImpact.UNAFFECTED
-            elif surviving_conjuncts > 0:
+            if perceived_surviving_conjuncts == 0:
+                impact_map[node_id] = RevisionImpact.RETRACTION_REQUIRED
+            elif perceived_surviving_conjuncts < len(parent_conjuncts) or actual_ref.status == EntitlementStatus.DEGRADED:
                 impact_map[node_id] = RevisionImpact.METADATA_UPDATE_ONLY
             else:
-                impact_map[node_id] = RevisionImpact.RETRACTION_REQUIRED
+                impact_map[node_id] = RevisionImpact.UNAFFECTED
                 
         return impact_map

@@ -3,10 +3,10 @@
 
 **Execution Date:** 2026-08-20  
 **Evidence Class:** `deterministic_zero_live_llm`  
-**Execution Freeze Git Tag:** `round5-stage5a-freeze`  
+**Execution Freeze Git Tag:** `round5-stage5a-freeze-v2`  
 **Total Evaluated Scenarios:** **432 cases** (368 local $5A_1$ + 64 DAG $5A_2$)  
-**Case Ledger:** `data/exploration_round5_stage5a_cases.jsonl` (`SHA256: 606229a7dc1f6cf507869e67e247755a3f3bb89af1e5c8bb7aead4e5be1dcc8c`)  
-**Summary JSON:** `data/exploration_round5_stage5a_summary.json` (`SHA256: 88a1d14bd2ccb4990b895b2858182e0fddb587a9fab265236738ef97858465f9`)  
+**Case Ledger:** `data/exploration_round5_stage5a_cases.jsonl` (`SHA256: 1499305d197cf53ad624fc65a6626a0d5fc9ea87993184583930ce952692548e`)  
+**Summary JSON:** `data/exploration_round5_stage5a_summary.json` (`SHA256: dc39becc57dfed03ee772095d75a1fd7342f84342745428a1cedb7b7231e56eb`)  
 
 ---
 
@@ -22,9 +22,9 @@ Stage 5A characterized the mathematical failure regions of lossy dependency repr
 ├──────────────────────────────┼──────────────┼──────────────────┼─────────────────────────────┼───────────────────────────┤
 │ Reference Support-First S(c) │ 100.0%       │ 0 / 120 (0.0%)    │ 0.0% (0 / 104)           │ 0.0% (0 / 120)         │
 │ Single Reported Witness (AB) │ 83.7%        │ 60  / 120      │ 57.7% (60 / 104)     │ 50.0% (60  / 120)    │
-│ Flat Union (ABDE)            │ 71.7%        │ 104 / 120      │ 100.0% (104 / 104)    │ 86.7% (104 / 120)    │
-│ Bloated Union (+Distractor)  │ 69.6%        │ 112 / 120      │ 100.0% (104 / 104)*  │ 93.3% (112 / 120)    │
-│ Lineage Quarantine (Ancestry)│ 71.7%        │ 104 / 120      │ 100.0% (104 / 104)    │ 86.7% (104 / 120)    │
+│ Flat Union (ABDE)            │ 71.7%        │ 104 / 120      │ 100.0% (104 / 104)   │ 86.7% (104 / 120)    │
+│ Bloated Union (+Distractor)  │ 69.6%        │ 112 / 120      │ 100.0% (104 / 104)   │ 93.3% (112 / 120)*   │
+│ Lineage Quarantine (Ancestry)│ 71.7%        │ 104 / 120      │ 100.0% (104 / 104)   │ 86.7% (104 / 120)    │
 └──────────────────────────────┴──────────────┴──────────────────┴─────────────────────────────┴───────────────────────────┘
 ```
 *\* Note: Bloated Union falsely retracts 100% of degraded cases (104/104) plus 8 incremental false retractions on previously UNCHANGED states when distractor F is invalidated, yielding 112/120 (93.3%) total autoimmunity.*
@@ -40,7 +40,7 @@ $$\text{Ent}^*(c, I) = \bigvee_{i=1}^k \mathbf{1}[S_i \cap I = \emptyset]$$
 ### Two Distinct Failure Regimes:
 1. **Undercomplete Representation Failure (Single Witness $R = S_1$):**
    - Storing a single valid neural explanation ($R = \{A,B\}$) falsely kills $c$ upon $\text{do}(A=0)$ even though alternative support $DE$ remains valid.
-   - **Autoimmunity on Degraded States:** **57.7%** (60  false retractions).
+   - **Autoimmunity on Degraded States:** **57.7%** (60 / 104 false retractions).
 2. **Overinclusive Representation Failure (Flat Union $R = \bigcup S_i$):**
    - Storing the flat union of all reported evidence ($R = \{A,B,D,E\}$) falsely kills $c$ whenever *any* single assumption in *any* path is invalidated.
    - **Autoimmunity on Degraded States:** **100.0%** (Preserved **0 / 104** partially damaged-but-still-entitled states).
@@ -54,72 +54,73 @@ $$\text{Ent}^*(c, I) = \bigvee_{i=1}^k \mathbf{1}[S_i \cap I = \emptyset]$$
 ```
                   AUTOIMMUNITY BY SUPPORT TOPOLOGY (DEGRADED STATES)
                   
-┌──────────────────────────────┬──────────────┬──────────────┬────────────────┬─────────────────┐
-│ Topology                     │ Total Cases  │ Degraded (N) │ Flat Union Auto│ Single Wit. Auto│
-├──────────────────────────────┼──────────────┼──────────────┼────────────────┼─────────────────┤
-│ single_conjunctive (AB)      │ 16           │ 0            │ 0.0% (N/A)     │ 0.0% (N/A)      │
-│ independent_alternat. (AB|DE)│ 64           │ 24           │ 100.0% (36/36) │ 44.4% (16/36)   │
-│ shared_root_alternat. (AB|AD)│ 32           │ 8           │ 100.0% (16/16) │ 50.0% (8/16)    │
-│ recombinant_tri_path (3-path)│ 256          │ 72          │ 100.0% (180/180│ 60.0% (108/180) │
-└──────────────────────────────┴──────────────┴──────────────┴────────────────┴─────────────────┘
+┌────────────────────────────────┬──────────────┬──────────────┬────────────────────┬────────────────────┐
+│ Topology                       │ Total Cases  │ Degraded (N) │ Flat Union Auto    │ Single Wit. Auto   │
+├────────────────────────────────┼──────────────┼──────────────┼────────────────────┼────────────────────┤
+│ single_conjunctive             │ 16           │ 0            │ 0.0% (N/A)         │ 0.0% (N/A)         │
+│ independent_alternatives       │ 64           │ 24           │ 100.0% (24/24)     │ 50.0% (12/24)      │
+│ shared_root_alternatives       │ 32           │ 8            │ 100.0% (8/8)       │ 50.0% (4/8)        │
+│ recombinant_tri_path           │ 256          │ 72           │ 100.0% (72/72)     │ 61.1% (44/72)      │
+└────────────────────────────────┴──────────────┴──────────────┴────────────────────┴────────────────────┘
 ```
 
 ---
 
 ## 4. Sub-Assay 5A_1: The Resilience Signature $\rho(c) = (|S(c)|, \kappa(c))$
 
-Stage 5A revealed that **support degradation does not necessarily lower cut-set size $\kappa(c)$**:
+Stage 5A proved that **support degradation does not necessarily lower cut-set size $\kappa(c)$**:
 
 ```
                   RESILIENCE TRANSITION MATRIX RHO -> RHO'
                   
-┌──────────────────────────────┬──────────────┬────────────────────────────────────────────────────────┐
-│ Transition rho -> rho'       │ Occurrences  │ Epistemic Meaning                                      │
-├──────────────────────────────┼──────────────┼────────────────────────────────────────────────────────┤
-│ (1, 1) -> (1, 1) [Unchanged] │ 8 cases      │ Single-path baseline untouched.                        │
-│ (2, 2) -> (2, 2) [Unchanged] │ 8 cases      │ Independent alternatives untouched.                    │
-│ (2, 1) -> (2, 1) [Unchanged] │ 8 cases      │ Shared-root alternatives untouched.                    │
-│ (3, 2) -> (3, 2) [Unchanged] │ 8 cases      │ Recombinant tri-path untouched.                        │
-├──────────────────────────────┼──────────────┼────────────────────────────────────────────────────────┤
-│ (2, 2) -> (1, 1) [Degraded]  │ 36 cases     │ Independent alternative lost: both |S| and kappa drop. │
-│ (2, 1) -> (1, 1) [Degraded]  │ 16 cases     │ Shared-root alternative lost: |S| drops, kappa STABLE! │
-│ (3, 2) -> (2, 2) [Degraded]  │ 36 cases     │ Tri-path branch lost: |S| drops, kappa STABLE!         │
-│ (3, 2) -> (1, 1) [Degraded]  │ 144 cases    │ Two tri-path branches lost: both |S| and kappa drop.   │
-├──────────────────────────────┼──────────────┼────────────────────────────────────────────────────────┤
-│ All Retracted (rho' = (0, 0))│ 112 cases    │ Complete loss of entitlement.                          │
-└──────────────────────────────┴──────────────┴────────────────────────────────────────────────────────┘
+┌────────────────────────────────┬──────────────┬────────────────────────────────────────────────────────────────┐
+│ Transition rho -> rho'         │ Occurrences  │ Epistemic Meaning                                              │
+├────────────────────────────────┼──────────────┼────────────────────────────────────────────────────────────────┤
+│ (1, 1)->(0, 0)                 │ 12           │ Complete loss of entitlement (all support paths broken).       │
+│ (1, 1)->(1, 1)                 │ 4            │ Baseline support untouched (UNCHANGED).                        │
+│ (2, 1)->(0, 0)                 │ 20           │ Complete loss of entitlement (all support paths broken).       │
+│ (2, 1)->(1, 1)                 │ 8            │ Shared-root alternative lost: |S| drops (2->1), kappa STABLE (1->1). │
+│ (2, 1)->(2, 1)                 │ 4            │ Baseline support untouched (UNCHANGED).                        │
+│ (2, 2)->(0, 0)                 │ 36           │ Complete loss of entitlement (all support paths broken).       │
+│ (2, 2)->(1, 1)                 │ 24           │ Independent alternative lost: both |S| and kappa drop.         │
+│ (2, 2)->(2, 2)                 │ 4            │ Baseline support untouched (UNCHANGED).                        │
+│ (3, 2)->(0, 0)                 │ 180          │ Complete loss of entitlement (all support paths broken).       │
+│ (3, 2)->(1, 1)                 │ 60           │ Two tri-path branches lost: both |S| and kappa drop.           │
+│ (3, 2)->(2, 1)                 │ 12           │ Tri-path branch lost: |S| drops (3->2), kappa drops (2->1) due to shared premise D. │
+│ (3, 2)->(3, 2)                 │ 4            │ Baseline support untouched (UNCHANGED).                        │
+└────────────────────────────────┴──────────────┴────────────────────────────────────────────────────────────────┘
 ```
 
 > [!IMPORTANT]
-> **Resilience Signature vs Scalar Cut-Set:** In shared-root and multi-path topologies, a belief can lose an entire valid justification without changing $\kappa(c)$ (e.g. $(2,1) \to (1,1)$ or $(3,2) \to (2,2)$). Durable memory must track the full signature $\rho(c) = (|S(c)|, \kappa(c))$ to provide formal input for **Action Proportionality (Pillar 5)**.
+> **Resilience Signature vs Scalar Cut-Set:** In the shared-root topology ($\mathcal{S}(C) = \{\{A,B\}, \{A,D\}\}$), invalidating $B$ causes a valid alternative justification to be lost while $\kappa$ remains constant ($|S|$ drops $2 \to 1$, $\kappa = 1 \to 1$, in 8 cases). Scalar cut-set $\kappa(c)$ is insufficient to capture epistemic degradation; the epistemic state requires the full signature $\rho(c) = (|S(c)|, \kappa(c))$.
 
 ---
 
-## 5. Sub-Assay 5A_2: Multi-Tier DAG Cascades & Stale-Cached Baseline Contrast
+## 5. Sub-Assay 5A_2: Multi-Tier DAG Cascades & Staleness Factorial
 
-Evaluating the 3-tier recombinant diamond DAG across all $2^6 = 64$ root invalidation subsets:
+Evaluating the 3-tier recombinant diamond DAG across all $2^6 = 64$ root invalidation subsets and intermediate cache staleness regimes:
 
 ```
-                  DAG CASCADE & STALE-CACHED BASELINE CONTRAST
+                  DAG CASCADE STALENESS FACTORIAL (64 SUBSETS)
                   
-┌────────────────────────────────────────┬──────────────────────┬──────────────────────────────┐
-│ Metric                                 │ Count / Denominator  │ Epistemic Meaning            │
-├────────────────────────────────────────┼──────────────────────┼──────────────────────────────┤
-│ Total Evaluated Cascade Cases          │ 64 / 64              │ Exhaustive root power set    │
-│ Ground Truth Retractions (FinalGoal)   │ 48 / 64 cases        │ All root paths broken        │
-│ Stale Zombie Derivations (FinalGoal)   │ 36 / 48 (75.0%)      │ Stale intermediate cached M1 │
-│ Root Expansion Exactness (S_root)      │ 64 / 64 (100.0%)     │ Zero zombie derivations      │
-└────────────────────────────────────────┴──────────────────────┴──────────────────────────────┘
+┌───────────────────────────┬────────────────────────────────┬──────────────────────────────┐
+│ Stale Cache Configuration │ Stale Zombie Retractions (FG)  │ Exact Reference Agreement    │
+├───────────────────────────┼────────────────────────────────┼──────────────────────────────┤
+│ None (Exact Reference)    │ 0   / 48 (0.0%) │ 64  / 64 (100.0%) │
+│ M1                        │ 12  / 48 (25.0%) │ 52  / 64 (81.2%) │
+│ M2                        │ 12  / 48 (25.0%) │ 52  / 64 (81.2%) │
+│ M1, M2                    │ 48  / 48 (100.0%) │ 16  / 64 (25.0%) │
+└───────────────────────────┴────────────────────────────────┴──────────────────────────────┘
 ```
 
 ### Cascade Discovery:
-In **75.0% of retracted cases (36/48)**, relying on stale cached intermediate representations causes the downstream goal to falsely survive as a **zombie belief**. Root-expanded support derivation ($\mathcal{S}_{\text{root}}$) eliminates 100% of zombie derivations without premature retractions.
+When intermediate lemmas become stale, downstream goals falsely survive as **zombie beliefs** (up to **100% of retracted cases** when both intermediates are stale). Root-expanded support derivation ($\mathcal{S}_{\text{root}}$) eliminates 100% of zombie derivations without premature retractions.
 
 ---
 
 ## 6. Artifact & Provenance Record
 
-- **Case Ledger (JSONL):** `data/exploration_round5_stage5a_cases.jsonl` (`SHA256: 606229a7dc1f6cf507869e67e247755a3f3bb89af1e5c8bb7aead4e5be1dcc8c`)
-- **Summary Statistics:** `data/exploration_round5_stage5a_summary.json` (`SHA256: 88a1d14bd2ccb4990b895b2858182e0fddb587a9fab265236738ef97858465f9`)
-- **Unit Tests:** `tests/explore_round5/test_revision_engine.py` (5/5 passing)
+- **Case Ledger (JSONL):** `data/exploration_round5_stage5a_cases.jsonl` (`SHA256: 1499305d197cf53ad624fc65a6626a0d5fc9ea87993184583930ce952692548e`)
+- **Summary Statistics:** `data/exploration_round5_stage5a_summary.json` (`SHA256: dc39becc57dfed03ee772095d75a1fd7342f84342745428a1cedb7b7231e56eb`)
+- **Unit Tests:** `tests/explore_round5/test_revision_engine.py` (8/8 passing)
 - **Zero Live LLM Compute:** Deterministic mathematical characterization.

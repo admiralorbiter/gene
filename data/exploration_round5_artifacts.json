@@ -3,7 +3,9 @@
   "evidence_class": "deterministic_zero_live_llm",
   "base_tag": "round4-postreview-freeze",
   "base_commit": "cf472ee",
-  "stage_5a_freeze_tag": "round5-stage5a-freeze",
+  "superseded_freeze_tag": "round5-stage5a-freeze",
+  "superseded_freeze_commit": "c302ee6",
+  "stage_5a_freeze_tag": "round5-stage5a-freeze-v2",
   "subassay_5a1_local_what_if": {
     "total_cases": 368,
     "entitled_cases": 120,
@@ -11,35 +13,45 @@
     "unchanged_cases": 16,
     "retracted_cases": 248,
     "flat_union_autoimmunity_on_degraded": 1.0,
-    "single_witness_autoimmunity_on_degraded": 0.5769,
-    "bloat_incremental_false_retractions": 8,
-    "primary_discovery": "Loss of alternative-support algebra causes 100% false retraction on damaged-but-still-entitled states (104/104); explanatory bloat (E_S > 0) causes 8 additional false retractions on unchanged states."
+    "single_witness_autoimmunity_on_degraded": 0.5769230769230769,
+    "bloat_incremental_false_retractions_on_unchanged": 8,
+    "bloat_all_entitled_autoimmunity": 0.9333333333333333,
+    "topology_breakdown": {
+      "single_conjunctive": { "degraded": 0, "flat_union_auto": 0.0, "single_witness_auto": 0.0 },
+      "independent_alternatives": { "degraded": 24, "flat_union_auto": 1.0, "single_witness_auto": 0.5 },
+      "shared_root_alternatives": { "degraded": 8, "flat_union_auto": 1.0, "single_witness_auto": 0.5 },
+      "recombinant_tri_path": { "degraded": 72, "flat_union_auto": 1.0, "single_witness_auto": 0.6111111111111112 }
+    },
+    "primary_discovery": "Loss of alternative-support algebra causes 100% false retraction on damaged-but-still-entitled states (104/104); single witness causes 57.7% (60/104); explanatory bloat causes 8 additional false retractions on unchanged states."
   },
   "subassay_5a2_network_then_what": {
     "total_cases": 64,
     "ground_truth_retractions": 48,
-    "stale_cached_zombie_derivations": 36,
-    "stale_zombie_rate_on_retracted": 0.75,
-    "root_expansion_exactness": 1.0,
-    "primary_discovery": "Root-expanded support derivation (S_root) prevents stale-cached zombie derivations in 75.0% of retracted DAG cases (36/48)."
+    "staleness_factorial": {
+      "none_stale": { "zombie_count": 0, "zombie_rate": 0.0, "exact_agreement": 64, "exact_agreement_rate": 1.0 },
+      "only_m1_stale": { "zombie_count": 12, "zombie_rate": 0.25, "exact_agreement": 52, "exact_agreement_rate": 0.8125 },
+      "only_m2_stale": { "zombie_count": 12, "zombie_rate": 0.25, "exact_agreement": 52, "exact_agreement_rate": 0.8125 },
+      "both_stale": { "zombie_count": 48, "zombie_rate": 1.0, "exact_agreement": 16, "exact_agreement_rate": 0.25 }
+    },
+    "primary_discovery": "Staleness factorial demonstrates that intermediate cache staleness causes zombie derivations (25% when single lemma is stale, 100% when both are stale). Root-expanded support derivation (S_root) guarantees 100% exact agreement with zero zombie derivations."
   },
   "resilience_signature": {
     "transition_rho_to_rho_prime": {
-      "(2,1)->(1,1)": "Shared-root alternative lost: |S| drops (2->1), kappa STABLE (1->1)",
-      "(3,2)->(2,2)": "Tri-path branch lost: |S| drops (3->2), kappa STABLE (2->2)",
-      "(2,2)->(1,1)": "Independent alternative lost: |S| drops (2->1), kappa drops (2->1)",
-      "(3,2)->(1,1)": "Two tri-path branches lost: |S| drops (3->1), kappa drops (2->1)"
+      "(2,1)->(1,1)": "Shared-root alternative lost: |S| drops (2->1), kappa STABLE (1->1) [8 cases]",
+      "(2,2)->(1,1)": "Independent alternative lost: both |S| and kappa drop (2->1) [24 cases]",
+      "(3,2)->(2,1)": "Tri-path branch lost: |S| drops (3->2), kappa drops (2->1) due to shared premise D [12 cases]",
+      "(3,2)->(1,1)": "Two tri-path branches lost: both |S| and kappa drop (3->1, 2->1) [60 cases]"
     },
-    "theoretical_insight": "Cut-set size kappa alone is insufficient to track degradation; epistemic state requires the full signature rho(c) = (|S(c)|, kappa(c))."
+    "theoretical_insight": "Cut-set size kappa alone is insufficient to track degradation; the (2,1)->(1,1) transition proves that support structure changes while kappa remains stable, requiring the full signature rho(c) = (|S(c)|, kappa(c))."
   },
   "case_ledger": {
     "path": "data/exploration_round5_stage5a_cases.jsonl",
-    "sha256": "606229a7dc1f6cf507869e67e247755a3f3bb89af1e5c8bb7aead4e5be1dcc8c",
+    "sha256": "1499305d197cf53ad624fc65a6626a0d5fc9ea87993184583930ce952692548e",
     "total_records": 432
   },
   "summary_json": {
     "path": "data/exploration_round5_stage5a_summary.json",
-    "sha256": "88a1d14bd2ccb4990b895b2858182e0fddb587a9fab265236738ef97858465f9"
+    "sha256": "dc39becc57dfed03ee772095d75a1fd7342f84342745428a1cedb7b7231e56eb"
   },
   "results_report": {
     "path": "docs/results/EXPLORATION_ROUND5_STAGE5A_REPORT.md"

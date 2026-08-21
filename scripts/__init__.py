@@ -1,1 +1,1 @@
-# scripts package
+"""GENE scripts package."""

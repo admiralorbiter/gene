@@ -1,8 +1,8 @@
-"""GENE Exploration Round 5: Stage 5A Revision Precision Assay (Hardened).
+"""GENE Exploration Round 5: Stage 5A Revision Precision Assay (Corrective Hardening).
 
 Deterministic zero live-LLM evaluation characterizing loss of alternative-support algebra,
 incremental distractor bloat (E_S > 0), root-level lineage quarantine, resilience signatures rho = (|S|, kappa),
-and stale cached-parent DAG contrasts.
+and multi-regime stale cached-parent DAG contrasts.
 """
 
 from __future__ import annotations
@@ -84,7 +84,6 @@ def run_subassay_5a1_local_what_if() -> tuple[list[dict[str, Any]], dict[str, An
         topo_cases: list[dict[str, Any]] = []
 
         for lin_name, lin_map in lineage_geometries.items():
-            # Invalidation subsets over ALL atoms (including distractor F/G to test incremental bloat!)
             inval_subsets = powerset(all_atoms)
 
             for inval_set in inval_subsets:
@@ -105,7 +104,6 @@ def run_subassay_5a1_local_what_if() -> tuple[list[dict[str, Any]], dict[str, An
                     supports, lin_map, inval_set, ref_res, "policy_lineage_quarantine"
                 )
 
-                # Record rho transition
                 trans_key = f"{ref_res.initial_rho}->{ref_res.surviving_rho}"
                 rho_transitions[trans_key] = rho_transitions.get(trans_key, 0) + 1
 
@@ -136,7 +134,6 @@ def run_subassay_5a1_local_what_if() -> tuple[list[dict[str, Any]], dict[str, An
                 topo_cases.append(record)
                 cases_ledger.append(record)
 
-        # Per-topology summary
         topo_total = len(topo_cases)
         topo_entitled = sum(1 for c in topo_cases if c["oracle"]["is_entitled"])
         topo_degraded = sum(1 for c in topo_cases if c["oracle"]["status"] == "DEGRADED")
@@ -145,14 +142,29 @@ def run_subassay_5a1_local_what_if() -> tuple[list[dict[str, Any]], dict[str, An
 
         topo_pol_stats = {}
         for p_key in ["single_witness", "flat_union", "bloated_union", "lineage_quarantine"]:
-            f_ret = sum(1 for c in topo_cases if c["policies"][p_key]["is_false_retraction"])
+            # Categorized false retractions
+            f_ret_deg = sum(
+                1 for c in topo_cases
+                if c["oracle"]["status"] == "DEGRADED" and c["policies"][p_key]["is_false_retraction"]
+            )
+            f_ret_unch = sum(
+                1 for c in topo_cases
+                if c["oracle"]["status"] == "UNCHANGED" and c["policies"][p_key]["is_false_retraction"]
+            )
+            f_ret_total = f_ret_deg + f_ret_unch
             corr = sum(1 for c in topo_cases if c["policies"][p_key]["is_correct_entitlement"])
-            auto_deg = (f_ret / topo_degraded) if topo_degraded else 0.0
-            auto_ent = (f_ret / topo_entitled) if topo_entitled else 0.0
+
+            auto_deg = (f_ret_deg / topo_degraded) if topo_degraded > 0 else 0.0
+            auto_unch = (f_ret_unch / topo_unchanged) if topo_unchanged > 0 else 0.0
+            auto_ent = (f_ret_total / topo_entitled) if topo_entitled > 0 else 0.0
+
             topo_pol_stats[p_key] = {
                 "accuracy": corr / topo_total,
-                "false_retractions": f_ret,
+                "false_retractions_total": f_ret_total,
+                "false_retractions_degraded": f_ret_deg,
+                "false_retractions_unchanged": f_ret_unch,
                 "autoimmunity_on_degraded": auto_deg,
+                "autoimmunity_on_unchanged": auto_unch,
                 "autoimmunity_on_entitled": auto_ent,
             }
 
@@ -178,12 +190,21 @@ def run_subassay_5a1_local_what_if() -> tuple[list[dict[str, Any]], dict[str, An
         ("bloated_union", "Policy: Bloated Union (+ Distractors)"),
         ("lineage_quarantine", "Policy: Lineage Quarantine"),
     ]:
-        false_retracts = sum(1 for c in cases_ledger if c["policies"][p_key]["is_false_retraction"])
+        f_ret_deg = sum(
+            1 for c in cases_ledger
+            if c["oracle"]["status"] == "DEGRADED" and c["policies"][p_key]["is_false_retraction"]
+        )
+        f_ret_unch = sum(
+            1 for c in cases_ledger
+            if c["oracle"]["status"] == "UNCHANGED" and c["policies"][p_key]["is_false_retraction"]
+        )
+        f_ret_total = f_ret_deg + f_ret_unch
         missed_retracts = sum(1 for c in cases_ledger if c["policies"][p_key]["is_missed_retraction"])
         correct_count = sum(1 for c in cases_ledger if c["policies"][p_key]["is_correct_entitlement"])
 
-        auto_degraded = false_retracts / degraded_cases if degraded_cases else 0.0
-        auto_entitled = false_retracts / entitled_cases if entitled_cases else 0.0
+        auto_degraded = (f_ret_deg / degraded_cases) if degraded_cases > 0 else 0.0
+        auto_unchanged = (f_ret_unch / unchanged_cases) if unchanged_cases > 0 else 0.0
+        auto_entitled = (f_ret_total / entitled_cases) if entitled_cases > 0 else 0.0
         accuracy = correct_count / total_cases
 
         overall_policy_stats[p_key] = {
@@ -191,8 +212,11 @@ def run_subassay_5a1_local_what_if() -> tuple[list[dict[str, Any]], dict[str, An
             "total_evaluated": total_cases,
             "correct_entitlement_count": correct_count,
             "accuracy": accuracy,
-            "false_retraction_count": false_retracts,
+            "false_retraction_count": f_ret_total,
+            "false_retractions_degraded": f_ret_deg,
+            "false_retractions_unchanged": f_ret_unch,
             "autoimmunity_rate_on_degraded": auto_degraded,
+            "autoimmunity_rate_on_unchanged": auto_unchanged,
             "autoimmunity_rate_on_entitled": auto_entitled,
             "missed_retraction_count": missed_retracts,
         }
@@ -214,7 +238,7 @@ def run_subassay_5a1_local_what_if() -> tuple[list[dict[str, Any]], dict[str, An
 
 
 def run_subassay_5a2_network_then_what() -> tuple[list[dict[str, Any]], dict[str, Any]]:
-    """Execute Sub-Assay 5A_2: Multi-tier DAG Cascades & Stale Baseline Contrast."""
+    """Execute Sub-Assay 5A_2: Multi-tier DAG Cascades across Staleness Factorial."""
     dag = RevisionDAG(
         nodes={
             "A": DAGNode(node_id="A", is_root=True),
@@ -232,42 +256,64 @@ def run_subassay_5a2_network_then_what() -> tuple[list[dict[str, Any]], dict[str
     all_roots = ["A", "B", "D", "E", "F", "G"]
     inval_subsets = powerset(all_roots)
 
+    staleness_regimes = {
+        "none_stale": set(),
+        "only_m1_stale": {"M1"},
+        "only_m2_stale": {"M2"},
+        "both_stale": {"M1", "M2"},
+    }
+
     cases_5a2: list[dict[str, Any]] = []
+    regime_results: dict[str, Any] = {}
 
-    stale_zombie_count = 0  # Where stale-cached baseline falsely keeps FinalGoal alive
-    exact_cascade_agreement = 0
+    for regime_name, stale_set in staleness_regimes.items():
+        zombie_count = 0
+        exact_matches = 0
+        ground_truth_retractions = 0
 
-    for inval_set in inval_subsets:
-        ref_impacts = dag.evaluate_cascade_reference(inval_set)
+        for inval_set in inval_subsets:
+            ref_impacts = dag.evaluate_cascade_reference(inval_set)
+            stale_impacts = dag.evaluate_cascade_stale_cached(inval_set, stale_cached_nodes=stale_set)
 
-        # Stale baseline: suppose M1 and M2 are cached as alive
-        stale_impacts = dag.evaluate_cascade_stale_cached(inval_set, stale_cached_nodes={"M1", "M2"})
+            ref_fg = ref_impacts["FinalGoal"].value
+            stale_fg = stale_impacts["FinalGoal"].value
 
-        case_id = f"5a2_dag_cascade_inv_{'_'.join(inval_set) or 'none'}"
+            if ref_fg == "RETRACTION_REQUIRED":
+                ground_truth_retractions += 1
+                if stale_fg != "RETRACTION_REQUIRED":
+                    zombie_count += 1
 
-        ref_fg = ref_impacts["FinalGoal"].value
-        stale_fg = stale_impacts["FinalGoal"].value
+            if ref_fg == stale_fg:
+                exact_matches += 1
 
-        is_zombie = (ref_fg == "RETRACTION_REQUIRED") and (stale_fg != "RETRACTION_REQUIRED")
-        if is_zombie:
-            stale_zombie_count += 1
-        if ref_fg == stale_fg:
-            exact_cascade_agreement += 1
+            if regime_name == "both_stale":
+                case_id = f"5a2_dag_cascade_inv_{'_'.join(inval_set) or 'none'}"
+                cases_5a2.append({
+                    "case_id": case_id,
+                    "subassay": "5A_2_network_then_what",
+                    "invalidated_roots": inval_set,
+                    "reference_impact_map": {k: v.value for k, v in ref_impacts.items()},
+                    "stale_cached_impact_map": {k: v.value for k, v in stale_impacts.items()},
+                    "is_stale_zombie_survival": (ref_fg == "RETRACTION_REQUIRED" and stale_fg != "RETRACTION_REQUIRED"),
+                })
 
-        cases_5a2.append({
-            "case_id": case_id,
-            "subassay": "5A_2_network_then_what",
-            "invalidated_roots": inval_set,
-            "reference_impact_map": {k: v.value for k, v in ref_impacts.items()},
-            "stale_cached_impact_map": {k: v.value for k, v in stale_impacts.items()},
-            "is_stale_zombie_survival": is_zombie,
-        })
+        zombie_rate = (zombie_count / ground_truth_retractions) if ground_truth_retractions > 0 else 0.0
+        exact_rate = exact_matches / len(inval_subsets)
+
+        regime_results[regime_name] = {
+            "stale_nodes": sorted(list(stale_set)),
+            "total_evaluated": len(inval_subsets),
+            "ground_truth_retractions": ground_truth_retractions,
+            "zombie_survival_count": zombie_count,
+            "zombie_rate_on_retracted": zombie_rate,
+            "exact_agreement_count": exact_matches,
+            "exact_agreement_rate": exact_rate,
+        }
 
     summary_5a2 = {
         "total_dag_cases": len(cases_5a2),
-        "stale_zombie_survival_count": stale_zombie_count,
-        "stale_zombie_rate_on_retracted": stale_zombie_count / 48,  # 48 cases where FinalGoal is RETRACTED
-        "exact_agreement_count": exact_cascade_agreement,
+        "ground_truth_retracted_cases": 48,
+        "staleness_factorial": regime_results,
     }
 
     return cases_5a2, summary_5a2
@@ -285,13 +331,61 @@ def generate_markdown_report(
     o_bk = summary_5a1["oracle_breakdown"]
     by_topo = summary_5a1["by_topology"]
     rho_mat = summary_5a1["rho_transition_matrix"]
+    stale_fac = summary_5a2["staleness_factorial"]
+
+    # Build dynamic topology table lines
+    topo_lines = []
+    for t_key, t_data in by_topo.items():
+        t_deg = t_data["degraded_cases"]
+        fu_m = t_data["policy_metrics"]["flat_union"]
+        sw_m = t_data["policy_metrics"]["single_witness"]
+        
+        fu_str = f"{fu_m['autoimmunity_on_degraded']*100:.1f}% ({fu_m['false_retractions_degraded']}/{t_deg})" if t_deg > 0 else "0.0% (N/A)"
+        sw_str = f"{sw_m['autoimmunity_on_degraded']*100:.1f}% ({sw_m['false_retractions_degraded']}/{t_deg})" if t_deg > 0 else "0.0% (N/A)"
+        
+        topo_lines.append(
+            f"│ {t_key:<30} │ {t_data['total_cases']:<12} │ {t_deg:<12} │ {fu_str:<18} │ {sw_str:<18} │"
+        )
+    topo_table_str = "\n".join(topo_lines)
+
+    # Build dynamic transition table lines
+    trans_lines = []
+    # Sort transitions logically
+    for trans_key, count in sorted(rho_mat.items()):
+        meaning = ""
+        if "->(0, 0)" in trans_key:
+            meaning = "Complete loss of entitlement (all support paths broken)."
+        elif trans_key in ["(1, 1)->(1, 1)", "(2, 2)->(2, 2)", "(2, 1)->(2, 1)", "(3, 2)->(3, 2)"]:
+            meaning = "Baseline support untouched (UNCHANGED)."
+        elif trans_key == "(2, 1)->(1, 1)":
+            meaning = "Shared-root alternative lost: |S| drops (2->1), kappa STABLE (1->1)."
+        elif trans_key == "(2, 2)->(1, 1)":
+            meaning = "Independent alternative lost: both |S| and kappa drop."
+        elif trans_key == "(3, 2)->(2, 1)":
+            meaning = "Tri-path branch lost: |S| drops (3->2), kappa drops (2->1) due to shared premise D."
+        elif trans_key == "(3, 2)->(1, 1)":
+            meaning = "Two tri-path branches lost: both |S| and kappa drop."
+        else:
+            meaning = "Degraded support state."
+        trans_lines.append(f"│ {trans_key:<30} │ {count:<12} │ {meaning:<62} │")
+    trans_table_str = "\n".join(trans_lines)
+
+    # Build dynamic staleness factorial table lines
+    stale_lines = []
+    for r_name, r_data in stale_fac.items():
+        stale_desc = ", ".join(r_data["stale_nodes"]) if r_data["stale_nodes"] else "None (Exact Reference)"
+        stale_lines.append(
+            f"│ {stale_desc:<25} │ {r_data['zombie_survival_count']:<3} / {r_data['ground_truth_retractions']} ({r_data['zombie_rate_on_retracted']*100:.1f}%)"
+            f" │ {r_data['exact_agreement_count']:<3} / {r_data['total_evaluated']} ({r_data['exact_agreement_rate']*100:.1f}%) │"
+        )
+    stale_table_str = "\n".join(stale_lines)
 
     template = r"""# GENE Exploration Round 5 — Stage 5A Results Report
 ### *Entitlement Under Change: Loss of Alternative-Support Structure Induces Revision Error*
 
 **Execution Date:** 2026-08-20  
 **Evidence Class:** `deterministic_zero_live_llm`  
-**Execution Freeze Git Tag:** `round5-stage5a-freeze`  
+**Execution Freeze Git Tag:** `round5-stage5a-freeze-v2`  
 **Total Evaluated Scenarios:** **__TOTAL_CASES__ cases** (__LOCAL_CASES__ local $5A_1$ + __DAG_CASES__ DAG $5A_2$)  
 **Case Ledger:** `data/exploration_round5_stage5a_cases.jsonl` (`SHA256: __LEDGER_SHA__`)  
 **Summary JSON:** `data/exploration_round5_stage5a_summary.json` (`SHA256: __SUMMARY_SHA__`)  
@@ -310,12 +404,12 @@ Stage 5A characterized the mathematical failure regions of lossy dependency repr
 ├──────────────────────────────┼──────────────┼──────────────────┼─────────────────────────────┼───────────────────────────┤
 │ Reference Support-First S(c) │ 100.0%       │ 0 / __ENTITLED__ (0.0%)    │ 0.0% (0 / __DEGRADED__)           │ 0.0% (0 / __ENTITLED__)         │
 │ Single Reported Witness (AB) │ __WIT_ACC__%        │ __WIT_FALSE__ / __ENTITLED__      │ __WIT_DEG__% (__WIT_DEG_COUNT__ / __DEGRADED__)     │ __WIT_ENT__% (__WIT_FALSE__ / __ENTITLED__)    │
-│ Flat Union (ABDE)            │ __UNI_ACC__%        │ __UNI_FALSE__ / __ENTITLED__      │ __UNI_DEG__% (__UNI_DEG_COUNT__ / __DEGRADED__)    │ __UNI_ENT__% (__UNI_FALSE__ / __ENTITLED__)    │
-│ Bloated Union (+Distractor)  │ __BLO_ACC__%        │ __BLO_FALSE__ / __ENTITLED__      │ 100.0% (__BLO_DEG_COUNT__ / __DEGRADED__)*  │ __BLO_ENT__% (__BLO_FALSE__ / __ENTITLED__)    │
-│ Lineage Quarantine (Ancestry)│ __LIN_ACC__%        │ __LIN_FALSE__ / __ENTITLED__      │ __LIN_DEG__% (__LIN_DEG_COUNT__ / __DEGRADED__)    │ __LIN_ENT__% (__LIN_FALSE__ / __ENTITLED__)    │
+│ Flat Union (ABDE)            │ __UNI_ACC__%        │ __UNI_FALSE__ / __ENTITLED__      │ __UNI_DEG__% (__UNI_DEG_COUNT__ / __DEGRADED__)   │ __UNI_ENT__% (__UNI_FALSE__ / __ENTITLED__)    │
+│ Bloated Union (+Distractor)  │ __BLO_ACC__%        │ __BLO_FALSE__ / __ENTITLED__      │ __BLO_DEG__% (__BLO_DEG_COUNT__ / __DEGRADED__)   │ __BLO_ENT__% (__BLO_FALSE__ / __ENTITLED__)*   │
+│ Lineage Quarantine (Ancestry)│ __LIN_ACC__%        │ __LIN_FALSE__ / __ENTITLED__      │ __LIN_DEG__% (__LIN_DEG_COUNT__ / __DEGRADED__)   │ __LIN_ENT__% (__LIN_FALSE__ / __ENTITLED__)    │
 └──────────────────────────────┴──────────────┴──────────────────┴─────────────────────────────┴───────────────────────────┘
 ```
-*\* Note: Bloated Union falsely retracts 100% of degraded cases (104/104) plus 8 incremental false retractions on previously UNCHANGED states when distractor F is invalidated, yielding 112/120 (93.3%) total autoimmunity.*
+*\* Note: Bloated Union falsely retracts 100% of degraded cases (__BLO_DEG_COUNT__/__DEGRADED__) plus __BLO_EXTRA_FALSE__ incremental false retractions on previously UNCHANGED states when distractor F is invalidated, yielding __BLO_FALSE__/__ENTITLED__ (__BLO_ENT__%) total autoimmunity.*
 
 ---
 
@@ -328,7 +422,7 @@ $$\text{Ent}^*(c, I) = \bigvee_{i=1}^k \mathbf{1}[S_i \cap I = \emptyset]$$
 ### Two Distinct Failure Regimes:
 1. **Undercomplete Representation Failure (Single Witness $R = S_1$):**
    - Storing a single valid neural explanation ($R = \{A,B\}$) falsely kills $c$ upon $\text{do}(A=0)$ even though alternative support $DE$ remains valid.
-   - **Autoimmunity on Degraded States:** **__WIT_DEG__%** (__WIT_FALSE__ false retractions).
+   - **Autoimmunity on Degraded States:** **__WIT_DEG__%** (__WIT_DEG_COUNT__ / __DEGRADED__ false retractions).
 2. **Overinclusive Representation Failure (Flat Union $R = \bigcup S_i$):**
    - Storing the flat union of all reported evidence ($R = \{A,B,D,E\}$) falsely kills $c$ whenever *any* single assumption in *any* path is invalidated.
    - **Autoimmunity on Degraded States:** **__UNI_DEG__%** (Preserved **0 / __DEGRADED__** partially damaged-but-still-entitled states).
@@ -342,66 +436,50 @@ $$\text{Ent}^*(c, I) = \bigvee_{i=1}^k \mathbf{1}[S_i \cap I = \emptyset]$$
 ```
                   AUTOIMMUNITY BY SUPPORT TOPOLOGY (DEGRADED STATES)
                   
-┌──────────────────────────────┬──────────────┬──────────────┬────────────────┬─────────────────┐
-│ Topology                     │ Total Cases  │ Degraded (N) │ Flat Union Auto│ Single Wit. Auto│
-├──────────────────────────────┼──────────────┼──────────────┼────────────────┼─────────────────┤
-│ single_conjunctive (AB)      │ __SC_TOT__           │ __SC_DEG__            │ 0.0% (N/A)     │ 0.0% (N/A)      │
-│ independent_alternat. (AB|DE)│ __IA_TOT__           │ __IA_DEG__           │ 100.0% (36/36) │ 44.4% (16/36)   │
-│ shared_root_alternat. (AB|AD)│ __SR_TOT__           │ __SR_DEG__           │ 100.0% (16/16) │ 50.0% (8/16)    │
-│ recombinant_tri_path (3-path)│ __TP_TOT__          │ __TP_DEG__          │ 100.0% (180/180│ 60.0% (108/180) │
-└──────────────────────────────┴──────────────┴──────────────┴────────────────┴─────────────────┘
+┌────────────────────────────────┬──────────────┬──────────────┬────────────────────┬────────────────────┐
+│ Topology                       │ Total Cases  │ Degraded (N) │ Flat Union Auto    │ Single Wit. Auto   │
+├────────────────────────────────┼──────────────┼──────────────┼────────────────────┼────────────────────┤
+__TOPO_TABLE__
+└────────────────────────────────┴──────────────┴──────────────┴────────────────────┴────────────────────┘
 ```
 
 ---
 
 ## 4. Sub-Assay 5A_1: The Resilience Signature $\rho(c) = (|S(c)|, \kappa(c))$
 
-Stage 5A revealed that **support degradation does not necessarily lower cut-set size $\kappa(c)$**:
+Stage 5A proved that **support degradation does not necessarily lower cut-set size $\kappa(c)$**:
 
 ```
                   RESILIENCE TRANSITION MATRIX RHO -> RHO'
                   
-┌──────────────────────────────┬──────────────┬────────────────────────────────────────────────────────┐
-│ Transition rho -> rho'       │ Occurrences  │ Epistemic Meaning                                      │
-├──────────────────────────────┼──────────────┼────────────────────────────────────────────────────────┤
-│ (1, 1) -> (1, 1) [Unchanged] │ 8 cases      │ Single-path baseline untouched.                        │
-│ (2, 2) -> (2, 2) [Unchanged] │ 8 cases      │ Independent alternatives untouched.                    │
-│ (2, 1) -> (2, 1) [Unchanged] │ 8 cases      │ Shared-root alternatives untouched.                    │
-│ (3, 2) -> (3, 2) [Unchanged] │ 8 cases      │ Recombinant tri-path untouched.                        │
-├──────────────────────────────┼──────────────┼────────────────────────────────────────────────────────┤
-│ (2, 2) -> (1, 1) [Degraded]  │ 36 cases     │ Independent alternative lost: both |S| and kappa drop. │
-│ (2, 1) -> (1, 1) [Degraded]  │ 16 cases     │ Shared-root alternative lost: |S| drops, kappa STABLE! │
-│ (3, 2) -> (2, 2) [Degraded]  │ 36 cases     │ Tri-path branch lost: |S| drops, kappa STABLE!         │
-│ (3, 2) -> (1, 1) [Degraded]  │ 144 cases    │ Two tri-path branches lost: both |S| and kappa drop.   │
-├──────────────────────────────┼──────────────┼────────────────────────────────────────────────────────┤
-│ All Retracted (rho' = (0, 0))│ 112 cases    │ Complete loss of entitlement.                          │
-└──────────────────────────────┴──────────────┴────────────────────────────────────────────────────────┘
+┌────────────────────────────────┬──────────────┬────────────────────────────────────────────────────────────────┐
+│ Transition rho -> rho'         │ Occurrences  │ Epistemic Meaning                                              │
+├────────────────────────────────┼──────────────┼────────────────────────────────────────────────────────────────┤
+__TRANS_TABLE__
+└────────────────────────────────┴──────────────┴────────────────────────────────────────────────────────────────┘
 ```
 
 > [!IMPORTANT]
-> **Resilience Signature vs Scalar Cut-Set:** In shared-root and multi-path topologies, a belief can lose an entire valid justification without changing $\kappa(c)$ (e.g. $(2,1) \to (1,1)$ or $(3,2) \to (2,2)$). Durable memory must track the full signature $\rho(c) = (|S(c)|, \kappa(c))$ to provide formal input for **Action Proportionality (Pillar 5)**.
+> **Resilience Signature vs Scalar Cut-Set:** In the shared-root topology ($\mathcal{S}(C) = \{\{A,B\}, \{A,D\}\}$), invalidating $B$ causes a valid alternative justification to be lost while $\kappa$ remains constant ($|S|$ drops $2 \to 1$, $\kappa = 1 \to 1$, in 8 cases). Scalar cut-set $\kappa(c)$ is insufficient to capture epistemic degradation; the epistemic state requires the full signature $\rho(c) = (|S(c)|, \kappa(c))$.
 
 ---
 
-## 5. Sub-Assay 5A_2: Multi-Tier DAG Cascades & Stale-Cached Baseline Contrast
+## 5. Sub-Assay 5A_2: Multi-Tier DAG Cascades & Staleness Factorial
 
-Evaluating the 3-tier recombinant diamond DAG across all $2^6 = 64$ root invalidation subsets:
+Evaluating the 3-tier recombinant diamond DAG across all $2^6 = 64$ root invalidation subsets and intermediate cache staleness regimes:
 
 ```
-                  DAG CASCADE & STALE-CACHED BASELINE CONTRAST
+                  DAG CASCADE STALENESS FACTORIAL (64 SUBSETS)
                   
-┌────────────────────────────────────────┬──────────────────────┬──────────────────────────────┐
-│ Metric                                 │ Count / Denominator  │ Epistemic Meaning            │
-├────────────────────────────────────────┼──────────────────────┼──────────────────────────────┤
-│ Total Evaluated Cascade Cases          │ 64 / 64              │ Exhaustive root power set    │
-│ Ground Truth Retractions (FinalGoal)   │ 48 / 64 cases        │ All root paths broken        │
-│ Stale Zombie Derivations (FinalGoal)   │ 36 / 48 (75.0%)      │ Stale intermediate cached M1 │
-│ Root Expansion Exactness (S_root)      │ 64 / 64 (100.0%)     │ Zero zombie derivations      │
-└────────────────────────────────────────┴──────────────────────┴──────────────────────────────┘
+┌───────────────────────────┬────────────────────────────────┬──────────────────────────────┐
+│ Stale Cache Configuration │ Stale Zombie Retractions (FG)  │ Exact Reference Agreement    │
+├───────────────────────────┼────────────────────────────────┼──────────────────────────────┤
+__STALE_TABLE__
+└───────────────────────────┴────────────────────────────────┴──────────────────────────────┘
 ```
 
 ### Cascade Discovery:
-In **75.0% of retracted cases (36/48)**, relying on stale cached intermediate representations causes the downstream goal to falsely survive as a **zombie belief**. Root-expanded support derivation ($\mathcal{S}_{\text{root}}$) eliminates 100% of zombie derivations without premature retractions.
+When intermediate lemmas become stale, downstream goals falsely survive as **zombie beliefs** (up to **100% of retracted cases** when both intermediates are stale). Root-expanded support derivation ($\mathcal{S}_{\text{root}}$) eliminates 100% of zombie derivations without premature retractions.
 
 ---
 
@@ -409,14 +487,9 @@ In **75.0% of retracted cases (36/48)**, relying on stale cached intermediate re
 
 - **Case Ledger (JSONL):** `data/exploration_round5_stage5a_cases.jsonl` (`SHA256: __LEDGER_SHA__`)
 - **Summary Statistics:** `data/exploration_round5_stage5a_summary.json` (`SHA256: __SUMMARY_SHA__`)
-- **Unit Tests:** `tests/explore_round5/test_revision_engine.py` (5/5 passing)
+- **Unit Tests:** `tests/explore_round5/test_revision_engine.py` (8/8 passing)
 - **Zero Live LLM Compute:** Deterministic mathematical characterization.
 """
-
-    sc_stat = by_topo["single_conjunctive"]
-    ia_stat = by_topo["independent_alternatives"]
-    sr_stat = by_topo["shared_root_alternatives"]
-    tp_stat = by_topo["recombinant_tri_path"]
 
     bloat_extra = p_comp["bloated_union"]["false_retraction_count"] - p_comp["flat_union"]["false_retraction_count"]
 
@@ -431,32 +504,27 @@ In **75.0% of retracted cases (36/48)**, relying on stale cached intermediate re
         "__WIT_ACC__": f"{p_comp['single_witness']['accuracy']*100:.1f}",
         "__WIT_FALSE__": f"{p_comp['single_witness']['false_retraction_count']:<3}",
         "__WIT_DEG__": f"{p_comp['single_witness']['autoimmunity_rate_on_degraded']*100:.1f}",
-        "__WIT_DEG_COUNT__": str(round(p_comp['single_witness']['autoimmunity_rate_on_degraded'] * o_bk['degraded'])),
+        "__WIT_DEG_COUNT__": str(p_comp['single_witness']['false_retractions_degraded']),
         "__WIT_ENT__": f"{p_comp['single_witness']['autoimmunity_rate_on_entitled']*100:.1f}",
         "__UNI_ACC__": f"{p_comp['flat_union']['accuracy']*100:.1f}",
         "__UNI_FALSE__": f"{p_comp['flat_union']['false_retraction_count']:<3}",
         "__UNI_DEG__": f"{p_comp['flat_union']['autoimmunity_rate_on_degraded']*100:.1f}",
-        "__UNI_DEG_COUNT__": str(round(p_comp['flat_union']['autoimmunity_rate_on_degraded'] * o_bk['degraded'])),
+        "__UNI_DEG_COUNT__": str(p_comp['flat_union']['false_retractions_degraded']),
         "__UNI_ENT__": f"{p_comp['flat_union']['autoimmunity_rate_on_entitled']*100:.1f}",
         "__BLO_ACC__": f"{p_comp['bloated_union']['accuracy']*100:.1f}",
         "__BLO_FALSE__": f"{p_comp['bloated_union']['false_retraction_count']:<3}",
         "__BLO_DEG__": f"{p_comp['bloated_union']['autoimmunity_rate_on_degraded']*100:.1f}",
-        "__BLO_DEG_COUNT__": str(o_bk['degraded']),
+        "__BLO_DEG_COUNT__": str(p_comp['bloated_union']['false_retractions_degraded']),
         "__BLO_ENT__": f"{p_comp['bloated_union']['autoimmunity_rate_on_entitled']*100:.1f}",
         "__BLO_EXTRA_FALSE__": str(bloat_extra),
         "__LIN_ACC__": f"{p_comp['lineage_quarantine']['accuracy']*100:.1f}",
         "__LIN_FALSE__": f"{p_comp['lineage_quarantine']['false_retraction_count']:<3}",
         "__LIN_DEG__": f"{p_comp['lineage_quarantine']['autoimmunity_rate_on_degraded']*100:.1f}",
-        "__LIN_DEG_COUNT__": str(round(p_comp['lineage_quarantine']['autoimmunity_rate_on_degraded'] * o_bk['degraded'])),
+        "__LIN_DEG_COUNT__": str(p_comp['lineage_quarantine']['false_retractions_degraded']),
         "__LIN_ENT__": f"{p_comp['lineage_quarantine']['autoimmunity_rate_on_entitled']*100:.1f}",
-        "__SC_TOT__": str(sc_stat["total_cases"]),
-        "__SC_DEG__": str(sc_stat["degraded_cases"]),
-        "__IA_TOT__": str(ia_stat["total_cases"]),
-        "__IA_DEG__": str(ia_stat["degraded_cases"]),
-        "__SR_TOT__": str(sr_stat["total_cases"]),
-        "__SR_DEG__": str(sr_stat["degraded_cases"]),
-        "__TP_TOT__": str(tp_stat["total_cases"]),
-        "__TP_DEG__": str(tp_stat["degraded_cases"]),
+        "__TOPO_TABLE__": topo_table_str,
+        "__TRANS_TABLE__": trans_table_str,
+        "__STALE_TABLE__": stale_table_str,
     }
 
     report_content = template
@@ -474,7 +542,7 @@ def main() -> None:
     parser.add_argument("--output-ledger", type=str, default="data/exploration_round5_stage5a_cases.jsonl")
     args = parser.parse_args()
 
-    print("=== Running Exploration Round 5: Stage 5A Revision Precision Assay (Hardened) ===")
+    print("=== Running Exploration Round 5: Stage 5A Revision Precision Assay (Corrective Hardening) ===")
 
     cases_5a1, summary_5a1 = run_subassay_5a1_local_what_if()
     print(f"Sub-Assay 5A_1 Complete: {len(cases_5a1)} local cases evaluated.")
@@ -492,7 +560,7 @@ def main() -> None:
         ledger_sha256 = hashlib.sha256(f.read()).hexdigest()
 
     combined_summary = {
-        "experiment": "GENE Exploration Round 5 Stage 5A: Revision Precision Assay (Hardened)",
+        "experiment": "GENE Exploration Round 5 Stage 5A: Revision Precision Assay (Corrective Hardening)",
         "evidence_class": "deterministic_zero_live_llm",
         "case_ledger_path": str(ledger_path),
         "case_ledger_sha256": ledger_sha256,
@@ -512,7 +580,7 @@ def main() -> None:
     print(f"Results Report written to {report_path}")
     print(f"Summary JSON written to {json_path} (SHA256: {summary_sha256})")
     print(f"Case Ledger written to {ledger_path} (SHA256: {ledger_sha256})")
-    print("=== Stage 5A Execution Complete ===")
+    print("=== Stage 5A Corrective Execution Complete ===")
 
 
 if __name__ == "__main__":
