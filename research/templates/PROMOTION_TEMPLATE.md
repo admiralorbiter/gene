@@ -54,13 +54,21 @@
 
 ---
 
-## 6. Escalation & Governance Review
+## 6. Unresolved Issues & Known Gaps
+
+- **Unresolved Anomalies / Edge Cases**: `[Document any observed runtime issues, schema discrepancies, or edge case failures]`
+- **Methodological / Benchmark Limitations**: `[Identify constraints of the current experimental design or population scope]`
+- **Known Gaps for Future Rounds**: `[List open questions that remain out of scope for this milestone but must be addressed eventually]`
+
+---
+
+## 7. Escalation & Governance Review
 
 - **Potential Epistemic Escalation**: `NO` | `YES`
 - *(If YES, explain the epistemic decision required by the human researcher)*: `[...]`
 
 ---
 
-## 7. Roadmap & Candidate Next Steps
+## 8. Roadmap & Candidate Next Steps
 
 - **Candidate Next Step**: `[Reference next milestone from roadmap or write NOT YET FROZEN]`

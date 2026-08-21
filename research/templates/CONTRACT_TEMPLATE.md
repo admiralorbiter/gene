@@ -89,3 +89,15 @@
 - **Estimated LLM Invocations**: `[e.g., 52 calls]`
 - **Estimated Execution Time**: `[e.g., 5 minutes]`
 - **Long-Running Process Handling**: `[e.g., daemon Ollama process]`
+---
+
+## 8. Completion Definition
+
+This contract is declared complete ONLY when all of the following conditions are simultaneously satisfied:
+1. All preregistered experimental cases, factorial permutations, and control arms have executed to completion without runtime exceptions or missing outputs.
+2. All primary estimands, field-level accuracies, and downstream invariant probes are computed mechanically from recorded execution artifacts.
+3. All required artifacts (`runs/*.db`, `data/*.jsonl`, `data/*_summary.json`, `docs/results/*_REPORT.md`) are generated, SHA-256 hashed, and actively tracked in git.
+4. The canonical claim ledger (`data/claim_ledger.json`), Atlas claims (`docs/atlas/data/claims.json`), and results manifest (`data/canonical_results_manifest.json`) are updated and deeply synchronized.
+5. The full local verification suite passes cleanly (`python scripts/verify_repo.py` returns exit code 0).
+6. A completed Promotion Record (`PROMOTION_TEMPLATE.md` instance) is filled out and reviewed.
+7. The final repository state is committed, tagged, and pushed with a clean working tree (zero uncommitted changes or untracked drift).
