@@ -1,11 +1,16 @@
-# Preregistration: Exploration Round 6 Stage 6C — Neural Semantic Observation Extraction & Upward Error Migration Assay
+# Protocol Reconstruction: Exploration Round 6 Stage 6C — Neural Semantic Observation Extraction & Fault Localization Assay
 
-## 1. Executive Protocol & Purpose
+> **Provenance & Protocol Status Note**:
+> The dataset (`data/exploration_round6_stage6c_cases.jsonl`) and manifest (`data/exploration_round6_stage6c_manifest.json`) were generated locally prior to live execution (manifest timestamp `05:04:33Z`). However, the formal protocol documentation was not committed as a Git-verifiable pre-execution artifact before the live model calls. This document provides the authoritative protocol reconstruction, experimental specifications, and measurement standards for the frozen Stage 6C assay.
+
+---
+
+## 1. Executive Purpose & Research Question
 
 Following the completion of Stage 6A (Bitemporal Supersession Engine) and Stage 6B (Contract-Guided State Adjudication), Stage 6C investigates the **Neural-Formal Ingress Boundary** of the GENE epistemic architecture.
 
 ### Research Question
-Can a local neural model reliably convert natural language sentences into structured factual observations $\langle \text{subject}, \text{predicate}, \text{object}, t_{v,\text{start}}, t_{v,\text{end}} \rangle$ required by an already-correct formal epistemic runtime, and does modular extraction externalize errors to the input boundary without corrupting downstream durable state?
+Can a local neural model reliably convert natural language sentences into structured factual observations $\langle \text{subject}, \text{predicate}, \text{object}, t_{v,\text{start}}, t_{v,\text{end}} \rangle$ required by an already-correct formal epistemic runtime, and does modular extraction externalize uncertainty to the input boundary (Layer 0) without opaquely mutating durable state?
 
 ---
 
@@ -14,10 +19,10 @@ Can a local neural model reliably convert natural language sentences into struct
 ### Arm N1: End-to-End Direct Neural Transition Emission
 - **Interface**: The neural model is supplied with the natural language observation, the current active facts in memory, and the predicate ontology contract.
 - **Task**: The model is prompted to directly output the formal state-transition event batch (`ASSERT`, `SUPERSEDES`, `CONTRADICTS`, `RETRACT`) in structured JSON.
-- **Hypothesis**: Direct memory mutation will suffer severe transition syntax and bitemporal reasoning failures due to unconstrained state adjudication in autoregressive generation.
+- **Observed Mechanism**: Spontaneous collapse toward generic replacement heuristics (`SUPERSEDES` across 10/12 cases regardless of `ADDITIVE` or `EPISODIC` contracts).
 
 ### Arm N2: Modular Semantic Observation Extraction (GENE Bridge)
-- **Interface**: The neural model is supplied strictly with the natural language observation and the target predicate name/mode.
+- **Interface**: The neural model is supplied with the natural language observation and the target predicate name/mode.
 - **Task**: The model extracts solely the factual proposition tuple $\langle \text{subject}, \text{predicate}, \text{object}, t_{v,\text{start}}, t_{v,\text{end}} \rangle$.
 - **Downstream Runtime**: The formal runtime receives the extracted observation, attaches trusted metadata, executes contract-guided adjudication (`adjudicate_observation`), updates the bitemporal occurrence state, and computes minimal antichain support $S_{t_v}(q \mid t_k)$.
 
@@ -37,9 +42,9 @@ To avoid provenance laundering and epistemic hallucinations, the following field
 
 ---
 
-## 4. Benchmark Composition ($N=12$ Cases)
+## 4. Benchmark Composition ($N=12$ Stratified Coverage Cases)
 
-The benchmark is balanced across 4 Predicate Contracts $\times$ 4 Temporal Update Scenarios:
+The benchmark comprises 12 deliberately stratified coverage cases across 4 predicate modes (TIME_VARYING: 4, ADDITIVE: 4, EPISODIC: 2, INTERVAL_BOUNDED: 2):
 
 | Case ID | Predicate Mode | Update Scenario | Target Predicate | Text Assertion |
 |:---|:---|:---|:---|:---|
@@ -58,10 +63,10 @@ The benchmark is balanced across 4 Predicate Contracts $\times$ 4 Temporal Updat
 
 ---
 
-## 5. Metric Definitions & Four-Layer Decomposition
+## 5. Metric Definitions & Decoupled Measurement Layers
 
 1. **Layer 0 (Semantic Extraction Fidelity)**:
-   - Evaluated field-by-field: Subject Accuracy, Predicate Accuracy, Object Accuracy, $t_{v,\text{start}}$ Accuracy, $t_{v,\text{end}}$ Accuracy, and Complete Tuple Match.
+   - Evaluated field-by-field: Subject Accuracy, Predicate Accuracy (prompt reproduction), Object Accuracy, $t_{v,\text{start}}$ Accuracy, $t_{v,\text{end}}$ Accuracy, and Complete Tuple Match.
 2. **Layer A (State Transition Fidelity)**:
    - Exact tuple match on normalized transition event sequences: `(event_type, target_fact_id, secondary_fact_id, t_v_start, t_v_end)`.
 3. **Layer B (Premise State Fidelity)**:
@@ -70,14 +75,14 @@ The benchmark is balanced across 4 Predicate Contracts $\times$ 4 Temporal Updat
 4. **Layer C (Epistemic Support & Entitlement)**:
    - **Support Fidelity**: Set equality on minimal premise antichain support sets $S_{t_v}(q \mid t_k)$.
    - **Entitlement Accuracy**: Boolean agreement on derivability $\text{Entitled}(q \mid t_v, t_k) \iff |S_{t_v}(q \mid t_k)| > 0$.
-5. **Fault Localization & Error Migration**:
-   - Classify all entitlement failures into exact origins: `OBSERVATION_EXTRACTION_ERROR`, `TRANSITION_EMISSION_ERROR`, `PREMISE_STATE_ERROR`, or `SUPPORT_DERIVATION_ERROR`.
+5. **Fault Localization & Error Boundary Externalization**:
+   - Classify entitlement failures into exact origins: `OBSERVATION_EXTRACTION_ERROR`, `TRANSITION_EMISSION_ERROR`, `PREMISE_STATE_ERROR`, or `SUPPORT_DERIVATION_ERROR`.
+   - Distinguish exact tuple fidelity ($1/12$) from query-level outcome invariance under surface lexical differences ($3/12$).
 
 ---
 
-## 6. Pre-Execution Local Manifest Standard
+## 6. Execution Parameters
 
-The experiment protocol requires a pre-execution dataset and manifest artifact:
-- Dataset: `data/exploration_round6_stage6c_cases.jsonl`
-- Manifest: `data/exploration_round6_stage6c_manifest.json` (specifying SHA256, model parameters, and call budget)
-- Local Model: `gemma3:12b` (pinned digest: `f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a`)
+- Model: `gemma3:12b` (pinned digest: `f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a`)
+- Temperature: `0.0`, Seed: `42`, Format: `json`
+- Frozen Replay Canaries: 4 cases (`C6C_01`, `C6C_05`, `C6C_09`, `C6C_11`) re-evaluated for exact raw string and semantic JSON invariance.

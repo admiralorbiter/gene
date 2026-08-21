@@ -1,7 +1,7 @@
 {
   "manifest_version": "2.0.0",
   "project": "GENE (Genealogical Epistemic Network Experiments)",
-  "generated_at": "2026-08-21T13:19:39.034255+00:00",
+  "generated_at": "2026-08-21T13:28:53.857679+00:00",
   "canonical_experiments": {
     "exp0": {
       "experiment": "Experiment 0 (Lineage Observability & Factorial Calibration)",
@@ -289,7 +289,7 @@
       "summary_file": "exploration_round6_stage6c_summary.json",
       "database": "exploration_round6_stage6c_results.db",
       "raw_calls_archive": "exploration_round6_stage6c_raw_calls.jsonl",
-      "commit": "round6-stage6c-master-freeze",
+      "commit": "round6-stage6c-postreview-freeze",
       "model_name": "gemma3:12b",
       "model_digest": "f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a",
       "total_calls": 28,
@@ -319,12 +319,12 @@
         "semantic_premise_state_fidelity": 0.1667,
         "layer_c_entitlement_accuracy": 0.25,
         "p_final_correct_given_exact_observation": {
-          "neural_empirical_sample": "1 / 1 (100.0%)",
+          "neural_empirical_sample": "1 / 1 (100.0%) (sole exact extraction case remained 100% correct downstream)",
           "oracle_ceiling": "12 / 12 (100.0%)",
           "runtime_autoimmunity": "0 / 12 (0.0%)"
         },
-        "intervention_relevant_observation_fidelity": "3 / 12 (25.0%) (2 cases correct due to downstream query invariance to lexical suffix)",
-        "fault_localization": "Epistemic Error Boundary Externalization: uncertainty localized to Layer 0 without mutating durable state"
+        "query_level_outcome_invariance": "3 / 12 (25.0%) final entitlement correct despite 1/12 exact extraction (query-level outcome invariance under surface lexical differences)",
+        "fault_localization": "Epistemic Error Boundary Externalization: Error origin is localized to Layer 0; deterministic runtime contains error propagation after admission without runtime autoimmunity"
       },
       "canary_determinism": "4 / 4 raw string matches (100.0%), 4 / 4 semantic JSON matches (100.0%)",
       "status": "COMPLETED_AND_FROZEN"

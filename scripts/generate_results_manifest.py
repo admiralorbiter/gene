@@ -600,7 +600,7 @@ def extract_stage6c_metrics(summary_path: Path) -> dict[str, Any]:
             "semantic_premise_state_fidelity": n2.get("semantic_premise_state_fidelity", 0.0),
             "layer_c_entitlement_accuracy": n2.get("layer_c_entitlement_accuracy", 0.0),
             "p_final_correct_given_exact_observation": n2.get("p_final_correct_given_exact_observation", {}),
-            "intervention_relevant_observation_fidelity": n2.get("intervention_relevant_observation_fidelity", ""),
+            "query_level_outcome_invariance": n2.get("query_level_outcome_invariance", ""),
             "fault_localization": data.get("fault_localization_principle", ""),
         },
         "canary_determinism": f"{canary.get('raw_string_matches', 0)} / {canary.get('total_canaries', 4)} raw string matches ({canary.get('raw_determinism_rate', 0.0)*100:.1f}%), {canary.get('semantic_json_matches', 0)} / {canary.get('total_canaries', 4)} semantic JSON matches ({canary.get('semantic_determinism_rate', 0.0)*100:.1f}%)",
