@@ -33,6 +33,9 @@ data/*
 !data/artifacts.json
 !data/exploration_artifacts.json
 !data/exploration_round2_artifacts.json
+!data/exploration_round3_artifacts.json
+!data/exploration_round4_artifacts.json
+!data/exploration_round4_summary.json
 
 # IDEs and Editors
 .vscode/

@@ -1,0 +1,815 @@
+{
+  "experiment": "GENE Exploration Round 4 \u2014 Epistemic Context Compilation",
+  "git_commit": "d13c0a7",
+  "model": {
+    "model_name": "gemma3:12b",
+    "family": "gemma3",
+    "parameter_size": "12.2B",
+    "quantization_level": "Q4_K_M",
+    "digest": "f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a"
+  },
+  "provenance": {
+    "database_path": "data/exploration_round4_results.db",
+    "database_sha256": "820e574e6d3a0196dfec13ffc392d68d399791b210fd65187795dd834046269e",
+    "total_calls": 116,
+    "total_evaluations": 116,
+    "valid_json_rate": 1.0
+  },
+  "track_r": {
+    "evals_count": 24,
+    "phenotype": {
+      "canonical_shortcuts": [
+        "cross_BD",
+        "cross_AD"
+      ],
+      "canonical_invariant": [
+        "cross_AE",
+        "cross_BE",
+        "empty"
+      ],
+      "swapped_active": [
+        "cross_BD",
+        "cross_AE",
+        "cross_AD"
+      ],
+      "swapped_invariant": [
+        "cross_BE",
+        "empty"
+      ],
+      "opaque_active": [
+        "cross_BD",
+        "cross_AE",
+        "cross_AD"
+      ],
+      "opaque_invariant": [
+        "cross_BE",
+        "empty"
+      ],
+      "heuristic_class": "role_anchored_predicate_class_shortcut (AD v AE v BD with BE=0)"
+    },
+    "cells": {
+      "cond_canonical_point_all_4": {
+        "expected": "PROTO_X7",
+        "predicted_raw": "PROTO_X7",
+        "predicted_semantic": "PROTO_X7"
+      },
+      "cond_canonical_point_cross_AD": {
+        "expected": "UNKNOWN",
+        "predicted_raw": "PROTOCOL_X7",
+        "predicted_semantic": "PROTO_X7"
+      },
+      "cond_canonical_point_cross_AE": {
+        "expected": "UNKNOWN",
+        "predicted_raw": "UNKNOWN",
+        "predicted_semantic": "UNKNOWN"
+      },
+      "cond_canonical_point_cross_BD": {
+        "expected": "UNKNOWN",
+        "predicted_raw": "PROTOCOL_X7",
+        "predicted_semantic": "PROTO_X7"
+      },
+      "cond_canonical_point_cross_BE": {
+        "expected": "UNKNOWN",
+        "predicted_raw": "UNKNOWN",
+        "predicted_semantic": "UNKNOWN"
+      },
+      "cond_canonical_point_empty": {
+        "expected": "UNKNOWN",
+        "predicted_raw": "UNKNOWN",
+        "predicted_semantic": "UNKNOWN"
+      },
+      "cond_canonical_point_path_AB": {
+        "expected": "PROTO_X7",
+        "predicted_raw": "PROTO_X7",
+        "predicted_semantic": "PROTO_X7"
+      },
+      "cond_canonical_point_path_DE": {
+        "expected": "PROTO_X7",
+        "predicted_raw": "PROTO_X7",
+        "predicted_semantic": "PROTO_X7"
+      },
+      "cond_opaque_point_all_4": {
+        "expected": "PROTO_X7",
+        "predicted_raw": "PROTO_X7",
+        "predicted_semantic": "PROTO_X7"
+      },
+      "cond_opaque_point_cross_AD": {
+        "expected": "UNKNOWN",
+        "predicted_raw": "PROTO_X7",
+        "predicted_semantic": "PROTO_X7"
+      },
+      "cond_opaque_point_cross_AE": {
+        "expected": "UNKNOWN",
+        "predicted_raw": "PROTO_X7",
+        "predicted_semantic": "PROTO_X7"
+      },
+      "cond_opaque_point_cross_BD": {
+        "expected": "UNKNOWN",
+        "predicted_raw": "PROTO_X7",
+        "predicted_semantic": "PROTO_X7"
+      },
+      "cond_opaque_point_cross_BE": {
+        "expected": "UNKNOWN",
+        "predicted_raw": "UNKNOWN",
+        "predicted_semantic": "UNKNOWN"
+      },
+      "cond_opaque_point_empty": {
+        "expected": "UNKNOWN",
+        "predicted_raw": "UNKNOWN",
+        "predicted_semantic": "UNKNOWN"
+      },
+      "cond_opaque_point_path_AB": {
+        "expected": "PROTO_X7",
+        "predicted_raw": "PROTO_X7",
+        "predicted_semantic": "PROTO_X7"
+      },
+      "cond_opaque_point_path_DE": {
+        "expected": "PROTO_X7",
+        "predicted_raw": "PROTO_X7",
+        "predicted_semantic": "PROTO_X7"
+      },
+      "cond_swapped_point_all_4": {
+        "expected": "PROTO_X7",
+        "predicted_raw": "PROTO_X7",
+        "predicted_semantic": "PROTO_X7"
+      },
+      "cond_swapped_point_cross_AD": {
+        "expected": "UNKNOWN",
+        "predicted_raw": "PROTO_X7",
+        "predicted_semantic": "PROTO_X7"
+      },
+      "cond_swapped_point_cross_AE": {
+        "expected": "UNKNOWN",
+        "predicted_raw": "PROTOCOL_X7",
+        "predicted_semantic": "PROTO_X7"
+      },
+      "cond_swapped_point_cross_BD": {
+        "expected": "UNKNOWN",
+        "predicted_raw": "PROTOCOL_X7",
+        "predicted_semantic": "PROTO_X7"
+      },
+      "cond_swapped_point_cross_BE": {
+        "expected": "UNKNOWN",
+        "predicted_raw": "UNKNOWN",
+        "predicted_semantic": "UNKNOWN"
+      },
+      "cond_swapped_point_empty": {
+        "expected": "UNKNOWN",
+        "predicted_raw": "UNKNOWN",
+        "predicted_semantic": "UNKNOWN"
+      },
+      "cond_swapped_point_path_AB": {
+        "expected": "PROTO_X7",
+        "predicted_raw": "PROTO_X7",
+        "predicted_semantic": "PROTO_X7"
+      },
+      "cond_swapped_point_path_DE": {
+        "expected": "PROTO_X7",
+        "predicted_raw": "PROTO_X7",
+        "predicted_semantic": "PROTO_X7"
+      }
+    }
+  },
+  "track_p": {
+    "evals_count": 28,
+    "symbolic": {
+      "sample_size": 24,
+      "output_distribution": {
+        "PROTO_X7": 18,
+        "PROTOCOL_X7": 6
+      },
+      "output_entropy": 0.8113,
+      "disagreement_rate": 0.3913,
+      "flip_count": 6,
+      "k_i": 0.6087,
+      "worst_case_accuracy": 0.0,
+      "canonical_replay_sample_size": 4,
+      "canonical_replay_disagreement_rate": 0.0
+    },
+    "semantic": {
+      "sample_size": 24,
+      "output_distribution": {
+        "PROTO_X7": 24
+      },
+      "output_entropy": 0.0,
+      "disagreement_rate": 0.0,
+      "flip_count": 0,
+      "k_i": 1.0,
+      "worst_case_accuracy": 1.0,
+      "canonical_replay_sample_size": 4,
+      "canonical_replay_disagreement_rate": 0.0
+    },
+    "conclusion": "Premise serialization changes surface token realization (PROTO_X7 vs PROTOCOL_X7; D_perm=0.3913) without altering semantic authorized belief (D_perm,sem=0.0000)."
+  },
+  "track_m": {
+    "evals_count": 32,
+    "symbolic": {
+      "total_success_to_error_transitions": 2,
+      "chains": [
+        {
+          "chain_name": "KESTREL_chain_1_append",
+          "steps_count": 4,
+          "step_predictions": [
+            "PROTO_X7",
+            "PROTO_X7",
+            "PROTO_X7",
+            "PROTO_X7"
+          ],
+          "success_to_error_count": 0,
+          "is_monotonically_preserved": true,
+          "k_mono": 1
+        },
+        {
+          "chain_name": "KESTREL_chain_1_prepend",
+          "steps_count": 4,
+          "step_predictions": [
+            "PROTO_X7",
+            "PROTO_X7",
+            "PROTO_X7",
+            "PROTOCOL_X7"
+          ],
+          "success_to_error_count": 1,
+          "is_monotonically_preserved": false,
+          "k_mono": 0
+        },
+        {
+          "chain_name": "KESTREL_chain_2_append",
+          "steps_count": 4,
+          "step_predictions": [
+            "PROTO_X7",
+            "PROTO_X7",
+            "PROTO_X7",
+            "PROTO_X7"
+          ],
+          "success_to_error_count": 0,
+          "is_monotonically_preserved": true,
+          "k_mono": 1
+        },
+        {
+          "chain_name": "KESTREL_chain_2_prepend",
+          "steps_count": 4,
+          "step_predictions": [
+            "PROTO_X7",
+            "PROTO_X7",
+            "PROTO_X7",
+            "PROTO_X7"
+          ],
+          "success_to_error_count": 0,
+          "is_monotonically_preserved": true,
+          "k_mono": 1
+        },
+        {
+          "chain_name": "VELORA_chain_1_append",
+          "steps_count": 4,
+          "step_predictions": [
+            "PROTO_X7",
+            "PROTO_X7",
+            "PROTO_X7",
+            "PROTO_X7"
+          ],
+          "success_to_error_count": 0,
+          "is_monotonically_preserved": true,
+          "k_mono": 1
+        },
+        {
+          "chain_name": "VELORA_chain_1_prepend",
+          "steps_count": 4,
+          "step_predictions": [
+            "PROTO_X7",
+            "PROTO_X7",
+            "PROTO_X7",
+            "PROTOCOL_X7"
+          ],
+          "success_to_error_count": 1,
+          "is_monotonically_preserved": false,
+          "k_mono": 0
+        },
+        {
+          "chain_name": "VELORA_chain_2_append",
+          "steps_count": 4,
+          "step_predictions": [
+            "PROTO_X7",
+            "PROTO_X7",
+            "PROTO_X7",
+            "PROTO_X7"
+          ],
+          "success_to_error_count": 0,
+          "is_monotonically_preserved": true,
+          "k_mono": 1
+        },
+        {
+          "chain_name": "VELORA_chain_2_prepend",
+          "steps_count": 4,
+          "step_predictions": [
+            "PROTO_X7",
+            "PROTO_X7",
+            "PROTO_X7",
+            "PROTO_X7"
+          ],
+          "success_to_error_count": 0,
+          "is_monotonically_preserved": true,
+          "k_mono": 1
+        }
+      ]
+    },
+    "semantic": {
+      "total_success_to_error_transitions": 0,
+      "chains": [
+        {
+          "chain_name": "KESTREL_chain_1_append",
+          "steps_count": 4,
+          "step_predictions": [
+            "PROTO_X7",
+            "PROTO_X7",
+            "PROTO_X7",
+            "PROTO_X7"
+          ],
+          "success_to_error_count": 0,
+          "is_monotonically_preserved": true,
+          "k_mono": 1
+        },
+        {
+          "chain_name": "KESTREL_chain_1_prepend",
+          "steps_count": 4,
+          "step_predictions": [
+            "PROTO_X7",
+            "PROTO_X7",
+            "PROTO_X7",
+            "PROTO_X7"
+          ],
+          "success_to_error_count": 0,
+          "is_monotonically_preserved": true,
+          "k_mono": 1
+        },
+        {
+          "chain_name": "KESTREL_chain_2_append",
+          "steps_count": 4,
+          "step_predictions": [
+            "PROTO_X7",
+            "PROTO_X7",
+            "PROTO_X7",
+            "PROTO_X7"
+          ],
+          "success_to_error_count": 0,
+          "is_monotonically_preserved": true,
+          "k_mono": 1
+        },
+        {
+          "chain_name": "KESTREL_chain_2_prepend",
+          "steps_count": 4,
+          "step_predictions": [
+            "PROTO_X7",
+            "PROTO_X7",
+            "PROTO_X7",
+            "PROTO_X7"
+          ],
+          "success_to_error_count": 0,
+          "is_monotonically_preserved": true,
+          "k_mono": 1
+        },
+        {
+          "chain_name": "VELORA_chain_1_append",
+          "steps_count": 4,
+          "step_predictions": [
+            "PROTO_X7",
+            "PROTO_X7",
+            "PROTO_X7",
+            "PROTO_X7"
+          ],
+          "success_to_error_count": 0,
+          "is_monotonically_preserved": true,
+          "k_mono": 1
+        },
+        {
+          "chain_name": "VELORA_chain_1_prepend",
+          "steps_count": 4,
+          "step_predictions": [
+            "PROTO_X7",
+            "PROTO_X7",
+            "PROTO_X7",
+            "PROTO_X7"
+          ],
+          "success_to_error_count": 0,
+          "is_monotonically_preserved": true,
+          "k_mono": 1
+        },
+        {
+          "chain_name": "VELORA_chain_2_append",
+          "steps_count": 4,
+          "step_predictions": [
+            "PROTO_X7",
+            "PROTO_X7",
+            "PROTO_X7",
+            "PROTO_X7"
+          ],
+          "success_to_error_count": 0,
+          "is_monotonically_preserved": true,
+          "k_mono": 1
+        },
+        {
+          "chain_name": "VELORA_chain_2_prepend",
+          "steps_count": 4,
+          "step_predictions": [
+            "PROTO_X7",
+            "PROTO_X7",
+            "PROTO_X7",
+            "PROTO_X7"
+          ],
+          "success_to_error_count": 0,
+          "is_monotonically_preserved": true,
+          "k_mono": 1
+        }
+      ]
+    },
+    "conclusion": "Appending premises is 100% monotonic. Prepending irrelevant premises (occ_F) induced surface token realization drift at Step 3 without loss of underlying derivation."
+  },
+  "track_c": {
+    "evals_count": 32,
+    "cells": [
+      {
+        "compiler_pipeline": "genealogical_normalization",
+        "ecology": "copy",
+        "station": "KESTREL",
+        "independence_status": "determinable",
+        "perceived_independent_roots": null,
+        "k_a": 1,
+        "k_s_suff": 1,
+        "k_s_exact": 1,
+        "excess_evidence_count": 0,
+        "k_l": null
+      },
+      {
+        "compiler_pipeline": "genealogical_normalization",
+        "ecology": "copy",
+        "station": "VELORA",
+        "independence_status": "determinable",
+        "perceived_independent_roots": null,
+        "k_a": 1,
+        "k_s_suff": 1,
+        "k_s_exact": 1,
+        "excess_evidence_count": 0,
+        "k_l": null
+      },
+      {
+        "compiler_pipeline": "genealogical_normalization",
+        "ecology": "entitled",
+        "station": "KESTREL",
+        "independence_status": "determinable",
+        "perceived_independent_roots": 2,
+        "k_a": 1,
+        "k_s_suff": 1,
+        "k_s_exact": 0,
+        "excess_evidence_count": 1,
+        "k_l": null
+      },
+      {
+        "compiler_pipeline": "genealogical_normalization",
+        "ecology": "entitled",
+        "station": "VELORA",
+        "independence_status": "determinable",
+        "perceived_independent_roots": null,
+        "k_a": 1,
+        "k_s_suff": 1,
+        "k_s_exact": 1,
+        "excess_evidence_count": 0,
+        "k_l": null
+      },
+      {
+        "compiler_pipeline": "genealogical_normalization",
+        "ecology": "pruned",
+        "station": "KESTREL",
+        "independence_status": "determinable",
+        "perceived_independent_roots": 0,
+        "k_a": 1,
+        "k_s_suff": 1,
+        "k_s_exact": 1,
+        "excess_evidence_count": 0,
+        "k_l": null
+      },
+      {
+        "compiler_pipeline": "genealogical_normalization",
+        "ecology": "pruned",
+        "station": "VELORA",
+        "independence_status": "determinable",
+        "perceived_independent_roots": null,
+        "k_a": 1,
+        "k_s_suff": 1,
+        "k_s_exact": 1,
+        "excess_evidence_count": 0,
+        "k_l": null
+      },
+      {
+        "compiler_pipeline": "genealogical_normalization",
+        "ecology": "unentitled",
+        "station": "KESTREL",
+        "independence_status": "indeterminable",
+        "perceived_independent_roots": null,
+        "k_a": 1,
+        "k_s_suff": null,
+        "k_s_exact": null,
+        "excess_evidence_count": null,
+        "k_l": null
+      },
+      {
+        "compiler_pipeline": "genealogical_normalization",
+        "ecology": "unentitled",
+        "station": "VELORA",
+        "independence_status": "indeterminable",
+        "perceived_independent_roots": null,
+        "k_a": 1,
+        "k_s_suff": null,
+        "k_s_exact": null,
+        "excess_evidence_count": null,
+        "k_l": null
+      },
+      {
+        "compiler_pipeline": "proof_carrying_certificate",
+        "ecology": "copy",
+        "station": "KESTREL",
+        "independence_status": "determinable",
+        "perceived_independent_roots": 1,
+        "k_a": 1,
+        "k_s_suff": 1,
+        "k_s_exact": 1,
+        "excess_evidence_count": 0,
+        "k_l": 1
+      },
+      {
+        "compiler_pipeline": "proof_carrying_certificate",
+        "ecology": "copy",
+        "station": "VELORA",
+        "independence_status": "determinable",
+        "perceived_independent_roots": 1,
+        "k_a": 1,
+        "k_s_suff": 0,
+        "k_s_exact": 0,
+        "excess_evidence_count": 1,
+        "k_l": 1
+      },
+      {
+        "compiler_pipeline": "proof_carrying_certificate",
+        "ecology": "entitled",
+        "station": "KESTREL",
+        "independence_status": "determinable",
+        "perceived_independent_roots": 2,
+        "k_a": 1,
+        "k_s_suff": 1,
+        "k_s_exact": 0,
+        "excess_evidence_count": 2,
+        "k_l": null
+      },
+      {
+        "compiler_pipeline": "proof_carrying_certificate",
+        "ecology": "entitled",
+        "station": "VELORA",
+        "independence_status": "determinable",
+        "perceived_independent_roots": 2,
+        "k_a": 1,
+        "k_s_suff": 1,
+        "k_s_exact": 0,
+        "excess_evidence_count": 2,
+        "k_l": null
+      },
+      {
+        "compiler_pipeline": "proof_carrying_certificate",
+        "ecology": "pruned",
+        "station": "KESTREL",
+        "independence_status": "determinable",
+        "perceived_independent_roots": 1,
+        "k_a": 1,
+        "k_s_suff": 1,
+        "k_s_exact": 1,
+        "excess_evidence_count": 0,
+        "k_l": null
+      },
+      {
+        "compiler_pipeline": "proof_carrying_certificate",
+        "ecology": "pruned",
+        "station": "VELORA",
+        "independence_status": "determinable",
+        "perceived_independent_roots": 1,
+        "k_a": 1,
+        "k_s_suff": 1,
+        "k_s_exact": 1,
+        "excess_evidence_count": 0,
+        "k_l": null
+      },
+      {
+        "compiler_pipeline": "proof_carrying_certificate",
+        "ecology": "unentitled",
+        "station": "KESTREL",
+        "independence_status": "indeterminable",
+        "perceived_independent_roots": 1,
+        "k_a": 1,
+        "k_s_suff": null,
+        "k_s_exact": null,
+        "excess_evidence_count": null,
+        "k_l": null
+      },
+      {
+        "compiler_pipeline": "proof_carrying_certificate",
+        "ecology": "unentitled",
+        "station": "VELORA",
+        "independence_status": "indeterminable",
+        "perceived_independent_roots": 1,
+        "k_a": 1,
+        "k_s_suff": null,
+        "k_s_exact": null,
+        "excess_evidence_count": null,
+        "k_l": null
+      },
+      {
+        "compiler_pipeline": "raw_serialization",
+        "ecology": "copy",
+        "station": "KESTREL",
+        "independence_status": "determinable",
+        "perceived_independent_roots": 0,
+        "k_a": 1,
+        "k_s_suff": 1,
+        "k_s_exact": 1,
+        "excess_evidence_count": 0,
+        "k_l": 0
+      },
+      {
+        "compiler_pipeline": "raw_serialization",
+        "ecology": "copy",
+        "station": "VELORA",
+        "independence_status": "determinable",
+        "perceived_independent_roots": 0,
+        "k_a": 1,
+        "k_s_suff": 1,
+        "k_s_exact": 1,
+        "excess_evidence_count": 0,
+        "k_l": 0
+      },
+      {
+        "compiler_pipeline": "raw_serialization",
+        "ecology": "entitled",
+        "station": "KESTREL",
+        "independence_status": "determinable",
+        "perceived_independent_roots": 0,
+        "k_a": 1,
+        "k_s_suff": 1,
+        "k_s_exact": 0,
+        "excess_evidence_count": 2,
+        "k_l": null
+      },
+      {
+        "compiler_pipeline": "raw_serialization",
+        "ecology": "entitled",
+        "station": "VELORA",
+        "independence_status": "determinable",
+        "perceived_independent_roots": 0,
+        "k_a": 1,
+        "k_s_suff": 1,
+        "k_s_exact": 0,
+        "excess_evidence_count": 2,
+        "k_l": null
+      },
+      {
+        "compiler_pipeline": "raw_serialization",
+        "ecology": "pruned",
+        "station": "KESTREL",
+        "independence_status": "determinable",
+        "perceived_independent_roots": null,
+        "k_a": 1,
+        "k_s_suff": 1,
+        "k_s_exact": 1,
+        "excess_evidence_count": 0,
+        "k_l": null
+      },
+      {
+        "compiler_pipeline": "raw_serialization",
+        "ecology": "pruned",
+        "station": "VELORA",
+        "independence_status": "determinable",
+        "perceived_independent_roots": 1,
+        "k_a": 1,
+        "k_s_suff": 1,
+        "k_s_exact": 1,
+        "excess_evidence_count": 0,
+        "k_l": null
+      },
+      {
+        "compiler_pipeline": "raw_serialization",
+        "ecology": "unentitled",
+        "station": "KESTREL",
+        "independence_status": "indeterminable",
+        "perceived_independent_roots": null,
+        "k_a": 1,
+        "k_s_suff": null,
+        "k_s_exact": null,
+        "excess_evidence_count": null,
+        "k_l": null
+      },
+      {
+        "compiler_pipeline": "raw_serialization",
+        "ecology": "unentitled",
+        "station": "VELORA",
+        "independence_status": "indeterminable",
+        "perceived_independent_roots": null,
+        "k_a": 1,
+        "k_s_suff": null,
+        "k_s_exact": null,
+        "excess_evidence_count": null,
+        "k_l": null
+      },
+      {
+        "compiler_pipeline": "topology_aware_grouping",
+        "ecology": "copy",
+        "station": "KESTREL",
+        "independence_status": "determinable",
+        "perceived_independent_roots": null,
+        "k_a": 1,
+        "k_s_suff": 1,
+        "k_s_exact": 1,
+        "excess_evidence_count": 0,
+        "k_l": null
+      },
+      {
+        "compiler_pipeline": "topology_aware_grouping",
+        "ecology": "copy",
+        "station": "VELORA",
+        "independence_status": "determinable",
+        "perceived_independent_roots": 1,
+        "k_a": 1,
+        "k_s_suff": 1,
+        "k_s_exact": 1,
+        "excess_evidence_count": 0,
+        "k_l": 1
+      },
+      {
+        "compiler_pipeline": "topology_aware_grouping",
+        "ecology": "entitled",
+        "station": "KESTREL",
+        "independence_status": "determinable",
+        "perceived_independent_roots": 1,
+        "k_a": 1,
+        "k_s_suff": 1,
+        "k_s_exact": 0,
+        "excess_evidence_count": 2,
+        "k_l": null
+      },
+      {
+        "compiler_pipeline": "topology_aware_grouping",
+        "ecology": "entitled",
+        "station": "VELORA",
+        "independence_status": "determinable",
+        "perceived_independent_roots": 1,
+        "k_a": 1,
+        "k_s_suff": 1,
+        "k_s_exact": 0,
+        "excess_evidence_count": 2,
+        "k_l": null
+      },
+      {
+        "compiler_pipeline": "topology_aware_grouping",
+        "ecology": "pruned",
+        "station": "KESTREL",
+        "independence_status": "determinable",
+        "perceived_independent_roots": 0,
+        "k_a": 1,
+        "k_s_suff": 1,
+        "k_s_exact": 1,
+        "excess_evidence_count": 0,
+        "k_l": null
+      },
+      {
+        "compiler_pipeline": "topology_aware_grouping",
+        "ecology": "pruned",
+        "station": "VELORA",
+        "independence_status": "determinable",
+        "perceived_independent_roots": 1,
+        "k_a": 1,
+        "k_s_suff": 1,
+        "k_s_exact": 1,
+        "excess_evidence_count": 0,
+        "k_l": null
+      },
+      {
+        "compiler_pipeline": "topology_aware_grouping",
+        "ecology": "unentitled",
+        "station": "KESTREL",
+        "independence_status": "indeterminable",
+        "perceived_independent_roots": null,
+        "k_a": 1,
+        "k_s_suff": null,
+        "k_s_exact": null,
+        "excess_evidence_count": null,
+        "k_l": null
+      },
+      {
+        "compiler_pipeline": "topology_aware_grouping",
+        "ecology": "unentitled",
+        "station": "VELORA",
+        "independence_status": "indeterminable",
+        "perceived_independent_roots": null,
+        "k_a": 1,
+        "k_s_suff": null,
+        "k_s_exact": null,
+        "excess_evidence_count": null,
+        "k_l": null
+      }
+    ]
+  }
+}

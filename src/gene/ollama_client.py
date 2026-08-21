@@ -104,6 +104,15 @@ class OllamaClient:
                 data = res.json()
                 details = data.get("details", {})
                 digest = data.get("digest", "unknown")
+                
+                if digest == "unknown":
+                    tags_res = client.get(f"{self.host}/api/tags")
+                    if tags_res.status_code == 200:
+                        for m in tags_res.json().get("models", []):
+                            if m.get("name") == model_name or m.get("model") == model_name:
+                                digest = m.get("digest", "unknown")
+                                break
+
                 self._digest_cache[model_name] = digest
                 return ModelInfo(
                     model_name=model_name,
