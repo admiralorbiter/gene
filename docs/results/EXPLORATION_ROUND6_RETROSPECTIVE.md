@@ -138,9 +138,9 @@ Before an attestation becomes an active `OccurrenceNode`, it must pass an explic
 $$\text{SourceRecord} \xrightarrow{\text{Parsing}} \text{ParsedAttestation} \xrightarrow{\text{Linking}} \text{Candidate Set } \mathcal{B}(x) \xrightarrow[\text{Capability Policy}]{\text{Validation}} \text{AdmissionCertificate} \xrightarrow{} \text{AdmittedFact}$$
 
 ### Key Conceptual Pillars for Round 7:
-1. **Hypothesis Preservation over Ambiguity Collapse**: Rather than collapsing unresolved bindings to an opaque label, unpruned candidate sets $\mathcal{B}(x) = \{b_1, \dots, b_k\}$ are preserved under status **`DEFERRED_BINDING`** (*Preserve alternatives when future interventions may distinguish them*).
+1. **The Epistemic Alternative-Preservation Principle**: *Whenever unresolved alternatives may induce divergent future intervention responses, an epistemic runtime must preserve their structure until sufficient evidence justifies collapse.* (In Round 5, preserves alternative derivational support paths $\mathcal{S}(c)$; in Round 7, preserves alternative referential bindings $\mathcal{B}(x)$ under `DEFERRED_BINDING`).
 2. **Multidimensional Capability Context**: Replacing scalar authority scores with $\text{SourceContext} = \langle \text{Authenticity}, \text{AuthorizationScope}, \text{ReliabilityClass}, \text{IndependenceClass}, \text{ClaimType} \rangle$.
 3. **Nested Admission Gates**: Preserving novel entity mentions as **`PROVISIONAL_ENTITY`** to avoid contaminating canonical namespaces while retaining new evidence.
-4. **Proof-Carrying Certificates**: Emitting structured satisfaction/deferral witnesses rather than bare status enums.
+4. **Proof-Carrying Certificates & Independent Verifier**: Emitting structured satisfaction/deferral witnesses verified by a standalone `CertificateVerifier`.
 
 This unifies the write-side structural proofreading from Experiment 1B-C2b with the semantic ingress bridge of Stage 6C into a single, comprehensive systems abstraction: **Epistemic Write Admission**.

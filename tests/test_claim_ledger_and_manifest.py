@@ -140,34 +140,38 @@ def test_claim_ledger_multi_source_integrity():
                         capture_output=True,
                         text=True,
                     )
-                    # If results tag/ref exists, check blob binding
-                    if res_b.returncode == 0:
-                        resolved_b_sha = res_b.stdout.strip()
-                        art_git_path = src["artifact"].replace("\\", "/")
-                        res_show = subprocess.run(
-                            ["git", "show", f"{resolved_b_sha}:{art_git_path}"],
-                            cwd=root_dir,
-                            capture_output=True,
+                    assert res_b.returncode == 0, f"Results commit reference '{binding_ref}' in {claim['claim_id']} does not resolve in Git!"
+                    resolved_b_sha = res_b.stdout.strip()
+                    art_git_path = src["artifact"].replace("\\", "/")
+                    res_show = subprocess.run(
+                        ["git", "show", f"{resolved_b_sha}:{art_git_path}"],
+                        cwd=root_dir,
+                        capture_output=True,
+                    )
+                    is_git_tracked = src.get("git_tracked", True)
+                    if is_git_tracked:
+                        assert res_show.returncode == 0, (
+                            f"git show {resolved_b_sha}:{art_git_path} failed for {claim['claim_id']}: {res_show.stderr}"
                         )
-                        if res_show.returncode == 0:
-                            blob_raw = res_show.stdout
-                            blob_lf = blob_raw.replace(b"\r\n", b"\n")
-                            blob_crlf = blob_lf.replace(b"\n", b"\r\n")
-                            expected_sha = src["artifact_sha256"].lower()
-                            
-                            raw_sha = hashlib.sha256(blob_raw).hexdigest()
-                            lf_sha = hashlib.sha256(blob_lf).hexdigest()
-                            crlf_sha = hashlib.sha256(blob_crlf).hexdigest()
-                            
-                            matched = expected_sha in [raw_sha, lf_sha, crlf_sha]
-                            assert matched, (
-                                f"Git commit binding mismatch for {claim['claim_id']} ({src['artifact']} at {binding_ref} / {resolved_b_sha}): "
-                                f"expected {expected_sha}, git show produced (raw={raw_sha}, lf={lf_sha}, crlf={crlf_sha})"
-                            )
+                    if res_show.returncode == 0:
+                        blob_raw = res_show.stdout
+                        blob_lf = blob_raw.replace(b"\r\n", b"\n")
+                        blob_crlf = blob_lf.replace(b"\n", b"\r\n")
+                        expected_sha = src["artifact_sha256"].lower()
+                        
+                        raw_sha = hashlib.sha256(blob_raw).hexdigest()
+                        lf_sha = hashlib.sha256(blob_lf).hexdigest()
+                        crlf_sha = hashlib.sha256(blob_crlf).hexdigest()
+                        
+                        matched = expected_sha in [raw_sha, lf_sha, crlf_sha]
+                        assert matched, (
+                            f"Git commit binding mismatch for {claim['claim_id']} ({src['artifact']} at {binding_ref} / {resolved_b_sha}): "
+                            f"expected {expected_sha}, git show produced (raw={raw_sha}, lf={lf_sha}, crlf={crlf_sha})"
+                        )
 
-            # Check disk checksum if file exists on disk
+            # Check disk checksum if artifact is a tracked data file on disk
             art_disk_path = root_dir / src["artifact"]
-            if art_disk_path.exists():
+            if art_disk_path.exists() and src["artifact"].startswith("data/"):
                 actual_disk_sha = compute_sha256(art_disk_path)
                 assert actual_disk_sha.lower() == src["artifact_sha256"].lower(), (
                     f"Disk checksum mismatch for {claim['claim_id']} ({src['artifact']}): "

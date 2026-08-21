@@ -20,7 +20,8 @@
           "n_evaluations": 152,
           "unit_of_analysis": "call",
           "formal_report": "docs/results/EXPERIMENT_0_WALKTHROUGH.md",
-          "primary_metric": "C_nec = 1.000 (causal necessity), H_D = 0.000 (hallucinated distractor rate)"
+          "primary_metric": "C_nec = 1.000 (causal necessity), H_D = 0.000 (hallucinated distractor rate)",
+          "git_tracked": false
         },
         {
           "experiment": "Experiment 0-B (2x2 Factorial Calibration Assay)",
@@ -33,7 +34,8 @@
           "n_evaluations": 66,
           "unit_of_analysis": "call",
           "formal_report": "docs/results/EXPERIMENT_0_WALKTHROUGH.md",
-          "primary_metric": "Cell 4 Pass Rate = 66 / 66 (100.0% calibration across 276 total matrix calls)"
+          "primary_metric": "Cell 4 Pass Rate = 66 / 66 (100.0% calibration across 276 total matrix calls)",
+          "git_tracked": false
         }
       ],
       "scope_limitations": "Evaluated on synthetic worlds with deterministic ground-truth closure rules under structured JSON contracts with an explicit UNKNOWN rejection option.",
@@ -56,7 +58,8 @@
           "n_evaluations": 72,
           "unit_of_analysis": "call",
           "formal_report": "docs/results/EXPERIMENT_1A_REPORT.md",
-          "primary_metric": "tau = 1.000, D_ctx = 1.000, Phenotype = semantic (0, 1, 1, 1, 1) across G1 and G2"
+          "primary_metric": "tau = 1.000, D_ctx = 1.000, Phenotype = semantic (0, 1, 1, 1, 1) across G1 and G2",
+          "git_tracked": false
         }
       ],
       "scope_limitations": "Provides a controlled counterexample in synthetic procedural domains with 2-premise first-order Horn clause derivations.",
@@ -79,7 +82,8 @@
           "n_evaluations": 150000,
           "unit_of_analysis": "family_tree",
           "formal_report": "docs/results/EXPERIMENT_1B_A2_REPORT.md",
-          "primary_metric": "q_inf(0.60) = 4/9 ~ 0.44444; q_inf(0.75) = 1/9 ~ 0.11111; q_inf(0.50) = 1.00000"
+          "primary_metric": "q_inf(0.60) = 4/9 ~ 0.44444; q_inf(0.75) = 1/9 ~ 0.11111; q_inf(0.50) = 1.00000",
+          "git_tracked": false
         },
         {
           "experiment": "Experiment 1B-B1c (Matched Path Sufficiency Assay)",
@@ -92,7 +96,8 @@
           "n_evaluations": 16,
           "unit_of_analysis": "call",
           "formal_report": "docs/results/EXP1B_B1C_MATCHED_EXPRESSION_REPORT.md",
-          "primary_metric": "P(active | complete path) = 8/8 = 1.000, P(active | broken path) = 0/8 = 0.000"
+          "primary_metric": "P(active | complete path) = 8/8 = 1.000, P(active | broken path) = 0/8 = 0.000",
+          "git_tracked": false
         }
       ],
       "scope_limitations": "Evaluated using BM25 tokenized lexical retrieval over synthetic memory ecologies with controlled distractor density.",
@@ -115,7 +120,8 @@
           "n_evaluations": 1200,
           "unit_of_analysis": "evaluation_cell",
           "formal_report": "docs/results/EXP1B_C1B_SHARED_ECOLOGY_REPORT.md",
-          "primary_metric": "C_H = C_I = 0.7177 for blind uniform thinning at k=6; S = 0.0000 across all blind controls"
+          "primary_metric": "C_H = C_I = 0.7177 for blind uniform thinning at k=6; S = 0.0000 across all blind controls",
+          "git_tracked": false
         }
       ],
       "scope_limitations": "Evaluated on symmetric counterbalanced 2-family ecologies with balanced role assignments.",
@@ -138,7 +144,8 @@
           "n_evaluations": 1200,
           "unit_of_analysis": "evaluation_cell",
           "formal_report": "docs/results/EXP1B_C1B_SHARED_ECOLOGY_REPORT.md",
-          "primary_metric": "S = +0.8000 at TPR=0.9/FPR=0.1; Node-Only C_I = 1.0000 (0% containment)"
+          "primary_metric": "S = +0.8000 at TPR=0.9/FPR=0.1; Node-Only C_I = 1.0000 (0% containment)",
+          "git_tracked": false
         },
         {
           "experiment": "Experiment 1B-C2a.1 (Live Behavioral Immunity Assay)",
@@ -151,7 +158,8 @@
           "n_evaluations": 50,
           "unit_of_analysis": "call",
           "formal_report": "docs/results/EXP1B_C2A_LIVE_ASSAY_REPORT.md",
-          "primary_metric": "Lineage Quarantine: 100% path elimination vs Node-Only: 0% containment"
+          "primary_metric": "Lineage Quarantine: 100% path elimination vs Node-Only: 0% containment",
+          "git_tracked": false
         }
       ],
       "scope_limitations": "Assumes tamper-proof lineage graph preservation (Lineage Integrity Assumption).",
@@ -174,7 +182,8 @@
           "n_evaluations": 50,
           "unit_of_analysis": "call",
           "formal_report": "docs/results/EXP1B_C2A_LIVE_ASSAY_REPORT.md",
-          "primary_metric": "X_path = 0 yielded 2/4 behavioral expressions in initial assay; 9/10 epistemic errors on repeated broken prompt"
+          "primary_metric": "X_path = 0 yielded 2/4 behavioral expressions in initial assay; 9/10 epistemic errors on repeated broken prompt",
+          "git_tracked": false
         }
       ],
       "scope_limitations": "Evaluated on Gemma 3:12B under greedy decoding (T=0, seed=42) on local GPU execution stacks.",
@@ -197,7 +206,8 @@
           "n_evaluations": 30,
           "unit_of_analysis": "call",
           "formal_report": "docs/results/EXP1B_C2B_BINDING_REPORT.md",
-          "primary_metric": "mu_expression = 0.300 (9/30) -> mu_heritable = 0.000 (0/30); W_proofread = 1.0 (valid), 0.0 (unsupported)"
+          "primary_metric": "mu_expression = 0.300 (9/30) -> mu_heritable = 0.000 (0/30); W_proofread = 1.0 (valid), 0.0 (unsupported)",
+          "git_tracked": false
         }
       ],
       "scope_limitations": "Proofreading verifies structural support certificates; it does not verify causal generation mechanisms (P_reported != P_causal).",
@@ -220,7 +230,8 @@
           "n_evaluations": 20,
           "unit_of_analysis": "prompt_hash_repetition",
           "formal_report": "docs/results/EXP1B_C2A_LIVE_ASSAY_REPORT.md",
-          "primary_metric": "9/10 epistemic errors + 1/10 contract failure on identical prompt hash"
+          "primary_metric": "9/10 epistemic errors + 1/10 contract failure on identical prompt hash",
+          "git_tracked": false
         }
       ],
       "scope_limitations": "Observed on local Ollama execution stacks running quantized Gemma 3:12B under greedy decoding.",
@@ -243,7 +254,8 @@
           "n_evaluations": 116,
           "unit_of_analysis": "call",
           "formal_report": "docs/results/EXPLORATION_ROUND4_REPORT.md",
-          "primary_metric": "Entitled non-exact support: 7/8 (87.5%, 6/8 citing all 4 docs, mean excess 1.625); Preregistered entitled+pruned exact: 9/16 (56.2%); Contract violations: 5/24 (20.8%); Symbol drift: 6/24 (25.0%)"
+          "primary_metric": "Entitled non-exact support: 7/8 (87.5%, 6/8 citing all 4 docs, mean excess 1.625); Preregistered entitled+pruned exact: 9/16 (56.2%); Contract violations: 5/24 (20.8%); Symbol drift: 6/24 (25.0%)",
+          "git_tracked": false
         }
       ],
       "scope_limitations": "Evaluated on Gemma 3:12B under structured JSON contracts across 24 isomorphic topological permutations.",
@@ -266,7 +278,8 @@
           "n_evaluations": 432,
           "unit_of_analysis": "revision_scenario",
           "formal_report": "docs/results/EXPLORATION_ROUND5_STAGE5A_REPORT.md",
-          "primary_metric": "Flat Union Autoimmunity: 104/104 (100.0%); Single Witness: 60/104 (57.7%); S(c) Reference: 0/104 (0.0%)"
+          "primary_metric": "Flat Union Autoimmunity: 104/104 (100.0%); Single Witness: 60/104 (57.7%); S(c) Reference: 0/104 (0.0%)",
+          "git_tracked": true
         }
       ],
       "scope_limitations": "Evaluated across all powerset invalidation subsets over 4 canonical support hypergraph topologies.",
@@ -289,7 +302,8 @@
           "n_evaluations": 368,
           "unit_of_analysis": "governance_scenario",
           "formal_report": "docs/results/EXPLORATION_ROUND5_STAGE5B_REPORT.md",
-          "primary_metric": "Axiomatic Compliance: P_binary 5/7, P_kappa 5/7, P_rho 6/7, P_lineage (S_L) 7/7 (100.0%)"
+          "primary_metric": "Axiomatic Compliance: P_binary 5/7, P_kappa 5/7, P_rho 6/7, P_lineage (S_L) 7/7 (100.0%)",
+          "git_tracked": true
         }
       ],
       "scope_limitations": "Evaluated across 368 factorial governance scenarios and 7 formal axiomatic invariants.",
@@ -313,7 +327,8 @@
           "n_evaluations": 32,
           "unit_of_analysis": "call",
           "formal_report": "docs/results/EXPLORATION_ROUND5_STAGE5C_REPORT.md",
-          "primary_metric": "Overall Entitlement: Arm 1 (Raw Neural) 75.0% (6/8), Arm 2 (Na\u00efve Reported) 50.0% (4/8, 0/4 degraded), Arm 3 (GENE Kernel) 100.0% (8/8); Failure Channels: Policy-Only 2/4, Neural-Only 1/4, Both 1/4; Action Gating: Preregistered Lineage Enforced"
+          "primary_metric": "Overall Entitlement: Arm 1 (Raw Neural) 75.0% (6/8), Arm 2 (Na\u00efve Reported) 50.0% (4/8, 0/4 degraded), Arm 3 (GENE Kernel) 100.0% (8/8); Failure Channels: Policy-Only 2/4, Neural-Only 1/4, Both 1/4; Action Gating: Preregistered Lineage Enforced",
+          "git_tracked": true
         }
       ],
       "scope_limitations": "Bounded direct rule-antecedent enumeration over shallow Horn worlds evaluated on Gemma 3:12B under greedy decoding.",
@@ -328,15 +343,16 @@
         {
           "experiment": "Exploration Round 6 Stage 6A-v2 (Bitemporal Supersession Engine)",
           "evidence_class": "deterministic_zero_live_llm",
-          "artifact": "data/exploration_round6_stage6b_results_summary.json",
-          "artifact_sha256": "8d20e1945c7fac86783b14feb2eba76285790ee53b5765d0bc2455f201071218",
-          "execution_commit": "round6-stage6b-master-freeze",
+          "artifact": "src/gene/supersession_engine.py",
+          "artifact_sha256": "b96411549ad7201c9ff9e373b729e5d0a81bbd7dfdfa7e0d8fa4e013b6ee76de",
+          "execution_commit": "round6-stage6a-v2-freeze",
+          "git_tracked": true,
           "model": "None (Deterministic Bitemporal Algebra)",
           "n_calls": 0,
-          "n_evaluations": 200,
-          "unit_of_analysis": "case",
+          "n_evaluations": 175,
+          "unit_of_analysis": "property_test",
           "formal_report": "docs/results/EXPLORATION_ROUND6_STAGE6B_REPORT.md",
-          "primary_metric": "Exhaustive small-world permutation modelcheck passed (100% invariant preservation across 200 cases)"
+          "primary_metric": "Exhaustive small-world permutation modelcheck passed (100% invariant preservation)"
         },
         {
           "experiment": "Exploration Round 6 Stage 6B.1 (Multi-Update Temporal Ordering Micro-Assay)",
@@ -344,6 +360,7 @@
           "artifact": "data/exploration_round6_stage6b1_temporal_summary.json",
           "artifact_sha256": "ecca1369df8de0e472df02cd422476f29514a084bd82ec8114d8e98eb6a8ca7f",
           "execution_commit": "round6-stage6b-master-freeze",
+          "git_tracked": true,
           "model": "None (Deterministic Engine)",
           "n_calls": 0,
           "n_evaluations": 12,
@@ -367,25 +384,13 @@
           "artifact": "data/exploration_round6_stage6b_results_summary.json",
           "artifact_sha256": "8d20e1945c7fac86783b14feb2eba76285790ee53b5765d0bc2455f201071218",
           "execution_commit": "round6-stage6b-master-freeze",
+          "git_tracked": true,
           "model": "None (Deterministic Adjudication Engine)",
           "n_calls": 0,
           "n_evaluations": 200,
           "unit_of_analysis": "case",
           "formal_report": "docs/results/EXPLORATION_ROUND6_STAGE6B_REPORT.md",
           "primary_metric": "Layer A Fidelity: Arm 1-4 55.0%, Arm 5-6 100.0%; Layer C Entitlement: Arm 5 64.0%, Arm 6 (GENE Kernel) 100.0%; Arm 5 Autoimmunity: 72/72 (100.0%)"
-        },
-        {
-          "experiment": "Exploration Round 6 Stage 6B.1 (Multi-Update Temporal Ordering Micro-Assay)",
-          "evidence_class": "deterministic_zero_live_llm",
-          "artifact": "data/exploration_round6_stage6b1_temporal_summary.json",
-          "artifact_sha256": "ecca1369df8de0e472df02cd422476f29514a084bd82ec8114d8e98eb6a8ca7f",
-          "execution_commit": "round6-stage6b-master-freeze",
-          "model": "None (Deterministic Engine)",
-          "n_calls": 0,
-          "n_evaluations": 12,
-          "unit_of_analysis": "coordinate",
-          "formal_report": "docs/results/EXPLORATION_ROUND6_STAGE6B_REPORT.md",
-          "primary_metric": "Policy Accuracy: KT-LWW 4/12 (33.3%), VT-LWW 9/12 (75.0%), Bitemporal 12/12 (100.0%)"
         }
       ],
       "scope_limitations": "Evaluated across 200 balanced synthetic update scenarios spanning 4 predicate modes, 5 update topologies, and 2 derivation structures.",
@@ -409,7 +414,8 @@
           "n_evaluations": 12,
           "unit_of_analysis": "case",
           "formal_report": "docs/results/EXPLORATION_ROUND6_STAGE6C_REPORT.md",
-          "primary_metric": "Layer A Fidelity: N1 0.0%, N2 83.3%; Active Occurrence-Set Fidelity: N1 16.7%, N2 91.7%; Semantic State Fidelity: N1 16.7%, N2 16.7%; Normalized Extraction: 11/12 (91.7%); Normalized Replay Entitlement: 12/12 (100.0%)"
+          "primary_metric": "Layer A Fidelity: N1 0.0%, N2 83.3%; Active Occurrence-Set Fidelity: N1 16.7%, N2 91.7%; Semantic State Fidelity: N1 16.7%, N2 16.7%; Normalized Extraction: 11/12 (91.7%); Normalized Replay Entitlement: 12/12 (100.0%)",
+          "git_tracked": true
         }
       ],
       "scope_limitations": "12 stratified coverage cases on Gemma 3:12B with platform-injected trusted metadata.",
