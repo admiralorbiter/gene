@@ -3,6 +3,7 @@ contract_id: CONTRACT-<ID>
 promotion_id: PROMOTION-<ID>
 status: CANDIDATE
 base_sha: [base_commit_sha]
+execution_base_sha: [execution_base_commit_sha]
 candidate_sha: [candidate_commit_sha]
 audit_date: YYYY-MM-DD
 ---
@@ -17,8 +18,9 @@ audit_date: YYYY-MM-DD
 
 ## 1. Provenance & Execution Identifiers
 
-- **Contract Base Commit (Base SHA)**: `[insert base commit hash here]`
-- **Candidate Implementation Commit (Candidate SHA)**: `[insert candidate commit hash here]`
+- **Contract Base Commit (`base_sha`)**: `[Commit SHA against which contract was authored]`
+- **Execution Base Commit (`execution_base_sha`)**: `[Commit SHA containing the frozen contract from which execution started]`
+- **Candidate Implementation Commit (`candidate_sha`)**: `[Commit SHA presenting results for audit/promotion]`
 - **Repository Freeze Tag**: `[e.g., round8-stage8a-freeze]`
 - **Date of Completion**: `YYYY-MM-DD`
 - **Primary Research Question Tested**: `[Restate question from contract]`

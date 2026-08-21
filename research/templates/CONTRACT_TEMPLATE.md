@@ -19,7 +19,7 @@ interruptible: true
 
 - **Contract ID**: `CONTRACT-<ID>`
 - **Contract Status**: `DRAFT` | `FROZEN` | `SUPERSEDED`
-- **Base Git Commit (Base SHA)**: `[insert base commit hash here]`
+- **Base Git Commit (`base_sha`)**: `[Commit SHA of scientific/code baseline against which contract was authored]`
 - **Target Experiment / Phase**: `[e.g., Exploration Round 8 Stage 8A]`
 - **Date Created / Frozen**: `YYYY-MM-DD`
 - **Protocol Version**: `vX.Y.Z`

@@ -24,7 +24,7 @@ All research experiments, contracts, promotions, and checkpoints are organized u
 
 - `research/ACTIVE_CONTRACT.md`: **The single machine-discoverable pointer to currently authorized work.** Agents MUST inspect this file before executing experimental runs. Its operational state vocabulary is:
   `IDLE | READY | RUNNING | AUDITING | ESCALATED`
-  When `status: IDLE`, no autonomous experimental execution may begin.
+  When `state: IDLE`, no autonomous experimental execution may begin.
 - `research/checkpoints/`: Milestones and migration snapshots (e.g., `MIGRATION_CHECKPOINT.md`).
 - `research/contracts/`: Active and archived research contracts named `CONTRACT-<ID>.md`. Contracts use an immutable lifecycle:
   `DRAFT | FROZEN | SUPERSEDED`
@@ -47,6 +47,12 @@ exclusive_gpu: false | true
 interruptible: true | false
 ---
 ```
+
+### Git Commit Provenance Semantics:
+To prevent circular commit dependencies, commit SHAs follow this explicit lifecycle:
+- `base_sha`: The baseline commit of code/science against which the contract was authored.
+- `execution_base_sha`: The actual commit containing the frozen contract (`status: FROZEN`), from which implementation and experimental execution begins.
+- `candidate_sha`: The candidate commit containing completed results and artifacts, presented for promotion audit.
 
 ---
 
