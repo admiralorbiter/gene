@@ -65,6 +65,10 @@ data/*
 !data/r8_stage8a_summary.json
 !data/r8_stage8a_raw_calls.jsonl
 !runs/r8_stage8a_candidate_generation.db
+!data/r8_stage8b_r1_summary.json
+!data/r8_stage8b_r1_raw_calls.jsonl
+!data/r8_stage8b_r1_evidence_manifest.json
+!runs/r8_stage8b_r1_candidate_generation.db
 
 # IDEs and Editors
 .vscode/
