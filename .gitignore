@@ -36,6 +36,8 @@ data/*
 !data/exploration_round3_artifacts.json
 !data/exploration_round4_artifacts.json
 !data/exploration_round4_summary.json
+!data/exploration_round5_stage5a_cases.jsonl
+!data/exploration_round5_stage5a_summary.json
 
 # IDEs and Editors
 .vscode/

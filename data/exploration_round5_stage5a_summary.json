@@ -1,0 +1,70 @@
+{
+  "experiment": "GENE Exploration Round 5 Stage 5A: Revision Precision Assay",
+  "evidence_class": "deterministic_zero_live_llm",
+  "case_ledger_path": "data\\exploration_round5_stage5a_cases.jsonl",
+  "case_ledger_sha256": "19ca50e07f970c221e15f151529ffcd6ae03b08e7a44e4666f9485a44dd81906",
+  "subassay_5a1": {
+    "total_cases": 184,
+    "oracle_breakdown": {
+      "unchanged": 8,
+      "degraded": 52,
+      "retracted": 124,
+      "total_entitled": 60
+    },
+    "policy_comparison": {
+      "single_witness": {
+        "name": "Policy: Single Reported Witness",
+        "total_evaluated": 184,
+        "correct_entitlement_count": 154,
+        "accuracy": 0.8369565217391305,
+        "false_retraction_count": 30,
+        "autoimmunity_rate_on_entitled": 0.5,
+        "missed_retraction_count": 0
+      },
+      "flat_union": {
+        "name": "Policy: Flat Union",
+        "total_evaluated": 184,
+        "correct_entitlement_count": 132,
+        "accuracy": 0.717391304347826,
+        "false_retraction_count": 52,
+        "autoimmunity_rate_on_entitled": 0.8666666666666667,
+        "missed_retraction_count": 0
+      },
+      "bloated_union": {
+        "name": "Policy: Bloated Union (+ Distractors)",
+        "total_evaluated": 184,
+        "correct_entitlement_count": 132,
+        "accuracy": 0.717391304347826,
+        "false_retraction_count": 52,
+        "autoimmunity_rate_on_entitled": 0.8666666666666667,
+        "missed_retraction_count": 0
+      },
+      "lineage_quarantine": {
+        "name": "Policy: Lineage Quarantine",
+        "total_evaluated": 184,
+        "correct_entitlement_count": 132,
+        "accuracy": 0.717391304347826,
+        "false_retraction_count": 52,
+        "autoimmunity_rate_on_entitled": 0.8666666666666667,
+        "missed_retraction_count": 0
+      }
+    }
+  },
+  "subassay_5a2": {
+    "total_dag_cases": 64,
+    "node_impact_distributions": {
+      "FinalGoal": {
+        "UNAFFECTED": 1,
+        "METADATA_UPDATE_ONLY": 15,
+        "REDERIVATION_REQUIRED": 0,
+        "RETRACTION_REQUIRED": 48
+      },
+      "M1": {
+        "UNAFFECTED": 4,
+        "METADATA_UPDATE_ONLY": 24,
+        "REDERIVATION_REQUIRED": 0,
+        "RETRACTION_REQUIRED": 36
+      }
+    }
+  }
+}
