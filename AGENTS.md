@@ -17,6 +17,34 @@ Read before coding:
 
 ---
 
+# Operational Research Workflow
+
+All research experiments, contracts, promotions, and checkpoints are organized under `research/`:
+
+- `research/checkpoints/`: Milestones and migration snapshots (e.g., `MIGRATION_CHECKPOINT.md`).
+- `research/contracts/`: Active and archived research contracts (e.g., `CONTRACT_[ID].md`). When no experiment is actively running, no contract in this directory holds `status: FROZEN`.
+- `research/promotions/`: Completed promotion records capturing empirical results, workflow metrics, and review status (e.g., `PROMOTION_[ID].md`).
+- `research/templates/`: Reusable templates for contracts (`CONTRACT_TEMPLATE.md`) and promotions (`PROMOTION_TEMPLATE.md`).
+
+### Machine-Readable Contract Frontmatter:
+Every contract in `research/contracts/` must begin with YAML frontmatter specifying execution requirements and resource classes:
+
+```yaml
+---
+contract_id: CONTRACT-[ID]
+status: DRAFT | FROZEN | SUPERSEDED
+base_sha: <commit-hash>
+resource_class: cpu | gpu | live_llm
+long_running: false | true
+exclusive_gpu: false | true
+interruptible: true | false
+---
+```
+
+Agents inspect `research/contracts/` for active contracts (`status: FROZEN`) before executing experiments.
+
+---
+
 # Autonomous Repair vs. Epistemic Escalation Boundaries
 
 ### Agents May Autonomously Repair:

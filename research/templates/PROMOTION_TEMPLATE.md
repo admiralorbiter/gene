@@ -21,7 +21,25 @@
 
 ---
 
-## 3. Empirical Results & Acceptance Verification
+## 3. Workflow & Human Attention Metrics
+
+```
++======================================+=======================+================================================+
+| Workflow / Attention Metric          | Recorded Value        | Operational Interpretation                     |
++======================================+=======================+================================================+
+| Autonomous Review & Fix Rounds       | [e.g., 2 rounds]      | Internal repair loops without human intervention|
+| Human Interventions Required         | [e.g., 1 escalation]  | Points where human epistemic judgment was invoked|
+| Total Wall-Clock Elapsed Time        | [e.g., 45 minutes]    | End-to-end milestone turnaround duration       |
+| Active Compute Duration              | [e.g., 12 minutes]    | Execution time on local GPU/CPU resources      |
+| Attention Efficiency Assessment      | [e.g., High]          | Validated progress per unit of human attention |
++======================================+=======================+================================================+
+```
+
+- **Process Assessment ("Fast Exploration, Slow Promotion")**: `[Evaluate whether autonomous loops reduced human context switching while preserving deep promotion rigor]`
+
+---
+
+## 4. Empirical Results & Acceptance Verification
 
 ```
 +================================+=======================+=======================+================+
@@ -38,19 +56,11 @@
 
 ---
 
-## 4. Hardening Corrections & Unexpected Findings
+## 5. Hardening Corrections & Unexpected Findings
 
 - **Corrections Made During Hardening**: `[List any bug fixes, oracle leakage removals, or schema fixes]`
 - **Unexpected Findings / Anomalies**: `[Document any surprising behaviors or edge cases]`
 - **Epistemic Belief / Interpretation Updates**: `[How did the findings update the theoretical model?]`
-
----
-
-## 5. Claims & Ledger Updates
-
-- **Claim ID(s) Registered / Updated**: `[e.g., GENE-C18]`
-- **Claim Headline**: `[...]`
-- **Claim Scope & Limitations**: `[...]`
 
 ---
 
@@ -62,13 +72,21 @@
 
 ---
 
-## 7. Escalation & Governance Review
+## 7. Claims & Ledger Updates
+
+- **Claim ID(s) Registered / Updated**: `[e.g., GENE-C18]`
+- **Claim Headline**: `[...]`
+- **Claim Scope & Limitations**: `[...]`
+
+---
+
+## 8. Escalation & Governance Review
 
 - **Potential Epistemic Escalation**: `NO` | `YES`
 - *(If YES, explain the epistemic decision required by the human researcher)*: `[...]`
 
 ---
 
-## 8. Roadmap & Candidate Next Steps
+## 9. Roadmap & Candidate Next Steps
 
 - **Candidate Next Step**: `[Reference next milestone from roadmap or write NOT YET FROZEN]`

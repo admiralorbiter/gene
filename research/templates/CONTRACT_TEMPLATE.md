@@ -1,3 +1,13 @@
+---
+contract_id: CONTRACT-[ID]
+status: DRAFT | FROZEN | SUPERSEDED
+base_sha: [insert_base_commit_hash_here]
+resource_class: cpu | gpu | live_llm
+long_running: false | true
+exclusive_gpu: false | true
+interruptible: true | false
+---
+
 # Research Contract: [Experiment / Milestone Name]
 
 > **CRITICAL REPRODUCIBILITY WARNING**:
@@ -7,6 +17,7 @@
 
 ## 1. Metadata & Lifecycle Status
 
+- **Contract ID**: `CONTRACT-[ID]`
 - **Contract Status**: `DRAFT` | `FROZEN` | `SUPERSEDED`
 - **Base Git Commit (Base SHA)**: `[insert base commit hash here]`
 - **Target Experiment / Phase**: `[e.g., Exploration Round 8 Stage 8A]`
@@ -89,6 +100,7 @@
 - **Estimated LLM Invocations**: `[e.g., 52 calls]`
 - **Estimated Execution Time**: `[e.g., 5 minutes]`
 - **Long-Running Process Handling**: `[e.g., daemon Ollama process]`
+
 ---
 
 ## 8. Completion Definition
