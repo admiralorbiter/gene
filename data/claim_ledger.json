@@ -1,5 +1,5 @@
 {
-  "ledger_version": "3.0.0",
+  "ledger_version": "2.0.0",
   "project": "GENE (Genealogical Epistemic Network Experiments)",
   "description": "Authoritative claim-evidence ledger mapping each core scientific claim in GENE to its empirical evidence sources, SHA-256 database checksums, execution commits, sample sizes, and boundary scope.",
   "claims": [
@@ -326,17 +326,17 @@
       "claim_text": "Separating Valid Time (t_v) from Knowledge Transaction Time (t_k) is structurally necessary for truth maintenance under retroactive, out-of-order, and disputed updates. Bitemporal occurrence tracking with cautious conflict window isolation resolves pairwise disputes without destroying orthogonal active assertions.",
       "evidence_sources": [
         {
-          "experiment": "Exploration Round 6 Stage 6A-v2 (Bitemporal Supersession Algebra)",
+          "experiment": "Exploration Round 6 Stage 6A-v2 (Bitemporal Supersession Algebra & Conflict Windows)",
           "evidence_class": "deterministic_zero_live_llm",
-          "artifact": "src/gene/supersession_engine.py",
-          "artifact_sha256": "d49ebfba0699a92fed590bae9ba906846461d533ac971ac08e70840c8f49a583",
-          "execution_commit": "round6-stage6a-v2-freeze",
-          "model": "None (Deterministic Bitemporal Algebra)",
+          "artifact": "data/exploration_round6_stage6b_results_summary.json",
+          "artifact_sha256": "8d20e1945c7fac86783b14feb2eba76285790ee53b5765d0bc2455f201071218",
+          "execution_commit": "round6-stage6b-master-freeze",
+          "model": "None (Deterministic Bitemporal Engine)",
           "n_calls": 0,
-          "n_evaluations": 175,
-          "unit_of_analysis": "property_test",
-          "formal_report": "docs/results/EXPLORATION_ROUND6_STAGE6A_REPORT.md",
-          "primary_metric": "Exhaustive small-world permutation modelcheck passed (100% invariant preservation)"
+          "n_evaluations": 200,
+          "unit_of_analysis": "case",
+          "formal_report": "docs/results/EXPLORATION_ROUND6_STAGE6B_REPORT.md",
+          "primary_metric": "Bitemporal supersession engine validated across 200 cases (100% transition and state fidelity)"
         }
       ],
       "scope_limitations": "Evaluated on bounded bitemporal event sequences and discrete transaction clocks.",
