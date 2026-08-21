@@ -62,6 +62,9 @@ data/*
 !data/exploration_round7_stage7b_raw_calls.jsonl
 !runs/exploration_round7_stage7b_results.db
 !runs/exploration_round7_stage7b_micro_results.db
+!data/r8_stage8a_summary.json
+!data/r8_stage8a_raw_calls.jsonl
+!runs/r8_stage8a_candidate_generation.db
 
 # IDEs and Editors
 .vscode/
