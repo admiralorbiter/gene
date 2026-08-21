@@ -666,6 +666,34 @@ def extract_stage7a_metrics(summary_path: Path) -> dict[str, Any]:
     }
 
 
+def extract_stage7b_metrics(summary_path: Path) -> dict[str, Any]:
+    """Extract metrics from Exploration Round 7 Stage 7B live neural ingress benchmark."""
+    if not summary_path.exists():
+        raise FileNotFoundError(f"Stage 7B summary not found: {summary_path}")
+
+    with open(summary_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    return {
+        "experiment": "Exploration Round 7 Stage 7B (Live Neural Ingress Interface & Candidate Disambiguation Benchmark)",
+        "summary_file": summary_path.name,
+        "database": data.get("database_file", "exploration_round7_stage7b_results.db"),
+        "raw_calls_archive": data.get("raw_calls_file", "exploration_round7_stage7b_raw_calls.jsonl"),
+        "commit": "round7-stage7b-live-freeze",
+        "model_name": data.get("model_name", "gemma3:12b"),
+        "model_digest": data.get("model_digest", "f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a"),
+        "total_calls": data.get("total_calls", 52),
+        "primary_factorial_calls": data.get("primary_factorial_calls", 32),
+        "counterbalanced_calls": data.get("counterbalanced_calls", 16),
+        "canary_replay_calls": data.get("canary_replay_calls", 4),
+        "field_level_accuracies": data.get("field_level_accuracies", {}),
+        "canary_determinism": data.get("canary_determinism", {}),
+        "counterbalancing_slot_distribution": data.get("counterbalancing_slot_distribution", {}),
+        "downstream_probe_metrics": data.get("downstream_probe_metrics", {}),
+        "status": "COMPLETED_AND_FROZEN",
+    }
+
+
 def generate_manifest(write: bool = True) -> dict[str, Any]:
     """Assemble all frozen experiment milestones into the authoritative manifest."""
     root_dir = Path(__file__).resolve().parent.parent
@@ -703,6 +731,7 @@ def generate_manifest(write: bool = True) -> dict[str, Any]:
             "stage_6b1": extract_stage6b1_metrics(data_dir / "exploration_round6_stage6b1_temporal_summary.json"),
             "stage_6c": extract_stage6c_metrics(data_dir / "exploration_round6_stage6c_summary.json"),
             "stage_7a": extract_stage7a_metrics(data_dir / "exploration_round7_stage7a_benchmark_summary.json"),
+            "stage_7b": extract_stage7b_metrics(data_dir / "exploration_round7_stage7b_summary.json"),
         },
     }
 

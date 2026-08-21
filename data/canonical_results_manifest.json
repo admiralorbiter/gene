@@ -1,7 +1,7 @@
 {
   "manifest_version": "2.0.0",
   "project": "GENE (Genealogical Epistemic Network Experiments)",
-  "generated_at": "2026-08-21T18:27:48.941545+00:00",
+  "generated_at": "2026-08-21T18:43:11.432947+00:00",
   "canonical_experiments": {
     "exp0": {
       "experiment": "Experiment 0 (Lineage Observability & Factorial Calibration)",
@@ -367,6 +367,47 @@
           "sac_rate": 1.0,
           "upr_rate": 1.0
         }
+      },
+      "status": "COMPLETED_AND_FROZEN"
+    },
+    "stage_7b": {
+      "experiment": "Exploration Round 7 Stage 7B (Live Neural Ingress Interface & Candidate Disambiguation Benchmark)",
+      "summary_file": "exploration_round7_stage7b_summary.json",
+      "database": "exploration_round7_stage7b_results.db",
+      "raw_calls_archive": "exploration_round7_stage7b_raw_calls.jsonl",
+      "commit": "round7-stage7b-live-freeze",
+      "model_name": "gemma3:12b",
+      "model_digest": "f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a",
+      "total_calls": 52,
+      "primary_factorial_calls": 32,
+      "counterbalanced_calls": 16,
+      "canary_replay_calls": 4,
+      "field_level_accuracies": {
+        "subject_span": 1.0,
+        "predicate_span": 0.9807692307692307,
+        "object_span": 1.0,
+        "t_valid_start": 1.0,
+        "t_valid_end": 0.5769230769230769,
+        "candidate_entity_match": 1.0
+      },
+      "canary_determinism": {
+        "raw_string_exact_matches": "3 / 4 (75.0%)",
+        "semantic_field_exact_matches": "4 / 4 (100.0%)"
+      },
+      "counterbalancing_slot_distribution": {
+        "slot_0": 4,
+        "slot_1": 4,
+        "slot_2": 4,
+        "slot_3": 4,
+        "positional_entropy": 1.0,
+        "is_positionally_invariant": true
+      },
+      "downstream_probe_metrics": {
+        "overall_probe_pass_rate": 1.0,
+        "fdar_global": 0.0,
+        "runtime_autoimmunity_rate": 0.0,
+        "candidate_preservation_fidelity": 1.0,
+        "authority_gating_fidelity": 1.0
       },
       "status": "COMPLETED_AND_FROZEN"
     }

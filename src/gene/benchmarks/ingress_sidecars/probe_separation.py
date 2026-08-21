@@ -112,7 +112,7 @@ def run_probe_separation_assay() -> dict[str, Any]:
     active3 = len(e3.bitemporal_engine.get_active_facts(5.0, 2)) > 0
     entitled3 = why3["is_entitled"]
     auth3 = (why3["bounded_authority"] == 1.0 and any("ROOT_NET_1" in "".join(s) for s in why3["lineage_sets_S_L_t"]))
-    what_if3 = e3.bitemporal_engine.what_if_source_t("sensor_trusted_a", target_triple, 5.0, 2)
+    what_if3 = e3.bitemporal_engine.what_if_source_t("unrelated_source", target_triple, 5.0, 2)
     survives3 = what_if3["hypothetical_entitled"]
 
     raw3 = (1 if active3 else 0, 1 if entitled3 else 0, 1 if auth3 else 0, 1 if survives3 else 0)

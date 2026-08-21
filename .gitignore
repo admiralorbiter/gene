@@ -58,6 +58,9 @@ data/*
 !data/exploration_round6_stage6c_raw_calls.jsonl
 !data/exploration_round7_stage7a_benchmark_summary.json
 !data/exploration_round7_stage7a_security_summary.json
+!data/exploration_round7_stage7b_summary.json
+!data/exploration_round7_stage7b_raw_calls.jsonl
+!runs/exploration_round7_stage7b_results.db
 
 # IDEs and Editors
 .vscode/
