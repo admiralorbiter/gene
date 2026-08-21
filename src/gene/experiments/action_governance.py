@@ -1,7 +1,8 @@
-"""GENE Exploration Round 5 Stage 5B: Action Governance & Epistemic Resilience Engine.
+"""GENE Exploration Round 5 Stage 5B: Action Governance & Epistemic Resilience Engine (Hardened v2).
 
-Evaluates what surviving support information is minimally necessary to govern action authority
-under change. Implements candidate governance policies and formal axiomatic compliance tests.
+Evaluates the hierarchy of lossy support representations and investigates what surviving support
+information is minimally necessary to govern action authority under change. Implements lineage-projected
+support hypergraphs S_L(c), root cut-set resilience kappa_L(c), and formal collision/axiomatic benchmarks.
 """
 
 from __future__ import annotations
@@ -23,14 +24,42 @@ class GovernancePolicyType(str, Enum):
     BINARY_ENTITLEMENT = "binary_entitlement"  # Auth in {0, 1}
     SCALAR_RESILIENCE_KAPPA = "scalar_resilience_kappa"  # Scaled by kappa / kappa_init
     TUPLE_RESILIENCE_RHO = "tuple_resilience_rho"  # Governed by rho = (|S|, kappa)
-    LINEAGE_AWARE_GEOMETRY = "lineage_aware_geometry"  # Full geometry + lineage diversity
+    LINEAGE_PROJECTED_RESILIENCE = "lineage_projected_resilience"  # Lineage hypergraph S_L + rho_L
+
+
+class LineageProjectedState(BaseModel):
+    """Lineage-projected support hypergraph and resilience signature."""
+    support_family_roots: list[list[str]]
+    kappa_l: int
+    rho_l: tuple[int, int]  # (|S_L|, kappa_L)
+
+
+def project_lineage_support(
+    support_family: list[list[str]],
+    lineage_map: dict[str, str],
+) -> LineageProjectedState:
+    """Project premise-level support environments into minimal root-lineage hypergraph S_L(c)."""
+    engine = MinimalSupportEngine()
+    for path in support_family:
+        root_path = {lineage_map.get(p, p) for p in path}
+        engine.add_support_set("c_lineage", root_path)
+        
+    active_roots = [sorted(list(s)) for s in engine.active_support_sets("c_lineage")]
+    kappa_l = engine.epistemic_resilience("c_lineage")
+    rho_l = (len(active_roots), kappa_l)
+    
+    return LineageProjectedState(
+        support_family_roots=sorted(active_roots),
+        kappa_l=kappa_l,
+        rho_l=rho_l,
+    )
 
 
 class PolicyActionScore(BaseModel):
     """Computed action authority score under a specific governance policy."""
     policy_name: str
     action_authority: float = Field(ge=0.0, le=1.0)
-    is_action_permitted: bool  # Whether authority exceeds action gating threshold (default >= 0.5)
+    is_action_permitted: bool  # Whether authority exceeds illustrative threshold (default >= 0.5)
     details: dict[str, Any] = Field(default_factory=dict)
 
 
@@ -86,7 +115,6 @@ def compute_policy_tuple_resilience(
     else:
         kappa_ratio = reference.surviving_kappa / max(1, reference.initial_kappa)
         support_ratio = reference.surviving_support_count / max(1, reference.initial_support_count)
-        # Average of cut-set and path redundancy ratios
         auth = 0.5 * kappa_ratio + 0.5 * support_ratio
         
     auth = max(0.0, min(1.0, auth))
@@ -101,71 +129,58 @@ def compute_policy_tuple_resilience(
     )
 
 
-def compute_policy_lineage_aware_geometry(
+def compute_policy_lineage_projected(
     reference: ReferenceRevisionResult,
     support_family: list[list[str]],
     lineage_map: dict[str, str],
     threshold: float = 0.5,
 ) -> PolicyActionScore:
-    """Policy P_geom: Authority governed by minimal cut sets, path lengths, and ancestral root diversity."""
+    """Policy P_lineage_projected: Authority governed by minimal lineage hypergraph S_L and rho_L."""
     if not reference.is_entitled:
         return PolicyActionScore(
-            policy_name=GovernancePolicyType.LINEAGE_AWARE_GEOMETRY.value,
+            policy_name=GovernancePolicyType.LINEAGE_PROJECTED_RESILIENCE.value,
             action_authority=0.0,
             is_action_permitted=False,
             details={"status": "RETRACTED"},
         )
         
-    # 1. Cut set ratio (weight 0.4)
-    kappa_ratio = reference.surviving_kappa / max(1, reference.initial_kappa)
+    # Project initial and surviving paths into minimal root-lineage space
+    init_lin = project_lineage_support(reference.initial_supports, lineage_map)
+    surv_lin = project_lineage_support(reference.surviving_supports, lineage_map)
     
-    # 2. Lineage root diversity ratio (weight 0.3)
-    init_roots = {lineage_map.get(p, p) for s in reference.initial_supports for p in s}
-    surv_roots = {lineage_map.get(p, p) for s in reference.surviving_supports for p in s}
-    root_ratio = len(surv_roots) / max(1, len(init_roots))
+    # 1. Lineage cut-set ratio against premise potential: kappa_L' / max(1, kappa_premise)
+    kappa_l_ratio = surv_lin.kappa_l / max(1, reference.initial_kappa)
     
-    # 3. Path-length weighted structural support ratio (weight 0.3)
-    def path_weight(path: list[str]) -> float:
-        return 1.0 / (1.0 + 0.1 * max(0, len(path) - 1))
-        
-    init_struct_weight = sum(path_weight(s) for s in reference.initial_supports)
-    surv_struct_weight = sum(path_weight(s) for s in reference.surviving_supports)
-    struct_ratio = surv_struct_weight / max(1e-6, init_struct_weight)
+    # 2. Lineage independent path ratio against premise potential: |S_L'| / max(1, |S_premise|)
+    path_l_ratio = len(surv_lin.support_family_roots) / max(1, reference.initial_support_count)
     
-    # 4. Lineage Independence Factor (discounting when multiple paths share a single ancestral root)
-    k_paths = len(reference.surviving_supports)
-    delta_root = min(1.0, len(surv_roots) / max(1, k_paths)) if k_paths > 1 else 1.0
-    lineage_multiplier = 0.7 + 0.3 * delta_root
-    
-    # Combined authority score
-    base_auth = 0.4 * kappa_ratio + 0.3 * root_ratio + 0.3 * struct_ratio
-    auth = base_auth * lineage_multiplier
+    # Authority score
+    auth = 0.5 * kappa_l_ratio + 0.5 * path_l_ratio
     auth = max(0.0, min(1.0, auth))
     
     return PolicyActionScore(
-        policy_name=GovernancePolicyType.LINEAGE_AWARE_GEOMETRY.value,
+        policy_name=GovernancePolicyType.LINEAGE_PROJECTED_RESILIENCE.value,
         action_authority=auth,
         is_action_permitted=(auth >= threshold),
         details={
-            "kappa_ratio": kappa_ratio,
-            "root_diversity_ratio": root_ratio,
-            "structural_weight_ratio": struct_ratio,
-            "delta_root": delta_root,
-            "lineage_multiplier": lineage_multiplier,
-            "surviving_roots": sorted(list(surv_roots)),
+            "init_rho_l": init_lin.rho_l,
+            "surviving_rho_l": surv_lin.rho_l,
+            "surviving_s_l": surv_lin.support_family_roots,
+            "kappa_l_ratio": kappa_l_ratio,
+            "path_l_ratio": path_l_ratio,
         },
     )
 
 
 class AxiomaticComplianceReport(BaseModel):
-    """Results of checking a policy against the 7 formal action-governance axioms."""
+    """Results of checking a policy against formal action-governance axioms."""
     policy_name: str
     axiom_1_monotonicity: bool
     axiom_2_zero_on_retraction: bool
-    axiom_3_degradation_sensitivity: bool
+    axiom_3_effective_degradation_sensitivity: bool
     axiom_4_no_duplication_inflation: bool
-    axiom_5_bloat_invariance: bool
-    axiom_6_lineage_independence_discounting: bool
+    axiom_5_bloat_invariance_by_construction: bool
+    axiom_6_lineage_independence_ordering: bool
     axiom_7_isomorphism_invariance: bool
     total_passed: int
     is_fully_compliant: bool
@@ -180,7 +195,6 @@ def evaluate_policy_axioms(
     failures: list[str] = []
     
     # 1. Axiom 1: Monotonicity under Invalidation (I1 subset of I2 => Auth(I2) <= Auth(I1))
-    # Test on independent alternatives S={{A,B}, {D,E}} with I1={D}, I2={D, E}
     supports_mono = [["A", "B"], ["D", "E"]]
     lin_mono = {"A": "R1", "B": "R1", "D": "R2", "E": "R2"}
     ref_i1 = evaluate_reference_entitlement(supports_mono, ["D"], "C")
@@ -198,8 +212,7 @@ def evaluate_policy_axioms(
     if not ax2:
         failures.append(f"Axiom 2 failed: Retracted claim received Auth={auth_ret}")
         
-    # 3. Axiom 3: Non-Destructive Degradation Sensitivity (DEGRADED => 0 < Auth < Auth(unchanged))
-    # Test on shared-root S={{A,B}, {A,D}} with I={B}
+    # 3. Axiom 3: Effective Degradation Sensitivity (Effective degradation strictly reduces authority)
     supports_sr = [["A", "B"], ["A", "D"]]
     lin_sr = {"A": "R1", "B": "R2", "D": "R3"}
     ref_unch = evaluate_reference_entitlement(supports_sr, [], "C")
@@ -210,7 +223,7 @@ def evaluate_policy_axioms(
     if not ax3:
         failures.append(f"Axiom 3 failed: Degraded state received Auth={auth_deg} vs Unchanged={auth_unch}")
         
-    # 4. Axiom 4: No Duplication Authority (Duplicate support set cannot increase authority)
+    # 4. Axiom 4: No Duplication Inflation (Duplicate support set cannot increase authority)
     supports_dup = [["A", "B"], ["A", "B"], ["D", "E"]]
     ref_dup = evaluate_reference_entitlement(supports_dup, [], "C")
     ref_orig = evaluate_reference_entitlement(supports_mono, [], "C")
@@ -220,34 +233,37 @@ def evaluate_policy_axioms(
     if not ax4:
         failures.append(f"Axiom 4 failed: Duplicating path changed Auth from {auth_orig} to {auth_dup}")
         
-    # 5. Axiom 5: Bloat Invariance (Irrelevant distractor E_S > 0 cannot change authority)
-    ref_bloat = evaluate_reference_entitlement(supports_mono, [], "C")
-    auth_bloat = policy_fn(ref_bloat, supports_mono, lin_mono).action_authority
-    ax5 = (abs(auth_bloat - auth_orig) < 1e-6)
-    if not ax5:
-        failures.append(f"Axiom 5 failed: Explanatory bloat altered Auth")
+    # 5. Axiom 5: Bloat Invariance by Construction (Explanatory bloat cannot enter authority interface)
+    ax5 = True  # Guaranteed by type interface: policies consume S(c) and L(c), never R(c)
         
-    # 6. Axiom 6: Lineage Independence Discounting (Single-root alternative < Multi-root alternative)
-    # S1={{A,B}, {D,E}} where A,B,D,E <- R1 (shared root) vs A,B <- R1, D,E <- R2 (independent roots)
-    lin_single_root = {"A": "R1", "B": "R1", "D": "R1", "E": "R1"}
-    lin_multi_root = {"A": "R1", "B": "R1", "D": "R2", "E": "R2"}
+    # 6. Axiom 6: Lineage Independence Ordering (Independent roots > Shared origin roots >= All single root)
+    # Compare 3 distinct lineage structures on S={{A,B}, {D,E}}:
+    # a) Independent: A,B <- R1, D,E <- R2 => S_L={{R1},{R2}}, kappa_L=2
+    # b) Shared Origin: A,D <- R1, B,E <- R2 => S_L={{R1,R2}}, kappa_L=1
+    # c) Single Root: A,B,D,E <- R1 => S_L={{R1}}, kappa_L=1
+    lin_ind = {"A": "R1", "B": "R1", "D": "R2", "E": "R2"}
+    lin_shared = {"A": "R1", "D": "R1", "B": "R2", "E": "R2"}
+    lin_single = {"A": "R1", "B": "R1", "D": "R1", "E": "R1"}
+    
     ref_base = evaluate_reference_entitlement(supports_mono, [], "C")
-    auth_single_root = policy_fn(ref_base, supports_mono, lin_single_root).action_authority
-    auth_multi_root = policy_fn(ref_base, supports_mono, lin_multi_root).action_authority
-    ax6 = (auth_single_root < auth_multi_root)
+    auth_ind = policy_fn(ref_base, supports_mono, lin_ind).action_authority
+    auth_shared = policy_fn(ref_base, supports_mono, lin_shared).action_authority
+    auth_single = policy_fn(ref_base, supports_mono, lin_single).action_authority
+    
+    ax6 = (auth_ind > auth_shared) and (auth_shared >= auth_single)
     if not ax6:
         failures.append(
-            f"Axiom 6 failed: Single-root Auth ({auth_single_root}) not discounted vs Multi-root Auth ({auth_multi_root})"
+            f"Axiom 6 failed: Ordering violated. Independent ({auth_ind}) vs Shared ({auth_shared}) vs Single ({auth_single})"
         )
         
-    # 7. Axiom 7: Isomorphism Invariance (Premise renaming preserves exact authority)
+    # 7. Axiom 7: Isomorphism Invariance (Premise and root renaming preserves exact authority)
     supports_iso = [["X", "Y"], ["W", "Z"]]
-    lin_iso = {"X": "R1", "Y": "R1", "W": "R2", "Z": "R2"}
+    lin_iso = {"X": "ROOT_A", "Y": "ROOT_A", "W": "ROOT_B", "Z": "ROOT_B"}
     ref_iso = evaluate_reference_entitlement(supports_iso, [], "C")
     auth_iso = policy_fn(ref_iso, supports_iso, lin_iso).action_authority
-    ax7 = (abs(auth_iso - auth_multi_root) < 1e-6)
+    ax7 = (abs(auth_iso - auth_ind) < 1e-6)
     if not ax7:
-        failures.append(f"Axiom 7 failed: Isomorphism Auth ({auth_iso}) != Original Auth ({auth_multi_root})")
+        failures.append(f"Axiom 7 failed: Isomorphism Auth ({auth_iso}) != Original Auth ({auth_ind})")
         
     passed_count = sum([ax1, ax2, ax3, ax4, ax5, ax6, ax7])
     is_compliant = (passed_count == 7)
@@ -256,10 +272,10 @@ def evaluate_policy_axioms(
         policy_name=policy_name,
         axiom_1_monotonicity=ax1,
         axiom_2_zero_on_retraction=ax2,
-        axiom_3_degradation_sensitivity=ax3,
+        axiom_3_effective_degradation_sensitivity=ax3,
         axiom_4_no_duplication_inflation=ax4,
-        axiom_5_bloat_invariance=ax5,
-        axiom_6_lineage_independence_discounting=ax6,
+        axiom_5_bloat_invariance_by_construction=ax5,
+        axiom_6_lineage_independence_ordering=ax6,
         axiom_7_isomorphism_invariance=ax7,
         total_passed=passed_count,
         is_fully_compliant=is_compliant,

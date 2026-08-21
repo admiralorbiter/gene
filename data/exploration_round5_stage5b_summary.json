@@ -1,5 +1,5 @@
 {
-  "experiment": "GENE Exploration Round 5 Stage 5B: Action Governance & Epistemic Resilience Assay",
+  "experiment": "GENE Exploration Round 5 Stage 5B: Action Governance & Epistemic Resilience Assay (Hardened v2)",
   "evidence_class": "deterministic_zero_live_llm",
   "total_cases": 368,
   "oracle_breakdown": {
@@ -14,85 +14,125 @@
       "policy_name": "binary_entitlement",
       "axiom_1_monotonicity": true,
       "axiom_2_zero_on_retraction": true,
-      "axiom_3_degradation_sensitivity": false,
+      "axiom_3_effective_degradation_sensitivity": false,
       "axiom_4_no_duplication_inflation": true,
-      "axiom_5_bloat_invariance": true,
-      "axiom_6_lineage_independence_discounting": false,
+      "axiom_5_bloat_invariance_by_construction": true,
+      "axiom_6_lineage_independence_ordering": false,
       "axiom_7_isomorphism_invariance": true,
       "total_passed": 5,
       "is_fully_compliant": false,
       "failure_reasons": [
         "Axiom 3 failed: Degraded state received Auth=1.0 vs Unchanged=1.0",
-        "Axiom 6 failed: Single-root Auth (1.0) not discounted vs Multi-root Auth (1.0)"
+        "Axiom 6 failed: Ordering violated. Independent (1.0) vs Shared (1.0) vs Single (1.0)"
       ]
     },
     "scalar_resilience_kappa": {
       "policy_name": "scalar_resilience_kappa",
       "axiom_1_monotonicity": true,
       "axiom_2_zero_on_retraction": true,
-      "axiom_3_degradation_sensitivity": false,
+      "axiom_3_effective_degradation_sensitivity": false,
       "axiom_4_no_duplication_inflation": true,
-      "axiom_5_bloat_invariance": true,
-      "axiom_6_lineage_independence_discounting": false,
+      "axiom_5_bloat_invariance_by_construction": true,
+      "axiom_6_lineage_independence_ordering": false,
       "axiom_7_isomorphism_invariance": true,
       "total_passed": 5,
       "is_fully_compliant": false,
       "failure_reasons": [
         "Axiom 3 failed: Degraded state received Auth=1.0 vs Unchanged=1.0",
-        "Axiom 6 failed: Single-root Auth (1.0) not discounted vs Multi-root Auth (1.0)"
+        "Axiom 6 failed: Ordering violated. Independent (1.0) vs Shared (1.0) vs Single (1.0)"
       ]
     },
     "tuple_resilience_rho": {
       "policy_name": "tuple_resilience_rho",
       "axiom_1_monotonicity": true,
       "axiom_2_zero_on_retraction": true,
-      "axiom_3_degradation_sensitivity": true,
+      "axiom_3_effective_degradation_sensitivity": true,
       "axiom_4_no_duplication_inflation": true,
-      "axiom_5_bloat_invariance": true,
-      "axiom_6_lineage_independence_discounting": false,
+      "axiom_5_bloat_invariance_by_construction": true,
+      "axiom_6_lineage_independence_ordering": false,
       "axiom_7_isomorphism_invariance": true,
       "total_passed": 6,
       "is_fully_compliant": false,
       "failure_reasons": [
-        "Axiom 6 failed: Single-root Auth (1.0) not discounted vs Multi-root Auth (1.0)"
+        "Axiom 6 failed: Ordering violated. Independent (1.0) vs Shared (1.0) vs Single (1.0)"
       ]
     },
-    "lineage_aware_geometry": {
-      "policy_name": "lineage_aware_geometry",
+    "lineage_projected_resilience": {
+      "policy_name": "lineage_projected_resilience",
       "axiom_1_monotonicity": true,
       "axiom_2_zero_on_retraction": true,
-      "axiom_3_degradation_sensitivity": true,
+      "axiom_3_effective_degradation_sensitivity": true,
       "axiom_4_no_duplication_inflation": true,
-      "axiom_5_bloat_invariance": true,
-      "axiom_6_lineage_independence_discounting": true,
+      "axiom_5_bloat_invariance_by_construction": true,
+      "axiom_6_lineage_independence_ordering": true,
       "axiom_7_isomorphism_invariance": true,
       "total_passed": 7,
       "is_fully_compliant": true,
       "failure_reasons": []
     }
   },
-  "degraded_action_gating": {
-    "binary_entitlement": {
-      "degraded_action_permitted_count": 104,
-      "degraded_action_permitted_rate": 1.0,
-      "mean_degraded_authority": 1.0
+  "mean_degraded_authority": {
+    "binary_entitlement": 1.0,
+    "scalar_resilience_kappa": 0.5384615384615384,
+    "tuple_resilience_rho": 0.4807692307692308,
+    "lineage_projected_resilience": 0.47756410256410253
+  },
+  "operating_threshold_sweep": {
+    "tau_0.2": {
+      "binary_entitlement": {
+        "permitted_count": 104,
+        "permitted_rate": 1.0
+      },
+      "scalar_resilience_kappa": {
+        "permitted_count": 104,
+        "permitted_rate": 1.0
+      },
+      "tuple_resilience_rho": {
+        "permitted_count": 104,
+        "permitted_rate": 1.0
+      },
+      "lineage_projected_resilience": {
+        "permitted_count": 104,
+        "permitted_rate": 1.0
+      }
     },
-    "scalar_resilience_kappa": {
-      "degraded_action_permitted_count": 104,
-      "degraded_action_permitted_rate": 1.0,
-      "mean_degraded_authority": 0.5384615384615384
+    "tau_0.5": {
+      "binary_entitlement": {
+        "permitted_count": 104,
+        "permitted_rate": 1.0
+      },
+      "scalar_resilience_kappa": {
+        "permitted_count": 104,
+        "permitted_rate": 1.0
+      },
+      "tuple_resilience_rho": {
+        "permitted_count": 44,
+        "permitted_rate": 0.4230769230769231
+      },
+      "lineage_projected_resilience": {
+        "permitted_count": 42,
+        "permitted_rate": 0.40384615384615385
+      }
     },
-    "tuple_resilience_rho": {
-      "degraded_action_permitted_count": 44,
-      "degraded_action_permitted_rate": 0.4230769230769231,
-      "mean_degraded_authority": 0.4807692307692308
-    },
-    "lineage_aware_geometry": {
-      "degraded_action_permitted_count": 94,
-      "degraded_action_permitted_rate": 0.9038461538461539,
-      "mean_degraded_authority": 0.5788461538461539
+    "tau_0.8": {
+      "binary_entitlement": {
+        "permitted_count": 104,
+        "permitted_rate": 1.0
+      },
+      "scalar_resilience_kappa": {
+        "permitted_count": 8,
+        "permitted_rate": 0.07692307692307693
+      },
+      "tuple_resilience_rho": {
+        "permitted_count": 0,
+        "permitted_rate": 0.0
+      },
+      "lineage_projected_resilience": {
+        "permitted_count": 0,
+        "permitted_rate": 0.0
+      }
     }
   },
   "case_ledger_path": "data\\exploration_round5_stage5b_cases.jsonl",
-  "case_ledger_sha256": "12701a7ca30437e7ff700751e87e16f6e2891d6787a98aff10d63999bf4a8cc8"
+  "case_ledger_sha256": "1ada9c3b29eeb4fa32f6440bec1cfa31622fd4438f1326c806822dea056bf9da"
 }

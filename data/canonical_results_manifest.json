@@ -1,7 +1,7 @@
 {
   "manifest_version": "1.0.0",
   "project": "GENE (Genealogical Epistemic Network Experiments)",
-  "generated_at": "2026-08-21T02:09:10.079903+00:00",
+  "generated_at": "2026-08-21T02:25:21.510791+00:00",
   "canonical_experiments": {
     "exp0": {
       "experiment": "Experiment 0 (Lineage Observability & Factorial Calibration)",

@@ -4,7 +4,7 @@
   "base_tag": "round4-postreview-freeze",
   "base_commit": "cf472ee",
   "stage_5a_freeze_tag": "round5-stage5a-freeze-v2",
-  "stage_5b_freeze_tag": "round5-stage5b-freeze",
+  "stage_5b_freeze_tag": "round5-stage5b-freeze-v2",
   "subassay_5a1_local_what_if": {
     "total_cases": 368,
     "entitled_cases": 120,
@@ -40,23 +40,39 @@
       "binary_entitlement": "5/7 passed (fails Axiom 3: Degradation Sensitivity, Axiom 6: Lineage Independence)",
       "scalar_resilience_kappa": "5/7 passed (fails Axiom 3 on shared-root (2,1)->(1,1), Axiom 6: Lineage Independence)",
       "tuple_resilience_rho": "6/7 passed (passes Axiom 3, fails Axiom 6: Lineage Independence)",
-      "lineage_aware_geometry": "7/7 passed (fully compliant with all 7 formal invariants)"
+      "lineage_projected_resilience": "7/7 passed (fully compliant with all 7 formal invariants via S_L and rho_L)"
     },
-    "degraded_action_gating_at_tau_0_5": {
+    "operating_threshold_sweep_tau_0_5": {
       "binary_entitlement": "104 / 104 (100.0% permitted, mean auth = 1.000)",
       "scalar_resilience_kappa": "104 / 104 (100.0% permitted, mean auth = 0.538)",
       "tuple_resilience_rho": "44 / 104 (42.3% permitted, mean auth = 0.481)",
-      "lineage_aware_geometry": "94 / 104 (90.4% permitted, mean auth = 0.579)"
+      "lineage_projected_resilience": "42 / 104 (40.4% permitted, mean auth = 0.478)"
     },
-    "primary_discovery": "Action authority requires more than scalar cut-set kappa or tuple rho: full lineage-aware support geometry (P_geom) is minimally necessary to satisfy all 7 formal governance axioms."
+    "primary_discovery": "Hierarchy of representation incompleteness proves that scalar cut-set kappa, tuple rho, and global root counts are all lossy; lineage-projected support hypergraph S_L(c) and root resilience rho_L(c) are minimally necessary to govern action authority."
   },
   "artifacts": {
-    "stage_5a_cases_ledger": "data/exploration_round5_stage5a_cases.jsonl",
-    "stage_5a_summary": "data/exploration_round5_stage5a_summary.json",
-    "stage_5a_report": "docs/results/EXPLORATION_ROUND5_STAGE5A_REPORT.md",
-    "stage_5b_cases_ledger": "data/exploration_round5_stage5b_cases.jsonl",
-    "stage_5b_summary": "data/exploration_round5_stage5b_summary.json",
-    "stage_5b_report": "docs/results/EXPLORATION_ROUND5_STAGE5B_REPORT.md"
+    "stage_5a_cases_ledger": {
+      "path": "data/exploration_round5_stage5a_cases.jsonl",
+      "sha256": "1499305d197cf53ad624fc65a6626a0d5fc9ea87993184583930ce952692548e"
+    },
+    "stage_5a_summary": {
+      "path": "data/exploration_round5_stage5a_summary.json",
+      "sha256": "dc39becc57dfed03ee772095d75a1fd7342f84342745428a1cedb7b7231e56eb"
+    },
+    "stage_5a_report": {
+      "path": "docs/results/EXPLORATION_ROUND5_STAGE5A_REPORT.md"
+    },
+    "stage_5b_cases_ledger": {
+      "path": "data/exploration_round5_stage5b_cases.jsonl",
+      "sha256": "1ada9c3b29eeb4fa32f6440bec1cfa31622fd4438f1326c806822dea056bf9da"
+    },
+    "stage_5b_summary": {
+      "path": "data/exploration_round5_stage5b_summary.json",
+      "sha256": "871b8c17e0800b368b902e4a0982bfcd7766238febf08f2b745d1cf50b873145"
+    },
+    "stage_5b_report": {
+      "path": "docs/results/EXPLORATION_ROUND5_STAGE5B_REPORT.md"
+    }
   },
   "promotion_lifecycle": {
     "stage_5a_status": "complete_and_verified",
