@@ -298,24 +298,25 @@
     {
       "claim_id": "GENE-C12",
       "claim_status": "observed",
-      "headline": "Support-First Epistemic Runtime Rescues Neural Revision and Enables Risk-Calibrated Action Gating",
-      "claim_text": "In a 32-call live Gemma 3:12B assay across 4 structural micro-worlds, naive reported-dependency tracking over acquisition citations R(c) suffered 100% false retractions (0/4) on degraded states due to explanatory bloat. Compiling the minimal first-order entitling support family S_F(c) restored 100% entitlement retention (4/4) and 100% clean abstention (4/4). Lineage-projected authority Auth(S_L) successfully executed dual-layer containment: preserving belief entitlement while blocking operationally unsafe actions when root environments were degraded.",
+      "headline": "Support-First Compilation Improves Live Neural Revision Under Partial Invalidation",
+      "claim_text": "In a preregistered 32-call Gemma 3:12B mechanism assay across four structural worlds, raw neural revision retained 2/4 damaged-but-entitled claims, while the support-first GENE runtime retained 4/4 and abstained on 4/4 completely severed states. Acquisition self-reports exhibited overcomplete, undercomplete, and single-witness support representations. A naïve flat policy over acquisition R(c) triggered retraction in 3/4 degraded worlds and introduced two additional false retractions beyond the neural baseline; the combined naïve runtime retained 0/4. In one degraded recombinant world, GENE preserved belief entitlement while the preregistered lineage-authority gate blocked the proposed external action.",
       "evidence_sources": [
         {
           "experiment": "Exploration Round 5 Stage 5C (Neural Revision Bridge)",
           "evidence_class": "live_neural_assay",
           "artifact": "data/exploration_round5_stage5c_summary.json",
-          "artifact_sha256": "2d8fe5637889e4de5c59a6a2c90e0f4279168f8897641249c923cda7cb11172c",
-          "execution_commit": "round5-stage5c-runner-freeze",
+          "artifact_sha256": "568a0135941316019b7885dc482dade4843e73b985a2125fd28025a24a66be1e",
+          "execution_commit": "4203e91c70a0eead8c36def4a7dcfcab53fd584b",
+          "results_commit": "round5-stage5c-postreview-freeze",
           "model": "gemma3:12b (Ollama digest: f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a)",
           "n_calls": 32,
           "n_evaluations": 32,
           "unit_of_analysis": "call",
           "formal_report": "docs/results/EXPLORATION_ROUND5_STAGE5C_REPORT.md",
-          "primary_metric": "Overall Entitlement: Arm 1 (Raw Neural) 75.0% (6/8), Arm 2 (Naïve Reported) 50.0% (4/8, 0/4 degraded), Arm 3 (GENE Kernel) 100.0% (8/8); Action Gating: 100% calibrated"
+          "primary_metric": "Overall Entitlement: Arm 1 (Raw Neural) 75.0% (6/8), Arm 2 (Naïve Reported) 50.0% (4/8, 0/4 degraded), Arm 3 (GENE Kernel) 100.0% (8/8); Failure Channels: Policy-Only 2/4, Neural-Only 1/4, Both 1/4; Action Gating: Preregistered Lineage Enforced"
         }
       ],
-      "scope_limitations": "Evaluated across 4 canonical structural micro-worlds on Gemma 3:12B under greedy decoding.",
+      "scope_limitations": "Bounded direct rule-antecedent enumeration over shallow Horn worlds evaluated on Gemma 3:12B under greedy decoding.",
       "replication_status": "same_model_verified"
     }
   ]

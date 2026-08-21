@@ -129,30 +129,48 @@ def test_claim_ledger_multi_source_integrity():
                 assert res.returncode == 0, f"Commit reference '{commit_ref}' in {claim['claim_id']} does not resolve in Git!"
                 resolved_sha = res.stdout.strip()
 
-                # If artifact is tracked in git at execution_commit, verify exact blob binding
-                art_git_path = src["artifact"].replace("\\", "/")
-                res_show = subprocess.run(
-                    ["git", "show", f"{resolved_sha}:{art_git_path}"],
-                    cwd=root_dir,
-                    capture_output=True,
-                )
-                if res_show.returncode == 0:
-                    blob_raw = res_show.stdout
-                    blob_lf = blob_raw.replace(b"\r\n", b"\n")
-                    blob_crlf = blob_lf.replace(b"\n", b"\r\n")
-                    expected_sha = src["artifact_sha256"].lower()
-                    
-                    raw_sha = hashlib.sha256(blob_raw).hexdigest()
-                    lf_sha = hashlib.sha256(blob_lf).hexdigest()
-                    crlf_sha = hashlib.sha256(blob_crlf).hexdigest()
-                    
-                    matched = expected_sha in [raw_sha, lf_sha, crlf_sha]
-                    assert matched, (
-                        f"Git commit binding mismatch for {claim['claim_id']} ({src['artifact']} at {commit_ref} / {resolved_sha}): "
-                        f"expected {expected_sha}, git show produced (raw={raw_sha}, lf={lf_sha}, crlf={crlf_sha})"
+                # If results_commit is provided, resolve and verify results tree binding
+                binding_ref = src.get("results_commit", commit_ref)
+                if binding_ref and not binding_ref.startswith("deterministic"):
+                    res_b = subprocess.run(
+                        ["git", "rev-parse", f"{binding_ref}^{{commit}}"],
+                        cwd=root_dir,
+                        capture_output=True,
+                        text=True,
                     )
+                    # If results tag/ref exists, check blob binding
+                    if res_b.returncode == 0:
+                        resolved_b_sha = res_b.stdout.strip()
+                        art_git_path = src["artifact"].replace("\\", "/")
+                        res_show = subprocess.run(
+                            ["git", "show", f"{resolved_b_sha}:{art_git_path}"],
+                            cwd=root_dir,
+                            capture_output=True,
+                        )
+                        if res_show.returncode == 0:
+                            blob_raw = res_show.stdout
+                            blob_lf = blob_raw.replace(b"\r\n", b"\n")
+                            blob_crlf = blob_lf.replace(b"\n", b"\r\n")
+                            expected_sha = src["artifact_sha256"].lower()
+                            
+                            raw_sha = hashlib.sha256(blob_raw).hexdigest()
+                            lf_sha = hashlib.sha256(blob_lf).hexdigest()
+                            crlf_sha = hashlib.sha256(blob_crlf).hexdigest()
+                            
+                            matched = expected_sha in [raw_sha, lf_sha, crlf_sha]
+                            assert matched, (
+                                f"Git commit binding mismatch for {claim['claim_id']} ({src['artifact']} at {binding_ref} / {resolved_b_sha}): "
+                                f"expected {expected_sha}, git show produced (raw={raw_sha}, lf={lf_sha}, crlf={crlf_sha})"
+                            )
 
-            # If artifact is a .db file, verify it exists on disk and checksum matches
+            # Check disk checksum if file exists on disk
+            art_disk_path = root_dir / src["artifact"]
+            if art_disk_path.exists():
+                actual_disk_sha = compute_sha256(art_disk_path)
+                assert actual_disk_sha.lower() == src["artifact_sha256"].lower(), (
+                    f"Disk checksum mismatch for {claim['claim_id']} ({src['artifact']}): "
+                    f"expected {src['artifact_sha256']}, got {actual_disk_sha}"
+                )
             if src["artifact"].endswith(".db"):
                 db_path = root_dir / src["artifact"]
                 assert db_path.exists(), f"Database {src['artifact']} for claim {claim['claim_id']} does not exist"

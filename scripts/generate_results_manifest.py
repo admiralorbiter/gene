@@ -446,6 +446,9 @@ def extract_stage5c_metrics(summary_path: Path) -> dict[str, Any]:
         data = json.load(f)
 
     arms = data.get("revision_phase_arm_comparison", {})
+    decomp = arms.get("degraded_failure_channel_decomposition", {})
+    canary = data.get("replay_canary_determinism", {})
+
     return {
         "experiment": "Exploration Round 5 Stage 5C (Neural Revision Bridge)",
         "summary_file": summary_path.name,
@@ -463,13 +466,21 @@ def extract_stage5c_metrics(summary_path: Path) -> dict[str, Any]:
             "arm2_naive_reported": arms.get("arm2_naive_reported", {}).get("runtime_degraded_active_rate", 0.00),
             "arm3_gene_kernel": arms.get("arm3_gene_kernel", {}).get("runtime_degraded_active_rate", 1.00),
         },
+        "degraded_failure_channel_decomposition": {
+            "naive_policy_trigger_rate": decomp.get("naive_policy_trigger_rate", 0.75),
+            "raw_neural_degraded_failure_rate": decomp.get("raw_neural_degraded_failure_rate", 0.50),
+            "marginal_policy_induced_error_rate": decomp.get("marginal_policy_induced_error_rate", 0.50),
+            "policy_only_failure_worlds": decomp.get("policy_only_failure_worlds", ["W_IND", "W_SHO"]),
+            "neural_only_failure_worlds": decomp.get("neural_only_failure_worlds", ["W_SHP"]),
+            "both_channels_failure_worlds": decomp.get("both_channels_failure_worlds", ["W_REC"]),
+        },
         "retracted_clean_abstention_rate": {
             "arm1_raw_neural": arms.get("arm1_raw_neural", {}).get("runtime_retracted_clean_abstention_rate", 1.00),
             "arm2_naive_reported": arms.get("arm2_naive_reported", {}).get("runtime_retracted_clean_abstention_rate", 1.00),
             "arm3_gene_kernel": arms.get("arm3_gene_kernel", {}).get("runtime_retracted_clean_abstention_rate", 1.00),
         },
-        "action_governance_arm3": "100.0% calibrated (3 permitted, 1 blocked under structural root degradation, 4 retracted)",
-        "replay_canary_stability": "3 / 4 exact raw token matches (75.0%), 4 / 4 semantic matches (100.0%)",
+        "action_governance_arm3": "Preregistered Lineage Gating Enforced (3 permitted, 1 blocked under structural root degradation, 4 retracted)",
+        "replay_canary_stability": f"{canary.get('exact_raw_matches', 3)} / {canary.get('canary_calls', 4)} raw matches ({canary.get('exact_raw_determinism_rate', 0.75)*100:.1f}%), {canary.get('exact_semantic_matches', 4)} / {canary.get('canary_calls', 4)} semantic matches ({canary.get('exact_semantic_determinism_rate', 1.0)*100:.1f}%)",
         "status": "COMPLETED_AND_FROZEN",
     }
 

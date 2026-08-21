@@ -342,7 +342,7 @@ $\mathcal{S}_L(c)$ serves as the canonical intervention-sufficient normal form f
 
 ## 10. Discovery 10: Neural Revision Bridge & Dual-Layer Containment (Stage 5C)
 
-In Stage 5C, GENE bridged the formal theory to live neural inference in a **32-call live Gemma 3:12B assay** across 4 structural micro-worlds.
+In Stage 5C, GENE bridged the formal theory to live neural inference in a **preregistered 32-call live Gemma 3:12B assay** across 4 structural micro-worlds.
 
 ```
 +===================================================================================================+
@@ -353,16 +353,19 @@ In Stage 5C, GENE bridged the formal theory to live neural inference in a **32-c
 | Overall Entitlement  | 75.0% (6/8)             | 50.0% (4/8)            | 100.0% (8/8)            |
 | Degraded Active Rate | 50.0% (2/4)             | 0.0% (0/4) [100% Fail] | 100.0% (4/4)            |
 | Retracted Abstention | 100.0% (4/4)            | 100.0% (4/4)           | 100.0% (4/4)            |
-| Action Governance    | N/A (Uncalibrated)      | N/A (Premature Revoke) | 100.0% Calibrated (4/4) |
+| Lineage Action Gate  | N/A (Unchecked)         | N/A (Premature Revoke) | Preregistered Enforced  |
 +======================+=========================+========================+=========================+
 ```
+
 ### Key Empirical Findings:
-1. **Live Neural Explanatory Bloat Drives 100% Revision Autoimmunity (Arm 2)**:
-   In acquisition ($G_0$), Gemma 3:12B exhibited full explanatory bloat across $2/4$ worlds (citing all 4 premises across both alternative paths) and single-witness citation in $1/4$ worlds. When a single premise was invalidated under degraded-but-still-entitled conditions, **Arm 2 suffered 100% false retractions ($0/4$ retention)** because the naive dependency graph $\text{NaiveRetract}(c, I) = \mathbf{1}[R(c) \cap I \ne \emptyset]$ revoked the belief.
-2. **Minimal Support Compilation Restores Perfect Reasoning (Arm 3)**:
-   By dynamically enumerating minimal entitling support $\mathcal{S}_F(c)$ via first-order backward chaining and compiling only valid active facts into context, **Arm 3 achieved 100% entitlement retention ($4/4$) and 100% clean abstention ($4/4$)**.
-3. **Dual-Layer Containment & Action Gating**:
-   In $W_{\text{REC}}$ (where 2 of 3 paths and 2 of 4 roots were destroyed), Arm 3 demonstrated the critical operational distinction between **epistemic belief entitlement** and **action authorization**: while Gemma correctly deduced the entitled conclusion from surviving path $CD$, the Epistemic Kernel blocked the proposed operational action ($\text{Auth} = 0.417 < 0.50$), successfully protecting downstream execution from structural lineage degradation.
+1. **The Dual Failure Channels of Belief Maintenance Under Change**:
+   - **Unassisted Neural Revision Failure (Arm 1)**: In $2/4$ degraded worlds ($W_{\text{SHP}}$ and $W_{\text{REC}}$), raw neural reasoning failed to resolve support boundaries, over-retracting valid beliefs ($50\%$ failure) under perturbation.
+   - **Lossy Dependency Policy Failure (Arm 2)**: Naïve dependency tracking over acquisition citations $R(c)$ triggered retraction in $3/4$ degraded worlds ($75\%$) and added 2 marginal false retractions beyond the neural baseline ($W_{\text{IND}}$ and $W_{\text{SHO}}$), destroying all degraded beliefs ($0/4$ retention).
+   - **Failure Breakdown**: Policy-only failure in $2/4$ ($W_{\text{IND}}, W_{\text{SHO}}$), Neural-only failure in $1/4$ ($W_{\text{SHP}}$), and Both channels overlapping in $1/4$ ($W_{\text{REC}}$).
+2. **Support-First Runtime Package Rescues Revision (Arm 3)**:
+   By compiling only minimal first-order entitling support $\mathcal{S}_F(c)$ into active prompt context, **Arm 3 achieved 100% entitlement retention ($4/4$) and 100% clean abstention ($4/4$)**.
+3. **Dual-Layer Containment & Lineage-Thresholded Action Governance**:
+   In $W_{\text{REC}}$, Arm 3 demonstrated the critical operational distinction between **epistemic belief entitlement** and **action authorization**: while Gemma correctly deduced the entitled conclusion from surviving path $CD$, the Epistemic Kernel blocked the proposed operational action ($\text{Auth} = 0.417 < \tau = 0.50$), enforcing policy conformance when structural root lineage was degraded.
 
 ---
 

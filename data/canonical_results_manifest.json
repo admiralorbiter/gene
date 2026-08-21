@@ -1,7 +1,7 @@
 {
   "manifest_version": "2.0.0",
   "project": "GENE (Genealogical Epistemic Network Experiments)",
-  "generated_at": "2026-08-21T03:15:14.348997+00:00",
+  "generated_at": "2026-08-21T03:31:24.974945+00:00",
   "canonical_experiments": {
     "exp0": {
       "experiment": "Experiment 0 (Lineage Observability & Factorial Calibration)",
@@ -211,13 +211,28 @@
         "arm2_naive_reported": 0.0,
         "arm3_gene_kernel": 1.0
       },
+      "degraded_failure_channel_decomposition": {
+        "naive_policy_trigger_rate": 0.75,
+        "raw_neural_degraded_failure_rate": 0.5,
+        "marginal_policy_induced_error_rate": 0.5,
+        "policy_only_failure_worlds": [
+          "W_IND",
+          "W_SHO"
+        ],
+        "neural_only_failure_worlds": [
+          "W_SHP"
+        ],
+        "both_channels_failure_worlds": [
+          "W_REC"
+        ]
+      },
       "retracted_clean_abstention_rate": {
         "arm1_raw_neural": 1.0,
         "arm2_naive_reported": 1.0,
         "arm3_gene_kernel": 1.0
       },
-      "action_governance_arm3": "100.0% calibrated (3 permitted, 1 blocked under structural root degradation, 4 retracted)",
-      "replay_canary_stability": "3 / 4 exact raw token matches (75.0%), 4 / 4 semantic matches (100.0%)",
+      "action_governance_arm3": "Preregistered Lineage Gating Enforced (3 permitted, 1 blocked under structural root degradation, 4 retracted)",
+      "replay_canary_stability": "3 / 4 raw matches (75.0%), 4 / 4 semantic matches (100.0%)",
       "status": "COMPLETED_AND_FROZEN"
     }
   }

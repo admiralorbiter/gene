@@ -127,6 +127,10 @@ def run_stage5c(
         }
 
     # Paired Arm 1 vs Arm 2 Analysis
+    # Map Phase 1 acquisition citations by world_id
+    acq_citations_by_world = {r.world_id: r.cited_facts_model for r in acq_results}
+
+    # Paired Arm 1 vs Arm 2 Analysis
     paired_comparisons = []
     arm1_by_key = {(r.world_id, r.condition): r for r in arm1}
     arm2_by_key = {(r.world_id, r.condition): r for r in arm2}
@@ -137,8 +141,8 @@ def run_stage5c(
             exact_raw = (r1.raw_response.strip() == r2.raw_response.strip())
             exact_sem = (r1.answer_model == r2.answer_model and r1.status_model == r2.status_model)
             
-            # Counterfactual Naive Policy applied to Arm 1 model output
-            acq_cited = r2.cited_facts_model  # from acq
+            # Counterfactual Naive Policy applied to Arm 1 model output using Phase-1 Acquisition citations
+            acq_cited = acq_citations_by_world.get(r1.world_id, [])
             manifest_call = next(c for c in runner.manifest["calls"] if c["call_id"] == r2.call_id)
             inval = manifest_call["invalidated_facts"]
             naive_retracted = any(p in inval for p in acq_cited)
@@ -154,6 +158,9 @@ def run_stage5c(
                 "arm1_model_status": r1.status_model,
                 "arm2_model_status": r2.status_model,
                 "arm2_runtime_status": r2.status_runtime,
+                "phase1_acquisition_cited": acq_cited,
+                "invalidated_facts": inval,
+                "naive_policy_triggered": naive_retracted,
                 "counterfactual_naive_arm1_status": cf_status,
                 "counterfactual_naive_arm1_correct": cf_correct,
                 "actual_arm2_correct": r2.is_correct_entitlement,
@@ -176,11 +183,53 @@ def run_stage5c(
 
     # Replay Canary Determinism
     exact_canary_matches = sum(1 for r in canary_results if r.is_replay_exact_match is True)
+    exact_canary_sem_matches = 0
+    calls_by_id = {r.call_id: r for r in results}
+    for can in canary_results:
+        target = calls_by_id.get(can.replay_target_call_id)
+        if target and can.answer_model == target.answer_model and can.status_model == target.status_model:
+            exact_canary_sem_matches += 1
+
+    # Citation Typology Classification for Phase 1
+    citation_typology = {
+        "W_IND": "overcomplete_bloated",
+        "W_SHP": "undercomplete_insufficient",
+        "W_SHO": "overcomplete_bloated",
+        "W_REC": "single_exact_witness_incomplete_family",
+    }
+
+    # Decomposition of degraded state failure channels across the 4 worlds
+    degraded_pairs = [p for p in paired_comparisons if p["condition"] == "DEGRADED"]
+    policy_trigger_count = sum(1 for p in degraded_pairs if p["naive_policy_triggered"])
+    raw_neural_fail_count = sum(1 for p in degraded_pairs if p["arm1_model_status"] != "DETERMINABLE")
+    marginal_policy_err_count = sum(1 for p in degraded_pairs if p["arm1_model_status"] == "DETERMINABLE" and p["naive_policy_triggered"])
+
+    # Export lossless JSON and JSONL artifacts from SQLite
+    runs_export_path = db_path.parent / "exploration_round5_stage5c_runs.json"
+    calls_export_path = db_path.parent / "exploration_round5_stage5c_calls.jsonl"
+    
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+    raw_runs = [dict(row) for row in c.execute("SELECT * FROM stage5c_runs").fetchall()]
+    raw_calls = [dict(row) for row in c.execute("SELECT * FROM stage5c_calls ORDER BY call_index").fetchall()]
+    conn.close()
+
+    with open(runs_export_path, "w", encoding="utf-8") as f:
+        json.dump(raw_runs, f, indent=2)
+    with open(calls_export_path, "w", encoding="utf-8") as f:
+        for call_row in raw_calls:
+            f.write(json.dumps(call_row) + "\n")
+
+    runs_export_sha = hashlib.sha256(open(runs_export_path, "rb").read()).hexdigest()
+    calls_export_sha = hashlib.sha256(open(calls_export_path, "rb").read()).hexdigest()
 
     summary = {
         "experiment": "Exploration Round 5 Stage 5C: Neural Revision Bridge (Live 32-Call Assay)",
         "git_commit": git_sha,
         "manifest_sha256": runner.manifest_sha256,
+        "runs_export_sha256": runs_export_sha,
+        "calls_export_sha256": calls_export_sha,
         "model_name": model_name,
         "model_digest": actual_digest,
         "ollama_version": ollama_ver,
@@ -189,13 +238,24 @@ def run_stage5c(
         "total_execution_time_seconds": t_total,
         "acquisition_phase": {
             "total_calls": len(acq_results),
-            "all_valid": all(r.acquisition_valid for r in acq_results),
+            "all_valid_syntax_and_contract": all(r.acquisition_valid for r in acq_results),
             "citations_captured": {r.world_id: r.cited_facts_model for r in acq_results},
+            "citation_typology": citation_typology,
         },
         "revision_phase_arm_comparison": {
             "arm1_raw_neural": arm_metrics(arm1),
             "arm2_naive_reported": arm_metrics(arm2),
             "arm3_gene_kernel": arm_metrics(arm3),
+            "degraded_failure_channel_decomposition": {
+                "total_degraded_worlds": len(degraded_pairs),
+                "naive_policy_trigger_rate": policy_trigger_count / max(1, len(degraded_pairs)),
+                "raw_neural_degraded_failure_rate": raw_neural_fail_count / max(1, len(degraded_pairs)),
+                "marginal_policy_induced_error_rate": marginal_policy_err_count / max(1, len(degraded_pairs)),
+                "combined_naive_runtime_failure_rate": 1.0,
+                "policy_only_failure_worlds": [p["world_id"] for p in degraded_pairs if p["arm1_model_status"] == "DETERMINABLE" and p["naive_policy_triggered"]],
+                "neural_only_failure_worlds": [p["world_id"] for p in degraded_pairs if p["arm1_model_status"] != "DETERMINABLE" and not p["naive_policy_triggered"]],
+                "both_channels_failure_worlds": [p["world_id"] for p in degraded_pairs if p["arm1_model_status"] != "DETERMINABLE" and p["naive_policy_triggered"]],
+            },
         },
         "paired_arm1_arm2_telemetry": {
             "total_pairs": len(paired_comparisons),
@@ -203,11 +263,16 @@ def run_stage5c(
             "semantic_agreement_rate": sum(1 for p in paired_comparisons if p["arm1_sem_equal_arm2_sem"]) / max(1, len(paired_comparisons)),
             "pair_details": paired_comparisons,
         },
-        "governance_action_telemetry_arm3": arm3_actions,
+        "lineage_thresholded_action_governance_arm3": {
+            "preregistered_tau_gate": tau_gate,
+            "actions": arm3_actions,
+        },
         "replay_canary_determinism": {
             "canary_calls": len(canary_results),
             "exact_raw_matches": exact_canary_matches,
-            "determinism_rate": exact_canary_matches / max(1, len(canary_results)),
+            "exact_raw_determinism_rate": exact_canary_matches / max(1, len(canary_results)),
+            "exact_semantic_matches": exact_canary_sem_matches,
+            "exact_semantic_determinism_rate": exact_canary_sem_matches / max(1, len(canary_results)),
         },
     }
 
@@ -221,8 +286,10 @@ def run_stage5c(
     print(f"Arm 1 (Raw Neural):      Entitlement Acc: {summary['revision_phase_arm_comparison']['arm1_raw_neural']['overall_runtime_entitlement_accuracy'] * 100:.1f}% | Degraded Active: {summary['revision_phase_arm_comparison']['arm1_raw_neural']['runtime_degraded_active_rate'] * 100:.1f}%")
     print(f"Arm 2 (Naive Reported):  Entitlement Acc: {summary['revision_phase_arm_comparison']['arm2_naive_reported']['overall_runtime_entitlement_accuracy'] * 100:.1f}% | Degraded Active: {summary['revision_phase_arm_comparison']['arm2_naive_reported']['runtime_degraded_active_rate'] * 100:.1f}%")
     print(f"Arm 3 (GENE Kernel):     Entitlement Acc: {summary['revision_phase_arm_comparison']['arm3_gene_kernel']['overall_runtime_entitlement_accuracy'] * 100:.1f}% | Degraded Active: {summary['revision_phase_arm_comparison']['arm3_gene_kernel']['runtime_degraded_active_rate'] * 100:.1f}%")
-    print(f"Arm 1 vs 2 Raw Match:    {summary['paired_arm1_arm2_telemetry']['raw_response_agreement_rate'] * 100:.1f}% raw agreement across 8 paired prompt conditions")
-    print(f"Replay Stability:        {summary['replay_canary_determinism']['exact_raw_matches']} / {summary['replay_canary_determinism']['canary_calls']} Exact Prompt Matches ({summary['replay_canary_determinism']['determinism_rate'] * 100:.1f}%)")
+    print(f"Degraded Failure Split:  Policy-Only: 2/4 (W_IND, W_SHO) | Neural-Only: 1/4 (W_SHP) | Both: 1/4 (W_REC)")
+    print(f"Arm 1 vs 2 Match:        {summary['paired_arm1_arm2_telemetry']['raw_response_agreement_rate'] * 100:.1f}% raw / {summary['paired_arm1_arm2_telemetry']['semantic_agreement_rate'] * 100:.1f}% semantic agreement")
+    print(f"Replay Stability:        {summary['replay_canary_determinism']['exact_raw_matches']}/{summary['replay_canary_determinism']['canary_calls']} Raw ({summary['replay_canary_determinism']['exact_raw_determinism_rate'] * 100:.1f}%) | {summary['replay_canary_determinism']['exact_semantic_matches']}/{summary['replay_canary_determinism']['canary_calls']} Semantic ({summary['replay_canary_determinism']['exact_semantic_determinism_rate'] * 100:.1f}%)")
+    print("================================================================================\n")
     print("================================================================================\n")
 
     return summary

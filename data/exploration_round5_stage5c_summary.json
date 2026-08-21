@@ -2,15 +2,16 @@
   "experiment": "Exploration Round 5 Stage 5C: Neural Revision Bridge (Live 32-Call Assay)",
   "git_commit": "4203e91c70a0eead8c36def4a7dcfcab53fd584b",
   "manifest_sha256": "ce963fde7e1771bb16a31209fdda84777596d567bc08b9079252dd58c5cf3f8e",
+  "runs_export_sha256": "3be0fd4cf9376f601bfbcb7b393d1b348de66f698a53ee52312cef77ee87fa01",
+  "calls_export_sha256": "c7b6e8278e283f29ea974cb3b09e258a295fa59fd9f8153e1d64a219700d533a",
   "model_name": "gemma3:12b",
   "model_digest": "f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a",
   "ollama_version": "0.32.15",
   "database_path": "data\\exploration_round5_stage5c_results.db",
   "total_calls": 32,
-  "total_execution_time_seconds": 82.23926840000786,
   "acquisition_phase": {
     "total_calls": 4,
-    "all_valid": true,
+    "all_valid_syntax_and_contract": true,
     "citations_captured": {
       "W_IND": [
         "FACT_IND_A",
@@ -31,6 +32,12 @@
         "FACT_REC_A",
         "FACT_REC_B"
       ]
+    },
+    "citation_typology": {
+      "W_IND": "overcomplete_bloated",
+      "W_SHP": "undercomplete_insufficient",
+      "W_SHO": "overcomplete_bloated",
+      "W_REC": "single_exact_witness_incomplete_family"
     }
   },
   "revision_phase_arm_comparison": {
@@ -69,6 +76,23 @@
       "runtime_retracted_clean_abstention_rate": 1.0,
       "neural_retracted_unknown_rate": 1.0,
       "overall_runtime_entitlement_accuracy": 1.0
+    },
+    "degraded_failure_channel_decomposition": {
+      "total_degraded_worlds": 4,
+      "naive_policy_trigger_rate": 0.75,
+      "raw_neural_degraded_failure_rate": 0.5,
+      "marginal_policy_induced_error_rate": 0.5,
+      "combined_naive_runtime_failure_rate": 1.0,
+      "policy_only_failure_worlds": [
+        "W_IND",
+        "W_SHO"
+      ],
+      "neural_only_failure_worlds": [
+        "W_SHP"
+      ],
+      "both_channels_failure_worlds": [
+        "W_REC"
+      ]
     }
   },
   "paired_arm1_arm2_telemetry": {
@@ -84,8 +108,18 @@
         "arm1_model_status": "DETERMINABLE",
         "arm2_model_status": "DETERMINABLE",
         "arm2_runtime_status": "INDETERMINABLE",
-        "counterfactual_naive_arm1_status": "DETERMINABLE",
-        "counterfactual_naive_arm1_correct": true,
+        "phase1_acquisition_cited": [
+          "FACT_IND_A",
+          "FACT_IND_B",
+          "FACT_IND_D",
+          "FACT_IND_E"
+        ],
+        "invalidated_facts": [
+          "FACT_IND_D"
+        ],
+        "naive_policy_triggered": true,
+        "counterfactual_naive_arm1_status": "INDETERMINABLE",
+        "counterfactual_naive_arm1_correct": false,
         "actual_arm2_correct": false
       },
       {
@@ -96,6 +130,17 @@
         "arm1_model_status": "INDETERMINABLE",
         "arm2_model_status": "INDETERMINABLE",
         "arm2_runtime_status": "INDETERMINABLE",
+        "phase1_acquisition_cited": [
+          "FACT_IND_A",
+          "FACT_IND_B",
+          "FACT_IND_D",
+          "FACT_IND_E"
+        ],
+        "invalidated_facts": [
+          "FACT_IND_A",
+          "FACT_IND_D"
+        ],
+        "naive_policy_triggered": true,
         "counterfactual_naive_arm1_status": "INDETERMINABLE",
         "counterfactual_naive_arm1_correct": true,
         "actual_arm2_correct": true
@@ -108,6 +153,13 @@
         "arm1_model_status": "INDETERMINABLE",
         "arm2_model_status": "INDETERMINABLE",
         "arm2_runtime_status": "INDETERMINABLE",
+        "phase1_acquisition_cited": [
+          "FACT_SHP_A"
+        ],
+        "invalidated_facts": [
+          "FACT_SHP_B"
+        ],
+        "naive_policy_triggered": false,
         "counterfactual_naive_arm1_status": "INDETERMINABLE",
         "counterfactual_naive_arm1_correct": false,
         "actual_arm2_correct": false
@@ -120,6 +172,13 @@
         "arm1_model_status": "INDETERMINABLE",
         "arm2_model_status": "INDETERMINABLE",
         "arm2_runtime_status": "INDETERMINABLE",
+        "phase1_acquisition_cited": [
+          "FACT_SHP_A"
+        ],
+        "invalidated_facts": [
+          "FACT_SHP_A"
+        ],
+        "naive_policy_triggered": true,
         "counterfactual_naive_arm1_status": "INDETERMINABLE",
         "counterfactual_naive_arm1_correct": true,
         "actual_arm2_correct": true
@@ -132,8 +191,18 @@
         "arm1_model_status": "DETERMINABLE",
         "arm2_model_status": "DETERMINABLE",
         "arm2_runtime_status": "INDETERMINABLE",
-        "counterfactual_naive_arm1_status": "DETERMINABLE",
-        "counterfactual_naive_arm1_correct": true,
+        "phase1_acquisition_cited": [
+          "FACT_SHO_A",
+          "FACT_SHO_B",
+          "FACT_SHO_D",
+          "FACT_SHO_E"
+        ],
+        "invalidated_facts": [
+          "FACT_SHO_D"
+        ],
+        "naive_policy_triggered": true,
+        "counterfactual_naive_arm1_status": "INDETERMINABLE",
+        "counterfactual_naive_arm1_correct": false,
         "actual_arm2_correct": false
       },
       {
@@ -144,6 +213,17 @@
         "arm1_model_status": "INDETERMINABLE",
         "arm2_model_status": "INDETERMINABLE",
         "arm2_runtime_status": "INDETERMINABLE",
+        "phase1_acquisition_cited": [
+          "FACT_SHO_A",
+          "FACT_SHO_B",
+          "FACT_SHO_D",
+          "FACT_SHO_E"
+        ],
+        "invalidated_facts": [
+          "FACT_SHO_A",
+          "FACT_SHO_D"
+        ],
+        "naive_policy_triggered": true,
         "counterfactual_naive_arm1_status": "INDETERMINABLE",
         "counterfactual_naive_arm1_correct": true,
         "actual_arm2_correct": true
@@ -156,6 +236,15 @@
         "arm1_model_status": "INDETERMINABLE",
         "arm2_model_status": "INDETERMINABLE",
         "arm2_runtime_status": "INDETERMINABLE",
+        "phase1_acquisition_cited": [
+          "FACT_REC_A",
+          "FACT_REC_B"
+        ],
+        "invalidated_facts": [
+          "FACT_REC_A",
+          "FACT_REC_B"
+        ],
+        "naive_policy_triggered": true,
         "counterfactual_naive_arm1_status": "INDETERMINABLE",
         "counterfactual_naive_arm1_correct": false,
         "actual_arm2_correct": false
@@ -168,97 +257,111 @@
         "arm1_model_status": "INDETERMINABLE",
         "arm2_model_status": "INDETERMINABLE",
         "arm2_runtime_status": "INDETERMINABLE",
+        "phase1_acquisition_cited": [
+          "FACT_REC_A",
+          "FACT_REC_B"
+        ],
+        "invalidated_facts": [
+          "FACT_REC_B",
+          "FACT_REC_C"
+        ],
+        "naive_policy_triggered": true,
         "counterfactual_naive_arm1_status": "INDETERMINABLE",
         "counterfactual_naive_arm1_correct": true,
         "actual_arm2_correct": true
       }
     ]
   },
-  "governance_action_telemetry_arm3": [
-    {
-      "call_id": "CALL_REV_W_IND_DEGRADED_arm3_gene_kernel",
-      "world_id": "W_IND",
-      "condition": "DEGRADED",
-      "proposed_action_model": "Confirm operating protocol with station personnel.",
-      "action_confidence_model": 0.95,
-      "lineage_authority": 0.5,
-      "gate_verdict": "PERMIT",
-      "executed_action": "Confirm operating protocol with station personnel."
-    },
-    {
-      "call_id": "CALL_REV_W_IND_RETRACTED_arm3_gene_kernel",
-      "world_id": "W_IND",
-      "condition": "RETRACTED",
-      "proposed_action_model": null,
-      "action_confidence_model": 0.95,
-      "lineage_authority": 0.0,
-      "gate_verdict": "N/A",
-      "executed_action": null
-    },
-    {
-      "call_id": "CALL_REV_W_SHP_DEGRADED_arm3_gene_kernel",
-      "world_id": "W_SHP",
-      "condition": "DEGRADED",
-      "proposed_action_model": "Verify Tier Assignment",
-      "action_confidence_model": 0.95,
-      "lineage_authority": 0.75,
-      "gate_verdict": "PERMIT",
-      "executed_action": "Verify Tier Assignment"
-    },
-    {
-      "call_id": "CALL_REV_W_SHP_RETRACTED_arm3_gene_kernel",
-      "world_id": "W_SHP",
-      "condition": "RETRACTED",
-      "proposed_action_model": null,
-      "action_confidence_model": 0.95,
-      "lineage_authority": 0.0,
-      "gate_verdict": "N/A",
-      "executed_action": null
-    },
-    {
-      "call_id": "CALL_REV_W_SHO_DEGRADED_arm3_gene_kernel",
-      "world_id": "W_SHO",
-      "condition": "DEGRADED",
-      "proposed_action_model": "Grant access with CODE_EPSILON",
-      "action_confidence_model": 0.95,
-      "lineage_authority": 0.75,
-      "gate_verdict": "PERMIT",
-      "executed_action": "Grant access with CODE_EPSILON"
-    },
-    {
-      "call_id": "CALL_REV_W_SHO_RETRACTED_arm3_gene_kernel",
-      "world_id": "W_SHO",
-      "condition": "RETRACTED",
-      "proposed_action_model": null,
-      "action_confidence_model": 0.95,
-      "lineage_authority": 0.0,
-      "gate_verdict": "N/A",
-      "executed_action": null
-    },
-    {
-      "call_id": "CALL_REV_W_REC_DEGRADED_arm3_gene_kernel",
-      "world_id": "W_REC",
-      "condition": "DEGRADED",
-      "proposed_action_model": "route_transit",
-      "action_confidence_model": 0.95,
-      "lineage_authority": 0.41666666666666663,
-      "gate_verdict": "BLOCK",
-      "executed_action": null
-    },
-    {
-      "call_id": "CALL_REV_W_REC_RETRACTED_arm3_gene_kernel",
-      "world_id": "W_REC",
-      "condition": "RETRACTED",
-      "proposed_action_model": null,
-      "action_confidence_model": 0.95,
-      "lineage_authority": 0.0,
-      "gate_verdict": "N/A",
-      "executed_action": null
-    }
-  ],
+  "lineage_thresholded_action_governance_arm3": {
+    "preregistered_tau_gate": 0.5,
+    "actions": [
+      {
+        "call_id": "CALL_REV_W_IND_DEGRADED_arm3_gene_kernel",
+        "world_id": "W_IND",
+        "condition": "DEGRADED",
+        "proposed_action_model": "Confirm operating protocol with station personnel.",
+        "action_confidence_model": 0.95,
+        "lineage_authority": 0.5,
+        "gate_verdict": "PERMIT",
+        "executed_action": "Confirm operating protocol with station personnel."
+      },
+      {
+        "call_id": "CALL_REV_W_IND_RETRACTED_arm3_gene_kernel",
+        "world_id": "W_IND",
+        "condition": "RETRACTED",
+        "proposed_action_model": null,
+        "action_confidence_model": 0.95,
+        "lineage_authority": 0.0,
+        "gate_verdict": "N/A",
+        "executed_action": null
+      },
+      {
+        "call_id": "CALL_REV_W_SHP_DEGRADED_arm3_gene_kernel",
+        "world_id": "W_SHP",
+        "condition": "DEGRADED",
+        "proposed_action_model": "Verify Tier Assignment",
+        "action_confidence_model": 0.95,
+        "lineage_authority": 0.75,
+        "gate_verdict": "PERMIT",
+        "executed_action": "Verify Tier Assignment"
+      },
+      {
+        "call_id": "CALL_REV_W_SHP_RETRACTED_arm3_gene_kernel",
+        "world_id": "W_SHP",
+        "condition": "RETRACTED",
+        "proposed_action_model": null,
+        "action_confidence_model": 0.95,
+        "lineage_authority": 0.0,
+        "gate_verdict": "N/A",
+        "executed_action": null
+      },
+      {
+        "call_id": "CALL_REV_W_SHO_DEGRADED_arm3_gene_kernel",
+        "world_id": "W_SHO",
+        "condition": "DEGRADED",
+        "proposed_action_model": "Grant access with CODE_EPSILON",
+        "action_confidence_model": 0.95,
+        "lineage_authority": 0.75,
+        "gate_verdict": "PERMIT",
+        "executed_action": "Grant access with CODE_EPSILON"
+      },
+      {
+        "call_id": "CALL_REV_W_SHO_RETRACTED_arm3_gene_kernel",
+        "world_id": "W_SHO",
+        "condition": "RETRACTED",
+        "proposed_action_model": null,
+        "action_confidence_model": 0.95,
+        "lineage_authority": 0.0,
+        "gate_verdict": "N/A",
+        "executed_action": null
+      },
+      {
+        "call_id": "CALL_REV_W_REC_DEGRADED_arm3_gene_kernel",
+        "world_id": "W_REC",
+        "condition": "DEGRADED",
+        "proposed_action_model": "route_transit",
+        "action_confidence_model": 0.95,
+        "lineage_authority": 0.41666666666666663,
+        "gate_verdict": "BLOCK",
+        "executed_action": null
+      },
+      {
+        "call_id": "CALL_REV_W_REC_RETRACTED_arm3_gene_kernel",
+        "world_id": "W_REC",
+        "condition": "RETRACTED",
+        "proposed_action_model": null,
+        "action_confidence_model": 0.95,
+        "lineage_authority": 0.0,
+        "gate_verdict": "N/A",
+        "executed_action": null
+      }
+    ]
+  },
   "replay_canary_determinism": {
     "canary_calls": 4,
     "exact_raw_matches": 3,
-    "determinism_rate": 0.75
+    "exact_raw_determinism_rate": 0.75,
+    "exact_semantic_matches": 4,
+    "exact_semantic_determinism_rate": 1.0
   }
 }
