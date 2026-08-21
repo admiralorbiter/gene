@@ -1,10 +1,10 @@
 ---
 contract_id: CONTRACT-R8-8B-R1
-status: DRAFT
+status: FROZEN
 proposed_by: antigravity
 design_review: APPROVED
 reviewed_by: chatgpt-pro
-authorized_by: null
+authorized_by: human
 base_sha: 3861de935a8f4c2e6840004ff41c59bb79bc6102
 execution_base_sha: null
 resource_class: gpu
@@ -13,7 +13,7 @@ exclusive_gpu: true
 interruptible: true
 ---
 
-# Research Contract Proposal: CONTRACT-R8-8B-R1
+# Research Contract: CONTRACT-R8-8B-R1 (Frozen)
 
 ## Title
 Exploration Round 8 Stage 8B-R1: Multi-Document Coreference Resolution & Asynchronous Bitemporal Supersession Fusion
