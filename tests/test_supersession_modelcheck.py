@@ -134,7 +134,26 @@ def test_exhaustive_small_world_event_permutations_including_supersedes():
     # Enumerate all subsequences of mutations of length 1 and 2
     for r in [1, 2]:
         for mutation_seq in itertools.permutations(event_pool, r):
-            all_events = base_asserts + list(mutation_seq)
+            raw_events = base_asserts + list(mutation_seq)
+            # Re-index event_seq cleanly per t_knowledge to respect transaction uniqueness
+            events_by_tk: dict[int, list[TemporalEvent]] = {}
+            for ev in raw_events:
+                events_by_tk.setdefault(ev.t_knowledge, []).append(ev)
+
+            all_events: list[TemporalEvent] = []
+            for tk in sorted(events_by_tk.keys()):
+                for seq_idx, ev in enumerate(events_by_tk[tk]):
+                    all_events.append(TemporalEvent(
+                        event_id=ev.event_id,
+                        event_type=ev.event_type,
+                        t_knowledge=ev.t_knowledge,
+                        event_seq=seq_idx,
+                        t_valid_start=ev.t_valid_start,
+                        t_valid_end=ev.t_valid_end,
+                        target_fact_id=ev.target_fact_id,
+                        secondary_fact_id=ev.secondary_fact_id,
+                        payload=ev.payload,
+                    ))
 
             engine = BitemporalEngine(cautious_conflicts=True)
             for f in facts:

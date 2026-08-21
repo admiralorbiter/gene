@@ -1,7 +1,7 @@
 {
   "manifest_version": "2.0.0",
   "project": "GENE (Genealogical Epistemic Network Experiments)",
-  "generated_at": "2026-08-21T03:31:24.974945+00:00",
+  "generated_at": "2026-08-21T04:42:27.084540+00:00",
   "canonical_experiments": {
     "exp0": {
       "experiment": "Experiment 0 (Lineage Observability & Factorial Calibration)",
@@ -233,6 +233,41 @@
       },
       "action_governance_arm3": "Preregistered Lineage Gating Enforced (3 permitted, 1 blocked under structural root degradation, 4 retracted)",
       "replay_canary_stability": "3 / 4 raw matches (75.0%), 4 / 4 semantic matches (100.0%)",
+      "status": "COMPLETED_AND_FROZEN"
+    },
+    "stage_6b": {
+      "experiment": "Exploration Round 6 Stage 6B (Contract-Guided State Adjudication)",
+      "summary_file": "exploration_round6_stage6b_results_summary.json",
+      "commit": "round6-stage6b-benchmark-v2",
+      "total_cases": 200,
+      "layer_a_transition_fidelity": {
+        "arm1_append_only": 0.6,
+        "arm2_kt_lww": 0.6,
+        "arm3_vt_lww": 0.6,
+        "arm4_bitemporal_latest": 0.6,
+        "arm5_predicate_contract_flat": 1.0,
+        "arm6_gene_kernel": 1.0
+      },
+      "layer_b_premise_state_fidelity": {
+        "arm1_append_only": 0.4,
+        "arm2_kt_lww": 0.55,
+        "arm3_vt_lww": 0.55,
+        "arm4_bitemporal_latest": 0.55,
+        "arm5_predicate_contract_flat": 1.0,
+        "arm6_gene_kernel": 1.0
+      },
+      "layer_c_entitlement_accuracy": {
+        "arm1_append_only": 0.76,
+        "arm2_kt_lww": 0.76,
+        "arm3_vt_lww": 0.76,
+        "arm4_bitemporal_latest": 0.76,
+        "arm5_predicate_contract_flat": 0.64,
+        "arm6_gene_kernel": 1.0
+      },
+      "layer_c_conditional_revision_autoimmunity": {
+        "arm5_predicate_contract_flat": "72 / 72 (100.0% failure on alternative support opportunities, 36.0% global incidence)",
+        "arm6_gene_kernel": "0 / 72 (0.0% autoimmunity, 100.0% support fidelity)"
+      },
       "status": "COMPLETED_AND_FROZEN"
     }
   }

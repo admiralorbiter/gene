@@ -112,7 +112,9 @@ class BitemporalEngine:
         self.events: list[TemporalEvent] = []
 
     def register_fact(self, fact: BitemporalFact) -> None:
-        """Register an occurrence node."""
+        """Register an immutable occurrence node (fails closed on duplicate ID)."""
+        if fact.fact_id in self.facts:
+            raise ValueError(f"Duplicate OccurrenceNode fact_id: {fact.fact_id}")
         self.facts[fact.fact_id] = fact
 
     def register_rule(self, rule: BitemporalRule) -> None:
@@ -120,7 +122,11 @@ class BitemporalEngine:
         self.rules[rule.rule_id] = rule
 
     def record_event(self, event: TemporalEvent) -> None:
-        """Append an event to the authoritative event log."""
+        """Append an event to the authoritative event log (fails closed on duplicate ID or sequence)."""
+        if any(e.event_id == event.event_id for e in self.events):
+            raise ValueError(f"Duplicate event_id: {event.event_id}")
+        if any(e.t_knowledge == event.t_knowledge and e.event_seq == event.event_seq for e in self.events):
+            raise ValueError(f"Duplicate transaction sequence (t_k={event.t_knowledge}, event_seq={event.event_seq})")
         self.events.append(event)
         self.events.sort(key=lambda e: (e.t_knowledge, e.event_seq, e.event_id))
 

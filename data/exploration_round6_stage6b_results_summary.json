@@ -1,0 +1,145 @@
+{
+  "benchmark_name": "Stage 6B Contract-Guided State Adjudication Factorial Benchmark (v2 - True Implementations)",
+  "timestamp_utc": "2026-08-21T04:42:09Z",
+  "total_cases": 200,
+  "arm_metrics": {
+    "ARM_1_APPEND_ONLY": {
+      "total_cases": 200,
+      "layer_a_transition_fidelity": 0.6,
+      "layer_b_active_state_fidelity": 0.4,
+      "stale_retention_rate_global": 0.6,
+      "stale_retention_rate_conditional": 1.0,
+      "false_supersession_rate_global": 0.0,
+      "false_supersession_rate_conditional": 0.0,
+      "conflict_isolation_error_rate": 0.5,
+      "revision_autoimmunity_rate_global": 0.0,
+      "revision_autoimmunity_rate_conditional": 0.0,
+      "zombie_retention_rate_global": 0.24,
+      "zombie_retention_rate_conditional": 2.4,
+      "support_fidelity_rate": "N/A",
+      "entitlement_accuracy": 0.76,
+      "opportunity_counts": {
+        "stale_opportunities": 120,
+        "false_sup_opportunities": 80,
+        "conflict_opportunities": 20,
+        "alternative_support_opportunities": 72,
+        "zombie_opportunities": 20
+      }
+    },
+    "ARM_2_KNOWLEDGE_TIME_LWW": {
+      "total_cases": 200,
+      "layer_a_transition_fidelity": 0.6,
+      "layer_b_active_state_fidelity": 0.55,
+      "stale_retention_rate_global": 0.0,
+      "stale_retention_rate_conditional": 0.0,
+      "false_supersession_rate_global": 0.4,
+      "false_supersession_rate_conditional": 1.0,
+      "conflict_isolation_error_rate": 0.5,
+      "revision_autoimmunity_rate_global": 0.24,
+      "revision_autoimmunity_rate_conditional": 0.6667,
+      "zombie_retention_rate_global": 0.0,
+      "zombie_retention_rate_conditional": 0.0,
+      "support_fidelity_rate": "N/A",
+      "entitlement_accuracy": 0.76,
+      "opportunity_counts": {
+        "stale_opportunities": 120,
+        "false_sup_opportunities": 80,
+        "conflict_opportunities": 20,
+        "alternative_support_opportunities": 72,
+        "zombie_opportunities": 20
+      }
+    },
+    "ARM_3_VALID_TIME_LWW": {
+      "total_cases": 200,
+      "layer_a_transition_fidelity": 0.6,
+      "layer_b_active_state_fidelity": 0.55,
+      "stale_retention_rate_global": 0.0,
+      "stale_retention_rate_conditional": 0.0,
+      "false_supersession_rate_global": 0.4,
+      "false_supersession_rate_conditional": 1.0,
+      "conflict_isolation_error_rate": 0.5,
+      "revision_autoimmunity_rate_global": 0.24,
+      "revision_autoimmunity_rate_conditional": 0.6667,
+      "zombie_retention_rate_global": 0.0,
+      "zombie_retention_rate_conditional": 0.0,
+      "support_fidelity_rate": "N/A",
+      "entitlement_accuracy": 0.76,
+      "opportunity_counts": {
+        "stale_opportunities": 120,
+        "false_sup_opportunities": 80,
+        "conflict_opportunities": 20,
+        "alternative_support_opportunities": 72,
+        "zombie_opportunities": 20
+      }
+    },
+    "ARM_4_BITEMPORAL_LATEST": {
+      "total_cases": 200,
+      "layer_a_transition_fidelity": 0.6,
+      "layer_b_active_state_fidelity": 0.55,
+      "stale_retention_rate_global": 0.0,
+      "stale_retention_rate_conditional": 0.0,
+      "false_supersession_rate_global": 0.4,
+      "false_supersession_rate_conditional": 1.0,
+      "conflict_isolation_error_rate": 0.5,
+      "revision_autoimmunity_rate_global": 0.24,
+      "revision_autoimmunity_rate_conditional": 0.6667,
+      "zombie_retention_rate_global": 0.0,
+      "zombie_retention_rate_conditional": 0.0,
+      "support_fidelity_rate": "N/A",
+      "entitlement_accuracy": 0.76,
+      "opportunity_counts": {
+        "stale_opportunities": 120,
+        "false_sup_opportunities": 80,
+        "conflict_opportunities": 20,
+        "alternative_support_opportunities": 72,
+        "zombie_opportunities": 20
+      }
+    },
+    "ARM_5_PREDICATE_CONTRACT_FLAT": {
+      "total_cases": 200,
+      "layer_a_transition_fidelity": 1.0,
+      "layer_b_active_state_fidelity": 1.0,
+      "stale_retention_rate_global": 0.0,
+      "stale_retention_rate_conditional": 0.0,
+      "false_supersession_rate_global": 0.0,
+      "false_supersession_rate_conditional": 0.0,
+      "conflict_isolation_error_rate": 0.0,
+      "revision_autoimmunity_rate_global": 0.36,
+      "revision_autoimmunity_rate_conditional": 1.0,
+      "zombie_retention_rate_global": 0.0,
+      "zombie_retention_rate_conditional": 0.0,
+      "support_fidelity_rate": "N/A",
+      "entitlement_accuracy": 0.64,
+      "opportunity_counts": {
+        "stale_opportunities": 120,
+        "false_sup_opportunities": 80,
+        "conflict_opportunities": 20,
+        "alternative_support_opportunities": 72,
+        "zombie_opportunities": 20
+      }
+    },
+    "ARM_6_GENE_KERNEL": {
+      "total_cases": 200,
+      "layer_a_transition_fidelity": 1.0,
+      "layer_b_active_state_fidelity": 1.0,
+      "stale_retention_rate_global": 0.0,
+      "stale_retention_rate_conditional": 0.0,
+      "false_supersession_rate_global": 0.0,
+      "false_supersession_rate_conditional": 0.0,
+      "conflict_isolation_error_rate": 0.0,
+      "revision_autoimmunity_rate_global": 0.0,
+      "revision_autoimmunity_rate_conditional": 0.0,
+      "zombie_retention_rate_global": 0.0,
+      "zombie_retention_rate_conditional": 0.0,
+      "support_fidelity_rate": 1.0,
+      "entitlement_accuracy": 1.0,
+      "opportunity_counts": {
+        "stale_opportunities": 120,
+        "false_sup_opportunities": 80,
+        "conflict_opportunities": 20,
+        "alternative_support_opportunities": 72,
+        "zombie_opportunities": 20
+      }
+    }
+  }
+}

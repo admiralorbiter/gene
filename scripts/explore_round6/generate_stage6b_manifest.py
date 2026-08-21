@@ -129,7 +129,7 @@ def build_stage6b_case(
             "t_knowledge": 0,
             "event_seq": 0,
             "t_valid_start": 0.0,
-            "t_valid_end": 5.0 if pred_mode == "interval_bounded" else None,
+            "t_valid_end": 5.0 if (pred_mode == "interval_bounded" or upd_pat == "recurrence_expiry") else None,
             "target_fact_id": f_init.fact_id,
         }
     ]
@@ -170,6 +170,11 @@ def build_stage6b_case(
         expected_transitions.append({"event_type": "ASSERT", "target_fact_id": f_incoming.fact_id, "t_valid_start": t_v_in, "t_valid_end": t_v_in + 5.0})
         if upd_pat in ["forward_update", "delayed_report", "retroactive_correction"]:
             expected_transitions.append({"event_type": "SUPERSEDES", "target_fact_id": f_incoming.fact_id, "secondary_fact_id": f_init.fact_id, "t_valid_start": t_v_in})
+        elif upd_pat == "contemporaneous_disagreement":
+            if src_rel == "same_source":
+                expected_transitions.append({"event_type": "SUPERSEDES", "target_fact_id": f_incoming.fact_id, "secondary_fact_id": f_init.fact_id, "t_valid_start": t_v_in})
+            else:
+                expected_transitions.append({"event_type": "CONTRADICTS", "target_fact_id": f_incoming.fact_id, "secondary_fact_id": f_init.fact_id, "t_valid_start": t_v_in, "t_valid_end": float("inf")})
 
     engine = BitemporalEngine(cautious_conflicts=True)
     engine.register_fact(f_init)
@@ -191,8 +196,8 @@ def build_stage6b_case(
             target_fact_id=ev_dict["target_fact_id"],
         ))
 
-    for faux in [f_aux1, f_aux2, f_aux3]:
-        engine.record_event(TemporalEvent(f"ev_ass_{faux.fact_id}", EventType.ASSERT, t_knowledge=0, t_valid_start=0.0, target_fact_id=faux.fact_id))
+    for i, faux in enumerate([f_aux1, f_aux2, f_aux3]):
+        engine.record_event(TemporalEvent(f"ev_ass_{faux.fact_id}", EventType.ASSERT, t_knowledge=0, event_seq=1 + i, t_valid_start=0.0, target_fact_id=faux.fact_id))
 
     init_lineage = engine.compute_temporal_lineage(goal_triple, t_v=0.0, t_k=0)
 
@@ -227,6 +232,7 @@ def build_stage6b_case(
         "initial_events": init_events,
         "incoming_observation": {
             "obs_id": f"obs_{case_id}",
+            "case_id": case_id,
             "subject": "Agent_Alice",
             "predicate": pred_name,
             "obj": val_in,

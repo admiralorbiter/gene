@@ -108,14 +108,15 @@ def test_bitemporal_conflict_interval_isolation():
 
     fa = BitemporalFact("fa", "Alice", "city", "KansasCity", roots=frozenset(["R1"]))
     fb = BitemporalFact("fb", "Alice", "city", "Chicago", roots=frozenset(["R2"]))
-    for f in [fa, fb]:
+    for i, f in enumerate([fa, fb]):
         engine.register_fact(f)
-        engine.record_event(TemporalEvent(f"ev_ass_{f.fact_id}", EventType.ASSERT, t_knowledge=0, t_valid_start=0.0, target_fact_id=f.fact_id))
+        engine.record_event(TemporalEvent(f"ev_ass_{f.fact_id}", EventType.ASSERT, t_knowledge=0, event_seq=i, t_valid_start=0.0, target_fact_id=f.fact_id))
 
     engine.record_event(TemporalEvent(
         event_id="ev_conf_window",
         event_type=EventType.CONTRADICTS,
         t_knowledge=1,
+        event_seq=0,
         t_valid_start=5.0,
         t_valid_end=8.0,
         target_fact_id="fa",
@@ -139,9 +140,9 @@ def test_deep_then_what_geometry_change_detection():
     f2 = BitemporalFact("f2", "X", "p", "2", roots=frozenset(["R2"]))
     f3 = BitemporalFact("f3", "X", "p", "3", roots=frozenset(["R1"]))
     f4 = BitemporalFact("f4", "X", "p", "4", roots=frozenset(["R2"]))
-    for f in [f1, f2, f3, f4]:
+    for i, f in enumerate([f1, f2, f3, f4]):
         engine.register_fact(f)
-        engine.record_event(TemporalEvent(f"ev_ass_{f.fact_id}", EventType.ASSERT, t_knowledge=0, t_valid_start=0.0, target_fact_id=f.fact_id))
+        engine.record_event(TemporalEvent(f"ev_ass_{f.fact_id}", EventType.ASSERT, t_knowledge=0, event_seq=i, t_valid_start=0.0, target_fact_id=f.fact_id))
 
     goal = ("Goal", "status", "TRUE")
     r1 = BitemporalRule("r1", goal, (f1.triple, f2.triple))
@@ -149,7 +150,7 @@ def test_deep_then_what_geometry_change_detection():
     engine.register_rule(r1)
     engine.register_rule(r2)
 
-    ev_ret_f3 = TemporalEvent("ev_ret_f3", EventType.RETRACT, t_knowledge=1, t_valid_start=0.0, target_fact_id="f3")
+    ev_ret_f3 = TemporalEvent("ev_ret_f3", EventType.RETRACT, t_knowledge=1, event_seq=0, t_valid_start=0.0, target_fact_id="f3")
 
     impact = engine.then_what_t(ev_ret_f3, t_v=0.0, t_k=0)
     assert impact["impacted_count"] >= 1
@@ -158,3 +159,25 @@ def test_deep_then_what_geometry_change_detection():
     assert goal_trans["prior_entitled"] is True
     assert goal_trans["post_entitled"] is True
     assert goal_trans["transition"] == "SUPPORT_GEOMETRY_CHANGED"
+
+
+def test_fail_closed_duplicate_identifiers_and_sequences():
+    """Verify that duplicate fact_ids, event_ids, and (t_k, event_seq) collide and fail closed."""
+    engine = BitemporalEngine()
+
+    f1 = BitemporalFact("occ_dup", "A", "p", "1")
+    engine.register_fact(f1)
+    with pytest.raises(ValueError, match="Duplicate OccurrenceNode"):
+        engine.register_fact(f1)
+
+    ev1 = TemporalEvent("ev_dup", EventType.ASSERT, t_knowledge=0, event_seq=0, target_fact_id="occ_dup")
+    engine.record_event(ev1)
+
+    ev2 = TemporalEvent("ev_dup", EventType.RETRACT, t_knowledge=1, event_seq=0, target_fact_id="occ_dup")
+    with pytest.raises(ValueError, match="Duplicate event_id"):
+        engine.record_event(ev2)
+
+    ev3 = TemporalEvent("ev_diff_id", EventType.RETRACT, t_knowledge=0, event_seq=0, target_fact_id="occ_dup")
+    with pytest.raises(ValueError, match="Duplicate transaction sequence"):
+        engine.record_event(ev3)
+

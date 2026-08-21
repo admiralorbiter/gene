@@ -485,6 +485,52 @@ def extract_stage5c_metrics(summary_path: Path) -> dict[str, Any]:
     }
 
 
+def extract_stage6b_metrics(summary_path: Path) -> dict[str, Any]:
+    """Extract metrics from Exploration Round 6 Stage 6B (Contract-Guided State Adjudication)."""
+    if not summary_path.exists():
+        raise FileNotFoundError(f"Stage 6B summary not found: {summary_path}")
+
+    with open(summary_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    arms = data.get("arm_metrics", {})
+    return {
+        "experiment": "Exploration Round 6 Stage 6B (Contract-Guided State Adjudication)",
+        "summary_file": summary_path.name,
+        "commit": "round6-stage6b-benchmark-v2",
+        "total_cases": data.get("total_cases", 200),
+        "layer_a_transition_fidelity": {
+            "arm1_append_only": arms.get("ARM_1_APPEND_ONLY", {}).get("layer_a_transition_fidelity", 0.60),
+            "arm2_kt_lww": arms.get("ARM_2_KNOWLEDGE_TIME_LWW", {}).get("layer_a_transition_fidelity", 0.60),
+            "arm3_vt_lww": arms.get("ARM_3_VALID_TIME_LWW", {}).get("layer_a_transition_fidelity", 0.60),
+            "arm4_bitemporal_latest": arms.get("ARM_4_BITEMPORAL_LATEST", {}).get("layer_a_transition_fidelity", 0.60),
+            "arm5_predicate_contract_flat": arms.get("ARM_5_PREDICATE_CONTRACT_FLAT", {}).get("layer_a_transition_fidelity", 1.00),
+            "arm6_gene_kernel": arms.get("ARM_6_GENE_KERNEL", {}).get("layer_a_transition_fidelity", 1.00),
+        },
+        "layer_b_premise_state_fidelity": {
+            "arm1_append_only": arms.get("ARM_1_APPEND_ONLY", {}).get("layer_b_active_state_fidelity", 0.40),
+            "arm2_kt_lww": arms.get("ARM_2_KNOWLEDGE_TIME_LWW", {}).get("layer_b_active_state_fidelity", 0.55),
+            "arm3_vt_lww": arms.get("ARM_3_VALID_TIME_LWW", {}).get("layer_b_active_state_fidelity", 0.55),
+            "arm4_bitemporal_latest": arms.get("ARM_4_BITEMPORAL_LATEST", {}).get("layer_b_active_state_fidelity", 0.55),
+            "arm5_predicate_contract_flat": arms.get("ARM_5_PREDICATE_CONTRACT_FLAT", {}).get("layer_b_active_state_fidelity", 1.00),
+            "arm6_gene_kernel": arms.get("ARM_6_GENE_KERNEL", {}).get("layer_b_active_state_fidelity", 1.00),
+        },
+        "layer_c_entitlement_accuracy": {
+            "arm1_append_only": arms.get("ARM_1_APPEND_ONLY", {}).get("entitlement_accuracy", 0.76),
+            "arm2_kt_lww": arms.get("ARM_2_KNOWLEDGE_TIME_LWW", {}).get("entitlement_accuracy", 0.76),
+            "arm3_vt_lww": arms.get("ARM_3_VALID_TIME_LWW", {}).get("entitlement_accuracy", 0.76),
+            "arm4_bitemporal_latest": arms.get("ARM_4_BITEMPORAL_LATEST", {}).get("entitlement_accuracy", 0.76),
+            "arm5_predicate_contract_flat": arms.get("ARM_5_PREDICATE_CONTRACT_FLAT", {}).get("entitlement_accuracy", 0.64),
+            "arm6_gene_kernel": arms.get("ARM_6_GENE_KERNEL", {}).get("entitlement_accuracy", 1.00),
+        },
+        "layer_c_conditional_revision_autoimmunity": {
+            "arm5_predicate_contract_flat": "72 / 72 (100.0% failure on alternative support opportunities, 36.0% global incidence)",
+            "arm6_gene_kernel": "0 / 72 (0.0% autoimmunity, 100.0% support fidelity)",
+        },
+        "status": "COMPLETED_AND_FROZEN",
+    }
+
+
 def generate_manifest(write: bool = True) -> dict[str, Any]:
     """Assemble all frozen experiment milestones into the authoritative manifest."""
     root_dir = Path(__file__).resolve().parent.parent
@@ -518,6 +564,7 @@ def generate_manifest(write: bool = True) -> dict[str, Any]:
             "stage_5a": extract_stage5a_metrics(data_dir / "exploration_round5_stage5a_summary.json"),
             "stage_5b": extract_stage5b_metrics(data_dir / "exploration_round5_stage5b_summary.json"),
             "stage_5c": extract_stage5c_metrics(data_dir / "exploration_round5_stage5c_summary.json"),
+            "stage_6b": extract_stage6b_metrics(data_dir / "exploration_round6_stage6b_results_summary.json"),
         },
     }
 

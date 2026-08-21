@@ -57,6 +57,31 @@ def verify_clean_worktree() -> None:
         print("PASSED: Worktree is 100% clean with zero drift.\n")
 
 
+def verify_git_tracked_artifacts() -> None:
+    print("--> Verifying all canonical research artifacts are tracked in git...")
+    required_artifacts = [
+        "data/canonical_results_manifest.json",
+        "data/claim_ledger.json",
+        "data/exploration_round5_stage5a_cases.jsonl",
+        "data/exploration_round5_stage5a_summary.json",
+        "data/exploration_round5_stage5b_cases.jsonl",
+        "data/exploration_round5_stage5b_summary.json",
+        "data/exploration_round5_stage5c_manifest.json",
+        "data/exploration_round5_stage5c_summary.json",
+        "data/exploration_round6_scale_envelope_summary.json",
+        "data/exploration_round6_lineage_threat_matrix_summary.json",
+        "data/exploration_round6_stage6b_cases.jsonl",
+        "data/exploration_round6_stage6b_manifest.json",
+        "data/exploration_round6_stage6b_results_summary.json",
+    ]
+    for rel_path in required_artifacts:
+        res = subprocess.run(["git", "ls-files", "--error-unmatch", rel_path], cwd=root_dir, capture_output=True, text=True)
+        if res.returncode != 0:
+            print(f"FAILED: Artifact {rel_path} is NOT tracked in git!")
+            sys.exit(1)
+    print("PASSED: All canonical data artifacts are actively tracked in git.\n")
+
+
 def main() -> None:
     print("=========================================================")
     print("      GENE LOCAL REPRODUCIBILITY & VERIFICATION SUITE    ")
@@ -74,7 +99,10 @@ def main() -> None:
     # 4. Atlas Deep Sync
     verify_atlas_sync()
 
-    # 5. Clean Worktree Check
+    # 5. Git-Tracked Artifacts Invariant
+    verify_git_tracked_artifacts()
+
+    # 6. Clean Worktree Check
     verify_clean_worktree()
 
     print("=========================================================")
