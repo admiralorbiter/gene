@@ -1,6 +1,6 @@
 ---
 contract_id: CONTRACT-R8-8A
-status: DRAFT
+status: FROZEN
 base_sha: 21e63efe537def204ce0a0013a0e9f7d974e5217
 resource_class: gpu
 long_running: false
@@ -9,29 +9,29 @@ interruptible: true
 proposed_by: antigravity
 design_review: APPROVED
 reviewed_by: chatgpt-pro
-authorized_by: null
+authorized_by: human
 creation_date: "2026-08-21"
 target_completion_date: "2026-08-23"
 ---
 
-# Research Contract (Draft Proposal): CONTRACT-R8-8A — Autonomous Open-World Candidate Generation
+# Research Contract: CONTRACT-R8-8A — Autonomous Open-World Candidate Generation
 
-> **DRAFT PROPOSAL — DESIGN REVIEW APPROVED — PENDING STRATEGIC AUTHORIZATION**:
-> This contract formalizes Exploration Round 8 Stage 8A, testing autonomous candidate hypothesis extraction $\hat{\mathcal{B}}(x)$ from unstructured text without externally supplied finite menus, evaluated across a sealed 50-world benchmark with paired baseline controls and end-to-end useful admission coverage.
+> **FROZEN RESEARCH CONTRACT — AUTHORIZED FOR EXECUTION**:
+> This contract is frozen and authorized by the Human Research Director following scientific review by `chatgpt-pro`. It formalizes Exploration Round 8 Stage 8A, testing autonomous candidate hypothesis extraction $\hat{\mathcal{B}}(x)$ from unstructured text without externally supplied finite menus, evaluated across a sealed 50-world benchmark with paired baseline controls and end-to-end useful admission coverage.
 
 ---
 
 ## 1. Metadata & Lifecycle Status
 
 - **Contract ID**: `CONTRACT-R8-8A`
-- **Contract Status**: `DRAFT` (Pending Human Director Strategic Authorization)
+- **Contract Status**: `FROZEN`
 - **Base Git Commit (`base_sha`)**: `21e63efe537def204ce0a0013a0e9f7d974e5217`
 - **Target Experiment / Phase**: Exploration Round 8 Stage 8A (Autonomous Open Ingress)
 - **Protocol Version**: `v0.1`
 - **Governance**:
   - **Proposed By**: `antigravity`
   - **Design Review**: `APPROVED` (Reviewed by `chatgpt-pro`)
-  - **Authorized By**: `null` (Pending Human Director Strategic Authorization)
+  - **Authorized By**: `human` (Human Director Strategic Authorization)
 
 ---
 
