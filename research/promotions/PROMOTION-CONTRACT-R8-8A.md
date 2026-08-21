@@ -1,26 +1,25 @@
 ---
 promotion_id: PROMOTION-CONTRACT-R8-8A
 contract_id: CONTRACT-R8-8A
-status: CANDIDATE
+status: PROMOTED
 candidate_sha: c7c9ef641393adf6687f9ce05eda0b8776e2e32d
-generated_at: "2026-08-21 22:10:00Z"
+promoted_at: "2026-08-21 22:16:00Z"
 repair_rounds: 2
-reviewed_by: codex
-authorized_by: null
+reviewed_by: chatgpt-pro
+authorized_by: human
 ---
 
-# Candidate Promotion Record: PROMOTION-CONTRACT-R8-8A (Revision 1)
+# Promotion Record: PROMOTION-CONTRACT-R8-8A (Promoted)
 
-**Lifecycle Status**: `CANDIDATE` (Awaiting Human Director & ChatGPT Pro Promotion Review)
+**Lifecycle Status**: `PROMOTED` (Authorized by Human Research Director & ChatGPT Pro Scientific Review Desk)
 
 ## 1. Execution & Audit Summary
 - **Target Contract**: `CONTRACT-R8-8A`
 - **Phase / Milestone**: Exploration Round 8 Stage 8A (Autonomous Open Ingress)
-- **Candidate Branch**: `mb/CONTRACT-R8-8A`
-- **Candidate Commit SHA**: `c7c9ef641393adf6687f9ce05eda0b8776e2e32d`
+- **Promoted Candidate Commit SHA**: `c7c9ef641393adf6687f9ce05eda0b8776e2e32d`
 - **Contract Acceptance Verifier**: `PASS` (`scripts/verify_contract_r8_8a.py` executed and cleanly passed)
-- **Auditor Verdict**: `PASS` (All empirical estimands satisfied over 115 live model invocations)
-- **Repair Iterations**: 2 rounds (executed genuine live `gemma3:12b` calls via Ollama adapter with fail-closed error handling, world-specific distractor menus, and bitemporal downstream probe queries)
+- **Scientific Review Verdict**: `APPROVED` (with one follow-up verifier hardening debt recorded)
+- **Governance**: Human Director Promotion Merge.
 
 ## 2. Benchmark Verification & Estimands Audit
 
@@ -35,5 +34,7 @@ authorized_by: null
 | **Paired Relative Drop vs Menu Control** | $\le 10.0\%$ | **$0.0\%$ drop** across 50 paired worlds | **PASS** |
 | **Downstream Probes Q1..Q4** | $\equiv 100.0\%$ | **100.0% passed** (Point-in-time, interval support, active facts, certificates) | **PASS** |
 
-## 3. Epistemic Invariant Verification
-All 115 live model calls on `gemma3:12b` (`f4031aab637d...`) were recorded to `runs/r8_stage8a_candidate_generation.db` and `data/r8_stage8a_raw_calls.jsonl` with zero fallback records (`fallback_calls_detected = 0`). Extracted relations verified clean proof certificates in `IngressEngine`, were committed to `BitemporalEngine`, and verified across all 4 downstream query probes with zero false fact admissions in the bitemporal store.
+## 3. Epistemic Invariants & Methodological Debt
+- **Belief Update**: In this controlled synthetic single-document domain, removing the explicit finite candidate menu did not reduce candidate extraction or downstream safe-admission performance for `gemma3:12b`.
+- **Claim Ceiling**: Does not establish unrestricted open-world entity induction. Predicate schema is supplied, ontology exists downstream, and narratives are single-document synthetic telemetry.
+- **Follow-up Hardening Debt**: Future Stage 8+ acceptance verifiers should recompute primary estimands directly from raw persisted evidence rather than trusting canonical-summary metric fields.
