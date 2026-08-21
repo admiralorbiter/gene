@@ -1,15 +1,15 @@
 ---
-state: ESCALATED
+state: AUDITING
 active_contract_id: CONTRACT-R8-8A
 contract_path: research/contracts/CONTRACT-R8-8A.md
 execution_base_sha: b64b67679168335722036d6af22c1fbcd025aea6
 last_checkpoint: research/checkpoints/MIGRATION_CHECKPOINT.md
-last_promotion: null
+last_promotion: research/promotions/PROMOTION-CONTRACT-R8-8A.md
 ---
 
 # Active Research Contract Pointer
 
-**Current Operational State**: `READY`
+**Current Operational State**: `AUDITING`
 
 This document provides the machine-discoverable operational entry point for autonomous research agents and Mother Base.
 
@@ -18,9 +18,7 @@ This document provides the machine-discoverable operational entry point for auto
 - **Contract Path**: [`research/contracts/CONTRACT-R8-8A.md`](contracts/CONTRACT-R8-8A.md)
 - **Execution Base Commit (`execution_base_sha`)**: `b64b67679168335722036d6af22c1fbcd025aea6`
 - **Last Checkpoint**: [`research/checkpoints/MIGRATION_CHECKPOINT.md`](checkpoints/MIGRATION_CHECKPOINT.md)
-- **Governance**: Design Review `APPROVED`, Authorized by `human`.
-
-## Protocol for Agents
-1. When starting work, parse the YAML frontmatter above.
-2. If `state: ESCALATED` or `state: ESCALATED`, inspect the target contract at `contract_path` and optimize implementation strictly against its frozen constraints.
-3. Prohibited from modifying hypotheses, estimands, metrics, or claim ceilings after freezing.
+- **Candidate Promotion Record**: [`research/promotions/PROMOTION-CONTRACT-R8-8A.md`](promotions/PROMOTION-CONTRACT-R8-8A.md)
+- **Candidate Branch**: `mb/CONTRACT-R8-8A` (SHA: `14653c9e2e83a239518e094049b4defd7dad4574`)
+- **Auditor Verdict**: `PASS` (All criteria satisfied across sealed 50-world benchmark)
+- **Governance**: Design Review `APPROVED`, Authorized by `human`. Awaiting Scientific Promotion Review by `chatgpt-pro` and Human Promotion Merge.
