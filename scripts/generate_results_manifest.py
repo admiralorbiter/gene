@@ -644,14 +644,14 @@ def extract_stage7a_metrics(summary_path: Path) -> dict[str, Any]:
             "a2_candidate_aware": {
                 "world_pass_rate": a2.get("world_pass_rate", 0.0),
                 "fdar_global": a2.get("fdar_global", 0.0),
-                "fdar_authority": a2.get("fdar_authority", 0.0),
+                "fdar_authority_conditional_resolved": a2.get("fdar_authority_conditional_resolved", 0.0),
                 "sac_rate": a2.get("sac_rate", 0.0),
                 "upr_rate": a2.get("upr_rate", 0.0),
             },
             "a3_authority_aware": {
                 "world_pass_rate": a3.get("world_pass_rate", 0.0),
                 "fdar_global": a3.get("fdar_global", 0.0),
-                "fdar_ambiguity": a3.get("fdar_ambiguity", 0.0),
+                "fdar_ambiguity_conditional_authorized": a3.get("fdar_ambiguity_conditional_authorized", 0.0),
                 "sac_rate": a3.get("sac_rate", 0.0),
                 "upr_rate": a3.get("upr_rate", 0.0),
             },

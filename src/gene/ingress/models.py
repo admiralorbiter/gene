@@ -22,6 +22,13 @@ class ClaimType(str, Enum):
     HYPOTHETICAL_DERIVATION = "HYPOTHETICAL_DERIVATION"
 
 
+class ClaimPrivilege(str, Enum):
+    """Maximum authorization privilege level for admitted claims."""
+    ROOT_FACT = "ROOT_FACT"
+    ATTESTATION_ONLY = "ATTESTATION_ONLY"
+    PREFERENCE_ONLY = "PREFERENCE_ONLY"
+
+
 @dataclass(frozen=True)
 class CaptureProvenance:
     """Telemetry about physical receipt of the message by the platform."""
@@ -55,6 +62,23 @@ class SourceRecord:
     claimed_origin: ClaimedOrigin
     authenticated_origin: AuthenticatedOrigin
     t_knowledge: int
+
+
+@dataclass(frozen=True)
+class TrustedSourceContext:
+    """Runtime-derived capability, reliability, and provenance context.
+    
+    CRITICAL SECURITY INVARIANT:
+    TrustedSourceContext is NEVER supplied by an external caller or model.
+    It is deterministically derived by the platform kernel from:
+    SourceRecord + AuthenticatedOrigin + CapabilityPolicyRegistry.
+    """
+    authenticity: str  # "CRYPTOGRAPHIC_VERIFIED" | "PLATFORM_LOCAL" | "UNVERIFIED"
+    authorization_scope: frozenset[str]
+    max_claim_privilege: ClaimPrivilege
+    reliability_class: str
+    independence_class: str
+    is_spoofed_origin: bool = False
 
 
 @dataclass(frozen=True)
@@ -94,6 +118,8 @@ class DeferredBinding:
     t_valid_end: Optional[float] = None
     t_knowledge: int = 1
     reason_deferred: str = "AMBIGUOUS_CANDIDATE_SET"
+    is_resolved: bool = False
+    admitted_fact_id: Optional[str] = None
 
 
 @dataclass(frozen=True)
@@ -104,6 +130,8 @@ class ProvisionalEntity:
     first_source_record_id: str
     t_created_knowledge: int
     associated_attestation_ids: tuple[str, ...] = field(default_factory=tuple)
+    is_promoted: bool = False
+    canonical_entity_id: Optional[str] = None
 
 
 @dataclass(frozen=True)
@@ -118,16 +146,7 @@ class ProvisionalRelation:
     source_record_id: str
     is_subject_provisional: bool
     is_object_provisional: bool
-
-
-@dataclass(frozen=True)
-class SourceContext:
-    """Multidimensional capability, reliability, and provenance context."""
-    authenticity: str  # "CRYPTOGRAPHIC_VERIFIED" | "PLATFORM_LOCAL" | "UNVERIFIED"
-    authorization_scope: frozenset[str]  # e.g., frozenset(["system_status", "temperature"])
-    reliability_class: str  # "HIGH_PRECISION_SENSOR" | "HUMAN_OPERATOR" | "UNTRUSTED_WEB"
-    independence_class: str  # e.g., "SENSOR_NET_A", "OPERATOR_ROOT_1"
-    claim_type: ClaimType = ClaimType.FACTUAL_OBSERVATION
+    lineage_roots: frozenset[str] = field(default_factory=frozenset)
 
 
 @dataclass(frozen=True)

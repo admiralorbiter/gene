@@ -174,11 +174,13 @@ class BitemporalEngine:
                     if cur_s <= cut_t < cur_e:
                         cur_e = cut_t
 
-                # Supersession: this occurrence node is superseded by another
+                # Supersession: this occurrence node is superseded by another (if superseding fact is not itself retracted at t_v)
                 if ev.event_type == EventType.SUPERSEDES and ev.secondary_fact_id == fact_id:
-                    cut_t = ev.t_valid_start
-                    if cur_s <= cut_t < cur_e:
-                        cur_e = cut_t
+                    is_superseding_fact_retracted = any(r.event_type == EventType.RETRACT and r.target_fact_id == ev.target_fact_id and r.t_valid_start <= t_v for r in events)
+                    if not is_superseding_fact_retracted:
+                        cut_t = ev.t_valid_start
+                        if cur_s <= cut_t < cur_e:
+                            cur_e = cut_t
 
                 # Expiration
                 if ev.event_type == EventType.EXPIRES and ev.target_fact_id == fact_id:
@@ -199,9 +201,12 @@ class BitemporalEngine:
             c_end = ev.t_valid_end if ev.t_valid_end is not None else float("inf")
 
             if ev.event_type == EventType.CONTRADICTS and ev.secondary_fact_id:
-                if c_start <= t_v < c_end:
-                    pair = frozenset([ev.target_fact_id, ev.secondary_fact_id])
-                    active_conflicts.add(pair)
+                target_retracted = any(r.event_type == EventType.RETRACT and r.target_fact_id == ev.target_fact_id and r.t_valid_start <= t_v for r in events)
+                sec_retracted = any(r.event_type == EventType.RETRACT and r.target_fact_id == ev.secondary_fact_id and r.t_valid_start <= t_v for r in events)
+                if not target_retracted and not sec_retracted:
+                    if c_start <= t_v < c_end:
+                        pair = frozenset([ev.target_fact_id, ev.secondary_fact_id])
+                        active_conflicts.add(pair)
 
             elif ev.event_type == EventType.RESOLVE_CONFLICT and ev.secondary_fact_id:
                 if c_start <= t_v < c_end:

@@ -8,9 +8,11 @@ from gene.ingress.models import (
     AdmissionCertificate,
     AdmissionStatus,
     BindingHypothesisSet,
+    ClaimPrivilege,
+    ClaimType,
     ParsedAttestation,
-    SourceContext,
     SourceRecord,
+    TrustedSourceContext,
 )
 from gene.ingress.ontology import CapabilityPolicyRegistry, IngressOntology
 from gene.supersession_engine import Observation, PredicateContract
@@ -33,14 +35,11 @@ class CertificateVerifier:
         ontology: IngressOntology,
         capability_registry: CapabilityPolicyRegistry,
         contract: PredicateContract,
-        source_context: SourceContext,
+        trusted_context: TrustedSourceContext,
         certificate: AdmissionCertificate,
     ) -> Tuple[bool, Optional[str]]:
-        """Verify that certificate legitimately justifies the proposed admission action.
-        
-        Returns:
-            (is_valid, failure_reason)
-        """
+        """Verify that certificate legitimately justifies the proposed admission action."""
+
         # 1. Verification of ADMIT certificates
         if certificate.status == AdmissionStatus.ADMIT:
             if proposed_observation is None:
@@ -55,7 +54,7 @@ class CertificateVerifier:
             obj_id = bw["object"]
 
             if proposed_observation.subject != sub_id or proposed_observation.obj != obj_id:
-                return False, "ProposedObservation does not match binding_witness entities"
+                return False, "ProposedObservation entities do not match binding_witness"
 
             # Verify that bound entities were legitimate candidate hypotheses
             if sub_id not in subject_hypotheses.candidate_entity_ids:
@@ -69,27 +68,46 @@ class CertificateVerifier:
             if not ontology.contains_entity(obj_id):
                 return False, f"Object entity {obj_id} does not exist in domain ontology"
 
+            # Verify predicate consistency
+            if proposed_observation.predicate != parsed_attestation.predicate_span:
+                return False, f"ProposedObservation predicate '{proposed_observation.predicate}' != ParsedAttestation predicate '{parsed_attestation.predicate_span}'"
+
+            # Verify transaction knowledge time
+            if proposed_observation.t_knowledge != source_record.t_knowledge:
+                return False, f"ProposedObservation t_k ({proposed_observation.t_knowledge}) != SourceRecord t_k ({source_record.t_knowledge})"
+
             # Verify temporal consistency
             if proposed_observation.t_valid_start != parsed_attestation.t_valid_start:
                 return False, "ProposedObservation valid start does not match ParsedAttestation"
             if proposed_observation.t_valid_end != parsed_attestation.t_valid_end:
                 return False, "ProposedObservation valid end does not match ParsedAttestation"
 
+            # Verify origin authenticity and spoofing detection
+            if trusted_context.is_spoofed_origin:
+                return False, "Spoofed claimed origin detected in SourceRecord"
+            if trusted_context.authenticity == "UNVERIFIED" and not source_record.authenticated_origin.is_authenticated:
+                return False, "Unauthenticated origin cannot produce ADMIT certificate for root fact"
+
             # Verify capability and authorization scope
             pred = parsed_attestation.predicate_span
-            if pred not in source_context.authorization_scope and "*" not in source_context.authorization_scope:
+            if pred not in trusted_context.authorization_scope and "*" not in trusted_context.authorization_scope:
                 return False, f"Source lacks authorization scope for predicate '{pred}'"
 
-            # Verify origin authenticity requirements
-            if source_context.authenticity == "UNVERIFIED" and not source_record.authenticated_origin.is_authenticated:
-                # If unverified, cannot produce authoritative ROOT_FACT unless policy explicitly permits
-                policy = capability_registry.get_policy(source_record.claimed_origin.claimed_role)
-                if policy and policy.max_claim_privilege == "ATTESTATION_ONLY":
-                    return False, "Unauthenticated source restricted to ATTESTATION_ONLY cannot produce ADMIT"
+            # Verify claim privilege (ATTESTATION_ONLY cannot become ROOT_FACT)
+            if trusted_context.max_claim_privilege != ClaimPrivilege.ROOT_FACT:
+                return False, f"Source privilege {trusted_context.max_claim_privilege.value} cannot assert ROOT_FACT"
+
+            # Verify extracted claim type
+            if parsed_attestation.extracted_claim_type != ClaimType.FACTUAL_OBSERVATION:
+                return False, f"Extracted claim type {parsed_attestation.extracted_claim_type.value} cannot assert ROOT_FACT"
 
             # Verify lineage root integrity
-            if not certificate.lineage_roots:
-                return False, "ADMIT certificate must declare non-empty lineage roots"
+            if not certificate.lineage_roots or proposed_observation.lineage_roots != certificate.lineage_roots:
+                return False, "ADMIT certificate and Observation lineage roots must match non-empty trusted context roots"
+
+            expected_root = trusted_context.independence_class
+            if expected_root not in certificate.lineage_roots:
+                return False, f"Lineage root '{expected_root}' missing from certificate lineage roots"
 
             return True, None
 

@@ -1,7 +1,7 @@
 {
   "manifest_version": "2.0.0",
   "project": "GENE (Genealogical Epistemic Network Experiments)",
-  "generated_at": "2026-08-21T14:30:07.839767+00:00",
+  "generated_at": "2026-08-21T14:46:37.364903+00:00",
   "canonical_experiments": {
     "exp0": {
       "experiment": "Experiment 0 (Lineage Observability & Factorial Calibration)",
@@ -336,28 +336,28 @@
       "total_probe_evaluations": 480,
       "arms": {
         "a0_top1_blind_write": {
-          "world_pass_rate": 0.5,
+          "world_pass_rate": 0.5833333333333334,
           "fdar_global": 0.7142857142857143,
           "sac_rate": 1.0,
           "upr_rate": 0.0
         },
         "a1_canonicalize_only": {
-          "world_pass_rate": 0.5,
+          "world_pass_rate": 0.5833333333333334,
           "fdar_global": 0.7142857142857143,
           "sac_rate": 1.0,
           "upr_rate": 0.0
         },
         "a2_candidate_aware": {
-          "world_pass_rate": 0.7,
+          "world_pass_rate": 0.75,
           "fdar_global": 0.42857142857142855,
-          "fdar_authority": 0.6,
+          "fdar_authority_conditional_resolved": 1.0,
           "sac_rate": 1.0,
           "upr_rate": 1.0
         },
         "a3_authority_aware": {
-          "world_pass_rate": 0.9,
+          "world_pass_rate": 0.9166666666666666,
           "fdar_global": 0.14285714285714285,
-          "fdar_ambiguity": 0.5,
+          "fdar_ambiguity_conditional_authorized": 1.0,
           "sac_rate": 1.0,
           "upr_rate": 0.0
         },

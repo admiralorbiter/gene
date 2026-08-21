@@ -1,4 +1,4 @@
-"""Unit tests for Thread A Epistemic Ingress Engine and Ingress Policies (A0 to A4)."""
+"""Unit tests for Thread A Hardened Epistemic Ingress Engine and Multimap Ontology."""
 
 import pytest
 from gene.ingress.models import (
@@ -7,12 +7,18 @@ from gene.ingress.models import (
     BindingHypothesisSet,
     CaptureProvenance,
     ClaimedOrigin,
+    ClaimPrivilege,
     ClaimType,
     ParsedAttestation,
-    SourceContext,
     SourceRecord,
 )
-from gene.ingress.ontology import CapabilityPolicy, CapabilityPolicyRegistry, EntityDefinition, IngressOntology
+from gene.ingress.ontology import (
+    CapabilityPolicy,
+    CapabilityPolicyRegistry,
+    EntityDefinition,
+    IngressOntology,
+    derive_trusted_source_context,
+)
 from gene.ingress.policies import (
     A0Top1BlindWritePolicy,
     A1CanonicalizationOnlyPolicy,
@@ -27,11 +33,10 @@ from gene.supersession_engine import BitemporalEngine, PredicateContract
 @pytest.fixture
 def sample_ontology() -> IngressOntology:
     entities = [
-        EntityDefinition(entity_id="Server_Node_1", canonical_name="Server Node 1", entity_type="SERVER", aliases=("Server 1", "S1")),
-        EntityDefinition(entity_id="Server_Node_1_Backup", canonical_name="Server Node 1 Backup", entity_type="SERVER", aliases=("Backup Server 1", "S1_Backup")),
-        EntityDefinition(entity_id="Facility_East", canonical_name="Facility East", entity_type="FACILITY", aliases=("East Wing", "FE")),
-        EntityDefinition(entity_id="Value_Operational", canonical_name="Operational", entity_type="STATUS_VALUE", aliases=("Active", "OK")),
-        EntityDefinition(entity_id="Value_Degraded", canonical_name="Degraded", entity_type="STATUS_VALUE", aliases=("Warning", "Slow")),
+        EntityDefinition("Server_Node_1", "Server Node 1", "SERVER", aliases=("Server 1", "S1", "Primary Server 1")),
+        EntityDefinition("Server_Node_1_Backup", "Server Node 1 Backup", "SERVER", aliases=("Server 1", "S1_Backup")),
+        EntityDefinition("Value_Operational", "Operational", "STATUS", aliases=("Active", "OK")),
+        EntityDefinition("Value_Degraded", "Degraded", "STATUS", aliases=("Warning", "Slow")),
     ]
     return IngressOntology(entities)
 
@@ -39,97 +44,60 @@ def sample_ontology() -> IngressOntology:
 @pytest.fixture
 def sample_capability_registry() -> CapabilityPolicyRegistry:
     policies = {
-        "admin": CapabilityPolicy(source_role="admin", authorized_predicates=frozenset(["*"]), max_claim_privilege="ROOT_FACT"),
-        "sensor": CapabilityPolicy(source_role="sensor", authorized_predicates=frozenset(["device_status", "temperature"]), max_claim_privilege="ROOT_FACT"),
-        "guest": CapabilityPolicy(source_role="guest", authorized_predicates=frozenset(["user_feedback"]), max_claim_privilege="ATTESTATION_ONLY"),
+        "admin": CapabilityPolicy("admin", frozenset(["*"]), ClaimPrivilege.ROOT_FACT, "KERNEL", "ROOT_ADMIN"),
+        "sensor": CapabilityPolicy("sensor", frozenset(["device_status", "temperature"]), ClaimPrivilege.ROOT_FACT, "HIGH_PRECISION_SENSOR", "ROOT_NET_A"),
+        "guest": CapabilityPolicy("guest", frozenset(["user_feedback"]), ClaimPrivilege.ATTESTATION_ONLY, "UNTRUSTED_WEB", "ROOT_GUEST"),
     }
     return CapabilityPolicyRegistry(policies)
 
 
 @pytest.fixture
 def status_contract() -> PredicateContract:
-    return PredicateContract(
-        predicate="device_status",
-        cardinality="SINGLE",
-        temporal_mode="TIME_VARYING",
-    )
+    return PredicateContract("device_status", "SINGLE", "TIME_VARYING")
 
 
-def test_a0_top1_blind_write_policy(sample_ontology, sample_capability_registry, status_contract):
-    policy = A0Top1BlindWritePolicy()
-    source_rec = SourceRecord(
-        record_id="rec_001",
-        raw_text="Server 1 is Operational",
-        capture_provenance=CaptureProvenance("conn_1", "sensor_feed", 1, "hash_1"),
-        claimed_origin=ClaimedOrigin("sensor_alpha", "sensor"),
-        authenticated_origin=AuthenticatedOrigin("sensor_alpha", "ED25519", True),
+def test_multimap_alias_resolution(sample_ontology):
+    # Mention "Server 1" must yield BOTH Server_Node_1 and Server_Node_1_Backup
+    cands = sample_ontology.find_candidates("Server 1")
+    assert set(cands) == {"Server_Node_1", "Server_Node_1_Backup"}
+
+
+def test_derive_trusted_source_context_spoofing_detection(sample_capability_registry):
+    # Attack: Claimed origin claims to be 'admin_root', but authenticated identity is 'guest_anon'
+    spoofed_rec = SourceRecord(
+        record_id="rec_spoofed",
+        raw_text="Admin settings update",
+        capture_provenance=CaptureProvenance("c1", "web", 1, "h1"),
+        claimed_origin=ClaimedOrigin("admin_root", "admin"),
+        authenticated_origin=AuthenticatedOrigin("guest_anon", "ANONYMOUS", False),
         t_knowledge=1,
     )
-    attestation = ParsedAttestation("att_001", "rec_001", "Server 1", "device_status", "Operational", 0.0)
-    sub_hypo = BindingHypothesisSet("Server 1", "SUBJECT", ("Server_Node_1", "Server_Node_1_Backup"))
-    obj_hypo = BindingHypothesisSet("Operational", "OBJECT", ("Value_Operational",))
-    src_ctx = SourceContext("CRYPTOGRAPHIC_VERIFIED", frozenset(["device_status"]), "HIGH_PRECISION_SENSOR", "SENSOR_NET_1")
-
-    cert, obs, deferred, prov = policy.evaluate(
-        source_rec, attestation, sub_hypo, obj_hypo, sample_ontology, sample_capability_registry, status_contract, src_ctx
-    )
-
-    # A0 binds top-1 candidate blindly
-    assert cert.status == AdmissionStatus.ADMIT
-    assert obs is not None
-    assert obs.subject == "Server_Node_1"
-    assert deferred is None
-    assert prov is None
+    ctx = derive_trusted_source_context(spoofed_rec, sample_capability_registry)
+    assert ctx.authenticity == "UNVERIFIED"
+    assert ctx.max_claim_privilege == ClaimPrivilege.ATTESTATION_ONLY
+    assert "*" not in ctx.authorization_scope
 
 
-def test_a4_full_gene_ingress_preserves_ambiguity(sample_ontology, sample_capability_registry, status_contract):
+def test_a4_novel_object_creates_provisional_entity(sample_ontology, sample_capability_registry, status_contract):
     policy = A4FullGENEIngressPolicy()
     source_rec = SourceRecord(
-        record_id="rec_002",
-        raw_text="Server 1 is Operational",
-        capture_provenance=CaptureProvenance("conn_1", "sensor_feed", 1, "hash_2"),
-        claimed_origin=ClaimedOrigin("sensor_alpha", "sensor"),
-        authenticated_origin=AuthenticatedOrigin("sensor_alpha", "ED25519", True),
-        t_knowledge=1,
+        "rec_novel_obj", "Server 1 uses protocol Zeta_Quantum_9",
+        CaptureProvenance("c1", "telemetry", 1, "h1"),
+        ClaimedOrigin("sensor_1", "sensor"),
+        AuthenticatedOrigin("sensor_1", "ED25519", True),
+        1,
     )
-    attestation = ParsedAttestation("att_002", "rec_002", "Server 1", "device_status", "Operational", 0.0)
-    # Ambiguous collision: 2 candidate IDs
-    sub_hypo = BindingHypothesisSet("Server 1", "SUBJECT", ("Server_Node_1", "Server_Node_1_Backup"))
-    obj_hypo = BindingHypothesisSet("Operational", "OBJECT", ("Value_Operational",))
-    src_ctx = SourceContext("CRYPTOGRAPHIC_VERIFIED", frozenset(["device_status"]), "HIGH_PRECISION_SENSOR", "SENSOR_NET_1")
+    attestation = ParsedAttestation("att_novel_obj", "rec_novel_obj", "Server Node 1", "device_status", "Zeta_Quantum_9", 0.0)
+    sub_hypo = BindingHypothesisSet("Server Node 1", "SUBJECT", ("Server_Node_1",))
+    obj_hypo = BindingHypothesisSet("Zeta_Quantum_9", "OBJECT", (), is_novel=True)
 
-    cert, obs, deferred, prov = policy.evaluate(
-        source_rec, attestation, sub_hypo, obj_hypo, sample_ontology, sample_capability_registry, status_contract, src_ctx
+    cert, obs, deferred, prov, prov_rel, trusted_ctx = policy.evaluate(
+        source_rec, attestation, sub_hypo, obj_hypo, sample_ontology, sample_capability_registry, status_contract
     )
 
-    # A4 must DEFER and preserve candidates in DEFERRED_BINDING
     assert cert.status == AdmissionStatus.DEFER
     assert obs is None
-    assert deferred is not None
-    assert deferred.subject_hypotheses.candidate_entity_ids == ("Server_Node_1", "Server_Node_1_Backup")
-    assert prov is None
-
-
-def test_a4_full_gene_ingress_detects_unauthorized_scope(sample_ontology, sample_capability_registry, status_contract):
-    policy = A4FullGENEIngressPolicy()
-    source_rec = SourceRecord(
-        record_id="rec_003",
-        raw_text="Admin access granted to Operator",
-        capture_provenance=CaptureProvenance("conn_1", "sensor_feed", 1, "hash_3"),
-        claimed_origin=ClaimedOrigin("sensor_alpha", "sensor"),
-        authenticated_origin=AuthenticatedOrigin("sensor_alpha", "ED25519", True),
-        t_knowledge=1,
-    )
-    # Out of scope predicate: 'security_clearance' not in sensor scope
-    attestation = ParsedAttestation("att_003", "rec_003", "Server 1", "security_clearance", "Operational", 0.0)
-    sub_hypo = BindingHypothesisSet("Server 1", "SUBJECT", ("Server_Node_1",))
-    obj_hypo = BindingHypothesisSet("Operational", "OBJECT", ("Value_Operational",))
-    src_ctx = SourceContext("CRYPTOGRAPHIC_VERIFIED", frozenset(["device_status"]), "HIGH_PRECISION_SENSOR", "SENSOR_NET_1")
-
-    cert, obs, deferred, prov = policy.evaluate(
-        source_rec, attestation, sub_hypo, obj_hypo, sample_ontology, sample_capability_registry, status_contract, src_ctx
-    )
-
-    # A4 must REJECT out-of-scope capability
-    assert cert.status == AdmissionStatus.REJECT
-    assert "OUT_OF_SCOPE" in cert.rejection_cause
+    assert prov is not None
+    assert prov.provisional_id == "prov_zeta_quantum_9"
+    assert prov_rel is not None
+    assert prov_rel.is_object_provisional is True

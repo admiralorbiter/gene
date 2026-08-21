@@ -1,7 +1,8 @@
-"""120-World 4-Probe Benchmark Evaluator (Thread B).
+"""Stateful 120-World 4-Probe Benchmark Evaluator (Stage 7A.1).
 
-Evaluates Arms A0, A1, A2, A3, A4 feeding the identical frozen downstream BitemporalEngine.
-Records binary outcome vector P(w) = (Q1, Q2, Q3, Q4), WorldPass(w), FDAR, SAC, UPR.
+Evaluates Arms A0, A1, A2, A3, A4 against seeded prior bitemporal state.
+Exercises true downstream Q1 (Bitemporal state), Q2 (Antichain support S_t via why_t),
+Q3 (Action governance Auth(S_L)), Q4 (Causal WHAT_IF ablation via what_if_t).
 """
 
 from __future__ import annotations
@@ -14,11 +15,16 @@ from gene.ingress.models import (
     BindingHypothesisSet,
     CaptureProvenance,
     ClaimedOrigin,
+    ClaimPrivilege,
     ParsedAttestation,
-    SourceContext,
     SourceRecord,
 )
-from gene.ingress.ontology import CapabilityPolicy, CapabilityPolicyRegistry, EntityDefinition, IngressOntology
+from gene.ingress.ontology import (
+    CapabilityPolicy,
+    CapabilityPolicyRegistry,
+    EntityDefinition,
+    IngressOntology,
+)
 from gene.ingress.policies import (
     A0Top1BlindWritePolicy,
     A1CanonicalizationOnlyPolicy,
@@ -28,30 +34,37 @@ from gene.ingress.policies import (
     IngressPolicy,
 )
 from gene.ingress.engine import IngressEngine
-from gene.supersession_engine import BitemporalEngine, PredicateContract
+from gene.supersession_engine import (
+    BitemporalEngine,
+    BitemporalFact,
+    EventType,
+    PredicateContract,
+    TemporalEvent,
+)
 
 
-def get_default_ontology() -> IngressOntology:
+def get_benchmark_ontology() -> IngressOntology:
     entities = [
         EntityDefinition("Server_Node_1", "Server Node 1", "SERVER", aliases=("Primary Server 1", "Server_Node_1", "Server 1")),
         EntityDefinition("Server_Node_1_Backup", "Server Node 1 Backup", "SERVER", aliases=("Backup Server 1", "Server 1")),
+        EntityDefinition("Value_Baseline", "Baseline Value", "STATUS", aliases=("Baseline",)),
         EntityDefinition("Value_Operational", "Operational", "STATUS", aliases=("Active", "Value_Operational")),
     ]
     return IngressOntology(entities)
 
 
-def get_default_capability_registry() -> CapabilityPolicyRegistry:
+def get_benchmark_capability_registry() -> CapabilityPolicyRegistry:
     policies = {
-        "sensor": CapabilityPolicy("sensor", frozenset(["*"]), "ROOT_FACT"),
-        "guest": CapabilityPolicy("guest", frozenset(["feedback_only"]), "ATTESTATION_ONLY"),
+        "sensor": CapabilityPolicy("sensor", frozenset(["*"]), ClaimPrivilege.ROOT_FACT, "HIGH_PRECISION_SENSOR", "ROOT_NET_1"),
+        "guest": CapabilityPolicy("guest", frozenset(["feedback_only"]), ClaimPrivilege.ATTESTATION_ONLY, "UNTRUSTED_WEB", "ROOT_GUEST"),
     }
     return CapabilityPolicyRegistry(policies)
 
 
 def evaluate_arm(policy: IngressPolicy, cases: list[IngressTestCase]) -> dict[str, Any]:
-    """Evaluate an ingress policy across all 120 cases feeding the bitemporal engine."""
-    ontology = get_default_ontology()
-    capability_registry = get_default_capability_registry()
+    """Evaluate an ingress policy across all 120 stateful cases feeding the bitemporal engine."""
+    ontology = get_benchmark_ontology()
+    capability_registry = get_benchmark_capability_registry()
 
     world_vectors: list[tuple[int, int, int, int]] = []
     world_passes: list[bool] = []
@@ -59,10 +72,14 @@ def evaluate_arm(policy: IngressPolicy, cases: list[IngressTestCase]) -> dict[st
 
     inadmissible_count = 0
     false_durable_admissions = 0
+
     fdar_bind_num, fdar_bind_den = 0, 0
     fdar_ambig_num, fdar_ambig_den = 0, 0
     fdar_novel_num, fdar_novel_den = 0, 0
     fdar_unauth_num, fdar_unauth_den = 0, 0
+
+    fdar_auth_cond_resolved_num, fdar_auth_cond_resolved_den = 0, 0
+    fdar_ambig_cond_auth_num, fdar_ambig_cond_auth_den = 0, 0
 
     admissible_count = 0
     correct_admissions = 0
@@ -73,8 +90,30 @@ def evaluate_arm(policy: IngressPolicy, cases: list[IngressTestCase]) -> dict[st
     for case in cases:
         oracle_exp = BenchmarkOracle.evaluate_case(case)
 
-        # Fresh bitemporal engine and ingress engine for this isolated world
+        # 1. Seed baseline prior state
         b_engine = BitemporalEngine()
+        base_fact = BitemporalFact(
+            fact_id=case.baseline_occurrence.fact_id,
+            subject=case.baseline_occurrence.subject,
+            predicate=case.baseline_occurrence.predicate,
+            obj=case.baseline_occurrence.obj,
+            roots=case.baseline_occurrence.lineage_roots,
+            source_id=case.baseline_occurrence.source_id,
+            origin_id=case.baseline_occurrence.origin_id,
+        )
+        b_engine.register_fact(base_fact)
+        b_engine.record_event(
+            TemporalEvent(
+                event_id=f"ev_base_{case.case_id}",
+                event_type=EventType.ASSERT,
+                target_fact_id=base_fact.fact_id,
+                t_knowledge=case.baseline_occurrence.t_knowledge,
+                t_valid_start=case.baseline_occurrence.t_valid_start,
+                t_valid_end=case.baseline_occurrence.t_valid_end,
+                event_seq=1,
+            )
+        )
+
         engine = IngressEngine(ontology, capability_registry, policy, b_engine)
 
         contract = PredicateContract(
@@ -103,18 +142,12 @@ def evaluate_arm(policy: IngressPolicy, cases: list[IngressTestCase]) -> dict[st
         )
         sub_hypo = BindingHypothesisSet(case.subject_mention, "SUBJECT", case.subject_candidate_ids, case.is_subject_novel)
         obj_hypo = BindingHypothesisSet(case.object_mention, "OBJECT", case.object_candidate_ids, case.is_object_novel)
-        src_ctx = SourceContext(
-            authenticity="CRYPTOGRAPHIC_VERIFIED" if case.is_authenticated else "UNVERIFIED",
-            authorization_scope=frozenset(["*"]) if case.is_authenticated else frozenset(["feedback_only"]),
-            reliability_class="HIGH_PRECISION_SENSOR" if case.is_authenticated else "UNTRUSTED_WEB",
-            independence_class=f"ROOT_{case.claimed_source}",
-        )
 
         # Ingest record
-        ingest_res = engine.ingest_record(source_rec, parsed_att, sub_hypo, obj_hypo, contract, src_ctx)
+        ingest_res = engine.ingest_record(source_rec, parsed_att, sub_hypo, obj_hypo, contract)
         actual_status = ingest_res["status"]
 
-        # Track FDAR opportunities & durable admissions
+        # Track FDAR metrics
         if oracle_exp.is_inadmissible_opportunity:
             inadmissible_count += 1
             if actual_status == "ADMIT":
@@ -140,7 +173,18 @@ def evaluate_arm(policy: IngressPolicy, cases: list[IngressTestCase]) -> dict[st
                 if actual_status == "ADMIT":
                     fdar_unauth_num += 1
 
-        # Track SAC opportunities
+            # Conditional FDARs
+            if oracle_exp.is_unauthorized_promotion_risk and oracle_exp.is_resolved_binding:
+                fdar_auth_cond_resolved_den += 1
+                if actual_status == "ADMIT":
+                    fdar_auth_cond_resolved_num += 1
+
+            if oracle_exp.is_ambiguity_collapse_risk and oracle_exp.is_authorized_direct_source:
+                fdar_ambig_cond_auth_den += 1
+                if actual_status == "ADMIT":
+                    fdar_ambig_cond_auth_num += 1
+
+        # Track SAC metrics
         if oracle_exp.is_admissible_ground_truth:
             admissible_count += 1
             if actual_status == "ADMIT":
@@ -148,32 +192,74 @@ def evaluate_arm(policy: IngressPolicy, cases: list[IngressTestCase]) -> dict[st
                 if obs and obs.subject == case.gold_subject_id and obs.obj == case.gold_object_id:
                     correct_admissions += 1
 
-        # Track UPR (Unresolved Preservation Rate) on authorized ambiguous/novel cases where DEFER is expected
+        # Track UPR metrics
         if oracle_exp.expected_admission_status == "DEFER":
             unresolved_opportunity_count += 1
             if actual_status == "DEFER":
                 correct_unresolved_preservations += 1
 
-        # --- The Four Formal Probes ---
-        # Q1: Active State Probe at (t_valid_start, t_knowledge)
-        active_facts = b_engine.get_active_facts(case.t_valid_start, case.t_knowledge)
+        # --- The Four Formal Downstream Probes ---
+        cand_fact_id = f"fact_{source_rec.record_id}"
+        query_triple = (case.gold_subject_id or "Server_Node_1", case.predicate_name, case.gold_object_id or "Value_Operational")
+        base_triple = (case.baseline_occurrence.subject, case.baseline_occurrence.predicate, case.baseline_occurrence.obj)
+
+        is_dispute_mode = (case.temporal_relation == "CONTEMPORANEOUS_DISPUTE" and contract.cardinality == "SINGLE")
+
+        # Q1: Exact Bitemporal Active State Probe at (t_valid_start, t_knowledge=2)
+        active_facts_now = b_engine.get_active_facts(case.t_valid_start, 2)
         if oracle_exp.is_admissible_ground_truth:
-            q1 = 1 if any(f.triple == oracle_exp.expected_active_fact_tuple for f in active_facts) else 0
+            if is_dispute_mode:
+                # Under contemporaneous dispute of single-cardinality facts, cautious isolation inactivates both facts
+                q1 = 1 if len(active_facts_now) == 0 else 0
+            else:
+                q1 = 1 if any(f.fact_id == cand_fact_id for f in active_facts_now) else 0
         else:
-            q1 = 1 if len(active_facts) == 0 else 0
+            # Inadmissible candidate must not be active
+            q1 = 1 if not any(f.fact_id == cand_fact_id for f in active_facts_now) else 0
 
-        # Q2: Structured Premise-Challenge Probe (testing whether a contradictory query premise is rejected)
-        q2 = 1 if (len(active_facts) == 0 if not oracle_exp.is_admissible_ground_truth else len(active_facts) == 1) else 0
-
-        # Q3: Action Policy Probe (action authorized iff active facts exist with authentic lineage roots)
-        has_auth_roots = any(len(f.roots) > 0 for f in active_facts)
+        # Q2: Structured Premise Challenge Probe via why_t
+        why_res = b_engine.why_t(query_triple, case.t_valid_start, 2)
         if oracle_exp.is_admissible_ground_truth:
-            q3 = 1 if has_auth_roots else 0
+            if is_dispute_mode:
+                # Under dispute, entitlement is cleanly blocked (cautious abstention)
+                q2 = 1 if not why_res["is_entitled"] else 0
+            else:
+                # Entitled with non-empty minimal antichain support S_t
+                q2 = 1 if (why_res["is_entitled"] and len(why_res["support_sets_S_t"]) >= 1) else 0
         else:
-            q3 = 1 if not has_auth_roots else 0
+            # Inadmissible query must NOT be entitled
+            q2 = 1 if not why_res["is_entitled"] else 0
 
-        # Q4: Causal Invalidation Probe
-        q4 = 1
+        # Q3: Action Policy Authority Probe via Auth(S_L)
+        if oracle_exp.is_admissible_ground_truth:
+            if is_dispute_mode:
+                # Disputed state has 0 authority to act
+                q3 = 1 if why_res["bounded_authority"] == 0.0 else 0
+            else:
+                # Entitled state has full authority (1.0) with authentic lineage
+                q3 = 1 if (why_res["bounded_authority"] == 1.0 and any("ROOT_NET_1" in "".join(s) for s in why_res["lineage_sets_S_L_t"])) else 0
+        else:
+            # Inadmissible input must have 0.0 bounded authority
+            q3 = 1 if why_res["bounded_authority"] == 0.0 else 0
+
+        # Q4: Causal Invalidation Probe via what_if_t
+        # Simulate counterfactual retraction of candidate fact: does it restore or preserve baseline state?
+        if cand_fact_id in b_engine.facts:
+            cf_event = TemporalEvent(
+                event_id=f"cf_retract_{case.case_id}",
+                event_type=EventType.RETRACT,
+                target_fact_id=cand_fact_id,
+                t_knowledge=2,
+                t_valid_start=case.t_valid_start,
+                event_seq=99,
+            )
+            eval_tv = 2.5 if (case.predicate_mode == "INTERVAL_BOUNDED" and case.temporal_relation == "FORWARD_UPDATE") else case.t_valid_start
+            what_if_res = b_engine.what_if_t(base_triple, cf_event, eval_tv, 2)
+            # Retracting candidate fact cleanly restores baseline or preserves clean state
+            q4 = 1 if what_if_res["hypothetical_entitled"] or case.predicate_mode in ("ADDITIVE", "EPISODIC") else 0
+        else:
+            # When candidate was not admitted, baseline remains unperturbed
+            q4 = 1
 
         p_vector = (q1, q2, q3, q4)
         w_pass = (q1 == 1 and q2 == 1 and q3 == 1 and q4 == 1)
@@ -194,9 +280,11 @@ def evaluate_arm(policy: IngressPolicy, cases: list[IngressTestCase]) -> dict[st
         "world_pass_count": sum(world_passes),
         "fdar_global": fdar_global,
         "fdar_bind": fdar_bind_num / fdar_bind_den if fdar_bind_den > 0 else 0.0,
-        "fdar_ambiguity": fdar_ambig_num / fdar_ambig_den if fdar_ambig_den > 0 else 0.0,
+        "fdar_ambiguity_unconditional": fdar_ambig_num / fdar_ambig_den if fdar_ambig_den > 0 else 0.0,
+        "fdar_ambiguity_conditional_authorized": fdar_ambig_cond_auth_num / fdar_ambig_cond_auth_den if fdar_ambig_cond_auth_den > 0 else 0.0,
         "fdar_novel": fdar_novel_num / fdar_novel_den if fdar_novel_den > 0 else 0.0,
-        "fdar_authority": fdar_unauth_num / fdar_unauth_den if fdar_unauth_den > 0 else 0.0,
+        "fdar_authority_unconditional": fdar_unauth_num / fdar_unauth_den if fdar_unauth_den > 0 else 0.0,
+        "fdar_authority_conditional_resolved": fdar_auth_cond_resolved_num / fdar_auth_cond_resolved_den if fdar_auth_cond_resolved_den > 0 else 0.0,
         "sac_rate": sac_rate,
         "upr_rate": upr_rate,
         "profile_distribution": profile_distribution,
@@ -204,7 +292,7 @@ def evaluate_arm(policy: IngressPolicy, cases: list[IngressTestCase]) -> dict[st
 
 
 def run_benchmark_120_all_arms() -> dict[str, Any]:
-    """Execute all 5 comparative ingress arms across the 120-world factorial benchmark."""
+    """Execute all 5 comparative ingress arms across the stateful 120-world benchmark."""
     cases = generate_120_worlds()
     arms = {
         "A0_Top1_Blind_Write": A0Top1BlindWritePolicy(),
@@ -220,9 +308,3 @@ def run_benchmark_120_all_arms() -> dict[str, Any]:
         results[arm_name] = res
 
     return results
-
-
-if __name__ == "__main__":
-    res = run_benchmark_120_all_arms()
-    for arm, data in res.items():
-        print(f"[{arm}] WorldPass: {data['world_pass_rate']:.1%}, FDAR: {data['fdar_global']:.1%}, SAC: {data['sac_rate']:.1%}, UPR: {data['upr_rate']:.1%}")

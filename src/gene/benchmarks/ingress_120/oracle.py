@@ -1,4 +1,4 @@
-"""Independent Benchmark Oracle (Thread B)."""
+"""Independent Benchmark Oracle (Stage 7A.1)."""
 
 from __future__ import annotations
 
@@ -14,12 +14,15 @@ class CaseOracleExpectation:
     expected_admission_status: str  # "ADMIT" | "DEFER" | "REJECT"
     is_admissible_ground_truth: bool
     is_inadmissible_opportunity: bool
-    # Failure opportunity labels (multi-label flags)
+    # Failure opportunity labels
     is_wrong_binding_risk: bool
     is_ambiguity_collapse_risk: bool
     is_novel_mislinking_risk: bool
     is_unauthorized_promotion_risk: bool
-    expected_active_fact_tuple: tuple[str, str, str] | None
+    # Condition-specific flags
+    is_authorized_direct_source: bool
+    is_resolved_binding: bool
+    expected_candidate_fact_triple: tuple[str, str, str] | None
 
 
 class BenchmarkOracle:
@@ -27,10 +30,6 @@ class BenchmarkOracle:
 
     @staticmethod
     def evaluate_case(case: IngressTestCase) -> CaseOracleExpectation:
-        # A case is admissible iff:
-        # 1. Source is direct & authenticated
-        # 2. Binding is resolvable (EXACT_CANONICAL, SURFACE_ALIAS, or resolvable ROLE_DISTRACTOR)
-        # 3. Not novel, not collision
         is_auth_direct = (case.source_role_form == "DIRECT_OBSERVATION" and case.is_authenticated)
         is_resolvable_binding = case.binding_condition in ("EXACT_CANONICAL", "SURFACE_ALIAS", "ROLE_DISTRACTOR")
         is_admissible = is_auth_direct and is_resolvable_binding
@@ -41,7 +40,7 @@ class BenchmarkOracle:
         elif is_auth_direct and case.binding_condition in ("CANDIDATE_COLLISION", "NOVEL_ENTITY"):
             expected_status = "DEFER"
             expected_fact = None
-        else:  # Unauthorized third party or unauthenticated origin
+        else:  # Unauthorized or unauthenticated
             expected_status = "REJECT"
             expected_fact = None
 
@@ -60,5 +59,7 @@ class BenchmarkOracle:
             is_ambiguity_collapse_risk=is_ambig,
             is_novel_mislinking_risk=is_novel,
             is_unauthorized_promotion_risk=is_unauth,
-            expected_active_fact_tuple=expected_fact,
+            is_authorized_direct_source=is_auth_direct,
+            is_resolved_binding=is_resolvable_binding,
+            expected_candidate_fact_triple=expected_fact,
         )

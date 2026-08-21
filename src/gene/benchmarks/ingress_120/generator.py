@@ -1,4 +1,4 @@
-"""120-World Factorial Benchmark Generator (Thread B).
+"""120-World Factorial Benchmark Generator with Seeded Preexisting State (Stage 7A.1).
 
 Factorial Grid:
 - 4 Predicate Modes: TIME_VARYING, ADDITIVE, EPISODIC, INTERVAL_BOUNDED
@@ -10,8 +10,23 @@ Total: 4 x 5 x 3 x 2 = 120 worlds.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
+
+
+@dataclass(frozen=True)
+class BaselineOccurrence:
+    """Preexisting occurrence node in bitemporal state before candidate observation arrives."""
+    fact_id: str
+    subject: str
+    predicate: str
+    obj: str
+    t_valid_start: float
+    t_valid_end: float | None
+    t_knowledge: int
+    source_id: str
+    origin_id: str
+    lineage_roots: frozenset[str]
 
 
 @dataclass(frozen=True)
@@ -22,7 +37,9 @@ class IngressTestCase:
     binding_condition: str
     temporal_relation: str
     source_role_form: str
-    # Raw observation details
+    # Seeded baseline prior state
+    baseline_occurrence: BaselineOccurrence
+    # Candidate incoming observation
     raw_text: str
     subject_mention: str
     predicate_name: str
@@ -44,7 +61,7 @@ class IngressTestCase:
 
 
 def generate_120_worlds() -> list[IngressTestCase]:
-    """Generate the deterministic, balanced 120-world factorial benchmark."""
+    """Generate the deterministic, balanced 120-world factorial benchmark with seeded prior state."""
     predicate_modes = ["TIME_VARYING", "ADDITIVE", "EPISODIC", "INTERVAL_BOUNDED"]
     binding_conditions = ["EXACT_CANONICAL", "SURFACE_ALIAS", "CANDIDATE_COLLISION", "ROLE_DISTRACTOR", "NOVEL_ENTITY"]
     temporal_relations = ["FORWARD_UPDATE", "RETROACTIVE_BACKFILL", "CONTEMPORANEOUS_DISPUTE"]
@@ -61,20 +78,35 @@ def generate_120_worlds() -> list[IngressTestCase]:
                     cid = f"C7_{case_num:03d}"
                     case_num += 1
 
-                    # Establish timing coordinates
+                    # 1. Baseline Prior State (asserted at t_k=1, valid [0.0, 5.0) or [0.0, None))
+                    base_end = 5.0 if p_mode == "INTERVAL_BOUNDED" else None
+                    base_occ = BaselineOccurrence(
+                        fact_id=f"base_fact_{cid}",
+                        subject="Server_Node_1",
+                        predicate=pred_name,
+                        obj="Value_Baseline",
+                        t_valid_start=0.0,
+                        t_valid_end=base_end,
+                        t_knowledge=1,
+                        source_id="sensor_baseline",
+                        origin_id="sensor_baseline",
+                        lineage_roots=frozenset(["ROOT_NET_1_sensor_baseline"]),
+                    )
+
+                    # 2. Timing Coordinates for Candidate Ingress Event at t_k=2
                     if t_rel == "FORWARD_UPDATE":
-                        tv_s, tv_e, tk = 10.0, None if p_mode != "INTERVAL_BOUNDED" else 15.0, 2
-                    elif t_rel == "RETROACTIVE_BACKFILL":
-                        tv_s, tv_e, tk = 2.0, 5.0 if p_mode == "INTERVAL_BOUNDED" else None, 3
-                    else:  # CONTEMPORANEOUS_DISPUTE
                         tv_s, tv_e, tk = 5.0, None if p_mode != "INTERVAL_BOUNDED" else 10.0, 2
+                    elif t_rel == "RETROACTIVE_BACKFILL":
+                        tv_s, tv_e, tk = 1.0, 3.0 if p_mode == "INTERVAL_BOUNDED" else None, 2
+                    else:  # CONTEMPORANEOUS_DISPUTE
+                        tv_s, tv_e, tk = 0.0, None if p_mode != "INTERVAL_BOUNDED" else 5.0, 2
 
-                    # Establish source context
+                    # 3. Source Context
                     is_auth = (s_role == "DIRECT_OBSERVATION")
-                    claimed_src = "sensor_alpha" if s_role == "DIRECT_OBSERVATION" else "unverified_third_party"
-                    claimed_r = "sensor" if s_role == "DIRECT_OBSERVATION" else "guest"
+                    claimed_src = "sensor_alpha" if is_auth else "guest_unverified"
+                    claimed_r = "sensor" if is_auth else "guest"
 
-                    # Establish binding specifics
+                    # 4. Binding specifics
                     if b_cond == "EXACT_CANONICAL":
                         sub_mention = "Server_Node_1"
                         obj_mention = "Value_Operational"
@@ -105,7 +137,7 @@ def generate_120_worlds() -> list[IngressTestCase]:
                     elif b_cond == "ROLE_DISTRACTOR":
                         sub_mention = "Field Monitor Beta reported Server Node 1"
                         obj_mention = "Operational"
-                        sub_cands = ("Server_Node_1",)  # Monitored device correctly identified
+                        sub_cands = ("Server_Node_1",)
                         obj_cands = ("Value_Operational",)
                         is_sub_nov, is_obj_nov = False, False
                         gold_s, gold_o = "Server_Node_1", "Value_Operational"
@@ -126,6 +158,7 @@ def generate_120_worlds() -> list[IngressTestCase]:
                         binding_condition=b_cond,
                         temporal_relation=t_rel,
                         source_role_form=s_role,
+                        baseline_occurrence=base_occ,
                         raw_text=raw,
                         subject_mention=sub_mention,
                         predicate_name=pred_name,
