@@ -45,6 +45,8 @@ data/*
 !data/exploration_round5_stage5c_summary.json
 !data/exploration_round5_stage5c_runs.json
 !data/exploration_round5_stage5c_calls.jsonl
+!data/exploration_round6_scale_envelope_summary.json
+!data/exploration_round6_lineage_threat_matrix_summary.json
 
 # IDEs and Editors
 .vscode/

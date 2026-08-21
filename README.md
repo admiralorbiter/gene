@@ -90,7 +90,8 @@ $$\text{Ancestry} \longrightarrow \text{Retrieval Exposure} \longrightarrow \tex
 | **Round 4** | Exploration Round 4 | Epistemic Context Compiler & Four-Layer Conformance Assay | **FROZEN** | `cf472ee` |
 | **Round 5A** | Exploration Round 5 Stage 5A | Revision Precision Assay & Loss of Support Algebra (432 cases) | **FROZEN** | `aff1baa` |
 | **Round 5B** | Exploration Round 5 Stage 5B | Action Governance & Lineage-Projected Epistemic Resilience (368 cases) | **FROZEN** | `round5-stage5b-freeze-v3` |
-| **Round 5C** | Exploration Round 5 Stage 5C | Neural Revision Bridge (32-Call Live Model Revision Assay) | **FROZEN** | `round5-stage5c-runner-freeze` |
+| **Round 5C** | Exploration Round 5 Stage 5C | Neural Revision Bridge (32-Call Live Model Revision Assay) | **FROZEN** | `round5-stage5c-postreview-freeze` |
+| **Round 6** | Exploration Round 6 | Epistemic State Under Change (Implicit Supersession & Validity) | **IN DESIGN** | `main` |
 
 ---
 
@@ -100,6 +101,7 @@ $$\text{Ancestry} \longrightarrow \text{Retrieval Exposure} \longrightarrow \tex
 - **Claim & Evidence Ledger:** [`data/claim_ledger.json`](data/claim_ledger.json) (Exact empirical provenance of all scientific claims GENE-C01 through GENE-C12)
 - **Foundational Project Vision:** [`docs/GENE_MOONSHOT.md`](docs/GENE_MOONSHOT.md)
 - **Canonical Scientific Narrative:** [`docs/GENE_STORY_MEMO.md`](docs/GENE_STORY_MEMO.md)
+- **Round 5 Retrospective & 2026 Literature Memo:** [`docs/results/EXPLORATION_ROUND5_RETROSPECTIVE.md`](docs/results/EXPLORATION_ROUND5_RETROSPECTIVE.md)
 - **System Architecture & Formalisms:** [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 - **Interactive Research Exhibit:** [`docs/atlas/index.html`](docs/atlas/index.html)
 - **Round 5 Results Reports:**

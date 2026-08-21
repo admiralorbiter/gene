@@ -369,19 +369,27 @@ In Stage 5C, GENE bridged the formal theory to live neural inference in a **prer
 
 ---
 
-## 11. Positioning in 2026 Literature & The Lineage Integrity Boundary
+## 11. Positioning in 2026 Literature & Classical AI Foundations
 
-### 11.1 Contemporary Literature Matrix
+### 11.1 Reclaiming Classical Foundations
+Rather than viewing support algebra as an ad hoc discovery, GENE sits on the shoulders of classical AI:
+- **Assumption-Based Truth Maintenance Systems (ATMS)**: De Kleer (1986) established that beliefs carry sound, complete, consistent, and antichain-minimal labels of assumption environments. GENE brings this structure into neural memory.
+- **Database Provenance Semirings**: Green et al. (2007) proved that $(K, +, \cdot, 0, 1)$ semirings model conjunctive dependencies as products and alternative derivations as sums ($P(c) = \sum \prod a$), mathematically explaining why flat graphs fail under change.
+- **AGM Belief Revision**: Alchourrón et al. (1985) formalized minimal belief contraction; Stage 5A validates the recovery of intact alternative paths.
+- **Causal & State Abstraction**: Beckers & Halpern (2019); Li et al. (2006). GENE's Intervention-Sufficiency Principle establishes that epistemic representations must preserve the causal interventions required for revision ($\mathcal{S}$) and action ($\mathcal{S}_L$).
+
+### 11.2 Contemporary 2026 Literature Matrix
 
 | Research Area | Recent Key Works (2025–2026) | Existing Focus | GENE's Distinct Contribution |
 | :--- | :--- | :--- | :--- |
-| **Persistent Memory Poisoning** | *Hidden in Memory*, *Remembering More, Risking More*, *Memory Contagion* | Measures attack success rates and downstream task degradation over long sessions. | Analytically decomposes transmission into exact constituent probabilities ($R_{\text{inherited}}$ and $\mu_U$), separating local deductive validity from global truth. |
-| **Provenance-Aware Memory** | *MemLineage*, *MAP-Graph*, *PPMF* | Attaches derivation DAGs and graphs for governance and access control. | Proves the theoretical limits of memory governance, showing that lineage quarantine achieves $S = \text{TPR} - \text{FPR}$ while exposing the pseudo-path reasoning gap. |
-| **Write-Time Defense & Origin Binding** | *ConsistencyGate*, *MemGuard*, *Louck's Origin-Binding Analysis* | Gating candidate memories via model self-reflection or typed boundaries. | Formally operationalizes write defense as an evolutionary filter ($W_U$) that reduces heritable corruption ($\mu_{U, \text{heritable}} = 0$) via first-order certificate unification. |
-| **Epistemic Runtime & Support Maintenance** | *GENE (2026)* | Support-first belief revision, lineage-projected minimal hypergraphs, and action governance under change. | Solves revision autoimmunity via minimal support sets $\mathcal{S}(c)$, provides live neural validation on Gemma 3:12B, and establishes the Principle of Intervention-Sufficiency for persistent agent runtime governance. |
+| **Stale Memory & Mutation** | *STALE* (May 2026), *Memora* (Apr 2026) | Measures agent failure under changing facts and forgetting penalties. | Provides the exact algebraic support runtime $\mathcal{S}_t(c)$ that tracks which alternative derivational environments survive change. |
+| **Structured Memory & Conflicts** | *MOSAIC* (May 2026), *MemLineage* | Uses graph heuristics and conflict detection to organize agent memory. | Implements exact antichain-minimized support hypergraphs and causal lineage projection $\mathcal{S}_L(c)$ to gate external actions. |
+| **Provenance & Origin Binding** | *Origin-Bound Memory Authority*, *MemGuard* | Explores derivational lineage laundering through summaries and tool echoes. | Formalizes lineage integrity as a critical systems boundary and operationalizes write certificates. |
+| **Support-Boundary Resolution** | *GENE (2026)* | Characterizes dual-channel neural revision errors ($F^+$ pseudo-paths and $F^-$ over-retraction). | Introduces the balanced $SBR = \frac{1}{2}[P(\text{ACTIVE}\mid\text{DEGRADED}) + P(\text{UNKNOWN}\mid\text{RETRACTED})]$ metric. |
 
-### 11.2 The Lineage Integrity Assumption
-GENE currently evaluates what lineage can achieve under the assumption that ancestry metadata is faithfully recorded by the experimental substrate. It does not yet claim that real-world multi-agent systems maintain trustworthy provenance under adversarial lineage forgery or lossy recursive summarization. Measuring provenance degradation over deep lineages ($G_5+$) defines the primary objective of future work.
+### 11.3 The Two Open Frontiers
+1. **Lineage Integrity & Laundering**: Adversarial multi-agent chains where lineage $\mathcal{L}$ is rewritten or forged.
+2. **ATMS Support-Family Scale Envelope**: Empirical characterization of exponential label growth in dense multi-path graph regimes.
 
 ## 12. Summary Table of Primary Empirical Results
 
@@ -406,6 +414,11 @@ GENE currently evaluates what lineage can achieve under the assumption that ance
 
 ---
 
-## 13. Conclusion & Horizon
+## 13. Conclusion & Horizon: Exploration Round 6
 
-GENE demonstrates that persistent AI memory requires an **epistemic runtime for maintaining entitlement under change**. By maintaining minimal entitling support $\mathcal{S}(c)$ and lineage-projected hypergraphs $\mathcal{S}_L(c)$, persistent agents can perform non-destructive belief revision, avoid explanatory bloat autoimmunity, and govern high-stakes actions with mathematical proportionality.
+GENE demonstrates that persistent AI memory requires an **epistemic runtime for maintaining entitlement under change**.
+
+With Round 5 complete and frozen, the active research mainline advances to **Exploration Round 6: State Under Change (Implicit Supersession, Temporal Validity, and Downstream Entitlement)**:
+- **Stage 6A**: Formal supersession algebra (`SUPERSEDES`, `EXPIRES`, `CONTRADICTS`, `RETRACT`, $\mathcal{S}_t(c)$, $\text{WHY}_t$, $\text{WHAT\_IF}_t$, $\text{THEN\_WHAT}_t$).
+- **Stage 6B**: Implicit change benchmark comparing append-only, last-write-wins, and support-aware state.
+- **Stage 6C**: Live neural state-adjudication bridge testing natural-language change updates without explicit retraction flags.
