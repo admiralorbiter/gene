@@ -1,0 +1,28 @@
+{
+  "contract_id": "CONTRACT-R8-8B-R1",
+  "model_name": "gemma3:12b",
+  "model_digest": "f4031aab637d1ffa69bfadff6a5c102a9e33dfabfa0e624c9c1b3f7f023f85eb",
+  "evidence_files": {
+    "data\\r8_stage8b_r1_raw_calls.jsonl": {
+      "sha256": "16f7b679ce1cbb654fe4d2abc120fa970a71ef9abf81260c8c451da48c1f48fa",
+      "bytes": 305988,
+      "record_count": 145
+    },
+    "data\\r8_stage8b_r1_summary.json": {
+      "sha256": "179cb1607ad1d097baf04bad15ef5d752bb45b471a05fd2f5a1db0befe25cf11",
+      "bytes": 1160
+    },
+    "runs\\r8_stage8b_r1_candidate_generation.db": {
+      "sha256": "873446a438c26604912eb763d619578741d0caf9e6752bdc37e49520ed53bef8",
+      "bytes": 278528
+    },
+    "docs\\results\\R8_STAGE8B_R1_REPORT.md": {
+      "sha256": "1cb224ad2c2d38411a95e4393b5689d1bd5ed9b13fca065c0d37f93896ae1fef",
+      "bytes": 2178
+    },
+    "scripts\\verify_contract_r8_8b_r1.py": {
+      "sha256": "87d38f3683d9d1deec36ca5e3297b16dbb908cc4bec59635ca7a23a51896fdf7",
+      "bytes": 21871
+    }
+  }
+}
