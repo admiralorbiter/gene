@@ -73,9 +73,11 @@ def test_claim_ledger_multi_source_integrity():
     with open(ledger_path, "r", encoding="utf-8") as f:
         ledger = json.load(f)
 
-    assert ledger["ledger_version"] == "2.0.0"
+    assert ledger["ledger_version"] == "3.0.0"
     claims = ledger["claims"]
-    assert len(claims) >= 8
+    assert len(claims) >= 15
+    claim_ids = [c["claim_id"] for c in claims]
+    assert len(claim_ids) == len(set(claim_ids)), "Claim IDs must be strictly unique"
 
     required_claim_fields = [
         "claim_id",

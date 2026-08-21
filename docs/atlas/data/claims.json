@@ -321,22 +321,35 @@
     },
     {
       "claim_id": "GENE-C13",
-      "claim_status": "mathematically_proven_and_observed",
-      "headline": "Bitemporal State Maintenance & Conflict Windows",
-      "claim_text": "Separating Valid Time (t_v) from Knowledge Transaction Time (t_k) is structurally necessary for truth maintenance under retroactive, out-of-order, and disputed updates. Bitemporal occurrence tracking with cautious conflict window isolation resolves pairwise disputes without destroying orthogonal active assertions.",
+      "claim_status": "formally_specified_and_deterministically_demonstrated",
+      "headline": "Bitemporal State Maintenance & Valid-Time Conflict Windows",
+      "claim_text": "Separating Valid Time (t_v) from Knowledge Transaction Time (t_k) is structurally necessary for truth maintenance under retroactive, out-of-order, and disputed updates. Bitemporal occurrence tracking with cautious conflict window isolation resolves pairwise disputes without destroying orthogonal active assertions. Single-clock heuristics structurally collapse on multi-update histories (KT-LWW 33.3%, VT-LWW 75.0%), whereas bitemporal reconstruction achieves 100% (12/12) for the tested temporal query class.",
       "evidence_sources": [
         {
-          "experiment": "Exploration Round 6 Stage 6A-v2 (Bitemporal Supersession Algebra & Conflict Windows)",
+          "experiment": "Exploration Round 6 Stage 6A-v2 (Bitemporal Supersession Engine)",
           "evidence_class": "deterministic_zero_live_llm",
           "artifact": "data/exploration_round6_stage6b_results_summary.json",
           "artifact_sha256": "8d20e1945c7fac86783b14feb2eba76285790ee53b5765d0bc2455f201071218",
           "execution_commit": "round6-stage6b-master-freeze",
-          "model": "None (Deterministic Bitemporal Engine)",
+          "model": "None (Deterministic Bitemporal Algebra)",
           "n_calls": 0,
           "n_evaluations": 200,
           "unit_of_analysis": "case",
           "formal_report": "docs/results/EXPLORATION_ROUND6_STAGE6B_REPORT.md",
-          "primary_metric": "Bitemporal supersession engine validated across 200 cases (100% transition and state fidelity)"
+          "primary_metric": "Exhaustive small-world permutation modelcheck passed (100% invariant preservation across 200 cases)"
+        },
+        {
+          "experiment": "Exploration Round 6 Stage 6B.1 (Multi-Update Temporal Ordering Micro-Assay)",
+          "evidence_class": "deterministic_zero_live_llm",
+          "artifact": "data/exploration_round6_stage6b1_temporal_summary.json",
+          "artifact_sha256": "ecca1369df8de0e472df02cd422476f29514a084bd82ec8114d8e98eb6a8ca7f",
+          "execution_commit": "round6-stage6b-master-freeze",
+          "model": "None (Deterministic Engine)",
+          "n_calls": 0,
+          "n_evaluations": 12,
+          "unit_of_analysis": "coordinate",
+          "formal_report": "docs/results/EXPLORATION_ROUND6_STAGE6B_REPORT.md",
+          "primary_metric": "Policy Separation: KT-LWW 4/12 (33.3%), VT-LWW 9/12 (75.0%), Bitemporal 12/12 (100.0%)"
         }
       ],
       "scope_limitations": "Evaluated on bounded bitemporal event sequences and discrete transaction clocks.",
@@ -344,9 +357,9 @@
     },
     {
       "claim_id": "GENE-C14",
-      "claim_status": "mathematically_proven_and_observed",
-      "headline": "Contract-Guided State Adjudication & State vs Support Decoupling",
-      "claim_text": "State transition deduction requires explicit predicate ontology contracts (TIME_VARYING, ADDITIVE, EPISODIC, INTERVAL_BOUNDED). In a 200-case factorial benchmark, contract adjudication achieved 100% transition and state fidelity, while generic LWW collapsed to 55.0%. In Stage 6B.1, bitemporal ordering achieved 100% (12/12) vs KT-LWW 33.3% (4/12) and VT-LWW 75.0% (9/12). Flat dependency tracking caused 100% revision autoimmunity on alternative derivations, proving state fidelity does not equal support fidelity.",
+      "claim_status": "formally_specified_and_deterministically_demonstrated",
+      "headline": "Predicate-Aware State Adjudication & State vs Support Decoupling",
+      "claim_text": "Timestamp ordering alone is insufficient for state transition deduction; transition semantics require predicate-semantic information. PredicateContract (specifying cardinality, temporal mode, conflict policy, and duration) is a sufficient formalization demonstrated by the assay. In a 200-case factorial benchmark, contract adjudication achieved 100% transition and state fidelity, while generic LWW collapsed to 55.0%. Flat dependency tracking caused 100% revision autoimmunity on alternative derivations, proving state fidelity does not equal support fidelity.",
       "evidence_sources": [
         {
           "experiment": "Exploration Round 6 Stage 6B (Contract-Guided State Adjudication)",

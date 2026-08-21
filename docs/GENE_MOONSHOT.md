@@ -37,9 +37,9 @@ An agent operating over durable memory must be able to answer five fundamental q
                                             v
              +-------------------------------------------------------------+
              |           Ontology Binding & Ingress Admission             |
-             |   * Deterministic entity resolution & symbol canonicalization|
-             |   * Epistemic Write Admission: Attestation != Admitted Fact |
-             |   * Gating: ADMIT, AMBIGUOUS, NOVEL, REJECT                 |
+             |   * SourceRecord != ParsedAttestation != AdmittedFact       |
+             |   * Hypothesis preservation (DEFERRED_BINDING over B(x))    |
+             |   * Proof-carrying certificates: ADMIT, DEFER, REJECT       |
              +------------------------------+------------------------------+
                                             | Validated Observation ⟨s, p, o, tv_s, tv_e⟩
                                             v
