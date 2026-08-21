@@ -1,6 +1,6 @@
 {
   "benchmark_name": "Exploration Round 7 Stage 7A Stateful Epistemic Ingress Benchmark",
-  "protocol_version": "1.3.0",
+  "protocol_version": "1.3.1",
   "n_factorial_worlds": 120,
   "n_core_ingress_decision_classes": 10,
   "n_evaluations_per_world": 4,

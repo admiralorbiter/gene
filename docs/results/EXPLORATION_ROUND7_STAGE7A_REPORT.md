@@ -1,12 +1,12 @@
-# Exploration Round 7 Stage 7A.3 Report: Epistemic Privilege Escalation, Lifecycle Security, and Final Ingress Closure
+# Exploration Round 7 Stage 7A Report: Epistemic Privilege Escalation, Lifecycle Security, and Formal Ingress Architecture
 
-**Document Status**: Canonical Empirical Report (Stage 7A.3 Final Zero-Compute Closure)  
+**Document Status**: Canonical Empirical Report (Stage 7A Ingress Architecture & Security Validation)  
 **Author**: Antigravity Research / GENE Core  
 **Associated Target Commit**: `round7-stage7a3-final-closure`  
-**Prerequisites**: Exploration Round 7 Wave 0.2 Freeze ([`round7-wave0-freeze`](https://github.com/admiralorbiter/gene/releases/tag/round7-wave0-freeze)), Stage 7A.1 ([`round7-stage7a-postreview-freeze`](https://github.com/admiralorbiter/gene/releases/tag/round7-stage7a-postreview-freeze))  
+**Prerequisites**: Exploration Round 7 Wave 0.2 Freeze ([`round7-wave0-freeze`](https://github.com/admiralorbiter/gene/releases/tag/round7-wave0-freeze))  
 **Primary Artifacts**:
-1. [`data/exploration_round7_stage7a_benchmark_summary.json`](../../data/exploration_round7_stage7a_benchmark_summary.json) (`SHA-256: 6b76513256987f470797e6365fb0dd8b86d79611599b663a0d93aeb44c0f4731`)
-2. [`data/exploration_round7_stage7a_security_summary.json`](../../data/exploration_round7_stage7a_security_summary.json) (`SHA-256: ae4e861a951543175709e8d77a6d53e7aaeb0a4a29983933decc363eba8d2134`)
+1. [`data/exploration_round7_stage7a_benchmark_summary.json`](../../data/exploration_round7_stage7a_benchmark_summary.json) (`SHA-256: 93dd421f900f29c9fbec3dc95a601bcd446afb2c2074139d0ffdaec13b529236`)
+2. [`data/exploration_round7_stage7a_security_summary.json`](../../data/exploration_round7_stage7a_security_summary.json) (`SHA-256: 18081edff907bfc8725f00c818de4b90a589b444d59896f8d3da574ad77c1c43`)
 
 ---
 
@@ -14,13 +14,11 @@
 
 Exploration Round 7 investigates the fundamental boundary condition of durable epistemic storage: **what earns the right to enter epistemic memory in the first place?**
 
-In Stage 7A.3, we complete the formalization of the **Epistemic Privilege Escalation Principle**:
+Stage 7A establishes the **Epistemic Privilege Escalation Principle**:
 > Persistent epistemic systems do not merely decide admission once at ingress. Rather, information repeatedly ascends through distinct privilege tiers over its operational lifecycle:
 > $$\text{Raw Record} \xrightarrow{\text{admission}} \text{Candidate / Deferred} \xrightarrow{\text{resolution}} \text{Admitted Fact} \xrightarrow{\text{promotion}} \text{Canonical Entity} \xrightarrow{\text{governance}} \text{Actionable Belief}$$
 > Every transition increases what the information is authorized to effectuate. Therefore:
 > $$\text{Admission Integrity} \not\equiv \text{Resolution Integrity} \not\equiv \text{Promotion Integrity}$$
-
-Stage 7A.3 achieves complete zero-compute closure by binding proof-carrying witnesses across every lifecycle transition, eliminating identity-based independence laundering fallbacks, preventing dual-novel status laundering, establishing native causal source ablation $do(\text{source}=0)$, and validating all mechanisms across an 8-world probe-separation assay and combinatorial adversarial mutation suites.
 
 ---
 
@@ -50,10 +48,10 @@ Stage 7A proves that referential ambiguity preservation and authorization gating
 
 ---
 
-## 3. Hardened Privilege-Lifecycle Architecture & Invariants
+## 3. Privilege-Lifecycle Security Architecture & Invariants
 
 ### 3.1 Principal-Bound Capabilities vs Untrusted Claimed Roles
-`CapabilityPolicyRegistry` is keyed strictly by `AuthenticatedOrigin.verified_id` (or verified principal role bindings within the platform kernel). Textually `ClaimedOrigin.claimed_role` is treated as untrusted metadata. A sensor claiming `claimed_role="admin"` in its raw text payload is strictly evaluated under its authenticated sensor capability.
+`CapabilityPolicyRegistry` is keyed strictly by `AuthenticatedOrigin.verified_id` (or verified principal role bindings within the platform kernel). Textually `ClaimedOrigin.claimed_role` is treated as untrusted metadata. Disambiguation privilege is fail-closed (`can_disambiguate: bool = False` by default).
 
 ### 3.2 Strict Fail-Closed Epistemic Independence
 $$\text{OriginIdentity} \not\equiv \text{DerivationLineage} \not\equiv \text{IndependenceClass}$$
@@ -74,22 +72,22 @@ When promoting provisional entity $A$ in relation $(A, \text{pred}, B)$ where $B
 
 ---
 
-## 4. Downstream Mechanism Decoupling & Probe Separation
+## 4. Downstream Mechanism Decoupling & Probe Separation Assay
 
-To confirm that the four downstream evaluation probes ($Q_1, Q_2, Q_3, Q_4$) represent distinct, non-redundant mechanisms, an 8-world assay ([`src/gene/benchmarks/ingress_sidecars/probe_separation.py`](../../src/gene/benchmarks/ingress_sidecars/probe_separation.py)) was executed with 100% engine-derived measurements:
+To confirm that the four downstream evaluation probes ($Q_1, Q_2, Q_3, Q_4$) represent distinct, non-redundant mechanisms, an 8-world assay ([`src/gene/benchmarks/ingress_sidecars/probe_separation.py`](../../src/gene/benchmarks/ingress_sidecars/probe_separation.py)) separates raw epistemic state vectors $(A, E, G, C)$ from behavioral probe correctness $(Q_1, Q_2, Q_3, Q_4)$:
 
-1. **`W1_FULL_PASS` $(1, 1, 1, 1)$**: Standard valid admission, supported, authorized, robust.
-2. **`W2_ACTION_GOVERNANCE_BLOCKED` $(1, 1, 0, 1)$**: Active in state ($Q_1=1$), entitled in Horn support ($Q_2=1$), but action authority blocked ($\text{Auth} = 0.0$, $Q_3=0$) due to unverified lineage roots (`ROOT_UNKNOWN_INDEPENDENCE`).
-3. **`W3_PREMISE_CHALLENGE_FAILED` $(1, 0, 0, 1)$**: Active in state ($Q_1=1$), but queried challenge triple is unentitled ($Q_2=0, Q_3=0$).
-4. **`W4_CAUSAL_SOURCE_ABLATION_VULNERABLE` $(1, 1, 1, 0)$**: Admitted ($Q_1=1$), supported ($Q_2=1$), authorized ($Q_3=1$), but under native causal source ablation $do(\text{source}=0)$ via `what_if_source_t("sensor_trusted_a")`, all supporting occurrences are retracted, losing entitlement ($Q_4=0$).
-5. **`W5_MULTISOURCE_REDUNDANT_RESCUE` $(1, 1, 1, 1)$**: Multi-source redundant derivation: ablating source A leaves independent source B support intact ($Q_4=1$).
-6. **`W6_DISPUTE_ISOLATION` $(1, 1, 1, 1)$**: Single cardinality contemporaneous dispute triggers cautious isolation.
-7. **`W7_UNAUTHENTICATED_REJECT` $(1, 1, 1, 1)$**: Unauthenticated assertion rejected fail-closed.
-8. **`W8_OUT_OF_SCOPE_REJECT` $(1, 1, 1, 1)$**: Out-of-scope assertion rejected.
+- **`W1_FULL_PASS`**: Raw $(1, 1, 1, 1)$, Correctness $(1, 1, 1, 1)$ — Standard valid admission, supported, authorized, robust.
+- **`W2_ACTION_GOVERNANCE_BLOCKED`**: Raw $(1, 1, 0, 1)$, Correctness $(1, 1, 1, 1)$ — Active in state ($A=1$), entitled in Horn support ($E=1$), but action governance blocked ($G=0$) due to unverified lineage roots (`ROOT_UNKNOWN_INDEPENDENCE`). Correctness vector is $(1, 1, 1, 1)$ because blocking unverified roots is the normative policy.
+- **`W3_PREMISE_CHALLENGE_FAILED`**: Raw $(1, 0, 0, 1)$, Correctness $(1, 1, 1, 1)$ — Active in state ($A=1$), but queried challenge triple is unentitled ($E=0, G=0$).
+- **`W4_CAUSAL_SOURCE_ABLATION_VULNERABLE`**: Raw $(1, 1, 1, 0)$, Correctness $(1, 1, 1, 1)$ — Admitted, supported, authorized, but under exact causal source ablation $do(\text{source}=0)$ via `what_if_source_t("sensor_trusted_a")`, all supporting occurrences are retracted, losing entitlement ($C=0$).
+- **`W5_MULTISOURCE_REDUNDANT_RESCUE`**: Raw $(1, 1, 1, 1)$, Correctness $(1, 1, 1, 1)$ — Multi-source redundant derivation: ablating source A leaves independent source B support intact ($C=1$).
+- **`W6_DISPUTE_ISOLATION`**: Raw $(0, 0, 0, 0)$, Correctness $(1, 1, 1, 1)$ — Single cardinality contemporaneous dispute triggers cautious isolation.
+- **`W7_UNAUTHENTICATED_REJECT`**: Raw $(0, 0, 0, 0)$, Correctness $(1, 1, 1, 1)$ — Unauthenticated assertion rejected fail-closed.
+- **`W8_OUT_OF_SCOPE_REJECT`**: Raw $(0, 0, 0, 0)$, Correctness $(1, 1, 1, 1)$ — Out-of-scope assertion rejected.
 
 ---
 
-## 5. Combinatorial Adversarial Mutation Matrix
+## 5. Programmatic Multi-Family Adversarial Mutation Suite
 
 Adversarial mutation suites test fail-closed rejection across all lifecycle certificate fields:
 - **`AdmissionCertificate` (7 vectors)**: Mutated predicate, $t_k$ spoofing, out-of-hypothesis subject, out-of-hypothesis object, forged roots, empty witness, valid interval mismatch.

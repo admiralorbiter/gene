@@ -32,7 +32,7 @@ class CapabilityPolicy:
     max_claim_privilege: ClaimPrivilege = ClaimPrivilege.ROOT_FACT
     reliability_class: str = "HIGH_PRECISION_SENSOR"
     is_ontology_admin: bool = False
-    can_disambiguate: bool = True
+    can_disambiguate: bool = False
 
 
 class CapabilityPolicyRegistry:

@@ -30,7 +30,10 @@ def test_live_counterbalancing_schedule():
 def test_probe_separation_8_worlds_sidecar():
     res = run_probe_separation_assay()
     assert res["n_worlds"] == 8
-    assert res["has_decoupled_governance"] is True
-    assert res["has_decoupled_premise"] is True
-    assert res["has_decoupled_causal"] is True
-    assert res["has_redundant_rescue"] is True
+    assert res["has_decoupled_governance_raw"] is True
+    assert res["has_decoupled_premise_raw"] is True
+    assert res["has_decoupled_causal_raw"] is True
+    assert res["has_redundant_rescue_raw"] is True
+    for w_id, corr in res["correctness_profiles"].items():
+        assert corr == (1, 1, 1, 1), f"World {w_id} correctness profile {corr} != (1,1,1,1)"
+

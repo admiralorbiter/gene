@@ -431,7 +431,7 @@
           "experiment": "Exploration Round 7 Stage 7A (Proof-Carrying Epistemic Ingress Benchmark)",
           "evidence_class": "deterministic_zero_live_llm",
           "artifact": "data/exploration_round7_stage7a_benchmark_summary.json",
-          "artifact_sha256": "6b76513256987f470797e6365fb0dd8b86d79611599b663a0d93aeb44c0f4731",
+          "artifact_sha256": "93dd421f900f29c9fbec3dc95a601bcd446afb2c2074139d0ffdaec13b529236",
           "execution_commit": "round7-stage7a3-final-closure",
           "git_tracked": true,
           "model": "None (Deterministic Ingress & Verification Engine)",
@@ -442,10 +442,10 @@
           "primary_metric": "WorldPass: A0 58.3% (70/120), A1 58.3% (70/120), A2 75.0% (90/120), A3 91.7% (110/120), A4 100.0% (120/120); Global FDAR: A0/A1 71.4%, A2 42.9%, A3 14.3%, A4 0.0%; Cond FDAR: A2_auth|res 100% (36/36), A3_ambig|auth 100% (12/12); SAC: 100.0%; UPR: 100.0%"
         },
         {
-          "experiment": "Exploration Round 7 Stage 7A.3 (Lifecycle Security & Probe Separation Assay)",
+          "experiment": "Exploration Round 7 Stage 7A (Lifecycle Security & Probe Separation Assay)",
           "evidence_class": "deterministic_zero_live_llm",
           "artifact": "data/exploration_round7_stage7a_security_summary.json",
-          "artifact_sha256": "ae4e861a951543175709e8d77a6d53e7aaeb0a4a29983933decc363eba8d2134",
+          "artifact_sha256": "18081edff907bfc8725f00c818de4b90a589b444d59896f8d3da574ad77c1c43",
           "execution_commit": "round7-stage7a3-final-closure",
           "git_tracked": true,
           "model": "None (Deterministic Ingress & Verification Engine)",
@@ -453,7 +453,7 @@
           "n_evaluations": 46,
           "unit_of_analysis": "security_assay",
           "formal_report": "docs/results/EXPLORATION_ROUND7_STAGE7A_REPORT.md",
-          "primary_metric": "Adversarial mutation fail-closed: 14/14 (100.0%); Probe separation: 8/8 worlds non-monotonically decoupled (Q1, Q2, Q3, Q4); Dual-novel status laundering prevention verified."
+          "primary_metric": "Programmatic multi-family adversarial mutation suite: 14/14 rejected fail-closed (100.0%); Probe separation: Eight-world assay containing three explicitly decoupled mechanism profiles plus full-pass, redundancy, conflict-isolation, and rejection controls; Dual-novel status laundering prevention verified."
         }
       ],
       "scope_limitations": "Evaluated across 120 balanced synthetic worlds spanning 4 predicate modes, 5 binding conditions, 3 temporal relations, and 2 source role forms.",
