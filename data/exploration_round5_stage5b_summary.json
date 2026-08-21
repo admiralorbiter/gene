@@ -1,0 +1,98 @@
+{
+  "experiment": "GENE Exploration Round 5 Stage 5B: Action Governance & Epistemic Resilience Assay",
+  "evidence_class": "deterministic_zero_live_llm",
+  "total_cases": 368,
+  "oracle_breakdown": {
+    "total_cases": 368,
+    "unchanged": 16,
+    "degraded": 104,
+    "retracted": 248,
+    "total_entitled": 120
+  },
+  "axiomatic_compliance": {
+    "binary_entitlement": {
+      "policy_name": "binary_entitlement",
+      "axiom_1_monotonicity": true,
+      "axiom_2_zero_on_retraction": true,
+      "axiom_3_degradation_sensitivity": false,
+      "axiom_4_no_duplication_inflation": true,
+      "axiom_5_bloat_invariance": true,
+      "axiom_6_lineage_independence_discounting": false,
+      "axiom_7_isomorphism_invariance": true,
+      "total_passed": 5,
+      "is_fully_compliant": false,
+      "failure_reasons": [
+        "Axiom 3 failed: Degraded state received Auth=1.0 vs Unchanged=1.0",
+        "Axiom 6 failed: Single-root Auth (1.0) not discounted vs Multi-root Auth (1.0)"
+      ]
+    },
+    "scalar_resilience_kappa": {
+      "policy_name": "scalar_resilience_kappa",
+      "axiom_1_monotonicity": true,
+      "axiom_2_zero_on_retraction": true,
+      "axiom_3_degradation_sensitivity": false,
+      "axiom_4_no_duplication_inflation": true,
+      "axiom_5_bloat_invariance": true,
+      "axiom_6_lineage_independence_discounting": false,
+      "axiom_7_isomorphism_invariance": true,
+      "total_passed": 5,
+      "is_fully_compliant": false,
+      "failure_reasons": [
+        "Axiom 3 failed: Degraded state received Auth=1.0 vs Unchanged=1.0",
+        "Axiom 6 failed: Single-root Auth (1.0) not discounted vs Multi-root Auth (1.0)"
+      ]
+    },
+    "tuple_resilience_rho": {
+      "policy_name": "tuple_resilience_rho",
+      "axiom_1_monotonicity": true,
+      "axiom_2_zero_on_retraction": true,
+      "axiom_3_degradation_sensitivity": true,
+      "axiom_4_no_duplication_inflation": true,
+      "axiom_5_bloat_invariance": true,
+      "axiom_6_lineage_independence_discounting": false,
+      "axiom_7_isomorphism_invariance": true,
+      "total_passed": 6,
+      "is_fully_compliant": false,
+      "failure_reasons": [
+        "Axiom 6 failed: Single-root Auth (1.0) not discounted vs Multi-root Auth (1.0)"
+      ]
+    },
+    "lineage_aware_geometry": {
+      "policy_name": "lineage_aware_geometry",
+      "axiom_1_monotonicity": true,
+      "axiom_2_zero_on_retraction": true,
+      "axiom_3_degradation_sensitivity": true,
+      "axiom_4_no_duplication_inflation": true,
+      "axiom_5_bloat_invariance": true,
+      "axiom_6_lineage_independence_discounting": true,
+      "axiom_7_isomorphism_invariance": true,
+      "total_passed": 7,
+      "is_fully_compliant": true,
+      "failure_reasons": []
+    }
+  },
+  "degraded_action_gating": {
+    "binary_entitlement": {
+      "degraded_action_permitted_count": 104,
+      "degraded_action_permitted_rate": 1.0,
+      "mean_degraded_authority": 1.0
+    },
+    "scalar_resilience_kappa": {
+      "degraded_action_permitted_count": 104,
+      "degraded_action_permitted_rate": 1.0,
+      "mean_degraded_authority": 0.5384615384615384
+    },
+    "tuple_resilience_rho": {
+      "degraded_action_permitted_count": 44,
+      "degraded_action_permitted_rate": 0.4230769230769231,
+      "mean_degraded_authority": 0.4807692307692308
+    },
+    "lineage_aware_geometry": {
+      "degraded_action_permitted_count": 94,
+      "degraded_action_permitted_rate": 0.9038461538461539,
+      "mean_degraded_authority": 0.5788461538461539
+    }
+  },
+  "case_ledger_path": "data\\exploration_round5_stage5b_cases.jsonl",
+  "case_ledger_sha256": "12701a7ca30437e7ff700751e87e16f6e2891d6787a98aff10d63999bf4a8cc8"
+}

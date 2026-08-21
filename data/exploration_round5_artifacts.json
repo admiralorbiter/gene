@@ -1,11 +1,10 @@
 {
-  "round": "Exploration Round 5: Entitlement Under Change — Support-First Epistemic Revision",
+  "round": "Exploration Round 5: Entitlement Under Change — Support-First Epistemic Revision & Action Governance",
   "evidence_class": "deterministic_zero_live_llm",
   "base_tag": "round4-postreview-freeze",
   "base_commit": "cf472ee",
-  "superseded_freeze_tag": "round5-stage5a-freeze",
-  "superseded_freeze_commit": "c302ee6",
   "stage_5a_freeze_tag": "round5-stage5a-freeze-v2",
+  "stage_5b_freeze_tag": "round5-stage5b-freeze",
   "subassay_5a1_local_what_if": {
     "total_cases": 368,
     "entitled_cases": 120,
@@ -35,29 +34,33 @@
     },
     "primary_discovery": "Staleness factorial demonstrates that intermediate cache staleness causes zombie derivations (25% when single lemma is stale, 100% when both are stale). Root-expanded support derivation (S_root) guarantees 100% exact agreement with zero zombie derivations."
   },
-  "resilience_signature": {
-    "transition_rho_to_rho_prime": {
-      "(2,1)->(1,1)": "Shared-root alternative lost: |S| drops (2->1), kappa STABLE (1->1) [8 cases]",
-      "(2,2)->(1,1)": "Independent alternative lost: both |S| and kappa drop (2->1) [24 cases]",
-      "(3,2)->(2,1)": "Tri-path branch lost: |S| drops (3->2), kappa drops (2->1) due to shared premise D [12 cases]",
-      "(3,2)->(1,1)": "Two tri-path branches lost: both |S| and kappa drop (3->1, 2->1) [60 cases]"
+  "subassay_5b_action_governance": {
+    "total_cases": 368,
+    "axiomatic_compliance": {
+      "binary_entitlement": "5/7 passed (fails Axiom 3: Degradation Sensitivity, Axiom 6: Lineage Independence)",
+      "scalar_resilience_kappa": "5/7 passed (fails Axiom 3 on shared-root (2,1)->(1,1), Axiom 6: Lineage Independence)",
+      "tuple_resilience_rho": "6/7 passed (passes Axiom 3, fails Axiom 6: Lineage Independence)",
+      "lineage_aware_geometry": "7/7 passed (fully compliant with all 7 formal invariants)"
     },
-    "theoretical_insight": "Cut-set size kappa alone is insufficient to track degradation; the (2,1)->(1,1) transition proves that support structure changes while kappa remains stable, requiring the full signature rho(c) = (|S(c)|, kappa(c))."
+    "degraded_action_gating_at_tau_0_5": {
+      "binary_entitlement": "104 / 104 (100.0% permitted, mean auth = 1.000)",
+      "scalar_resilience_kappa": "104 / 104 (100.0% permitted, mean auth = 0.538)",
+      "tuple_resilience_rho": "44 / 104 (42.3% permitted, mean auth = 0.481)",
+      "lineage_aware_geometry": "94 / 104 (90.4% permitted, mean auth = 0.579)"
+    },
+    "primary_discovery": "Action authority requires more than scalar cut-set kappa or tuple rho: full lineage-aware support geometry (P_geom) is minimally necessary to satisfy all 7 formal governance axioms."
   },
-  "case_ledger": {
-    "path": "data/exploration_round5_stage5a_cases.jsonl",
-    "sha256": "1499305d197cf53ad624fc65a6626a0d5fc9ea87993184583930ce952692548e",
-    "total_records": 432
-  },
-  "summary_json": {
-    "path": "data/exploration_round5_stage5a_summary.json",
-    "sha256": "dc39becc57dfed03ee772095d75a1fd7342f84342745428a1cedb7b7231e56eb"
-  },
-  "results_report": {
-    "path": "docs/results/EXPLORATION_ROUND5_STAGE5A_REPORT.md"
+  "artifacts": {
+    "stage_5a_cases_ledger": "data/exploration_round5_stage5a_cases.jsonl",
+    "stage_5a_summary": "data/exploration_round5_stage5a_summary.json",
+    "stage_5a_report": "docs/results/EXPLORATION_ROUND5_STAGE5A_REPORT.md",
+    "stage_5b_cases_ledger": "data/exploration_round5_stage5b_cases.jsonl",
+    "stage_5b_summary": "data/exploration_round5_stage5b_summary.json",
+    "stage_5b_report": "docs/results/EXPLORATION_ROUND5_STAGE5B_REPORT.md"
   },
   "promotion_lifecycle": {
     "stage_5a_status": "complete_and_verified",
-    "next_stage": "Stage 5B (Entitlement Degradation & Action Resilience Engine)"
+    "stage_5b_status": "complete_and_verified",
+    "next_stage": "Stage 5C (Neural Revision Bridge — Live Model Revision Assay)"
   }
 }
