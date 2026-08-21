@@ -1,25 +1,20 @@
 ---
-state: AUDITING
-active_contract_id: CONTRACT-R8-8B
-contract_path: research/contracts/CONTRACT-R8-8B.md
-execution_base_sha: 5345bdad6a69ba1e42f059cc1ff88fc21a4af532
+state: IDLE
+active_contract_id: null
+contract_path: null
+execution_base_sha: null
 last_checkpoint: research/checkpoints/CHECKPOINT-R8-8A.md
 last_promotion: research/promotions/PROMOTION-CONTRACT-R8-8B.md
 ---
 
 # Active Research Contract Pointer
 
-**Current Operational State**: `AUDITING`
+**Current Operational State**: `IDLE`
 
 This document provides the machine-discoverable operational entry point for autonomous research agents and Mother Base.
 
-## Active Contract Details
-- **Active Contract ID**: `CONTRACT-R8-8B`
-- **Contract Path**: [`research/contracts/CONTRACT-R8-8B.md`](contracts/CONTRACT-R8-8B.md)
-- **Execution Base Commit (`execution_base_sha`)**: `5345bdad6a69ba1e42f059cc1ff88fc21a4af532`
-- **Last Checkpoint**: [`research/checkpoints/CHECKPOINT-R8-8A.md`](checkpoints/CHECKPOINT-R8-8A.md)
-- **Candidate Promotion Record**: [`research/promotions/PROMOTION-CONTRACT-R8-8B.md`](promotions/PROMOTION-CONTRACT-R8-8B.md)
-- **Candidate Branch**: `mb/CONTRACT-R8-8B` (SHA: `98e556f99bf08207377f0e29c5de3e3cdc1bb400`)
-- **Contract Acceptance Verifier**: `PASS` (`scripts/verify_contract_r8_8b.py` passed with multi-document streams and bitemporal supersession replay)
-- **Auditor Verdict**: `PASS` (All criteria satisfied over 145 live gemma3:12b invocations)
-- **Governance**: Design Review `APPROVED`, Authorized by `human`. Awaiting Scientific Promotion Review by `chatgpt-pro` and Human Promotion Merge.
+## Current State Summary
+- **Active Contract**: None (`IDLE`).
+- **Last Promoted Checkpoint**: `CHECKPOINT-R8-8A` ([`research/checkpoints/CHECKPOINT-R8-8A.md`](checkpoints/CHECKPOINT-R8-8A.md))
+- **Last Promotion Disposition**: `PROMOTION-CONTRACT-R8-8B` ([`research/promotions/PROMOTION-CONTRACT-R8-8B.md`](promotions/PROMOTION-CONTRACT-R8-8B.md) — `REVISED_CONTRACT_REQUIRED`)
+- **Pending Proposed Contract**: [`research/contracts/CONTRACT-R8-8B-R1.md`](contracts/CONTRACT-R8-8B-R1.md) (`status: DRAFT`, awaiting Scientific Review Desk & Human Director Authorization)
