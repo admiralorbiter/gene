@@ -29,55 +29,37 @@ An agent operating over durable memory must be able to answer five fundamental q
                              THE EPISTEMIC INTERFACE STACK
                              
             +-------------------------------------------------------------+
-            |                    FORMAL EPISTEMIC STATE                   |
-            |          (Immutable IR, Hypergraph S_F, Lineage Graph)      |
+            |                 Neural Semantic Reasoner                    |
+            |   * Flexible synthesis across natural language evidence     |
+            |   * Proposes candidate beliefs and semantic answers         |
+            |   * Unreliable at exact support boundary resolution (SBR)   |
             +------------------------------+------------------------------+
-                                           |
+                                           | Proposals & Evidence Emitted
                                            v
             +-------------------------------------------------------------+
-            |                  EPISTEMIC CONTEXT COMPILER                 |
-            |  * Serialization Invariance (Topological / Canonical Blocks)|
-            |  * Non-leaking, backend-neutral evidence tagging            |
-            |  * Explicit privilege boundaries (Raw, Topo, Lineage, Cert) |
+            |                  State Adjudication Layer                   |
+            |   * Deduces state transitions (ADD, SUPERSEDES, EXPIRES)    |
+            |   * Bitemporal validity tracking: Valid Time (t_v) x Trans  |
+            |   * Isolates unresolved contradictions & temporal intervals |
             +------------------------------+------------------------------+
-                                           |
+                                           | Authoritative Facts F(t_v | t_k)
                                            v
             +-------------------------------------------------------------+
-            |                   NEURAL PROPOSAL ENGINE                    |
-            |  * Flexible semantic reasoning across natural language      |
-            |  * Subject to token realization drift & shortcut heuristics |
+            |             Support Minimizer & Lineage Kernel              |
+            |   * Extracts formal minimal S_F; routes R(c) to telemetry   |
+            |   * Exact graph-computed ancestral root statistics (S_L)    |
             +------------------------------+------------------------------+
-                                           |
+                                           | Support Hypergraph S_L,t(c)
                                            v
             +-------------------------------------------------------------+
-            |                  TYPED OUTPUT CANONICALIZER                 |
-            |  * Maps surface-form drift (PROTOCOL_X7 -> PROTO_X7)        |
-            |  * Enforces typed enums & schema conformity                 |
-            +------------------------------+------------------------------+
-                                           |
-                                           v
-            +-------------------------------------------------------------+
-            |                 CROSS-FIELD CONTRACT VALIDATOR              |
-            |  * Enforces logical coherence across structured fields      |
-            |  * (status=indeterminable => N=null; status=det => N in Nat)|
-            +------------------------------+------------------------------+
-                                           |
-                                           v
-            +-------------------------------------------------------------+
-            |             SUPPORT MINIMIZER & LINEAGE KERNEL              |
-            |  * Extracts formal minimal S_F; routes R(c) to telemetry    |
-            |  * Exact graph-computed ancestral root statistics (S_L)     |
-            +------------------------------+------------------------------+
-                                           |
-                                           v
-            +-------------------------------------------------------------+
-            |                   FORMAL ADMISSION & REPAIR                 |
-            |  * Proof checking (rejects illicit shortcuts: AD, BD, AE)   |
-            |  * Non-destructive belief maintenance (prevents autoimmunity|
+            |                 Persistent Action Governance                |
+            |   * Non-destructive belief revision under change            |
+            |   * Evaluates lineage authority Auth(S_L) against threshold |
+            |   * Governs downstream context compilation & action gating  |
             +-------------------------------------------------------------+
 ```
 
-The neural model is a **flexible candidate proposal engine operating inside a governed epistemic runtime**. **The model does not unilaterally define durable truth, compute graph statistics, or govern belief revision.** The Epistemic Kernel mediates memory admission, change propagation, and action authority.
+The neural model is a **flexible candidate proposal engine operating inside a governed epistemic runtime**. **The model does not unilaterally define durable truth, compute graph statistics, or govern belief revision.** The Epistemic Kernel mediates state adjudication, temporal validity, change propagation, and action authority.
 
 ---
 

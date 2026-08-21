@@ -1,20 +1,28 @@
-"""Temporal Supersession and Epistemic State Transition Algebra (Stage 6A).
+"""Bitemporal Supersession and Epistemic State Transition Algebra (Stage 6A-v2).
 
-Implements the deterministic formal engine for tracking temporal validity,
-implicit supersession, expiration, contradiction isolation, and dynamic
-antichain-minimized support hypergraphs S_t(c) and S_L,t(c) under natural change.
+Implements the deterministic formal engine for bitemporal truth maintenance:
+- Valid Time (t_v): When a fact or relation holds true in the world.
+- Knowledge Time (t_k): When the agent learned or committed the fact/event.
+
+Features:
+- Authoritative event log playback (reconstructing state at any t_v given t_k).
+- Multi-pair conflict set tracking (resolving A-B leaves A-C in conflict).
+- Automatic reverse-dependency discovery for THEN_WHAT without caller-supplied candidate lists.
+- Antichain-minimized support hypergraphs S_{t_v}(c | t_k) and lineage S_{L,t_v}(c | t_k).
+- Explicit baseline lineage tracking for action authority governance.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
+from itertools import combinations
 from typing import Any
 
 
 class EventType(str, Enum):
-    """Discrete temporal change event types."""
-    ADD = "ADD"
+    """Bitemporal state transition event types."""
+    ASSERT = "ASSERT"
     SUPERSEDES = "SUPERSEDES"
     RETRACT = "RETRACT"
     EXPIRES = "EXPIRES"
@@ -23,15 +31,13 @@ class EventType(str, Enum):
 
 
 @dataclass(frozen=True)
-class TemporalFact:
-    """A ground factual proposition with temporal and lineage metadata."""
+class BitemporalFact:
+    """Ground proposition template with permanent identifier and root lineage."""
     fact_id: str
     subject: str
     predicate: str
     obj: str
-    asserted_at: int = 0
     roots: frozenset[str] = field(default_factory=frozenset)
-    expires_at: int | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
 
     @property
@@ -40,7 +46,7 @@ class TemporalFact:
 
 
 @dataclass(frozen=True)
-class TemporalRule:
+class BitemporalRule:
     """Horn derivation rule: Head <= Body_1, ..., Body_k."""
     rule_id: str
     head: tuple[str, str, str]
@@ -50,17 +56,19 @@ class TemporalRule:
 
 @dataclass(frozen=True)
 class TemporalEvent:
-    """An immutable event recording a state transition at timestamp t."""
+    """Immutable event recording a state transition at knowledge time t_k with valid time t_v."""
     event_id: str
     event_type: EventType
-    timestamp: int
-    target_fact_id: str
+    t_knowledge: int
+    t_valid_start: float = 0.0
+    t_valid_end: float | None = None
+    target_fact_id: str = ""
     secondary_fact_id: str | None = None
     payload: dict[str, Any] = field(default_factory=dict)
 
 
 def compute_antichain(sets: set[frozenset[str]]) -> set[frozenset[str]]:
-    """Strict subset elimination: keep only minimal sets under set inclusion."""
+    """Strict subset elimination: retain only minimal sets under inclusion."""
     if not sets:
         return set()
     antichain: set[frozenset[str]] = set()
@@ -72,7 +80,7 @@ def compute_antichain(sets: set[frozenset[str]]) -> set[frozenset[str]]:
 
 
 def compute_cut_set_size(support_sets: set[frozenset[str]]) -> int:
-    """Compute exact minimal cut-set size kappa (minimum elements hitting all sets)."""
+    """Compute exact minimal hitting / cut-set size kappa."""
     if not support_sets:
         return 0
     if frozenset() in support_sets:
@@ -85,8 +93,6 @@ def compute_cut_set_size(support_sets: set[frozenset[str]]) -> int:
     elem_list = sorted(all_elements)
     n = len(elem_list)
 
-    # Breadth-first search for minimal hitting set
-    from itertools import combinations
     for k in range(1, n + 1):
         for combo in combinations(elem_list, k):
             combo_set = set(combo)
@@ -95,88 +101,133 @@ def compute_cut_set_size(support_sets: set[frozenset[str]]) -> int:
     return n
 
 
-class SupersessionEngine:
-    """Deterministic truth maintenance and temporal validity engine."""
+class BitemporalEngine:
+    """Deterministic bitemporal truth maintenance engine."""
 
     def __init__(self, cautious_conflicts: bool = True):
         self.cautious_conflicts = cautious_conflicts
-        self.facts: dict[str, TemporalFact] = {}
-        self.rules: dict[str, TemporalRule] = {}
+        self.facts: dict[str, BitemporalFact] = {}
+        self.rules: dict[str, BitemporalRule] = {}
         self.events: list[TemporalEvent] = []
 
-    def add_fact(self, fact: TemporalFact) -> None:
-        """Register a factual premise."""
+    def register_fact(self, fact: BitemporalFact) -> None:
+        """Register a fact template."""
         self.facts[fact.fact_id] = fact
 
-    def add_rule(self, rule: TemporalRule) -> None:
+    def register_rule(self, rule: BitemporalRule) -> None:
         """Register a Horn derivation rule."""
         self.rules[rule.rule_id] = rule
 
     def record_event(self, event: TemporalEvent) -> None:
-        """Append a state transition event to the timeline."""
+        """Append an event to the authoritative event log."""
         self.events.append(event)
-        # Sort events chronologically to preserve deterministic playback
-        self.events.sort(key=lambda e: (e.timestamp, e.event_id))
+        self.events.sort(key=lambda e: (e.t_knowledge, e.event_id))
 
-    def is_fact_valid(self, fact_id: str, t: int, simulated_events: list[TemporalEvent] | None = None) -> bool:
-        """Determine whether a fact is active and valid at timestamp t."""
+    def get_events_up_to(self, t_k: int, extra_events: list[TemporalEvent] | None = None) -> list[TemporalEvent]:
+        """Return all events known at or before transaction time t_k."""
+        ev_list = [e for e in self.events if e.t_knowledge <= t_k]
+        if extra_events:
+            ev_list.extend([e for e in extra_events if e.t_knowledge <= t_k])
+        ev_list.sort(key=lambda e: (e.t_knowledge, e.event_id))
+        return ev_list
+
+    def is_fact_valid(
+        self,
+        fact_id: str,
+        t_v: float,
+        t_k: int,
+        extra_events: list[TemporalEvent] | None = None,
+    ) -> bool:
+        """Determine whether fact_id holds true at valid time t_v, as known at transaction time t_k."""
         if fact_id not in self.facts:
             return False
 
-        fact = self.facts[fact_id]
-        if fact.asserted_at > t:
+        events = self.get_events_up_to(t_k, extra_events)
+
+        # 1. Determine validity intervals from assertions, supersessions, retractions, and expirations
+        is_asserted = False
+        valid_intervals: list[tuple[float, float]] = []
+
+        for ev in events:
+            if ev.target_fact_id == fact_id:
+                if ev.event_type == EventType.ASSERT:
+                    is_asserted = True
+                    start = ev.t_valid_start
+                    end = ev.t_valid_end if ev.t_valid_end is not None else float("inf")
+                    valid_intervals.append((start, end))
+
+        if not is_asserted:
             return False
 
-        if fact.expires_at is not None and t >= fact.expires_at:
+        # Apply truncations from SUPERSEDES, RETRACT, EXPIRES
+        effective_intervals: list[tuple[float, float]] = []
+        for (start, end) in valid_intervals:
+            cur_start = start
+            cur_end = end
+
+            for ev in events:
+                # Retraction terminates validity at ev.t_valid_start
+                if ev.event_type == EventType.RETRACT and ev.target_fact_id == fact_id:
+                    if ev.t_valid_start <= cur_end:
+                        cur_end = min(cur_end, ev.t_valid_start)
+
+                # Supersession: if this fact is superseded (secondary_fact_id), terminate validity at ev.t_valid_start
+                if ev.event_type == EventType.SUPERSEDES and ev.secondary_fact_id == fact_id:
+                    if ev.t_valid_start <= cur_end:
+                        cur_end = min(cur_end, ev.t_valid_start)
+
+                # Expiration
+                if ev.event_type == EventType.EXPIRES and ev.target_fact_id == fact_id:
+                    exp_t = ev.t_valid_start
+                    if exp_t <= cur_end:
+                        cur_end = min(cur_end, exp_t)
+
+            if cur_start <= t_v < cur_end:
+                effective_intervals.append((cur_start, cur_end))
+
+        if not effective_intervals:
             return False
 
-        all_events = self.events if simulated_events is None else sorted(self.events + simulated_events, key=lambda e: (e.timestamp, e.event_id))
+        # 2. Check active conflict sets
+        # Track unresolved conflict pairs: set of frozenset([f_a, f_b])
+        active_conflicts: set[frozenset[str]] = set()
+        for ev in events:
+            if ev.event_type == EventType.CONTRADICTS and ev.secondary_fact_id:
+                pair = frozenset([ev.target_fact_id, ev.secondary_fact_id])
+                active_conflicts.add(pair)
+            elif ev.event_type == EventType.RESOLVE_CONFLICT and ev.secondary_fact_id:
+                pair = frozenset([ev.target_fact_id, ev.secondary_fact_id])
+                active_conflicts.discard(pair)
 
-        in_conflict = False
-        for ev in all_events:
-            if ev.timestamp > t:
-                continue
-
-            # Retraction terminates validity
-            if ev.event_type == EventType.RETRACT and ev.target_fact_id == fact_id:
+        if self.cautious_conflicts:
+            # Fact is disqualified if it is part of ANY currently active conflict pair
+            if any(fact_id in pair for pair in active_conflicts):
                 return False
-
-            # Supersession terminates validity of the superseded old fact
-            if ev.event_type == EventType.SUPERSEDES and ev.secondary_fact_id == fact_id:
-                return False
-
-            # Contradiction marks fact in conflict
-            if ev.event_type == EventType.CONTRADICTS:
-                if ev.target_fact_id == fact_id or ev.secondary_fact_id == fact_id:
-                    in_conflict = True
-
-            # Resolving conflict clears the conflict flag
-            if ev.event_type == EventType.RESOLVE_CONFLICT:
-                if ev.target_fact_id == fact_id or ev.secondary_fact_id == fact_id:
-                    in_conflict = False
-
-        if in_conflict and self.cautious_conflicts:
-            return False
 
         return True
 
-    def get_active_facts(self, t: int, simulated_events: list[TemporalEvent] | None = None) -> list[TemporalFact]:
-        """Return all active facts at timestamp t."""
-        return [f for f in self.facts.values() if self.is_fact_valid(f.fact_id, t, simulated_events)]
+    def get_active_facts(
+        self,
+        t_v: float,
+        t_k: int,
+        extra_events: list[TemporalEvent] | None = None,
+    ) -> list[BitemporalFact]:
+        """Return all active facts holding at valid time t_v as known at t_k."""
+        return [f for f in self.facts.values() if self.is_fact_valid(f.fact_id, t_v, t_k, extra_events)]
 
     def compute_temporal_support(
         self,
         query: tuple[str, str, str],
-        t: int,
-        simulated_events: list[TemporalEvent] | None = None,
+        t_v: float,
+        t_k: int,
+        extra_events: list[TemporalEvent] | None = None,
     ) -> set[frozenset[str]]:
-        """Compute minimal active premise support sets S_t(query) via backward chaining."""
-        active_facts = self.get_active_facts(t, simulated_events)
-        active_triples: dict[tuple[str, str, str], list[TemporalFact]] = {}
+        """Compute minimal active premise support sets S_{t_v}(query | t_k) via Horn backward chaining."""
+        active_facts = self.get_active_facts(t_v, t_k, extra_events)
+        active_triples: dict[tuple[str, str, str], list[BitemporalFact]] = {}
         for f in active_facts:
             active_triples.setdefault(f.triple, []).append(f)
 
-        # Memoization cache for derivation paths to prevent infinite recursion
         memo: dict[tuple[str, str, str], set[frozenset[str]]] = {}
         visiting: set[tuple[str, str, str]] = set()
 
@@ -184,20 +235,19 @@ class SupersessionEngine:
             if target in memo:
                 return memo[target]
             if target in visiting:
-                return set()  # Cycle detected
+                return set()
 
             visiting.add(target)
             results: set[frozenset[str]] = set()
 
-            # 1. Base facts directly matching target
+            # Base fact match
             if target in active_triples:
                 for f in active_triples[target]:
                     results.add(frozenset([f.fact_id]))
 
-            # 2. Rule derivations
+            # Rule derivations
             for rule in self.rules.values():
                 if rule.head == target:
-                    # Cartesian product across body premise derivations
                     body_supports: list[set[frozenset[str]]] = []
                     valid_rule = True
                     for body_triple in rule.body:
@@ -227,11 +277,12 @@ class SupersessionEngine:
     def compute_temporal_lineage(
         self,
         query: tuple[str, str, str],
-        t: int,
-        simulated_events: list[TemporalEvent] | None = None,
+        t_v: float,
+        t_k: int,
+        extra_events: list[TemporalEvent] | None = None,
     ) -> set[frozenset[str]]:
-        """Compute antichain-minimized lineage-projected support hypergraph S_L,t(query)."""
-        support_sets = self.compute_temporal_support(query, t, simulated_events)
+        """Compute antichain-minimized lineage-projected support hypergraph S_{L,t_v}(query | t_k)."""
+        support_sets = self.compute_temporal_support(query, t_v, t_k, extra_events)
         if not support_sets:
             return set()
 
@@ -249,17 +300,17 @@ class SupersessionEngine:
     def compute_authority(
         self,
         query: tuple[str, str, str],
-        t: int,
+        t_v: float,
+        t_k: int,
         init_lineage_sets: set[frozenset[str]] | None = None,
-        simulated_events: list[TemporalEvent] | None = None,
+        extra_events: list[TemporalEvent] | None = None,
     ) -> float:
-        """Compute normalized action governance authority Auth_t(query)."""
-        current_l = self.compute_temporal_lineage(query, t, simulated_events)
+        """Compute normalized action authority Auth_{t_v | t_k}(query)."""
+        current_l = self.compute_temporal_lineage(query, t_v, t_k, extra_events)
         if not current_l:
             return 0.0
 
         if init_lineage_sets is None or not init_lineage_sets:
-            # Baseline is current state
             return 1.0
 
         kappa_curr = compute_cut_set_size(current_l)
@@ -272,20 +323,31 @@ class SupersessionEngine:
 
         return 0.5 * (kappa_ratio + paths_ratio)
 
+    def get_all_derived_propositions(self) -> set[tuple[str, str, str]]:
+        """Discover all possible target conclusions in the deductive rule closure."""
+        targets: set[tuple[str, str, str]] = set()
+        for r in self.rules.values():
+            targets.add(r.head)
+        for f in self.facts.values():
+            targets.add(f.triple)
+        return targets
+
     def why_t(
         self,
         query: tuple[str, str, str],
-        t: int,
+        t_v: float,
+        t_k: int,
         init_lineage_sets: set[frozenset[str]] | None = None,
     ) -> dict[str, Any]:
-        """Query why a claim is entitled at timestamp t."""
-        support = self.compute_temporal_support(query, t)
-        lineage = self.compute_temporal_lineage(query, t)
-        auth = self.compute_authority(query, t, init_lineage_sets)
+        """Explain why a claim is entitled at valid time t_v as known at transaction time t_k."""
+        support = self.compute_temporal_support(query, t_v, t_k)
+        lineage = self.compute_temporal_lineage(query, t_v, t_k)
+        auth = self.compute_authority(query, t_v, t_k, init_lineage_sets)
 
         return {
             "query": query,
-            "timestamp": t,
+            "t_valid": t_v,
+            "t_knowledge": t_k,
             "is_entitled": len(support) > 0,
             "support_sets_S_t": [sorted(list(s)) for s in sorted(support, key=lambda x: sorted(list(x)))],
             "lineage_sets_S_L_t": [sorted(list(s)) for s in sorted(lineage, key=lambda x: sorted(list(x)))],
@@ -297,19 +359,21 @@ class SupersessionEngine:
         self,
         query: tuple[str, str, str],
         event: TemporalEvent,
-        t: int,
+        t_v: float,
+        t_k: int,
         init_lineage_sets: set[frozenset[str]] | None = None,
     ) -> dict[str, Any]:
-        """Evaluate hypothetical entitlement under counterfactual event without state mutation."""
-        eval_t = max(t, event.timestamp)
-        base_state = self.why_t(query, eval_t, init_lineage_sets)
-        hypo_support = self.compute_temporal_support(query, eval_t, simulated_events=[event])
-        hypo_lineage = self.compute_temporal_lineage(query, eval_t, simulated_events=[event])
-        hypo_auth = self.compute_authority(query, eval_t, init_lineage_sets, simulated_events=[event])
+        """Evaluate hypothetical entitlement under counterfactual event without persistent state mutation."""
+        eval_tk = max(t_k, event.t_knowledge)
+        base_state = self.why_t(query, t_v, eval_tk, init_lineage_sets)
+        hypo_support = self.compute_temporal_support(query, t_v, eval_tk, extra_events=[event])
+        hypo_lineage = self.compute_temporal_lineage(query, t_v, eval_tk, extra_events=[event])
+        hypo_auth = self.compute_authority(query, t_v, eval_tk, init_lineage_sets, extra_events=[event])
 
         return {
             "query": query,
-            "timestamp": eval_t,
+            "t_valid": t_v,
+            "t_knowledge": eval_tk,
             "simulated_event": {
                 "event_type": event.event_type.value,
                 "target_fact_id": event.target_fact_id,
@@ -326,14 +390,19 @@ class SupersessionEngine:
     def then_what_t(
         self,
         event: TemporalEvent,
-        candidate_queries: list[tuple[str, str, str]],
-        t: int,
+        t_v: float,
+        t_k: int,
+        baseline_lineage_map: dict[tuple[str, str, str], set[frozenset[str]]] | None = None,
     ) -> dict[str, Any]:
-        """Compute downstream impact of event across candidate queries."""
-        eval_t = max(t, event.timestamp)
+        """Compute full downstream impact across all derivable propositions using dynamic graph discovery."""
+        eval_tk = max(t_k, event.t_knowledge)
+        candidate_queries = sorted(list(self.get_all_derived_propositions()))
+
         impacted: list[dict[str, Any]] = []
         for q in candidate_queries:
-            analysis = self.what_if_t(q, event, eval_t)
+            init_l = baseline_lineage_map.get(q) if baseline_lineage_map else None
+            analysis = self.what_if_t(q, event, t_v, eval_tk, init_lineage_sets=init_l)
+
             if (analysis["prior_entitled"] != analysis["hypothetical_entitled"] or
                     analysis["prior_authority"] != analysis["hypothetical_authority"]):
                 impacted.append({
@@ -351,7 +420,8 @@ class SupersessionEngine:
                 })
 
         return {
-            "timestamp": eval_t,
+            "t_valid": t_v,
+            "t_knowledge": eval_tk,
             "event": {
                 "event_type": event.event_type.value,
                 "target_fact_id": event.target_fact_id,
@@ -364,15 +434,17 @@ class SupersessionEngine:
     def timeline(
         self,
         query: tuple[str, str, str],
-        max_t: int,
+        valid_timestamps: list[float],
+        t_k: int,
         init_lineage_sets: set[frozenset[str]] | None = None,
     ) -> list[dict[str, Any]]:
-        """Compute full chronological progression of entitlement states from t=0 to max_t."""
+        """Compute chronological progression of entitlement states across valid time t_v given transaction time t_k."""
         records: list[dict[str, Any]] = []
-        for t in range(max_t + 1):
-            info = self.why_t(query, t, init_lineage_sets)
+        for tv in valid_timestamps:
+            info = self.why_t(query, tv, t_k, init_lineage_sets)
             records.append({
-                "t": t,
+                "t_valid": tv,
+                "t_knowledge": t_k,
                 "entitled": info["is_entitled"],
                 "authority": info["authority_score"],
                 "support_paths_count": len(info["support_sets_S_t"]),
@@ -380,22 +452,17 @@ class SupersessionEngine:
             })
         return records
 
-    def audit_conflicts(self, t: int) -> list[dict[str, Any]]:
-        """Identify all active contradiction pairs at timestamp t."""
-        conflicts: list[dict[str, Any]] = []
-        for ev in self.events:
-            if ev.timestamp <= t and ev.event_type == EventType.CONTRADICTS:
-                # Check if resolved
-                resolved = any(
-                    rev.timestamp <= t and rev.event_type == EventType.RESOLVE_CONFLICT and
-                    {rev.target_fact_id, rev.secondary_fact_id} == {ev.target_fact_id, ev.secondary_fact_id}
-                    for rev in self.events
-                )
-                if not resolved:
-                    conflicts.append({
-                        "event_id": ev.event_id,
-                        "timestamp": ev.timestamp,
-                        "fact_a": ev.target_fact_id,
-                        "fact_b": ev.secondary_fact_id,
-                    })
-        return conflicts
+    def audit_conflicts(self, t_k: int) -> list[dict[str, str]]:
+        """List all currently active unresolved contradiction pairs known at t_k."""
+        events = self.get_events_up_to(t_k)
+        active_conflicts: set[frozenset[str]] = set()
+
+        for ev in events:
+            if ev.event_type == EventType.CONTRADICTS and ev.secondary_fact_id:
+                pair = frozenset([ev.target_fact_id, ev.secondary_fact_id])
+                active_conflicts.add(pair)
+            elif ev.event_type == EventType.RESOLVE_CONFLICT and ev.secondary_fact_id:
+                pair = frozenset([ev.target_fact_id, ev.secondary_fact_id])
+                active_conflicts.discard(pair)
+
+        return [{"fact_a": sorted(list(p))[0], "fact_b": sorted(list(p))[1]} for p in sorted(active_conflicts, key=lambda x: sorted(list(x)))]

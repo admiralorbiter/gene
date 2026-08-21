@@ -2,7 +2,7 @@
 
 **Authors**: GENE Core Research Group  
 **Date**: August 2026  
-**Status**: Authoritative Scientific Positioning Memo  
+**Status**: Authoritative Scientific Positioning Memo (v2)  
 **Document URI**: `docs/results/EXPLORATION_ROUND5_RETROSPECTIVE.md`  
 **Reference Assays**: Exploration Round 5 (Stages 5A, 5B, 5C) & Experiments 0–1B-C2b
 
@@ -18,7 +18,7 @@ Across three formal stages (432 cases in 5A, 368 cases in 5B, and 32 live model 
 3. **Provenance**: Nominally distinct multi-path supports can secretly share the same ancestral vulnerability, requiring antichain-minimized lineage-projected hypergraphs $\mathcal{S}_L(c)$.
 4. **Action Governance**: Logical belief entitlement ($\mathcal{S}' \ne \emptyset$) is operationally distinct from action authorization ($\text{Auth}(\mathcal{S}_L') \ge \tau$).
 
-This memo synthesizes what Round 5 established, anchors GENE in classical AI foundations (de Kleer's ATMS, database provenance semirings, AGM belief revision, and causal abstraction), connects its findings to the emerging 2026 agent memory literature (STALE, Memora, MOSAIC, and origin-bound memory authority), introduces the **Support-Boundary Resolution ($SBR$)** metric, and formulates the core thesis for modern persistent AI architecture.
+This memo synthesizes what Round 5 established, anchors GENE in classical AI foundations (de Kleer's ATMS, database provenance semirings, AGM belief revision intuitions, and causal abstraction), connects its findings to the emerging 2026 agent memory literature (STALE, Memora, MOSAIC, Supersede, SodaMem, and bitemporal stores), introduces the **Support-Boundary Resolution ($SBR$)** metric, and formulates the core thesis for modern persistent AI architecture.
 
 ---
 
@@ -36,7 +36,7 @@ This leads to the foundational thesis of GENE:
 > **Neural systems are powerful proposers of semantic conclusions but unreliable custodians of their own epistemic state. Persistent artificial intelligence therefore requires an external, intervention-sufficient truth-maintenance layer that preserves minimal support and causal provenance across change.**
 
 ```
-                               THE EPISTEMIC INTERFACE
+                               THE EPISTEMIC INTERFACE STACK
                                
         +-------------------------------------------------------------+
         |                 Neural Semantic Reasoner                    |
@@ -44,21 +44,28 @@ This leads to the foundational thesis of GENE:
         |   * Proposes candidate beliefs and semantic answers         |
         |   * Unreliable at exact support boundary resolution (SBR)   |
         +------------------------------+------------------------------+
-                                       | Proposals & Evidence Emitted
+                                       | Candidate Propositions & Citations
                                        v
         +-------------------------------------------------------------+
-        |                  Epistemic Interface Layer                  |
-        |   * Separates authoritative support S_F(c) from process R(c)|
-        |   * Extracts minimal entitling premise environments         |
+        |                  State Adjudication Layer                   |
+        |   * Deduces state transitions (ADD, SUPERSEDES, EXPIRES)    |
+        |   * Bitemporal validity tracking: Valid Time (t_v) x Trans  |
+        |   * Isolates unresolved contradictions & temporal intervals |
+        +------------------------------+------------------------------+
+                                       | Authoritative Facts F(t_v | t_k)
+                                       v
+        +-------------------------------------------------------------+
+        |               Support Minimizer & Lineage Kernel            |
+        |   * Extracts formal minimal S_F(c); routes R(c) to telemetry|
         |   * Antichain minimization & lineage projection S_L(c)      |
         +------------------------------+------------------------------+
-                                       | Verified Support & Lineage
+                                       | Support Hypergraph S_L,t(c)
                                        v
         +-------------------------------------------------------------+
-        |                 Persistent Truth Maintenance                |
-        |   * Tracks temporal validity V_t and implicit supersession  |
-        |   * Non-destructive belief revision under change (do(x=0))  |
-        |   * Governs downstream retrieval context & action gating    |
+        |                 Persistent Action Governance                |
+        |   * Non-destructive belief revision under change            |
+        |   * Evaluates lineage authority Auth(S_L) against threshold |
+        |   * Governs downstream context compilation & action gating  |
         +-------------------------------------------------------------+
 ```
 
@@ -85,15 +92,19 @@ Rather than presenting support algebra as a de novo mathematical invention, GENE
 |                                | conjunctive dependency and +   |                                                      |
 |                                | represents alternative paths.  |                                                      |
 +--------------------------------+--------------------------------+------------------------------------------------------+
-| AGM Belief Revision            | Alchourrón, Gärdenfors,        | Stage 5A validates the AGM contraction postulate of  |
-| Postulates                     | Makinson (1985): Contraction   | recovery/minimality: invalidation of premise D must  |
-|                                | should preserve as much of the | retain belief C if an alternative path AB survives.  |
-|                                | prior belief state as possible.|                                                      |
+| Belief Revision & Contraction  | Alchourrón, Gärdenfors,        | Stage 5A operationalizes the minimal-change /        |
+| Intuitions                     | Makinson (1985); Hansson       | relevance intuition: removal of an invalidated       |
+|                                | (1999): Contraction should not | premise must not remove independently supported      |
+|                                | remove unrelated consequences. | consequences that possess surviving derivations.     |
 +--------------------------------+--------------------------------+------------------------------------------------------+
-| Causal & State Abstraction     | Beckers & Halpern (2019);      | Intervention-Sufficiency Principle: An epistemic     |
-|                                | Li, Walsh, Littman (2006):     | representation is sufficient relative to the class   |
-|                                | Compress state only when all   | of premise revisions (S) and root revisions (S_L)    |
-|                                | causal interventions hold.     | the runtime must support without behavioral error.   |
+| Causal Abstraction             | Beckers & Halpern (2019):      | Intervention-Sufficiency Principle: An epistemic     |
+|                                | High-level causal models must  | representation is sufficient relative to the class   |
+|                                | commute with interventions on  | of premise revisions (S) and root revisions (S_L)    |
+|                                | the underlying micro-system.   | the runtime must support without behavioral error.   |
++--------------------------------+--------------------------------+------------------------------------------------------+
+| Decision-Theoretic State       | Li, Walsh, Littman (2006):     | Preserving exact hypergraphs S_L(c) rather than      |
+| Abstraction                    | Compression must preserve the  | lossy scalar/tuple summaries (kappa, rho) ensures   |
+|                                | value function of all policies.| action authority remains monotone under revision.    |
 +================================+================================+======================================================+
 ```
 
@@ -117,7 +128,7 @@ This cleanly formalizes why flat dependency graphs ($R(c) = A \cup B \cup D \cup
 
 ## 3. Adjacent 2026 Memory Literature: Where GENE Sits
 
-The year 2026 has witnessed a major pivot in AI agent memory benchmarks away from static retrieval recall toward dynamic state evolution, mutation, and staleness:
+The year 2026 has witnessed a major pivot in AI agent memory benchmarks away from static retrieval recall toward dynamic state evolution, mutation, staleness, and bitemporal validity:
 
 ```
 +========================================================================================================================+
@@ -130,31 +141,35 @@ The year 2026 has witnessed a major pivot in AI agent memory benchmarks away fro
 |                                | and policy adaptation. Best    | entitled the belief, and which alternative support   |
 |                                | agent achieved only 55.2%.     | environments survive upstream change*.               |
 +--------------------------------+--------------------------------+------------------------------------------------------+
+| Supersede (June 2026)          | Tests knowledge-update main-   | Demonstrates that memory maintenance is distinct     |
+|                                | tenance in LongMemEval. Bounded| from update understanding (performance drops from    |
+|                                | self-maintenance drops 92%->77%| 92% to 77%). GENE externalizes this maintenance      |
+|                                | even with more context.        | into a formal truth-maintenance layer.               |
++--------------------------------+--------------------------------+------------------------------------------------------+
 | Memora (April 2026)            | Tests memory mutation across   | Memora introduces a forgetting penalty for reusing   |
 |                                | 4 LLMs and 6 memory agents.    | obsolete facts. GENE provides the algebraic runtime  |
 |                                | Finds severe reuse of invalid  | that computes exact non-destructive revision without |
 |                                | memories and weak reconciliation.| reliance on model self-reporting.                  |
 +--------------------------------+--------------------------------+------------------------------------------------------+
-| MOSAIC (May 2026)              | Structured graph memory with   | MOSAIC uses graph heuristics to detect conflicts.    |
-|                                | explicit conflict detection to | GENE uses exact antichain support hypergraphs and    |
-|                                | prevent silent contradiction   | causal lineage projection to gate external actions.  |
-|                                | accumulation.                  |                                                      |
+| Reliable Post-Retrieval        | Shows separating evidence      | Independently validates GENE's architecture:         |
+| Assembly (2026)                | extraction from policy         | neural proposal -> structured state -> deterministic |
+|                                | execution resolves conflicts.  | policy gating.                                       |
 +--------------------------------+--------------------------------+------------------------------------------------------+
-| Origin-Bound Memory Authority  | Analyzes derivational lineage  | Identifies that lineage itself can be forged or      |
-| & Provenance Guardrails (2026) | laundering through summaries,  | laundered. Sets the stage for GENE's Lineage         |
-|                                | tool echoes, and re-writes.    | Integrity threat matrix and write-time certificates. |
+| SodaMem & Bitemporal Stores    | Separates mention time, occur- | GENE extends bitemporal validity (t_v x t_k) to      |
+| (July - August 2026)           | rence time, and validity window| multi-hop derivational support hypergraphs S_{t_v}(c)|
+|                                | under updates and conflicts.   | and lineage-projected action governance.             |
 +================================+================================+======================================================+
 ```
 
 ---
 
-## 4. Support-Boundary Resolution ($SBR$): A Unified Metric
+## 4. Support-Boundary Resolution ($SBR$): Balanced Epistemic Accuracy
 
 Stage 5C resolved an apparent paradox in neural memory research. Earlier GENE experiments (Exp 1B-C2) found that models often hallucinate derivations from broken evidence ($F^+ > 0$). Stage 5C found the reverse: when unassisted models face retraction notices, they frequently become over-conservative and falsely abandon intact beliefs ($F^- > 0$).
 
 The underlying phenomenon is not a simple bias toward credulity or skepticism, but **poor support-boundary resolution**: the neural reasoner struggles to locate the precise logical boundary between what is entitled and what is invalidated.
 
-We formalize this with two complementary error rates:
+Mathematically, $SBR$ represents **balanced accuracy** across the two complementary support-boundary error classes:
 
 1. **False Expression Rate ($F^+$)**:
    $$F^+ = P(\text{ACTIVE} \mid \text{RETRACTED})$$
@@ -210,49 +225,15 @@ GENE currently assumes that recorded lineage $\mathcal{L}(p)$ is authentic. Rece
 - **Summarization compression**: Dropping intermediate provenance tags.
 - **Trusted-tool echoes**: Passing an unverified premise through a trusted calculator or formatter to inherit a synthetic root ID.
 - **Manufactured corroboration**: Creating artificial multi-path structures by cross-citing ungrounded claims.
-
-*Roadmap Response*: Develop write-time cryptographic origin binding and tamper-evident lineage chains.
+- **Root Splitting & Merging**: Artificially inflating or deflating cut-set resilience $\kappa_L$.
 
 ### Dragon 2: ATMS Support-Family Combinatorial Explosion
-In de Kleer's classic ATMS, the number of minimal assumption environments in a label can grow exponentially with graph depth and branching ($O(2^n)$ in worst-case bipartite matching). While GENE's micro-worlds have operated safely within small envelopes ($k \le 4$), scaling to thousands of multi-agent beliefs requires mapping the exact boundary where exact antichain minimization remains computationally tractable.
+In de Kleer's classic ATMS, the number of minimal assumption environments in a label can grow exponentially with graph depth and branching (maximal antichain bounds $\binom{N}{N/2}$). The runtime must empirically profile exact scale envelopes and define principled approximation thresholds.
 
 ---
 
-## 7. Systematic Positioning Matrix
+## 7. Transition to Exploration Round 6
 
-```
-+========================================================================================================================+
-|                                    GENE COMPREHENSIVE POSITIONING MATRIX                                               |
-+================================+================================+======================================================+
-| Category                       | Concept / Mechanism            | Scientific Status & Positioning                      |
-+================================+================================+======================================================+
-| **Classical AI Foundations**   | ATMS Labels & Antichains       | Classical foundation (de Kleer 1986).                |
-|                                | Provenance Semirings           | Classical foundation (Green et al. 2007).            |
-|                                | AGM Contraction Minimality     | Classical foundation (Alchourrón et al. 1985).       |
-|                                | Causal & State Abstraction     | Theoretical foundation (Beckers & Halpern 2019).     |
-+--------------------------------+--------------------------------+------------------------------------------------------+
-| **Modern 2026 Adjacent Work**  | Stale Memory Invalidation      | Explored by STALE & Memora (2026). GENE adds exact   |
-|                                |                                | derivational support algebra.                        |
-|                                | Structured Graph Memory        | Explored by MOSAIC (2026). GENE adds causal lineage  |
-|                                |                                | projection and action authority thresholds.          |
-|                                | Lineage Laundering Threats     | Explored in agent provenance security (2026).        |
-+--------------------------------+--------------------------------+------------------------------------------------------+
-| **GENE Empirical Discoveries** | Support-Boundary Resolution    | Empirical finding: models fail at both F+ and F-.    |
-|                                | Revision Autoimmunity          | Disproved flat dependency tracking: 100% false       |
-|                                |                                | retractions on degraded states (Stage 5A).           |
-|                                | Shared-Origin Masquerade       | Disproved scalar/tuple metrics (Stage 5B).           |
-|                                | Dual-Layer Action Containment  | Empirical demonstration: Entitlement != Auth (5C).   |
-+--------------------------------+--------------------------------+------------------------------------------------------+
-| **Open Frontiers**             | Implicit Supersession Algebra  | Exploration Round 6 mainline (Stage 6A).             |
-|                                | Exact Support Scale Envelope   | Deterministic profiling of ATMS label growth.        |
-|                                | Adversarial Lineage Integrity  | Origin-bound memory certificates under attack.       |
-+================================+================================+======================================================+
-```
+With Stage 5C frozen, GENE transitions directly to **Exploration Round 6: State Under Change (Implicit Supersession, Temporal Validity, and Downstream Entitlement)**.
 
----
-
-## 8. Transition to Exploration Round 6
-
-With Stage 5C frozen and fully audited, GENE transitions directly to **Exploration Round 6: State Under Change (Implicit Supersession, Temporal Validity, and Downstream Entitlement)**.
-
-Instead of receiving artificial, pre-classified retraction signals (`do(D=0)`), Round 6 asks how an epistemic runtime can deduce temporal validity when change arrives as new information (`"I moved to Chicago"` superseding `"My commute from Kansas City is 20 minutes"`), maintaining downstream entitlement without leaving zombies or triggering revision autoimmunity.
+The GENE-specific contribution is **support-propagating temporal adjudication**: determine which state changed, preserve alternative derivations, propagate validity through derived beliefs, preserve provenance, and independently govern action.

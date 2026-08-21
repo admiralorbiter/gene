@@ -1,232 +1,221 @@
-"""Deterministic Lineage Integrity & Provenance Laundering Threat Matrix Assay.
+"""Deterministic Lineage Integrity & Attack Matrix Assay (v1).
 
-Simulates 5 distinct lineage threat modalities across naive vs origin-bound
-memory architectures to evaluate epistemic invariant robustness and write-time defenses.
+Executes concrete deterministic root-splitting and root-merging attacks on
+support hypergraphs, measuring actual quantitative distortion on S_L, kappa_L,
+and action governance decisions.
 """
 
 from __future__ import annotations
 
 import json
-import time
 from pathlib import Path
 from typing import Any
 
 from gene.supersession_engine import (
+    BitemporalEngine,
+    BitemporalFact,
+    BitemporalRule,
     EventType,
-    SupersessionEngine,
     TemporalEvent,
-    TemporalFact,
-    TemporalRule,
     compute_antichain,
     compute_cut_set_size,
 )
 
 
-def evaluate_threat_vector_v1_summarization() -> dict[str, Any]:
-    """Threat V1: Multi-hop ancestry collapsed into a summary node dropping roots."""
-    # Ground truth: Claim C depends on Root R1 (untrusted)
-    # Attack: Summary S asserts C directly without carrying R1 in roots
-    engine_naive = SupersessionEngine()
-    engine_bound = SupersessionEngine()
+def run_root_splitting_attack_assay() -> dict[str, Any]:
+    """Attack 1: Root Splitting (Sybil Roots).
 
-    # Naive: Root R1 omitted in summary
-    f_sum_naive = TemporalFact("f_sum_naive", "System", "claim", "C", asserted_at=1, roots=frozenset(["SUMMARY_NODE"]))
-    engine_naive.add_fact(f_sum_naive)
+    An adversarial agent splits a single untrusted root R_1 into three fake roots
+    {R_1a, R_1b, R_1c} to artificially inflate cut-set resilience kappa_L from 1 to 3,
+    illegally bypassing a governance policy requiring kappa_L >= 2.
+    """
+    engine_honest = BitemporalEngine()
+    engine_attacked = BitemporalEngine()
 
-    # Origin-Bound: Cryptographic lineage envelope preserves original root R1
-    f_sum_bound = TemporalFact("f_sum_bound", "System", "claim", "C", asserted_at=1, roots=frozenset(["R1_UNTRUSTED"]))
-    engine_bound.add_fact(f_sum_bound)
+    # Honest scenario: 3 premises derived from the same single root R_1
+    f1 = BitemporalFact("f1", "Target", "param", "V1", roots=frozenset(["R_1"]))
+    f2 = BitemporalFact("f2", "Target", "param", "V2", roots=frozenset(["R_1"]))
+    f3 = BitemporalFact("f3", "Target", "param", "V3", roots=frozenset(["R_1"]))
+    for f in [f1, f2, f3]:
+        engine_honest.register_fact(f)
+        engine_honest.record_event(TemporalEvent(f"ev_{f.fact_id}", EventType.ASSERT, t_knowledge=0, t_valid_start=0.0, target_fact_id=f.fact_id))
 
-    # Invalidate R1 at t=2
-    ev_retract = TemporalEvent("ev_retract_r1", EventType.RETRACT, timestamp=2, target_fact_id="f_sum_naive")
-    ev_retract_bound = TemporalEvent("ev_retract_r1", EventType.RETRACT, timestamp=2, target_fact_id="f_sum_bound")
+    # Attacked scenario: Adversary re-labels roots as 3 distinct roots
+    f1_att = BitemporalFact("f1", "Target", "param", "V1", roots=frozenset(["R_1a"]))
+    f2_att = BitemporalFact("f2", "Target", "param", "V2", roots=frozenset(["R_1b"]))
+    f3_att = BitemporalFact("f3", "Target", "param", "V3", roots=frozenset(["R_1c"]))
+    for f in [f1_att, f2_att, f3_att]:
+        engine_attacked.register_fact(f)
+        engine_attacked.record_event(TemporalEvent(f"ev_{f.fact_id}", EventType.ASSERT, t_knowledge=0, t_valid_start=0.0, target_fact_id=f.fact_id))
 
-    naive_survives = engine_naive.is_fact_valid("f_sum_naive", t=2)  # Survives because naive doesn't link to R1
-    engine_bound.record_event(ev_retract_bound)
-    bound_survives = engine_bound.is_fact_valid("f_sum_bound", t=2)
+    # Rules: each fact independently entitles Goal
+    goal = ("Target", "action", "EXECUTE")
+    for fid in ["f1", "f2", "f3"]:
+        param = "V1" if fid == "f1" else "V2" if fid == "f2" else "V3"
+        r = BitemporalRule(f"r_{fid}", goal, (("Target", "param", param),))
+        engine_honest.register_rule(r)
+        engine_attacked.register_rule(r)
+
+    # Evaluate honest
+    honest_l = engine_honest.compute_temporal_lineage(goal, t_v=0.0, t_k=0)
+    honest_kappa = compute_cut_set_size(honest_l)
+    honest_gate = "PERMIT" if honest_kappa >= 2 else "BLOCK"
+
+    # Evaluate attacked
+    attack_l = engine_attacked.compute_temporal_lineage(goal, t_v=0.0, t_k=0)
+    attack_kappa = compute_cut_set_size(attack_l)
+    attack_gate = "PERMIT" if attack_kappa >= 2 else "BLOCK"
 
     return {
-        "threat_id": "V1_SUMMARIZATION_FLATTENING",
-        "description": "Recursive summarization drops deep ancestral provenance tags, detaching beliefs from upstream retractions.",
-        "invariants_breached_naive": ["Invariant 1 (Provenance Preservation)", "Invariant 4 (Revision Closure)"],
-        "naive_containment_rate": 0.0,
-        "origin_bound_containment_rate": 1.0,
-        "defense_mechanism": "Cryptographically chained origin certificates that recursively inherit root sets across summary transforms.",
+        "attack_name": "Root Splitting (Sybil Roots Inflation)",
+        "mechanism": "Adversary splits single root R_1 into {R_1a, R_1b, R_1c}",
+        "honest_S_L": [sorted(list(s)) for s in honest_l],
+        "honest_kappa_L": honest_kappa,
+        "honest_policy_decision": honest_gate,
+        "attacked_S_L": [sorted(list(s)) for s in attack_l],
+        "attacked_kappa_L": attack_kappa,
+        "attacked_policy_decision": attack_gate,
+        "policy_breach_detected": honest_gate == "BLOCK" and attack_gate == "PERMIT",
+        "cryptographic_defense": "Write-time digital origin binding: Origin certificates signed by private source keys prevent sybil root synthesis.",
     }
 
 
-def evaluate_threat_vector_v2_copy_multiplication() -> dict[str, Any]:
-    """Threat V2: 5 repetitions descended from 1 observation masquerading as independent support."""
-    # Attack: Assert 5 distinct facts with distinct IDs from same root R1
-    engine = SupersessionEngine()
-    for i in range(5):
-        f = TemporalFact(f"f_copy_{i}", "Subject", "trait", "X", asserted_at=0, roots=frozenset(["R1"]))
-        engine.add_fact(f)
+def run_root_merging_attack_assay() -> dict[str, Any]:
+    """Attack 2: Root Merging (Corroboration Suppression / Denial of Service).
 
-    # Naive count metric (|Facts| = 5)
-    naive_apparent_count = 5
-    # Lineage hypergraph evaluation (S_L = {{R1}})
-    l_sets = {frozenset(f.roots) for f in engine.facts.values()}
-    antichain_l = compute_antichain(l_sets)
-    effective_root_count = len(antichain_l)
-    kappa_l = compute_cut_set_size(antichain_l)
+    An adversary (or uncalibrated summarizer) merges 3 genuinely independent roots
+    {R_1, R_2, R_3} into a single root {R_common}, destroying true cut-set resilience
+    (kappa_L: 3 -> 1) and falsely blocking legitimate high-resilience actions.
+    """
+    engine_honest = BitemporalEngine()
+    engine_attacked = BitemporalEngine()
+
+    f1 = BitemporalFact("f1", "Target", "param", "V1", roots=frozenset(["R_1"]))
+    f2 = BitemporalFact("f2", "Target", "param", "V2", roots=frozenset(["R_2"]))
+    f3 = BitemporalFact("f3", "Target", "param", "V3", roots=frozenset(["R_3"]))
+    for f in [f1, f2, f3]:
+        engine_honest.register_fact(f)
+        engine_honest.record_event(TemporalEvent(f"ev_{f.fact_id}", EventType.ASSERT, t_knowledge=0, t_valid_start=0.0, target_fact_id=f.fact_id))
+
+    f1_m = BitemporalFact("f1", "Target", "param", "V1", roots=frozenset(["R_COMMON"]))
+    f2_m = BitemporalFact("f2", "Target", "param", "V2", roots=frozenset(["R_COMMON"]))
+    f3_m = BitemporalFact("f3", "Target", "param", "V3", roots=frozenset(["R_COMMON"]))
+    for f in [f1_m, f2_m, f3_m]:
+        engine_attacked.register_fact(f)
+        engine_attacked.record_event(TemporalEvent(f"ev_{f.fact_id}", EventType.ASSERT, t_knowledge=0, t_valid_start=0.0, target_fact_id=f.fact_id))
+
+    goal = ("Target", "action", "EXECUTE")
+    for fid in ["f1", "f2", "f3"]:
+        param = "V1" if fid == "f1" else "V2" if fid == "f2" else "V3"
+        r = BitemporalRule(f"r_{fid}", goal, (("Target", "param", param),))
+        engine_honest.register_rule(r)
+        engine_attacked.register_rule(r)
+
+    honest_l = engine_honest.compute_temporal_lineage(goal, t_v=0.0, t_k=0)
+    honest_kappa = compute_cut_set_size(honest_l)
+    honest_gate = "PERMIT" if honest_kappa >= 2 else "BLOCK"
+
+    attack_l = engine_attacked.compute_temporal_lineage(goal, t_v=0.0, t_k=0)
+    attack_kappa = compute_cut_set_size(attack_l)
+    attack_gate = "PERMIT" if attack_kappa >= 2 else "BLOCK"
 
     return {
-        "threat_id": "V2_COPY_MULTIPLICATION_ECHO",
-        "description": "Identical observations repeated across memory nodes masquerading as high-resilience multi-path support.",
-        "invariants_breached_naive": ["Invariant 3 (Independent-Support Accounting)", "Invariant 7 (Action Proportionality)"],
-        "naive_apparent_resilience": naive_apparent_count,
-        "gene_lineage_true_resilience": kappa_l,
-        "defense_mechanism": "Antichain-minimized lineage projection S_L collapses identical root sets to kappa_L=1.",
+        "attack_name": "Root Merging (Denial of Service Suppression)",
+        "mechanism": "Adversary or summarizer collapses {R_1, R_2, R_3} into {R_COMMON}",
+        "honest_S_L": [sorted(list(s)) for s in honest_l],
+        "honest_kappa_L": honest_kappa,
+        "honest_policy_decision": honest_gate,
+        "attacked_S_L": [sorted(list(s)) for s in attack_l],
+        "attacked_kappa_L": attack_kappa,
+        "attacked_policy_decision": attack_gate,
+        "policy_breach_detected": honest_gate == "PERMIT" and attack_gate == "BLOCK",
+        "defense": "Immutable root preservation across summarization and transformations.",
     }
 
 
-def evaluate_threat_vector_v3_trusted_tool_echo() -> dict[str, Any]:
-    """Threat V3: Untrusted premise passed through trusted tool adopting tool root ID."""
-    # Ground truth: Untrusted user input U processed by Calculator Tool T
-    # Attack: Memory tags fact as rooted in TOOL_CALCULATOR rather than USER_UNTRUSTED
-    return {
-        "threat_id": "V3_TRUSTED_TOOL_ECHO",
-        "description": "Passing unverified input through a trusted calculation or formatting tool causes the output to inherit trusted tool provenance.",
-        "invariants_breached_naive": ["Invariant 1 (Provenance Preservation)", "Invariant 6 (Reproductive Admission Gating)"],
-        "naive_containment_rate": 0.0,
-        "origin_bound_containment_rate": 1.0,
-        "defense_mechanism": "Conjunctive lineage propagation: Tool operations must compute L(output) = L(tool) * L(input).",
-    }
-
-
-def evaluate_threat_vector_v4_manufactured_corroboration() -> dict[str, Any]:
-    """Threat V4: Cross-citing ungrounded assertions to simulate multi-path support."""
-    # Attack: A -> B and B -> A rule cycle or shared ungrounded hypothesis
-    return {
-        "threat_id": "V4_MANUFACTURED_CORROBORATION",
-        "description": "Cross-citing ungrounded model assertions to simulate multi-path redundancy (pseudo-resilience).",
-        "invariants_breached_naive": ["Invariant 2 (Support Grounding)", "Invariant 5 (Non-Destructive Correction)"],
-        "naive_containment_rate": 0.0,
-        "origin_bound_containment_rate": 1.0,
-        "defense_mechanism": "Acyclic ground-oracle closure: Derivations must terminate at authenticated external root observations.",
-    }
-
-
-def evaluate_threat_vector_v5_lineage_relabeling() -> dict[str, Any]:
-    """Threat V5: Malicious agent directly forges root lineage metadata."""
-    return {
-        "threat_id": "V5_LINEAGE_METADATA_FORGERY",
-        "description": "Adversarial agent modifies or fabricates root lineage tags during memory write.",
-        "invariants_breached_naive": ["Invariant 1 (Provenance Preservation)", "Invariant 6 (Reproductive Admission Gating)"],
-        "naive_containment_rate": 0.0,
-        "origin_bound_containment_rate": 1.0,
-        "defense_mechanism": "Write-time digital signatures over (FactContent, LineageRoots, Timestamp) verified by Epistemic Kernel.",
-    }
-
-
-def run_lineage_threat_matrix_assay() -> dict[str, Any]:
-    """Execute the full threat matrix evaluation."""
+def run_lineage_attack_matrix_v1() -> dict[str, Any]:
+    """Execute the full lineage attack assay."""
     print("=" * 70)
-    print("      GENE LINEAGE INTEGRITY & PROVENANCE LAUNDERING THREAT MATRIX ")
+    print("      GENE LINEAGE INTEGRITY ATTACK ASSAY v1                       ")
     print("=" * 70)
 
-    threats = [
-        evaluate_threat_vector_v1_summarization(),
-        evaluate_threat_vector_v2_copy_multiplication(),
-        evaluate_threat_vector_v3_trusted_tool_echo(),
-        evaluate_threat_vector_v4_manufactured_corroboration(),
-        evaluate_threat_vector_v5_lineage_relabeling(),
+    attacks = [
+        run_root_splitting_attack_assay(),
+        run_root_merging_attack_assay(),
     ]
 
     summary = {
-        "assay_name": "Lineage Integrity & Provenance Laundering Threat Matrix",
-        "total_threat_vectors_evaluated": len(threats),
-        "evaluated_threats": threats,
-        "summary_findings": {
-            "naive_lineage_vulnerability_rate": 1.0,  # 5/5 vulnerable without origin binding
-            "origin_bound_containment_rate": 1.0,    # 5/5 mitigated via cryptographic & structural invariants
-        }
+        "assay_name": "Lineage Integrity Threat Model & Attack Matrix v1",
+        "attacks_evaluated": attacks,
     }
 
-    # Save JSON summary
     out_json = Path(r"C:\Users\admir\Github\gene\data\exploration_round6_lineage_threat_matrix_summary.json")
     out_json.parent.mkdir(parents=True, exist_ok=True)
     with open(out_json, "w", encoding="utf-8") as f:
         json.dump(summary, f, indent=2)
-    print(f"Saved summary to {out_json}")
+    print(f"Saved Lineage Attack Matrix v1 summary to {out_json}")
 
     return summary
 
 
-def write_threat_matrix_report(summary: dict[str, Any]) -> None:
-    """Generate formal Markdown report for Lineage Threat Matrix."""
+def write_lineage_threat_model_v1_report(summary: dict[str, Any]) -> None:
+    """Generate formal Markdown report for Lineage Threat Model v1."""
     report_path = Path(r"C:\Users\admir\Github\gene\docs\results\LINEAGE_INTEGRITY_THREAT_MATRIX.md")
 
-    threat_sections = []
-    for t in summary["evaluated_threats"]:
-        breaches = ", ".join(t["invariants_breached_naive"])
-        threat_sections.append(f"""### Threat Vector: `{t['threat_id']}`
-- **Description**: {t['description']}
-- **Invariants Breached Under Naïve Tracking**: {breaches}
-- **Naïve Containment Rate**: `{t.get('naive_containment_rate', 0.0) * 100:.1f}%`
-- **Origin-Bound Containment Rate**: `{t.get('origin_bound_containment_rate', 1.0) * 100:.1f}%`
-- **Required Invariant Defense**: **{t['defense_mechanism']}**
+    sections = []
+    for a in summary["attacks_evaluated"]:
+        sections.append(f"""### Attack: `{a['attack_name']}`
+- **Adversarial Mechanism**: {a['mechanism']}
+- **Honest Hypergraph $\\mathcal{{S}}_L$**: `{a['honest_S_L']}` ($\\kappa_L = {a['honest_kappa_L']}$, Policy Decision: **{a['honest_policy_decision']}**)
+- **Attacked Hypergraph $\\mathcal{{S}}_L$**: `{a['attacked_S_L']}` ($\\kappa_L = {a['attacked_kappa_L']}$, Policy Decision: **{a['attacked_policy_decision']}**)
+- **Policy Breach Demonstrated**: **{'YES (Gate Inverted)' if a['policy_breach_detected'] else 'NO'}**
+- **Defense Requirement**: **{a.get('cryptographic_defense', a.get('defense'))}**
 """)
 
-    threat_body = "\n".join(threat_sections)
+    body = "\n".join(sections)
 
-    md = f"""# Exploration Round 6 Lineage Integrity & Provenance Laundering Threat Matrix
+    md = f"""# Exploration Round 6 Lineage Integrity Threat Model & Attack Report (v1)
 
-**Assay Name**: Lineage Integrity & Adversarial Provenance Laundering Analysis  
-**Threat Vectors Evaluated**: `{summary['total_threat_vectors_evaluated']}`  
-**Parent Milestone**: `round5-stage5c-postreview-freeze` (`28a897b`)  
+**Assay Name**: Lineage Integrity & Adversarial Manipulation Analysis v1  
+**Target Milestone**: Exploration Round 6  
 **Summary Artifact**: [`../../data/exploration_round6_lineage_threat_matrix_summary.json`](../../data/exploration_round6_lineage_threat_matrix_summary.json)
 
 ---
 
 ## Executive Summary
 
-GENE's core mathematical theorems assume that derivational lineage metadata $\\mathcal{{L}}(p)$ is faithfully recorded. However, in multi-agent ecologies and long-running memory streams, lineage is vulnerable to **adversarial laundering, recursive summarization loss, and tool echoes**.
+GENE's action governance theorems establish that an agent's authority to act on a belief $c$ is proportional to its ancestral root cut-set resilience $\\kappa_L(\\mathcal{{S}}_L(c))$. If derivational lineage is treated as an unauthenticated, mutable metadata dictionary, an adversary can directly manipulate action gates via **Root Splitting** or **Root Merging**.
 
-This assay defines and formally simulates **5 distinct threat vectors**, evaluates which candidate invariants break under naïve lineage tracking, and specifies the required cryptographic and structural defenses.
+This assay formally implements and deterministically measures these two attack modalities, demonstrating how unauthenticated lineage allows adversaries to either illegally force actions (`BLOCK` $\\to$ `PERMIT`) or cause denial of service (`PERMIT` $\\to$ `BLOCK`).
 
 ```
 +========================================================================================================================+
-|                                    LINEAGE INTEGRITY THREAT MATRIX                                                     |
-+================================+================================+=========================+============================+
-| Threat Vector                  | Primary Vulnerability          | Naïve Tracking Outcome  | Origin-Bound Defense       |
-+================================+================================+=========================+============================+
-| V1: Summarization Flattening   | Recursive summarization drops  | Invalidation blindness  | Chained origin envelopes   |
-|                                | ancestral roots                | (survives retraction)   | preserving root sets       |
-+--------------------------------+--------------------------------+-------------------------+----------------------------+
-| V2: Copy Multiplication Echo   | Repetitions masquerade as      | Phantom resilience      | Antichain hypergraph S_L   |
-|                                | independent witnesses          | (kappa inflated to N)   | collapses to kappa_L=1     |
-+--------------------------------+--------------------------------+-------------------------+----------------------------+
-| V3: Trusted-Tool Echo          | Untrusted premise adopts       | Provenance laundering   | Conjunctive propagation    |
-|                                | tool root ID                   | (U gains tool trust)    | L(out) = L(tool) * L(in)   |
-+--------------------------------+--------------------------------+-------------------------+----------------------------+
-| V4: Manufactured Corroboration | Cross-citing ungrounded claims | Circular pseudo-paths   | Ground-oracle closure      |
-|                                | to simulate multi-path support | (kappa inflated)        | requiring external roots   |
-+--------------------------------+--------------------------------+-------------------------+----------------------------+
-| V5: Lineage Metadata Forgery   | Malicious agent fabricates     | Authority spoofing      | Write-time digital origin  |
-|                                | trusted root tags              | (untrusted acts as root)| signatures verified at gate|
-+================================+================================+=========================+============================+
+|                                    LINEAGE ATTACK MATRIX v1 RESULTS                                                    |
++================================+=========================+===========================+=================================+
+| Attack Modality                | Honest Metric           | Attacked Metric           | Governance Gate Impact          |
++================================+=========================+===========================+=================================+
+| 1. Root Splitting (Sybil)      | kappa_L = 1 (BLOCK)     | kappa_L = 3 (PERMIT)      | FORCED ACTION PERMISSION        |
+| 2. Root Merging (Suppression)  | kappa_L = 3 (PERMIT)    | kappa_L = 1 (BLOCK)       | FALSE ACTION DENIAL (DoS)       |
++================================+=========================+===========================+=================================+
 ```
 
 ---
 
-## Detailed Threat Vector Breakdown
+## Detailed Attack Experimental Results
 
-{threat_body}
+{body}
 
 ---
 
-## Architectural Requirements for Future Multi-Agent Rounds
+## Invariant Defense Requirements
 
-1. **Immutable Origin Binding**: Lineage metadata must not be a mutable dictionary field written by agents; it must be an immutable cryptographic certificate generated at observation time.
-2. **Conjunctive Tool Semantics**: When a tool executes, the output lineage must be the union/product of the tool's credentials and all input arguments: $\\mathcal{{L}}(\\text{{out}}) = \\mathcal{{L}}(\\text{{tool}}) \\cup \\bigcup_i \\mathcal{{L}}(\\text{{arg}}_i)$.
-3. **Antichain Governance**: The Epistemic Kernel's antichain projection $\\mathcal{{S}}_L(c)$ is provably robust against copy multiplication (Threat V2), collapsing arbitrary identical repetitions to their true underlying root cut-set $\\kappa_L$.
+1. **Write-Time Cryptographic Origin Binding**: Lineage roots $\\mathcal{{L}}(p)$ must be signed with private source keys $\\text{{Sign}}_{{K}}(f)$ at acquisition time. Agents cannot synthesize or relabel root IDs post-hoc.
+2. **Conjunctive Tool Envelope Propagation**: Any intermediary transformation tool must compute $\\mathcal{{L}}(\\text{{out}}) = \\mathcal{{L}}(\\text{{tool}}) \\cup \\bigcup_i \\mathcal{{L}}(\\text{{in}}_i)$.
 """
     report_path.write_text(md.strip() + "\n", encoding="utf-8")
-    print(f"Wrote threat matrix report to {report_path}")
+    print(f"Wrote Lineage Threat Model v1 report to {report_path}")
 
 
 if __name__ == "__main__":
-    summary = run_lineage_threat_matrix_assay()
-    write_threat_matrix_report(summary)
+    summary = run_lineage_attack_matrix_v1()
+    write_lineage_threat_model_v1_report(summary)

@@ -1,65 +1,57 @@
 {
-  "assay_name": "Lineage Integrity & Provenance Laundering Threat Matrix",
-  "total_threat_vectors_evaluated": 5,
-  "evaluated_threats": [
+  "assay_name": "Lineage Integrity Threat Model & Attack Matrix v1",
+  "attacks_evaluated": [
     {
-      "threat_id": "V1_SUMMARIZATION_FLATTENING",
-      "description": "Recursive summarization drops deep ancestral provenance tags, detaching beliefs from upstream retractions.",
-      "invariants_breached_naive": [
-        "Invariant 1 (Provenance Preservation)",
-        "Invariant 4 (Revision Closure)"
+      "attack_name": "Root Splitting (Sybil Roots Inflation)",
+      "mechanism": "Adversary splits single root R_1 into {R_1a, R_1b, R_1c}",
+      "honest_S_L": [
+        [
+          "R_1"
+        ]
       ],
-      "naive_containment_rate": 0.0,
-      "origin_bound_containment_rate": 1.0,
-      "defense_mechanism": "Cryptographically chained origin certificates that recursively inherit root sets across summary transforms."
+      "honest_kappa_L": 1,
+      "honest_policy_decision": "BLOCK",
+      "attacked_S_L": [
+        [
+          "R_1a"
+        ],
+        [
+          "R_1c"
+        ],
+        [
+          "R_1b"
+        ]
+      ],
+      "attacked_kappa_L": 3,
+      "attacked_policy_decision": "PERMIT",
+      "policy_breach_detected": true,
+      "cryptographic_defense": "Write-time digital origin binding: Origin certificates signed by private source keys prevent sybil root synthesis."
     },
     {
-      "threat_id": "V2_COPY_MULTIPLICATION_ECHO",
-      "description": "Identical observations repeated across memory nodes masquerading as high-resilience multi-path support.",
-      "invariants_breached_naive": [
-        "Invariant 3 (Independent-Support Accounting)",
-        "Invariant 7 (Action Proportionality)"
+      "attack_name": "Root Merging (Denial of Service Suppression)",
+      "mechanism": "Adversary or summarizer collapses {R_1, R_2, R_3} into {R_COMMON}",
+      "honest_S_L": [
+        [
+          "R_2"
+        ],
+        [
+          "R_1"
+        ],
+        [
+          "R_3"
+        ]
       ],
-      "naive_apparent_resilience": 5,
-      "gene_lineage_true_resilience": 1,
-      "defense_mechanism": "Antichain-minimized lineage projection S_L collapses identical root sets to kappa_L=1."
-    },
-    {
-      "threat_id": "V3_TRUSTED_TOOL_ECHO",
-      "description": "Passing unverified input through a trusted calculation or formatting tool causes the output to inherit trusted tool provenance.",
-      "invariants_breached_naive": [
-        "Invariant 1 (Provenance Preservation)",
-        "Invariant 6 (Reproductive Admission Gating)"
+      "honest_kappa_L": 3,
+      "honest_policy_decision": "PERMIT",
+      "attacked_S_L": [
+        [
+          "R_COMMON"
+        ]
       ],
-      "naive_containment_rate": 0.0,
-      "origin_bound_containment_rate": 1.0,
-      "defense_mechanism": "Conjunctive lineage propagation: Tool operations must compute L(output) = L(tool) * L(input)."
-    },
-    {
-      "threat_id": "V4_MANUFACTURED_CORROBORATION",
-      "description": "Cross-citing ungrounded model assertions to simulate multi-path redundancy (pseudo-resilience).",
-      "invariants_breached_naive": [
-        "Invariant 2 (Support Grounding)",
-        "Invariant 5 (Non-Destructive Correction)"
-      ],
-      "naive_containment_rate": 0.0,
-      "origin_bound_containment_rate": 1.0,
-      "defense_mechanism": "Acyclic ground-oracle closure: Derivations must terminate at authenticated external root observations."
-    },
-    {
-      "threat_id": "V5_LINEAGE_METADATA_FORGERY",
-      "description": "Adversarial agent modifies or fabricates root lineage tags during memory write.",
-      "invariants_breached_naive": [
-        "Invariant 1 (Provenance Preservation)",
-        "Invariant 6 (Reproductive Admission Gating)"
-      ],
-      "naive_containment_rate": 0.0,
-      "origin_bound_containment_rate": 1.0,
-      "defense_mechanism": "Write-time digital signatures over (FactContent, LineageRoots, Timestamp) verified by Epistemic Kernel."
+      "attacked_kappa_L": 1,
+      "attacked_policy_decision": "BLOCK",
+      "policy_breach_detected": true,
+      "defense": "Immutable root preservation across summarization and transformations."
     }
-  ],
-  "summary_findings": {
-    "naive_lineage_vulnerability_rate": 1.0,
-    "origin_bound_containment_rate": 1.0
-  }
+  ]
 }
