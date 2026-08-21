@@ -27,7 +27,7 @@
           "evidence_class": "live_neural_assay",
           "artifact": "gene_d1_c_v2_20260820_001206.db",
           "artifact_sha256": "074b6665f622e1ca5a33397ff2a5ee9faaba1ecde72880c890132959d03f4ed2",
-          "execution_commit": "3c102bf7fcc2e1f40d85adceb57223b2d1872df8",
+          "execution_commit": "3c102bf7fc141ed65fe2bdd61194db1291a00520",
           "model": "gemma3:12b",
           "n_calls": 72,
           "n_evaluations": 66,
@@ -73,7 +73,7 @@
           "evidence_class": "branching_simulation",
           "artifact": "gene_exp1b_branching_sim.py",
           "artifact_sha256": "deterministic_pgf_recursions",
-          "execution_commit": "f6d6cbe8f66810a996f01cbcfb4c264a93a0d5c0",
+          "execution_commit": "9c9e7cad9457eff75464574127477bb1d81fd412",
           "model": "None (Mathematical Branching Process)",
           "n_calls": 0,
           "n_evaluations": 150000,
@@ -138,33 +138,20 @@
           "n_evaluations": 1200,
           "unit_of_analysis": "evaluation_cell",
           "formal_report": "docs/results/EXP1B_C1B_SHARED_ECOLOGY_REPORT.md",
-          "primary_metric": "S = +0.8000 at TPR=0.9/FPR=0.1; Node-Only C_I = 1.0000 (0% containment)"
-        },
-        {
-          "experiment": "Experiment 1B-C2a.1 (Live Behavioral Immunity Assay)",
-          "evidence_class": "live_neural_assay",
-          "artifact": "gene_exp1b_c2a_live_assay_a1474d6.db",
-          "artifact_sha256": "69b20662173ff2b9a6abbbea74806fa3175eb246e12ae17deafc5213403c378a",
-          "execution_commit": "a1474d66e1434b075ee11c5888bafad9638c9057",
-          "model": "gemma3:12b",
-          "n_calls": 50,
-          "n_evaluations": 50,
-          "unit_of_analysis": "call",
-          "formal_report": "docs/results/EXP1B_C2A_LIVE_ASSAY_REPORT.md",
-          "primary_metric": "Lineage Quarantine: 100% path elimination vs Node-Only: 0% containment"
+          "primary_metric": "C_I = 1.0000, S = 0.0000 across all budgets under node-only quarantine"
         }
       ],
-      "scope_limitations": "Assumes tamper-proof lineage graph preservation (Lineage Integrity Assumption).",
+      "scope_limitations": "Evaluated in multi-hop deductive DAGs where intermediate G1 memories are stored as unflagged occurrences.",
       "replication_status": "same_model_verified"
     },
     {
       "claim_id": "GENE-C06",
       "claim_status": "observed",
       "headline": "Memory Containment Is Insufficient for Behavioral Containment",
-      "claim_text": "Quarantining legitimate derivation paths (X_path = 0) is insufficient to guarantee behavioral abstention. Downstream neural reasoners can manufacture unsupported pseudo-paths from surviving fragments via single-premise conclusion jumping or cross-entity variable binding shortcuts.",
+      "claim_text": "Removing legitimate support paths (X_path = 0) does not guarantee behavioral suppression. Under prompt conditions with missing required premises, neural reasoners manufacture unsupported pseudo-paths (mu_U = 0.375, 9/24), producing active epistemic errors despite successful memory-level quarantine. Memory governance (Layer 1) requires structural proofreading (Layer 2).",
       "evidence_sources": [
         {
-          "experiment": "Experiment 1B-C2a.1 (Live Behavioral Immunity & Replay Stability)",
+          "experiment": "Experiment 1B-C2a (Live Behavioral Immunity Assay)",
           "evidence_class": "live_neural_assay",
           "artifact": "gene_exp1b_c2a_live_assay_a1474d6.db",
           "artifact_sha256": "69b20662173ff2b9a6abbbea74806fa3175eb246e12ae17deafc5213403c378a",
@@ -174,7 +161,7 @@
           "n_evaluations": 50,
           "unit_of_analysis": "call",
           "formal_report": "docs/results/EXP1B_C2A_LIVE_ASSAY_REPORT.md",
-          "primary_metric": "X_path = 0 yielded 2/4 behavioral expressions in initial assay; 9/10 epistemic errors on repeated broken prompt"
+          "primary_metric": "P(active | broken path in swapped arm) = 2/4 (initial test) and 9/10 (replay stability test)"
         }
       ],
       "scope_limitations": "Evaluated on Gemma 3:12B under greedy decoding (T=0, seed=42) on local GPU execution stacks.",
@@ -225,6 +212,75 @@
       ],
       "scope_limitations": "Observed on local Ollama execution stacks running quantized Gemma 3:12B under greedy decoding.",
       "replication_status": "same_model_verified"
+    },
+    {
+      "claim_id": "GENE-C09",
+      "claim_status": "observed",
+      "headline": "The Four-Layer Epistemic Conformance Taxonomy & Explanatory Bloat",
+      "claim_text": "Neural self-reported justification R(c) is not a faithful representation of minimal entitling support S(c). Epistemic outputs decompose into four distinct layers: symbol realization != contract coherence != justification precision != formal derivability. In 116 live Gemma 3:12B calls under multi-path support environments, the model exhibited non-exact bloated support in 7/8 entitled cases (mean excess 1.625), 20.8% cross-field contract violations, and 25% symbol-form drift under permutation.",
+      "evidence_sources": [
+        {
+          "experiment": "Exploration Round 4 (Epistemic Context Compiler & Four-Layer Assay)",
+          "evidence_class": "live_neural_assay",
+          "artifact": "data/exploration_round4_results.db",
+          "artifact_sha256": "820e574e6d3a0196dfec13ffc392d68d399791b210fd65187795dd834046269e",
+          "execution_commit": "cf472ee76abb9af839bb5b102301de3302df9b87",
+          "model": "gemma3:12b (Ollama digest: f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a)",
+          "n_calls": 116,
+          "n_evaluations": 116,
+          "unit_of_analysis": "call",
+          "formal_report": "docs/results/EXPLORATION_ROUND4_REPORT.md",
+          "primary_metric": "Entitled non-exact support: 7/8 (87.5%, 6/8 citing all 4 docs, mean excess 1.625); Preregistered entitled+pruned exact: 9/16 (56.2%); Contract violations: 5/24 (20.8%); Symbol drift: 6/24 (25.0%)"
+        }
+      ],
+      "scope_limitations": "Evaluated on Gemma 3:12B under structured JSON contracts across 24 isomorphic topological permutations.",
+      "replication_status": "same_model_verified"
+    },
+    {
+      "claim_id": "GENE-C10",
+      "claim_status": "mathematically_proven_and_observed",
+      "headline": "Loss of Alternative-Support Algebra Causes 100% False Retractions on Degraded States",
+      "claim_text": "Representing alternative multi-path support environments S(c) = {S_1, ..., S_k} as a flat conjunctive dependency union causes 100% false retractions (104/104) on damaged-but-still-entitled states. Single-witness tracking falsely retracts 57.7% (60/104). Explanatory bloat (E_S > 0) causes 50% false retractions (8/16) on completely untouched states. Minimal entitling support S(c) eliminates 100% of revision errors without live compute.",
+      "evidence_sources": [
+        {
+          "experiment": "Exploration Round 5 Stage 5A (Revision Precision Assay)",
+          "evidence_class": "deterministic_zero_live_llm",
+          "artifact": "data/exploration_round5_stage5a_cases.jsonl",
+          "artifact_sha256": "1499305d197cf53ad624fc65a6626a0d5fc9ea87993184583930ce952692548e",
+          "execution_commit": "aff1baa34e55f371bfe710628f25abf9113c2f03",
+          "model": "None (Deterministic Support Algebra)",
+          "n_calls": 0,
+          "n_evaluations": 432,
+          "unit_of_analysis": "revision_scenario",
+          "formal_report": "docs/results/EXPLORATION_ROUND5_STAGE5A_REPORT.md",
+          "primary_metric": "Flat Union Autoimmunity: 104/104 (100.0%); Single Witness: 60/104 (57.7%); S(c) Reference: 0/104 (0.0%)"
+        }
+      ],
+      "scope_limitations": "Evaluated across all powerset invalidation subsets over 4 canonical support hypergraph topologies.",
+      "replication_status": "deterministic_exact"
+    },
+    {
+      "claim_id": "GENE-C11",
+      "claim_status": "mathematically_proven_and_observed",
+      "headline": "Intervention-Sufficient Epistemic Representation & Lineage-Projected Action Governance",
+      "claim_text": "Scalar cut-sets (kappa), tuple signatures (rho), and global root counts (|Roots|) all suffer lossy representation collisions under change. In shared origin ancestry (A,D<-R1, B,E<-R2), nominal multiplicity masquerades as independence while sharing common conjunctive root failure. Action authority governance requires the antichain-minimized lineage-projected support hypergraph S_L(c) = min_{subset} {{L(p) : p in S_i}}, achieving 100% compliance across 7 formal governance axioms.",
+      "evidence_sources": [
+        {
+          "experiment": "Exploration Round 5 Stage 5B (Action Governance Assay)",
+          "evidence_class": "deterministic_zero_live_llm",
+          "artifact": "data/exploration_round5_stage5b_cases.jsonl",
+          "artifact_sha256": "d08e1c5d58d430a2e087e4a3318f12ed67193fc80699146a6b27025a2ecefc3d",
+          "execution_commit": "316de0280e6325bfb411ade658763bf02b19dac6",
+          "model": "None (Deterministic Axiomatic Engine)",
+          "n_calls": 0,
+          "n_evaluations": 368,
+          "unit_of_analysis": "governance_scenario",
+          "formal_report": "docs/results/EXPLORATION_ROUND5_STAGE5B_REPORT.md",
+          "primary_metric": "Axiomatic Compliance: P_binary 5/7, P_kappa 5/7, P_rho 6/7, P_lineage (S_L) 7/7 (100.0%)"
+        }
+      ],
+      "scope_limitations": "Evaluated across 368 factorial governance scenarios and 7 formal axiomatic invariants.",
+      "replication_status": "deterministic_exact"
     }
   ]
 }

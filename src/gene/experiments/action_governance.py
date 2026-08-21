@@ -34,15 +34,38 @@ class LineageProjectedState(BaseModel):
     rho_l: tuple[int, int]  # (|S_L|, kappa_L)
 
 
+def minimize_antichain(sets: list[set[str]]) -> list[set[str]]:
+    """Minimize a family of sets into an antichain by removing strict supersets and duplicates."""
+    unique_sets = [set(s) for s in sets if len(s) > 0]
+    minimal_sets: list[set[str]] = []
+    
+    for candidate in unique_sets:
+        # Check if candidate is a strict superset of any other set in unique_sets
+        is_superset = False
+        for other in unique_sets:
+            if other < candidate:  # other is a strict subset of candidate
+                is_superset = True
+                break
+        if not is_superset and candidate not in minimal_sets:
+            minimal_sets.append(candidate)
+            
+    return minimal_sets
+
+
 def project_lineage_support(
     support_family: list[list[str]],
     lineage_map: dict[str, str],
 ) -> LineageProjectedState:
-    """Project premise-level support environments into minimal root-lineage hypergraph S_L(c)."""
+    """Project premise-level support environments into minimal root-lineage hypergraph S_L(c).
+    
+    Computes S_L(c) = min_{subseteq} {{L(p) : p in S_i} : S_i in S(c)}.
+    """
+    raw_root_sets = [{lineage_map.get(p, p) for p in path} for path in support_family]
+    minimal_root_sets = minimize_antichain(raw_root_sets)
+    
     engine = MinimalSupportEngine()
-    for path in support_family:
-        root_path = {lineage_map.get(p, p) for p in path}
-        engine.add_support_set("c_lineage", root_path)
+    for root_set in minimal_root_sets:
+        engine.add_support_set("c_lineage", root_set)
         
     active_roots = [sorted(list(s)) for s in engine.active_support_sets("c_lineage")]
     kappa_l = engine.epistemic_resilience("c_lineage")

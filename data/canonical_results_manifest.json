@@ -1,7 +1,7 @@
 {
-  "manifest_version": "1.0.0",
+  "manifest_version": "2.0.0",
   "project": "GENE (Genealogical Epistemic Network Experiments)",
-  "generated_at": "2026-08-21T02:25:21.510791+00:00",
+  "generated_at": "2026-08-21T02:40:45.277894+00:00",
   "canonical_experiments": {
     "exp0": {
       "experiment": "Experiment 0 (Lineage Observability & Factorial Calibration)",
@@ -157,6 +157,38 @@
       "mu_expression_on_broken_paths": 0.375,
       "mu_heritable_overall": 0.0,
       "mu_heritable_on_broken_paths": 0.0,
+      "status": "FROZEN"
+    },
+    "round4": {
+      "experiment": "Exploration Round 4 (Epistemic Context Compiler & Four-Layer Assay)",
+      "database": "exploration_round4_results.db",
+      "commit": "cf472ee76abb9af839bb5b102301de3302df9b87",
+      "model_digest": "f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a",
+      "total_calls": 116,
+      "total_evaluations": 116,
+      "bloat_rate_entitled": "7 / 8 (87.5%, mean excess = 1.625)",
+      "contract_violation_rate": "5 / 24 (20.8%)",
+      "symbol_drift_rate": "6 / 24 (25.0%)",
+      "status": "FROZEN"
+    },
+    "stage_5a": {
+      "experiment": "Exploration Round 5 Stage 5A (Support-First Revision Precision)",
+      "summary_file": "exploration_round5_stage5a_summary.json",
+      "commit": "aff1baa34e55f371bfe710628f25abf9113c2f03",
+      "total_cases": 368,
+      "degraded_cases": 104,
+      "flat_union_autoimmunity_on_degraded": 1.0,
+      "single_witness_autoimmunity_on_degraded": 0.5769,
+      "bloat_incremental_false_retractions": 8,
+      "status": "FROZEN"
+    },
+    "stage_5b": {
+      "experiment": "Exploration Round 5 Stage 5B (Lineage-Projected Action Governance)",
+      "summary_file": "exploration_round5_stage5b_summary.json",
+      "commit": "316de0280e6325bfb411ade658763bf02b19dac6",
+      "total_cases": 368,
+      "axiomatic_compliance_p_lineage": "7 / 7 (100.0% fully compliant)",
+      "degraded_permitted_rate_tau_0_5": "32 / 104 (30.8%)",
       "status": "FROZEN"
     }
   }

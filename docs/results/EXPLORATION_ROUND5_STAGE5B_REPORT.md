@@ -5,8 +5,8 @@
 **Evidence Class:** `deterministic_zero_live_llm`  
 **Execution Freeze Git Tag:** `round5-stage5b-freeze-v2`  
 **Total Evaluated Scenarios:** **368 cases**  
-**Case Ledger:** `data/exploration_round5_stage5b_cases.jsonl` (`SHA256: 1ada9c3b29eeb4fa32f6440bec1cfa31622fd4438f1326c806822dea056bf9da`)  
-**Summary JSON:** `data/exploration_round5_stage5b_summary.json` (`SHA256: 871b8c17e0800b368b902e4a0982bfcd7766238febf08f2b745d1cf50b873145`)  
+**Case Ledger:** `data/exploration_round5_stage5b_cases.jsonl` (`SHA256: d08e1c5d58d430a2e087e4a3318f12ed67193fc80699146a6b27025a2ecefc3d`)  
+**Summary JSON:** `data/exploration_round5_stage5b_summary.json` (`SHA256: 43765284fd35991cc297ea15d93e97a01268bf21eaca191ebe468f136304dbb6`)  
 
 ---
 
@@ -66,7 +66,7 @@ Authority modulation across illustrative operating thresholds ($\tau \in [0.2, 0
 │ P_binary (Binary Entitlement)    │ 1.000      │ 104 (100.0%)     │ 104 (100.0%)     │ 104 (100.0%)     │
 │ P_kappa (Scalar Cut-Set)         │ 0.538      │ 104 (100.0%)     │ 104 (100.0%)     │ 8 (7.7%)         │
 │ P_rho (Tuple Resilience)         │ 0.481      │ 104 (100.0%)     │ 44 (42.3%)       │ 0 (0.0%)         │
-│ P_lineage (Lineage Projected S_L) │ 0.478      │ 104 (100.0%)     │ 42 (40.4%)       │ 0 (0.0%)         │
+│ P_lineage (Lineage Projected S_L) │ 0.462      │ 104 (100.0%)     │ 32 (30.8%)       │ 0 (0.0%)         │
 └──────────────────────────────────┴────────────┴──────────────────┴──────────────────┴──────────────────┘
 ```
 
@@ -74,7 +74,7 @@ Authority modulation across illustrative operating thresholds ($\tau \in [0.2, 0
 
 ## 4. Artifact & Provenance Record
 
-- **Case Ledger (JSONL):** `data/exploration_round5_stage5b_cases.jsonl` (`SHA256: 1ada9c3b29eeb4fa32f6440bec1cfa31622fd4438f1326c806822dea056bf9da`)
-- **Summary Statistics:** `data/exploration_round5_stage5b_summary.json` (`SHA256: 871b8c17e0800b368b902e4a0982bfcd7766238febf08f2b745d1cf50b873145`)
+- **Case Ledger (JSONL):** `data/exploration_round5_stage5b_cases.jsonl` (`SHA256: d08e1c5d58d430a2e087e4a3318f12ed67193fc80699146a6b27025a2ecefc3d`)
+- **Summary Statistics:** `data/exploration_round5_stage5b_summary.json` (`SHA256: 43765284fd35991cc297ea15d93e97a01268bf21eaca191ebe468f136304dbb6`)
 - **Unit & Property Tests:** `tests/explore_round5/test_action_governance.py` (4/4 passing)
 - **Zero Live LLM Compute:** Pure deterministic axiomatic characterization.

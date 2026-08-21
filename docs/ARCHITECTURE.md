@@ -20,33 +20,41 @@ A vector database is intentionally excluded from v0.
 
 ---
 
-# 2. System layers
+# 2. System layers & The Three-Layer Epistemic Runtime
 
 ```text
 Synthetic World Generator
         ↓
-Immutable Ground-Truth Oracle
+Immutable Ground-Truth Oracle (Canonical World Closure W*)
         ↓
 Natural-Language Renderer
         ↓
 Experiment Scheduler
         ↓
-Memory Retrieval ────────┐
-        ↓                 │
-Ollama Model Call         │
-        ↓                 │
-Structured Claim Parser   │
-        ↓                 │
-Oracle Evaluation         │
-        ↓                 │
-Memory Writer ────────────┘
+[Layer 1: Memory Governance] ──► Lineage Filter / Delayed Quarantine (X_path)
         ↓
-Lineage Recorder
+Ollama Model Call ──────────────► Neural Proposal Engine (Candidate Claim + R(c))
         ↓
-Counterfactual Causal Runner
+[Layer 2: Support Minimizer] ──► Epistemic Kernel (Extracts minimal entitling support S(c))
         ↓
-Metrics + Export
+[Layer 3: Action Governance] ──► Lineage-Projected S_L(c) & rho_L(c) (Gates Actions via 7 Axioms)
+        ↓
+Memory Writer ──────────────────► Persistent Occurrence Store (Append-Only)
+        ↓
+Lineage Recorder ───────────────► Provenance DAG (E, R, C)
+        ↓
+Counterfactual Causal Runner ───► Dual-Oracle Revision Engine (WHAT_IF & THEN_WHAT)
+        ↓
+Metrics + Export ───────────────► Machine-Readable Ledgers & Reports
 ```
+
+### 2.1 The Support-First Runtime Architecture
+Persistent belief maintenance requires separating candidate generation from minimal entitlement:
+1. **Candidate Proposal:** The stochastic neural reasoner emits an answer along with reported justification $R(c)$, which exhibits explanatory bloat ($E_S > 0$).
+2. **Minimal Support Minimization ($\mathcal{S}(c)$):** The kernel reduces bloated citations to exact minimal entitling support families $\mathcal{S}(c) = \{S_1, \dots, S_k\}$, where each $S_i$ is a minimal sufficient premise set.
+3. **Lineage Projection ($\mathcal{S}_L(c)$):** The kernel projects premise support into root-lineage space and minimizes the resulting family into an antichain:
+   $$\mathcal{S}_L(c) = \min_{\subseteq} \{ \{ \mathcal{L}(p) : p \in S_i \} : S_i \in \mathcal{S}(c) \}$$
+4. **Action Governance:** High-stakes action authority $\text{Auth}(\mathcal{S}_L)$ is governed by surviving cut-set resilience $\kappa_L(c)$ and independent root paths $|\mathcal{S}_L(c)|$.
 
 ---
 

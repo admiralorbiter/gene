@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+import subprocess
 import sys
 import pytest
 
@@ -26,7 +27,7 @@ def compute_sha256(file_path: Path) -> str:
 def test_manifest_generation_and_schema():
     """Verify that manifest generation produces valid data matching the schema."""
     manifest = generate_manifest()
-    assert manifest["manifest_version"] == "1.0.0"
+    assert manifest["manifest_version"] == "2.0.0"
     assert manifest["project"] == "GENE (Genealogical Epistemic Network Experiments)"
     assert "T" in manifest["generated_at"]  # Dynamic ISO timestamp
 
@@ -115,6 +116,16 @@ def test_claim_ledger_multi_source_integrity():
             report_path = root_dir / src["formal_report"]
             assert report_path.exists(), f"Report {src['formal_report']} for claim {claim['claim_id']} does not exist"
 
+            # Verify execution_commit resolves in git
+            commit_hash = src["execution_commit"]
+            if commit_hash and len(commit_hash) == 40 and not commit_hash.startswith("deterministic"):
+                res = subprocess.run(
+                    ["git", "cat-file", "-e", f"{commit_hash}^{{commit}}"],
+                    cwd=root_dir,
+                    capture_output=True,
+                )
+                assert res.returncode == 0, f"Commit {commit_hash} in {claim['claim_id']} does not resolve in Git!"
+
             # If artifact is a .db file, verify it exists and checksum matches
             if src["artifact"].endswith(".db"):
                 db_path = root_dir / src["artifact"]
@@ -123,6 +134,30 @@ def test_claim_ledger_multi_source_integrity():
                 assert actual_sha.lower() == src["artifact_sha256"].lower(), (
                     f"SHA256 mismatch for {src['artifact']} in {claim['claim_id']}: expected {src['artifact_sha256']}, got {actual_sha}"
                 )
+            elif src["artifact"].endswith(".jsonl") or src["artifact"].endswith(".json"):
+                art_path = root_dir / src["artifact"]
+                if art_path.exists():
+                    actual_sha = compute_sha256(art_path)
+                    assert actual_sha.lower() == src["artifact_sha256"].lower(), (
+                        f"SHA256 mismatch for {src['artifact']} in {claim['claim_id']}: expected {src['artifact_sha256']}, got {actual_sha}"
+                    )
+
+
+def test_atlas_claims_sync() -> None:
+    """Verify that docs/atlas/data/claims.json exactly mirrors data/claim_ledger.json."""
+    ledger_path = root_dir / "data" / "claim_ledger.json"
+    atlas_path = root_dir / "docs" / "atlas" / "data" / "claims.json"
+    assert ledger_path.exists() and atlas_path.exists()
+    
+    with open(ledger_path, "r", encoding="utf-8") as f:
+        ledger_data = json.load(f)
+    with open(atlas_path, "r", encoding="utf-8") as f:
+        atlas_data = json.load(f)
+        
+    assert len(ledger_data["claims"]) == len(atlas_data["claims"])
+    for l_claim, a_claim in zip(ledger_data["claims"], atlas_data["claims"]):
+        assert l_claim["claim_id"] == a_claim["claim_id"]
+        assert l_claim["headline"] == a_claim["headline"]
 
 
 def test_epigraphs_file_integrity():
