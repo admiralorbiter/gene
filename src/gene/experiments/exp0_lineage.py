@@ -56,7 +56,7 @@ class Exp0LineageExperiment:
         # 2. Populate Generation 0 memory store with rendered facts and rules
         fact_to_node: dict[str, str] = {}
         for fact in target_world.facts:
-            nid = f"mem_{run_id[:8]}_{fact.fact_id}"
+            nid = f"mem_{run_id}_{fact.fact_id}"
             fact_to_node[fact.fact_id] = nid
             mem_store.add_node(
                 generation=0,
@@ -67,7 +67,7 @@ class Exp0LineageExperiment:
             )
 
         for rule in target_world.rules:
-            nid = f"mem_{run_id[:8]}_{rule.rule_id}"
+            nid = f"mem_{run_id}_{rule.rule_id}"
             fact_to_node[rule.rule_id] = nid
             mem_store.add_node(
                 generation=0,
