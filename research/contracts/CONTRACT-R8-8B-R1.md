@@ -2,11 +2,15 @@
 contract_id: CONTRACT-R8-8B-R1
 status: DRAFT
 proposed_by: antigravity
-design_review: null
+design_review: APPROVED
 reviewed_by: chatgpt-pro
 authorized_by: null
 base_sha: 3861de935a8f4c2e6840004ff41c59bb79bc6102
 execution_base_sha: null
+resource_class: gpu
+long_running: false
+exclusive_gpu: true
+interruptible: true
 ---
 
 # Research Contract Proposal: CONTRACT-R8-8B-R1
@@ -15,7 +19,9 @@ execution_base_sha: null
 Exploration Round 8 Stage 8B-R1: Multi-Document Coreference Resolution & Asynchronous Bitemporal Supersession Fusion
 
 ## 1. Context & Research Question
-In exploration stage 8A, `gemma3:12b` demonstrated high extraction fidelity within single document contexts. Stage 8B-R1 evaluates the next epistemic frontier: **multi-document streams** where entities are referenced across multiple asynchronous documents using aliases and coreferent expressions, with late-arriving out-of-order telemetry that introduces genuine valid-time state conflicts requiring bitemporal supersession.
+In exploration stage 8A, `gemma3:12b` demonstrated high extraction fidelity within single document contexts. Stage 8B exploratory pilot evaluation (145 live calls) validated entity mention extraction ($60/60$ alias mentions resolved) and near-collision distractor discrimination ($0/30$ false merges).
+
+Stage 8B-R1 provides the confirmatory research protocol evaluating **multi-document asynchronous telemetry streams** where entities are referenced across multiple asynchronous documents using aliases and coreferent expressions, with late-arriving out-of-order telemetry that introduces genuine valid-time state conflicts requiring bitemporal supersession.
 
 ### Core Research Question
 Can an autonomous neural agent (`gemma3:12b`) accurately extract and resolve multi-document coreferent mentions against a pre-registered canonical entity registry and correctly reconcile out-of-order temporal conflicts through formal bitemporal supersession without inducing false merges ($\text{FDAR} \equiv 0.0\%$)?
@@ -49,17 +55,35 @@ Aliased Coreference   [Cell 2: 15 Worlds (30 docs)]  [Cell 4: 15 Worlds (30 docs
 
 ---
 
-## 3. Four-Point Bitemporal Timeline Queries for Out-of-Order Worlds
+## 3. Epistemic Representation: Overlap-Specific Occurrence Splitting
 
-For every out-of-order world in Cells 3 & 4 ($N = 25$ worlds $\times 4$ query points $= 100$ bitemporal queries), the independent verifier evaluates:
-1. **Initial State ($t_k=1, t_v=6.0$)**: Returns initial state (`Active` or `Operational`).
-2. **Late Historical State ($t_k=2, t_v=1.5$)**: Returns late-arriving historical fact (`Degraded`).
-3. **Conflicting Overlap Supersession ($t_k=2, t_v=6.0$)**: Reconciles superseding fact (`Degraded`) via explicit `EventType.SUPERSEDES` event.
-4. **Un-superseded Future Tail ($t_k=2, t_v=8.0$)**: Returns initial state (`Active` or `Operational`).
+In GENE's bitemporal algebra, `SUPERSEDES` truncates an existing occurrence from a cut point forward. To reconcile an overlapping interval $[5.0, 7.0]$ between initial fact $F_1$ ($[5.0, 10.0]$) and late-arriving superseding historical fact $F_2$ ($[1.0, 7.0]$) without corrupting the un-superseded future tail $[7.0, 10.0]$, the ingestion harness executes **occurrence splitting**:
+
+1. **Transaction Time $t_k = 1$**:
+   - Initial occurrence $F_1$ is registered: `(Cluster Unit i, device_status, Active)` on valid interval $[5.0, 10.0)$.
+2. **Transaction Time $t_k = 2$ (Late Historical Arrival)**:
+   - Late-arriving occurrence $F_2$ is registered: `(Cluster Unit i, device_status, Degraded)` on valid interval $[1.0, 7.0)$.
+   - $F_2$ emits a `SUPERSEDES` event targeting $F_1$ at valid time $t_v = 5.0$, truncating $F_1$ at $5.0$.
+   - A derived un-superseded tail occurrence $F_{1,\text{tail}}$ is registered and asserted: `(Cluster Unit i, device_status, Active)` on valid interval $[7.0, 10.0)$, preserving the non-overlapping future entitlement.
+
+### Four-Point Bitemporal Timeline Queries
+For all 25 out-of-order worlds in Cells 3 & 4 ($N = 25 \times 4 = 100$ timeline queries), the verifier queries `BitemporalEngine.get_active_facts(t_v, t_k)` and asserts the **unique entitled state** (cardinality $\equiv 1$):
+1. **Initial Point-in-Time State**: $(t_k=1, t_v=6.0) \implies \{F_1\}$ (`Active` or `Operational`).
+2. **Late Historical State**: $(t_k=2, t_v=1.5) \implies \{F_2\}$ (`Degraded`).
+3. **Conflicting Overlap Supersession**: $(t_k=2, t_v=6.0) \implies \{F_2\}$ (`Degraded`).
+4. **Un-superseded Future Tail**: $(t_k=2, t_v=8.0) \implies \{F_{1,\text{tail}}\}$ (`Active` or `Operational`).
 
 ---
 
-## 4. Frozen Acceptance Criteria & Exact Denominators
+## 4. Fresh Confirmatory Evaluation Invariant
+
+The R8-8B-R1 confirmatory evaluation manifest must be generated from **fresh pre-registered seeds/world IDs** strictly disjoint from the prior 145-call exploratory run (`eval_r1_world_01` .. `eval_r1_world_50`, `collision_r1_world_01` .. `collision_r1_world_30`).
+
+Prompt templates, model version (`gemma3:12b`), digest (`f4031aab...`), ontology policies, alias-resolution rules, thresholds, temporal event semantics, and acceptance verifier logic must be frozen before opening the R1 evaluation manifest. No R1 evaluation outcome may drive prompt, threshold, or implementation tuning.
+
+---
+
+## 5. Frozen Acceptance Criteria & Exact Denominators
 
 | Gate / Estimand | Formal Definition & Exact Denominator | Pre-registered Acceptance Threshold |
 | :--- | :--- | :--- |
@@ -67,14 +91,13 @@ For every out-of-order world in Cells 3 & 4 ($N = 25$ worlds $\times 4$ query po
 | **Gate 2: Candidate Precision ($M_2$)** | $\frac{\text{TP}_{\text{extracted}}}{\text{Total Proposed Candidates}}$ ($N = 200$ candidate slots) | $\ge 85.0\%$ ($170 / 200$) |
 | **Gate 3: False Merge Rate** | $\frac{\text{False Merges}}{\text{Total Collision Trials}}$ ($N = 30$ distractor trials) | $\equiv 0.0\%$ ($0 / 30$) |
 | **Gate 4: False Split Rate** | $\frac{\text{False Splits}}{\text{Total Alias Mentions}}$ ($N = 60$ mentions across Cells 2 & 4) | $\le 5.0\%$ ($3 / 60$) |
-| **Gate 5: Bitemporal Supersession Correctness** | $\frac{\text{Correct 4-Point Timeline Queries}}{\text{Total Bitemporal Queries}}$ ($N = 100$ queries in Cells 3 & 4) | $\ge 90.0\%$ ($90 / 100$) |
+| **Gate 5: Bitemporal Supersession Correctness** | $\frac{\text{Unique Correct 4-Point Queries}}{\text{Total Bitemporal Queries}}$ ($N = 100$ queries in Cells 3 & 4) | $\ge 90.0\%$ ($90 / 100$) |
 | **Gate 6: Useful Admission Coverage ($M_3$)** | $\frac{\text{Useful Admitted Mention Slots}}{\text{Total Gold Mention Slots}}$ ($N = 200$ mention slots) | $\ge 80.0\%$ ($160 / 200$) |
 | **Gate 7: Global False Discovery Rate ($\text{FDAR}_{\text{global}}$)** | $\frac{\text{Incorrect Durable Admissions}}{\text{Total Durable Admissions}}$ | $\equiv 0.0\%$ ($0 / N$) |
-| **Gate 8: Downstream Query Probes Q1..Q4** | $\frac{\text{Passed Probes}}{\text{Total Probes Evaluated}}$ ($N = 400$ probe queries) | $\equiv 100.0\%$ |
+| **Gate 8: Downstream Query Probes Q1..Q4** | $\frac{\text{Passed Probes}}{\text{Total Probes on Admitted Claims}}$ ($N = 4 \times N_{\text{admitted\_document\_claims}}$) | $\equiv 100.0\%$ |
 
 ---
 
-## 5. Execution Parameters & Constraints
-- **Model**: `gemma3:12b` (`temperature: 0.0`, `seed: 42`, `format: json`).
-- **No Autonomous Freezing**: Requires Human Director Authorization following Scientific Review Desk evaluation.
-- **Independent Raw Verifier**: Acceptance verifier must independently parse raw model JSON spans, resolve entities, emit `SUPERSEDES` events, and replay timeline states with zero runner boolean dependencies.
+## 6. Epistemic Scope Ceilings
+- **Claim**: In multi-document asynchronous telemetry streams, `gemma3:12b` successfully resolves aliases against a pre-registered canonical entity registry and enables bitemporal fusion and supersession without false merges ($\text{FDAR} \equiv 0.0\%$).
+- **Exclusions**: Does NOT claim unconstrained open-world entity induction or autonomous ontology expansion (unresolvable novel mentions trigger safe `DEFER`/`UNRESOLVED`). Predicate definitions remain fixed.
