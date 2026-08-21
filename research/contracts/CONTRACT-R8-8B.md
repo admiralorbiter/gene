@@ -9,31 +9,49 @@ proposed_by: antigravity
 design_review: CHANGES_REQUESTED
 reviewed_by: chatgpt-pro
 authorized_by: null
-resource:
-  resource_class: GPU
-  long_running: false
-  exclusive_gpu: true
-  interruptible: true
-created_at: "2026-08-21 22:17:00Z"
+resource_class: gpu
+long_running: false
+exclusive_gpu: true
+interruptible: true
+created_at: "2026-08-21 22:30:00Z"
 ---
 
-# Research Contract Proposal: CONTRACT-R8-8B (Draft)
+# Research Contract Proposal: CONTRACT-R8-8B (Draft Revision 1)
 
-## 1. Epistemic Frontier & Research Question
-- **Context**: In Stage 8A, we demonstrated that `gemma3:12b` achieves $100\%$ candidate recall and zero false admissions on single-document telemetry narratives without candidate menus.
-- **Core Question (Stage 8B)**: Can autonomous open extraction successfully perform cross-document entity coreference resolution (mapping aliases and partial mentions to canonical entities) and bitemporal state fusion across asynchronous multi-document streams without inflating false discovery ($\text{FDAR} > 0.0$)?
+## 1. Epistemic Frontier & Scientific Context
+- **Baseline (Stage 8A Promoted)**: In `CONTRACT-R8-8A`, `gemma3:12b` achieved $100\%$ candidate recall and zero false admissions on single-document synthetic telemetry narratives without candidate menus.
+- **Core Question (Stage 8B)**: Can autonomous open ingress successfully perform cross-document entity coreference resolution and bitemporal state fusion across asynchronous multi-document streams without inflating false discovery ($\text{FDAR} \equiv 0.0\%$)?
 
-## 2. Hypothesis & Architectural Model
-- **Hypothesis**: Proof-carrying binding hypothesis sets with explicit alias resolution enable zero-shot extraction across multi-document streams while preserving strict $\text{FDAR} \equiv 0.0\%$ and bitemporal validity.
-- **Null Hypothesis ($H_0$)**: Cross-document entity ambiguity causes unconstrained candidate extraction to produce mismatched entity bindings, resulting in $\text{FDAR} > 5.0\%$ or probe failures under temporal conflict.
+## 2. Experimental Model: $2 \times 2$ Factorial Design
 
-## 3. Pre-registered Success Criteria & Falsification Floors
-- **Gate 1 (Cross-Document Coreference Recall $M_1$)**: $\ge 85.0\%$ across 50 multi-document worlds.
-- **Gate 2 (Ingress Candidate Precision $M_2$)**: $\ge 85.0\%$.
-- **Gate 3 (Useful Bitemporal Admission Coverage $M_3$)**: $\ge 80.0\%$.
-- **Gate 4 (Global False Discovery $\text{FDAR}_{\text{global}}$)**: $\equiv 0.0\%$ ($0$ false durable admissions).
-- **Gate 5 (Downstream Bitemporal Probes Q1..Q4)**: $100\%$ passed.
+To isolate identity resolution from temporal fusion mechanisms, Stage 8B evaluates 50 synthetic multi-document worlds across a $2 \times 2$ factorial matrix:
 
-## 4. Epistemic Boundaries & Non-Claims
-- This contract does NOT claim open-world schema discovery (predicate definitions remain fixed in ontology).
-- Acceptance verifiers must recompute all primary estimands directly from raw JSONL archives.
+| Factorial Cell | Identity Difficulty | Temporal / Arrival Structure | Primary Mechanistic Isolation |
+| :--- | :--- | :--- | :--- |
+| **Cell 1 (Literal $\times$ In-Order)** | Literal Canonical Names | Monotonic in-order valid time | Baseline Ingress Control |
+| **Cell 2 (Alias $\times$ In-Order)** | Aliases, Codes, Partial Mentions | Monotonic in-order valid time | **Entity Resolution Isolated** |
+| **Cell 3 (Literal $\times$ Out-of-Order)** | Literal Canonical Names | Asynchronous / superseding arrival | **Temporal Fusion Isolated** |
+| **Cell 4 (Alias $\times$ Out-of-Order)** | Aliases, Codes, Partial Mentions | Asynchronous / superseding arrival | **Combined End-to-End Challenge** |
+
+### Hard Negatives & Near-Collision Controls
+The entity registry and candidate generation environment include adversarial near-collisions where two distinct entities share higher surface string similarity (e.g. `Cluster Unit 12-A` vs `Cluster Unit 12-B`) than an entity shares with its genuine alias (`Cluster Unit 12-A` $\leftrightarrow$ `Relay Primus 12`).
+
+## 3. Pre-registered Success Gates & Estimands
+
+| Gate / Estimand | Target Matrix / Scope | Pre-registered Floor | Rationale |
+| :--- | :--- | :--- | :--- |
+| **Gate 1 (Coreference Recall $M_{1\text{coref}}$)** | Cells 2 & 4 | $\ge 85.0\%$ ($85 / 100$) | Multi-document alias discovery |
+| **Gate 2 (Candidate Precision $M_2$)** | Global | $\ge 85.0\%$ | Rejection of hallucinated entity bindings |
+| **Gate 3 (False Merge Rate)** | Near-Collision Adversarial Set | $\equiv 0.0\%$ ($0$ merged distinct entities) | Prevents identity corruption |
+| **Gate 4 (False Split Rate)** | Global Coreference Sets | $\le 5.0\%$ | Prevents entity fragmentation |
+| **Gate 5 (Temporal Correctness Under Out-of-Order)** | Cells 3 & 4 | $\ge 90.0\%$ | Correct supersession / bitemporal resolution |
+| **Gate 6 (Useful Admission Coverage $M_3$)** | Global | $\ge 80.0\%$ admitted & probe-verified | End-to-end safe ingress |
+| **Gate 7 (Global False Discovery $\text{FDAR}_{\text{global}}$)** | Global | $\equiv 0.0\%$ ($0$ false durable admissions) | Bitemporal safety invariant |
+| **Gate 8 (Downstream Probes Q1..Q4)** | Global Admitted Facts | $\equiv 100.0\%$ passed | Point-in-time, interval, and certificate integrity |
+
+## 4. Acceptance Verifier & Raw Evidence Recomputation
+- **Technical Debt Settlement**: The deterministic contract acceptance verifier `scripts/verify_contract_r8_8b.py` MUST parse `data/r8_stage8b_raw_calls.jsonl` and recompute all mention-level coreference links, confusion matrices, and bitemporal queries directly from raw model outputs, rather than trusting summary JSON fields.
+
+## 5. Epistemic Boundaries & Scope Ceilings
+- **Authorized Scope**: Cross-document alias and coreference resolution against a pre-registered canonical entity registry, followed by safe bitemporal ingress and supersession.
+- **Explicit Exclusions**: Does NOT claim unconstrained open-world entity induction or autonomous ontology expansion (unresolvable novel mentions must trigger safe `DEFER`/`UNRESOLVED`). Predicate definitions remain fixed.
