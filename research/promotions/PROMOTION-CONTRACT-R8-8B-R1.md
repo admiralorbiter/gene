@@ -1,31 +1,32 @@
 ---
 promotion_id: PROMOTION-CONTRACT-R8-8B-R1
 contract_id: CONTRACT-R8-8B-R1
-status: CANDIDATE
-candidate_sha: df777a41417cdf0265e8e62847b201599df4ae7d
-generated_at: "2026-08-21 23:40:00Z"
+status: PROMOTED
+candidate_sha: add7574737a88f43570d645a1a8e0dcae4b099d8
+generated_at: "2026-08-21 23:46:00Z"
 repair_rounds: 0
-reviewed_by: codex
-authorized_by: null
+reviewed_by: chatgpt-pro
+authorized_by: human
 ---
 
-# Candidate Promotion Record: PROMOTION-CONTRACT-R8-8B-R1 (Multi-Document Stream Coreference & Occurrence Splitting)
+# Promotion Record: PROMOTION-CONTRACT-R8-8B-R1 (Multi-Document Stream Coreference & Occurrence Splitting)
 
-**Lifecycle Status**: `CANDIDATE` (Awaiting Scientific Promotion Review by ChatGPT Pro & Human Research Director Authorization)
+**Lifecycle Status**: `PROMOTED` (Authorized by Human Research Director following Scientific Promotion Review)
 
 ## 1. Execution & Audit Summary
 - **Target Contract**: `CONTRACT-R8-8B-R1`
 - **Phase / Milestone**: Exploration Round 8 Stage 8B-R1 Confirmatory Benchmark
 - **Candidate Branch**: `mb/CONTRACT-R8-8B-R1`
-- **Scientific Candidate Commit SHA**: `df777a41417cdf0265e8e62847b201599df4ae7d`
+- **Scientific Candidate Commit SHA**: `add7574737a88f43570d645a1a8e0dcae4b099d8`
 - **Execution Base SHA**: `3da636d9ddd649160f24e8eb1074d8c7d260e2e8`
-- **Contract Acceptance Verifier**: `PASS` (`scripts/verify_contract_r8_8b_r1.py` executed with zero runner booleans, fresh sealed world manifest assertion, multi-document stream invariants, and independent occurrence-splitting bitemporal replay)
+- **Contract Acceptance Verifier**: `PASS` (`scripts/verify_contract_r8_8b_r1.py` executed with zero runner booleans, fresh sealed world manifest assertion, multi-document stream invariants, verified model digest consistency, and independent occurrence-splitting bitemporal replay)
 - **Evidence Package**: Committed and verified in tree:
   - `data/r8_stage8b_r1_raw_calls.jsonl` (145 raw model calls on `gemma3:12b`, SHA256: `16f7b679...`)
   - `runs/r8_stage8b_r1_candidate_generation.db` (SQLite archive, SHA256: `873446a4...`)
   - `data/r8_stage8b_r1_summary.json` (Canonical metrics summary, SHA256: `179cb160...`)
   - `data/r8_stage8b_r1_evidence_manifest.json` (Full content-addressed evidence manifest)
-- **Auditor Verdict**: `PASS` (All 8 Estimands, Factorial Grid, 4-Point Timeline Queries, and Distractor Falsification Controls verified across 145 live `gemma3:12b` calls)
+- **Scientific Review Desk Verdict**: `APPROVED`
+- **Human Director Verdict**: `PROMOTED`
 - **Repair Iterations**: 0 rounds (clean first-pass confirmatory execution on fresh manifest).
 
 ## 2. Confirmatory Estimands & Factorial Gate Outcomes
