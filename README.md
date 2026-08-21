@@ -8,36 +8,36 @@
 
 GENE is a scientific research instrument and epistemic runtime designed to study how information changes, reproduces, persists, evades governance, and dies inside persistent language-model memory ecologies.
 
-Rather than treating persistence as a loose bag of retrieved text or treating memory failures as transient hallucinations, GENE decomposes the epistemic lifecycle into an explicit systems pipeline:
-$$\text{Ancestry} \longrightarrow \text{Retrieval Exposure} \longrightarrow \text{Neural Reasoning} \longrightarrow \text{Support Minimization} \longrightarrow \text{Lineage Projection} \longrightarrow \text{Action Governance}$$
+Rather than treating persistence as a loose bag of retrieved text or treating memory failures as transient hallucinations, GENE decomposes the epistemic lifecycle into an explicit compiler systems pipeline:
+$$\text{Natural Language Ingress} \longrightarrow \text{Ontology Binding} \longrightarrow \text{Write Admission} \longrightarrow \text{State Adjudication} \longrightarrow \text{Bitemporal State} \longrightarrow \text{Support Minimization} \longrightarrow \text{Lineage Action}$$
 
 ```
-                                      THE GENE EPISTEMIC PIPELINE
+                                      THE GENE EPISTEMIC COMPILER PIPELINE
                                       
-  [ Ancestral Root Node ] 
+  [ Natural Language Observation ]
             │
             ▼
-  ┌───────────────────┐    Layer 1: Memory Governance (Lineage Immunity)
-  │ Retrieval Filter  │ ──► Prunes discredited ancestry branches (Modulates X_path)
-  └───────────────────┘     R_inherited ≈ b · X_path · τ_S · W_S  (Eliminates inherited transmission)
-            │ (Retrieved Context)
+  ┌───────────────────┐    Layer 1: Epistemic Ingress & Write Admission (Round 7 Frontier)
+  │ Ingress Validator │ ──► Resolves entity mentions; tests Candidate Intervention-Sufficiency
+  └───────────────────┘     Gating: ADMIT, AMBIGUOUS, NOVEL, REJECT  (Attestation != Admitted Fact)
+            │ (Validated Observation ⟨s, p, o, tv_s, tv_e⟩)
             ▼
-  ┌───────────────────┐
-  │ Neural Reasoner   │ ──► Stochastic candidate proposal engine (Emits answer + reported R(c))
-  └───────────────────┘
-            │
+  ┌───────────────────┐    Layer 2: Contract Adjudication & Bitemporality (Stages 6A/6B)
+  │ State Adjudicator │ ──► Deduces state transitions via Predicate Contracts (TIME_VARYING, ADDITIVE)
+  └───────────────────┘     Bitemporal occurrence tracking: Valid Time (t_v) x Transaction Time (t_k)
+            │ (Authoritative Occurrence Nodes F(t_v | t_k))
             ▼
-  ┌───────────────────┐    Layer 2: Support Minimization & Conformance Validation
+  ┌───────────────────┐    Layer 3: Support Minimization & Conformance Validation (R4/R5)
   │ Epistemic Kernel  │ ──► Extracts minimal entitling support S(c) from explanatory bloat R(c)
   └───────────────────┘     Prevents 100% false retractions on damaged-but-entitled states
             │
             ▼
-  ┌───────────────────┐    Layer 3: Lineage-Projected Action Governance
+  ┌───────────────────┐    Layer 4: Lineage-Projected Action Governance (Stage 5B)
   │ Governance Engine │ ──► Projects S(c) into root hypergraph S_L(c) and resilience rho_L(c)
   └───────────────────┘     Enforces 7 formal governance axioms before high-stakes actuation
             │
             ▼ (Admitted & Maintained)
-  [ Persistent Epistemic Node ] ──► Entitlement under change: WHAT_IF(c, a) & THEN_WHAT(a)
+  [ Persistent Epistemic Node ] ──► Entitlement under change: WHAT_IF_t(c, a) & THEN_WHAT_t(a)
 ```
 
 ---
@@ -74,11 +74,17 @@ $$\text{Ancestry} \longrightarrow \text{Retrieval Exposure} \longrightarrow \tex
 10. **Support-First Epistemic Runtime Rescues Neural Revision & Governs Action (Round 5 Stage 5C)**:
     In a 32-call live Gemma 3:12B assay, belief maintenance under change revealed two distinct failure channels: unassisted neural revision failed on 2/4 degraded worlds ($50\%$) due to support-boundary confusion, while naïve reported-dependency tracking ($R(c)$) triggered retraction on 3/4 degraded worlds ($75\%$) and introduced 2 marginal errors beyond the neural baseline (combined runtime $0/4$ retention). Compiling minimal first-order entitling support $\mathcal{S}_F(c)$ restored **100% entitlement retention ($4/4$)** and **100% clean abstention ($4/4$)**. Lineage-projected authority $\text{Auth}(\mathcal{S}_L)$ demonstrated **dual-layer containment**: maintaining belief entitlement while enforcing preregistered action thresholds when structural root lineage was degraded.
 
+11. **State Under Change Requires Bitemporality & Predicate Contracts (Round 6 Stages 6A, 6B, 6B.1)**:
+    Single-clock Last-Write-Wins (LWW) heuristics structurally collapse on multi-update and retroactive streams ($33.3\%$ KT-LWW accuracy). State maintenance requires independent Valid Time ($t_v$) and Knowledge Transaction Time ($t_k$), paired with explicit predicate contracts (`TIME_VARYING`, `ADDITIVE`, `EPISODIC`, `INTERVAL_BOUNDED`), achieving **100.0% transition and state fidelity ($200/200$)** and eliminating 100% of revision autoimmunity.
+
+12. **Epistemic Error Boundary Externalization & The Epistemic Compiler (Round 6 Stage 6C & Retrospective)**:
+    Direct neural memory mutation exhibits a spontaneous collapse toward generic replacement heuristics (`SUPERSEDES` in 10/12 cases, $0/12$ valid batches). Modular extraction localizes neural uncertainty strictly to Layer 0 without downstream runtime corruption ($0/12$ runtime autoimmunity). Temporal interval extraction achieved **100.0% accuracy ($12/12$)**, while entity canonicalization was the observed bottleneck ($1/12$ raw, recovered to **11/12 (91.7%)** under deterministic normalization). The persistent runtime operates as an **Epistemic Compiler**, establishing the foundational distinction: $\text{Attestation} \ne \text{Admitted Fact}$.
+
 ---
 
 ## Frozen Milestone Roadmap Status
 
-| Phase | Milestone Name | Key Objective | Status | Execution Commit |
+| Phase | Milestone Name | Key Objective | Status | Execution Commit / Tag |
 | :--- | :--- | :--- | :--- | :--- |
 | **Phase 0–4** | Instrumentation & Invariants | Deterministic SQLite persistence, dual oracles, causal interventions | **FROZEN** | `3b59368` |
 | **Phase 5–6** | Experiment 0 | Lineage Observability, Causal Parentage, & 2x2 Factorial Matrix | **FROZEN** | `79b94cd` / `3c102bf` |
@@ -91,39 +97,18 @@ $$\text{Ancestry} \longrightarrow \text{Retrieval Exposure} \longrightarrow \tex
 | **Round 5A** | Exploration Round 5 Stage 5A | Revision Precision Assay & Loss of Support Algebra (432 cases) | **FROZEN** | `aff1baa` |
 | **Round 5B** | Exploration Round 5 Stage 5B | Action Governance & Lineage-Projected Epistemic Resilience (368 cases) | **FROZEN** | `round5-stage5b-freeze-v3` |
 | **Round 5C** | Exploration Round 5 Stage 5C | Neural Revision Bridge (32-Call Live Model Revision Assay) | **FROZEN** | `round5-stage5c-postreview-freeze` |
-| **Round 6A** | Exploration Round 6 Stage 6A-v2 | Bitemporal Supersession Algebra & State Transition Semantics | **VERIFIED** | `main` |
-| **Round 6B** | Exploration Round 6 Stage 6B | Contract-Guided State Adjudication Factorial Benchmark (200 cases) | **VERIFIED** | `main` |
+| **Round 6A** | Exploration Round 6 Stage 6A-v2 | Bitemporal Supersession Algebra & Conflict Windows | **FROZEN** | `round6-stage6a-v2-freeze` |
+| **Round 6B** | Exploration Round 6 Stage 6B / 6B.1 | Contract-Guided Adjudication (200 cases) & Multi-Update Ordering | **FROZEN** | `round6-stage6b-master-freeze` |
+| **Round 6C** | Exploration Round 6 Stage 6C | Neural Semantic Observation Extraction & Fault Localization (28 calls) | **FROZEN** | `round6-stage6c-postreview-freeze` |
+| **Round 7** | Exploration Round 7 | Epistemic Ingress: Binding, Attestation & Write Admission | **ACTIVE** | Planning / Preregistration |
 
 ---
 
 ## Primary Documentation & Results Artifacts
 
-- **Authoritative Metrics Manifest:** [`data/canonical_results_manifest.json`](data/canonical_results_manifest.json)
-- **Claim & Evidence Ledger:** [`data/claim_ledger.json`](data/claim_ledger.json) (Exact empirical provenance of all scientific claims GENE-C01 through GENE-C12)
-- **Foundational Project Vision:** [`docs/GENE_MOONSHOT.md`](docs/GENE_MOONSHOT.md)
-- **Canonical Scientific Narrative:** [`docs/GENE_STORY_MEMO.md`](docs/GENE_STORY_MEMO.md)
-- **Round 5 Retrospective & 2026 Literature Memo:** [`docs/results/EXPLORATION_ROUND5_RETROSPECTIVE.md`](docs/results/EXPLORATION_ROUND5_RETROSPECTIVE.md)
-- **Round 6 Experiments & Reports:**
-  - [Stage 6A-v2 Bitemporal Specification](docs/experiments/STAGE_6A_PREREGISTRATION.md)
-  - [Stage 6B Adjudication Preregistration](docs/experiments/STAGE_6B_PREREGISTRATION.md)
-  - [Stage 6B Benchmark Report (200 cases)](docs/results/EXPLORATION_ROUND6_STAGE6B_REPORT.md)
-  - [Scale Envelope Benchmark Report v1](docs/results/SCALE_ENVELOPE_REPORT.md)
-  - [Lineage Threat Model & Attack Matrix Report v1](docs/results/LINEAGE_INTEGRITY_THREAT_MATRIX.md)
-- **System Architecture & Formalisms:** [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
-- **Interactive Research Exhibit:** [`docs/atlas/index.html`](docs/atlas/index.html)
-- **Round 5 Results Reports:**
-  - [Stage 5A Revision Precision Report](docs/results/EXPLORATION_ROUND5_STAGE5A_REPORT.md)
-  - [Stage 5B Action Governance Report](docs/results/EXPLORATION_ROUND5_STAGE5B_REPORT.md)
-  - [Stage 5C Neural Revision Bridge Report](docs/results/EXPLORATION_ROUND5_STAGE5C_REPORT.md)
-  - [Round 5 Master Walkthrough](docs/results/EXPLORATION_ROUND5_WALKTHROUGH.md)
-
----
-
-## Test Suite Execution
-
-All experimental fixtures, oracle closures, statistical analyzers, revision engines, and governance evaluators run under pytest:
-
-```bash
-pytest -v
-```
-*Current test health: 172 passed (Zero warnings/errors).*
+- **Moonshot Architecture**: [`docs/GENE_MOONSHOT.md`](docs/GENE_MOONSHOT.md)
+- **Scientific Story Memo**: [`docs/GENE_STORY_MEMO.md`](docs/GENE_STORY_MEMO.md)
+- **Round 6 Retrospective**: [`docs/results/EXPLORATION_ROUND6_RETROSPECTIVE.md`](docs/results/EXPLORATION_ROUND6_RETROSPECTIVE.md)
+- **Round 7 Research Plan**: [`docs/experiments/ROUND_7_RESEARCH_PLAN.md`](docs/experiments/ROUND_7_RESEARCH_PLAN.md)
+- **Authoritative Manifest**: [`data/canonical_results_manifest.json`](data/canonical_results_manifest.json)
+- **Verification Suite**: `pytest -v` (175 automated tests passing) & `python scripts/verify_repo.py`

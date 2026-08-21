@@ -26,37 +26,44 @@ An agent operating over durable memory must be able to answer five fundamental q
 | **`DID_YOU_ACTUALLY_USE(c, a)`** | Did the neural reasoner's output causally depend on $a$, or was $a$ merely cited / coincidental? | Causal Intervention Sufficiency Engine |
 
 ```
-                             THE EPISTEMIC INTERFACE STACK
-                             
-            +-------------------------------------------------------------+
-            |                 Neural Semantic Reasoner                    |
-            |   * Flexible synthesis across natural language evidence     |
-            |   * Proposes candidate beliefs and semantic answers         |
-            |   * Unreliable at exact support boundary resolution (SBR)   |
-            +------------------------------+------------------------------+
-                                           | Proposals & Evidence Emitted
-                                           v
-            +-------------------------------------------------------------+
-            |                  State Adjudication Layer                   |
-            |   * Deduces state transitions (ADD, SUPERSEDES, EXPIRES)    |
-            |   * Bitemporal validity tracking: Valid Time (t_v) x Trans  |
-            |   * Isolates unresolved contradictions & temporal intervals |
-            +------------------------------+------------------------------+
-                                           | Authoritative Facts F(t_v | t_k)
-                                           v
-            +-------------------------------------------------------------+
-            |             Support Minimizer & Lineage Kernel              |
-            |   * Extracts formal minimal S_F; routes R(c) to telemetry   |
-            |   * Exact graph-computed ancestral root statistics (S_L)    |
-            +------------------------------+------------------------------+
-                                           | Support Hypergraph S_L,t(c)
-                                           v
-            +-------------------------------------------------------------+
-            |                 Persistent Action Governance                |
-            |   * Non-destructive belief revision under change            |
-            |   * Evaluates lineage authority Auth(S_L) against threshold |
-            |   * Governs downstream context compilation & action gating  |
-            +-------------------------------------------------------------+
+                              THE EPISTEMIC COMPILER STACK
+                              
+             +-------------------------------------------------------------+
+             |                 Natural Language Ingress                    |
+             |   * Stochastic semantic parsing & entity mention extraction |
+             |   * Temporal interval extraction & prompt reproduction      |
+             +------------------------------+------------------------------+
+                                            | Extracted Mentions & Spans
+                                            v
+             +-------------------------------------------------------------+
+             |           Ontology Binding & Ingress Admission             |
+             |   * Deterministic entity resolution & symbol canonicalization|
+             |   * Epistemic Write Admission: Attestation != Admitted Fact |
+             |   * Gating: ADMIT, AMBIGUOUS, NOVEL, REJECT                 |
+             +------------------------------+------------------------------+
+                                            | Validated Observation ⟨s, p, o, tv_s, tv_e⟩
+                                            v
+             +-------------------------------------------------------------+
+             |                  State Adjudication Layer                   |
+             |   * Contract-guided state transitions (ASSERT, SUPERSEDES)  |
+             |   * Bitemporal validity tracking: Valid Time (t_v) x Trans  |
+             |   * Cautious conflict isolation & pairwise dispute tracking |
+             +------------------------------+------------------------------+
+                                            | Authoritative Events & Facts F(t_v | t_k)
+                                            v
+             +-------------------------------------------------------------+
+             |             Support Minimizer & Lineage Kernel              |
+             |   * Extracts formal minimal S_F; routes R(c) to telemetry   |
+             |   * Exact graph-computed ancestral root statistics (S_L)    |
+             +------------------------------+------------------------------+
+                                            | Support Hypergraph S_L,t(c)
+                                            v
+             +-------------------------------------------------------------+
+             |                 Persistent Action Governance                |
+             |   * Non-destructive belief revision under change            |
+             |   * Evaluates lineage authority Auth(S_L) against threshold |
+             |   * Governs downstream context compilation & action gating  |
+             +-------------------------------------------------------------+
 ```
 
 The neural model is a **flexible candidate proposal engine operating inside a governed epistemic runtime**. **The model does not unilaterally define durable truth, compute graph statistics, or govern belief revision.** The Epistemic Kernel mediates state adjudication, temporal validity, change propagation, and action authority.
@@ -85,8 +92,8 @@ For any neural output or belief $c$, GENE distinguishes four non-interchangeable
 
 ### Support Acquisition vs. Support Maintenance
 Belief governance divides cleanly into two operational phases:
-1. **Support Acquisition:** Given prompt evidence $E(c)$, how does the kernel extract a sound, complete, and antichain-minimized premise family $\mathcal{S}_F(c)$ from model proposals? (Addressed in Rounds 1-4).
-2. **Support Maintenance:** Given $\mathcal{S}_F(c)$, how does the entitlement hypergraph and action authority evolve as upstream premises are added, superseded, expired, or retracted? (Addressed in Round 5 and Round 6).
+1. **Support Acquisition & Ingress:** Given prompt evidence $E(c)$, how does the runtime extract a validated, antichain-minimized premise family $\mathcal{S}_F(c)$ from natural language observations without silent binding errors? (Rounds 1–4, 6C, and Round 7).
+2. **Support Maintenance:** Given $\mathcal{S}_F(c)$, how does the entitlement hypergraph and action authority evolve as upstream premises are added, superseded, expired, or retracted? (Rounds 5, 6A, and 6B).
 
 ---
 
@@ -138,8 +145,8 @@ Neural belief revision under change exhibits dual error channels:
 | 5. Non-Destructive       | Invalidation of one support path does not destroy a claim   |
 |    Correction            | if an alternative valid support path remains active.        |
 +--------------------------+-------------------------------------------------------------+
-| 6. Reproductive          | Model emissions may be recorded for audit, but do not gain  |
-|    Admission Gating      | reproductive memory privileges without a valid certificate. |
+| 6. Reproductive & Write  | Model emissions and external observations do not gain       |
+|    Admission Gating      | durable memory privileges without a validated certificate.  |
 +--------------------------+-------------------------------------------------------------+
 | 7. Action                | Evidential thresholds for storing a working note differ     |
 |    Proportionality       | from those required to authorize an irreversible action.    |
@@ -168,10 +175,10 @@ Neural belief revision under change exhibits dual error channels:
         * Proved that flat dependency sets cause 100% false retractions on degraded states (Stage 5A)
         * Characterized Support-Boundary Resolution (SBR) across live neural revision (Stage 5C)
         
-        PILLAR 4: EPISTEMIC REPRODUCTION & GOVERNANCE [MATURE]
+        PILLAR 4: EPISTEMIC REPRODUCTION & WRITE ADMISSION [MATURE CORE / ROUND 7 EXPANDING]
         * Lineage immunity & selective quarantine (Exp 1B-C)
         * Structural proofreading & write certificates (Exp 1B-C2b)
-        * Reproductive gating (R0 < 1 containment)
+        * Epistemic Write Admission: Attestation != Admitted Fact (Round 7 Ingress Frontier)
         
         PILLAR 5: EPISTEMIC ACTION AUTHORITY & LINEAGE PROJECTION [MATURE — STAGE 5B VALIDATED]
         * Hierarchy of epistemic incompleteness: binary -> kappa -> rho -> |Roots| -> rho_L -> S_L(c)
@@ -179,10 +186,10 @@ Neural belief revision under change exhibits dual error channels:
         * Dual-layer containment: Belief Entitlement != Action Authorization (Stage 5C)
         * 100% compliance across 7 formal governance axioms via antichain-minimized S_L(c)
         
-        PILLAR 6: EPISTEMIC STATE ADJUDICATION & TEMPORAL VALIDITY [EMERGING — ROUND 6]
-        * Implicit supersession algebra: SUPERSEDES, EXPIRES, CONTRADICTS, RETRACT
-        * Temporal validity state V_t, temporal support S_t(c), and lineage S_{L,t}(c)
-        * Epistemic queries under natural change: WHY_t, WHAT_IF_t, THEN_WHAT_t
+        PILLAR 6: EPISTEMIC STATE ADJUDICATION & TEMPORAL VALIDITY [MATURE — ROUND 6 VALIDATED]
+        * Bitemporal supersession algebra: Valid Time (t_v) x Knowledge Time (t_k) (Stage 6A)
+        * Predicate ontology contracts: TIME_VARYING, ADDITIVE, EPISODIC, INTERVAL_BOUNDED (Stage 6B)
+        * Fault localization & error boundary externalization at neural interface (Stage 6C)
 ```
 
 ---
@@ -192,20 +199,28 @@ Neural belief revision under change exhibits dual error channels:
 > **The Principle of Intervention-Sufficiency:**
 > *Whenever two distinct epistemic states collapse to the same stored summary representation, but require different responses to some future causal intervention or external action, that summary is too lossy for the runtime.*
 
-### The Class-Relative Sufficiency Form:
-- $\mathcal{S}(c)$ is the **canonical intervention-sufficient normal form for premise revisions** (`WHAT_IF(premise)`).
-- $\mathcal{S}_L(c)$ is the **canonical intervention-sufficient normal form for root-lineage revisions** (`WHAT_IF(root)`).
-- The runtime maintains the explicit typed projection:
-  $$\mathcal{S}(c) \xrightarrow{\mathcal{L}} \mathcal{S}_L(c) = \min_{\subseteq} \{ \{ \mathcal{L}(p) : p \in S_i \} : S_i \in \mathcal{S}(c) \}$$
+### The Ingress Extension: Candidate Intervention-Sufficient Binding Principle
+$$\forall b_i, b_j \in \mathcal{B}(x), \; \forall \iota \in \mathcal{I}: \; \text{Response}(b_i, \iota) = \text{Response}(b_j, \iota)$$
+Two candidate entity or role bindings may be safely collapsed to one durable representation if and only if they yield identical responses across all future queries and interventions in class $\mathcal{I}$. Otherwise, storing $\text{AMBIGUOUS}$ is strictly superior to premature commitment.
 
 ---
 
-## 7. The Two Open Boundaries (Known Dragons)
+## 7. The Three Open Frontiers ("The Three Dragons")
 
-1. **Lineage Integrity & Adversarial Provenance Laundering:**
-   GENE's formal guarantees assume lineage metadata $\mathcal{L}(p)$ is trustworthy. In multi-agent systems, lineage can be laundered via summarization, copy multiplication, or trusted-tool echoes. Write-time cryptographic origin binding is required.
-2. **ATMS Support-Family Combinatorial Explosion:**
-   Antichain labels $\mathcal{S}(c)$ can experience exponential growth in dense multi-path graphs. The runtime must empirically profile exact scale envelopes and define principled approximation thresholds.
+```
++========================================================================================================+
+|                                    THE THREE DRAGONS OF PERSISTENT AI                                  |
++============================+===========================================================================+
+| 1. Ingress Integrity       | How messy, ambiguous, authority-laden language becomes a canonical,       |
+|    (Round 7 Active Frontier)| authorized fact without silent binding, role, or authority errors.        |
++----------------------------+---------------------------------------------------------------------------+
+| 2. Lineage Integrity       | Whether origin identities and independence classes can be trusted under   |
+|    (Security Sidecar)      | multi-agent copying, summarization, Sybil attacks, and tool echoes.       |
++----------------------------+---------------------------------------------------------------------------+
+| 3. Representation Scale    | How to preserve intervention-sufficient support hypergraphs without       |
+|    (Systems Sidecar)       | exponential materialization in dense, multi-path dependency networks.    |
++============================+===========================================================================+
+```
 
 ---
 
@@ -224,12 +239,16 @@ Neural belief revision under change exhibits dual error channels:
     ├── Exploration Round 4: Epistemic Context Compiler & Four-Layer Conformance Taxonomy
     ├── Exploration Round 5 Stage 5A: Revision Precision Assay & Loss of Support Algebra (432 cases)
     ├── Exploration Round 5 Stage 5B: Action Governance & Lineage-Projected Resilience (368 cases)
-    └── Exploration Round 5 Stage 5C: Neural Revision Bridge & Failure Decomposition (32 calls)
+    ├── Exploration Round 5 Stage 5C: Neural Revision Bridge & Failure Decomposition (32 calls)
+    ├── Exploration Round 6 Stage 6A: Bitemporal Supersession Algebra & Conflict Windows (0 compute)
+    ├── Exploration Round 6 Stage 6B / 6B.1: Contract-Guided Adjudication & Temporal Ordering (200 cases)
+    └── Exploration Round 6 Stage 6C: Neural Extraction Bridge, Fault Localization, & Replay (28 calls)
     
-    [THE ACTIVE SCIENTIFIC MAINLINE — ROUND 6: STATE UNDER CHANGE]
-    ├── Stage 6A: Supersession Algebra & Temporal Validity Transitions (0 LLM compute)
-    ├── Stage 6B: Implicit Change Benchmark (Append-Only vs LWW vs Support-Aware) (0 LLM compute)
-    └── Stage 6C: Neural State-Adjudication Bridge (~24-48 live calls)
+    [THE ACTIVE SCIENTIFIC MAINLINE — ROUND 7: EPISTEMIC INGRESS & WRITE ADMISSION]
+    ├── Wave 1: Binding Algebra, Attestation Certificates, & 120-World 4-Probe Benchmark
+    ├── Wave 2: Authority Sidecar & Provenance Non-Amplification Invariants
+    ├── Wave 3: Adversarial Review & Holdout Mapping
+    └── Wave 4: 52-Call Live Interface Assay (Free Gen vs Candidate Selection vs Constrained Grammar)
 ```
 
 ---

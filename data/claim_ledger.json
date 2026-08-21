@@ -1,5 +1,5 @@
 {
-  "ledger_version": "2.0.0",
+  "ledger_version": "3.0.0",
   "project": "GENE (Genealogical Epistemic Network Experiments)",
   "description": "Authoritative claim-evidence ledger mapping each core scientific claim in GENE to its empirical evidence sources, SHA-256 database checksums, execution commits, sample sizes, and boundary scope.",
   "claims": [
@@ -299,7 +299,7 @@
       "claim_id": "GENE-C12",
       "claim_status": "observed",
       "headline": "Support-First Compilation Improves Live Neural Revision Under Partial Invalidation",
-      "claim_text": "In a preregistered 32-call Gemma 3:12B mechanism assay across four structural worlds, raw neural revision retained 2/4 damaged-but-entitled claims, while the support-first GENE runtime retained 4/4 and abstained on 4/4 completely severed states. Acquisition self-reports exhibited overcomplete, undercomplete, and single-witness support representations. A naïve flat policy over acquisition R(c) triggered retraction in 3/4 degraded worlds and introduced two additional false retractions beyond the neural baseline; the combined naïve runtime retained 0/4. In one degraded recombinant world, GENE preserved belief entitlement while the preregistered lineage-authority gate blocked the proposed external action.",
+      "claim_text": "In a preregistered 32-call Gemma 3:12B mechanism assay across four structural worlds, raw neural revision retained 2/4 damaged-but-entitled claims, while the support-first GENE runtime retained 4/4 and abstained on 4/4 completely severed states. Acquisition self-reports exhibited overcomplete, undercomplete, and single-witness support representations. A na\u00efve flat policy over acquisition R(c) triggered retraction in 3/4 degraded worlds and introduced two additional false retractions beyond the neural baseline; the combined na\u00efve runtime retained 0/4. In one degraded recombinant world, GENE preserved belief entitlement while the preregistered lineage-authority gate blocked the proposed external action.",
       "evidence_sources": [
         {
           "experiment": "Exploration Round 5 Stage 5C (Neural Revision Bridge)",
@@ -313,10 +313,93 @@
           "n_evaluations": 32,
           "unit_of_analysis": "call",
           "formal_report": "docs/results/EXPLORATION_ROUND5_STAGE5C_REPORT.md",
-          "primary_metric": "Overall Entitlement: Arm 1 (Raw Neural) 75.0% (6/8), Arm 2 (Naïve Reported) 50.0% (4/8, 0/4 degraded), Arm 3 (GENE Kernel) 100.0% (8/8); Failure Channels: Policy-Only 2/4, Neural-Only 1/4, Both 1/4; Action Gating: Preregistered Lineage Enforced"
+          "primary_metric": "Overall Entitlement: Arm 1 (Raw Neural) 75.0% (6/8), Arm 2 (Na\u00efve Reported) 50.0% (4/8, 0/4 degraded), Arm 3 (GENE Kernel) 100.0% (8/8); Failure Channels: Policy-Only 2/4, Neural-Only 1/4, Both 1/4; Action Gating: Preregistered Lineage Enforced"
         }
       ],
       "scope_limitations": "Bounded direct rule-antecedent enumeration over shallow Horn worlds evaluated on Gemma 3:12B under greedy decoding.",
+      "replication_status": "same_model_verified"
+    },
+    {
+      "claim_id": "GENE-C13",
+      "claim_status": "mathematically_proven_and_observed",
+      "headline": "Bitemporal State Maintenance & Conflict Windows",
+      "claim_text": "Separating Valid Time (t_v) from Knowledge Transaction Time (t_k) is structurally necessary for truth maintenance under retroactive, out-of-order, and disputed updates. Bitemporal occurrence tracking with cautious conflict window isolation resolves pairwise disputes without destroying orthogonal active assertions.",
+      "evidence_sources": [
+        {
+          "experiment": "Exploration Round 6 Stage 6A-v2 (Bitemporal Supersession Algebra)",
+          "evidence_class": "deterministic_zero_live_llm",
+          "artifact": "src/gene/supersession_engine.py",
+          "artifact_sha256": "d49ebfba0699a92fed590bae9ba906846461d533ac971ac08e70840c8f49a583",
+          "execution_commit": "round6-stage6a-v2-freeze",
+          "model": "None (Deterministic Bitemporal Algebra)",
+          "n_calls": 0,
+          "n_evaluations": 175,
+          "unit_of_analysis": "property_test",
+          "formal_report": "docs/results/EXPLORATION_ROUND6_STAGE6A_REPORT.md",
+          "primary_metric": "Exhaustive small-world permutation modelcheck passed (100% invariant preservation)"
+        }
+      ],
+      "scope_limitations": "Evaluated on bounded bitemporal event sequences and discrete transaction clocks.",
+      "replication_status": "deterministic_exact"
+    },
+    {
+      "claim_id": "GENE-C14",
+      "claim_status": "mathematically_proven_and_observed",
+      "headline": "Contract-Guided State Adjudication & State vs Support Decoupling",
+      "claim_text": "State transition deduction requires explicit predicate ontology contracts (TIME_VARYING, ADDITIVE, EPISODIC, INTERVAL_BOUNDED). In a 200-case factorial benchmark, contract adjudication achieved 100% transition and state fidelity, while generic LWW collapsed to 55.0%. In Stage 6B.1, bitemporal ordering achieved 100% (12/12) vs KT-LWW 33.3% (4/12) and VT-LWW 75.0% (9/12). Flat dependency tracking caused 100% revision autoimmunity on alternative derivations, proving state fidelity does not equal support fidelity.",
+      "evidence_sources": [
+        {
+          "experiment": "Exploration Round 6 Stage 6B (Contract-Guided State Adjudication)",
+          "evidence_class": "deterministic_zero_live_llm",
+          "artifact": "data/exploration_round6_stage6b_results_summary.json",
+          "artifact_sha256": "8d20e1945c7fac86783b14feb2eba76285790ee53b5765d0bc2455f201071218",
+          "execution_commit": "round6-stage6b-master-freeze",
+          "model": "None (Deterministic Adjudication Engine)",
+          "n_calls": 0,
+          "n_evaluations": 200,
+          "unit_of_analysis": "case",
+          "formal_report": "docs/results/EXPLORATION_ROUND6_STAGE6B_REPORT.md",
+          "primary_metric": "Layer A Fidelity: Arm 1-4 55.0%, Arm 5-6 100.0%; Layer C Entitlement: Arm 5 64.0%, Arm 6 (GENE Kernel) 100.0%; Arm 5 Autoimmunity: 72/72 (100.0%)"
+        },
+        {
+          "experiment": "Exploration Round 6 Stage 6B.1 (Multi-Update Temporal Ordering Micro-Assay)",
+          "evidence_class": "deterministic_zero_live_llm",
+          "artifact": "data/exploration_round6_stage6b1_temporal_summary.json",
+          "artifact_sha256": "ecca1369df8de0e472df02cd422476f29514a084bd82ec8114d8e98eb6a8ca7f",
+          "execution_commit": "round6-stage6b-master-freeze",
+          "model": "None (Deterministic Engine)",
+          "n_calls": 0,
+          "n_evaluations": 12,
+          "unit_of_analysis": "coordinate",
+          "formal_report": "docs/results/EXPLORATION_ROUND6_STAGE6B_REPORT.md",
+          "primary_metric": "Policy Accuracy: KT-LWW 4/12 (33.3%), VT-LWW 9/12 (75.0%), Bitemporal 12/12 (100.0%)"
+        }
+      ],
+      "scope_limitations": "Evaluated across 200 balanced synthetic update scenarios spanning 4 predicate modes, 5 update topologies, and 2 derivation structures.",
+      "replication_status": "deterministic_exact"
+    },
+    {
+      "claim_id": "GENE-C15",
+      "claim_status": "observed",
+      "headline": "Epistemic Error Boundary Externalization & Symbol Realization in Neural Extraction",
+      "claim_text": "Direct neural transition generation suffered spontaneous collapse toward replacement semantics (SUPERSEDES in 10/12 cases, 0/12 valid batches). Modular observation extraction externalized neural uncertainty strictly to Layer 0, preventing downstream runtime autoimmunity (0/12). Gemma 3:12B extracted temporal intervals with 100% accuracy (12/12), while exact canonical tuple extraction scored 8.3% (1/12) due to un-normalized entity strings. A deterministic normalization audit recovered 91.7% (11/12) extraction fidelity, isolating semantic-role assignment as the remaining failure.",
+      "evidence_sources": [
+        {
+          "experiment": "Exploration Round 6 Stage 6C (Neural Extraction & Fault Localization)",
+          "evidence_class": "live_neural_assay",
+          "artifact": "data/exploration_round6_stage6c_summary.json",
+          "artifact_sha256": "668e4db9120d1768b776755b96d725383fd63f167b8a10370b8c06839419f924",
+          "execution_commit": "round6-stage6c-execution-freeze",
+          "results_commit": "round6-stage6c-postreview-freeze",
+          "model": "gemma3:12b (Ollama digest: f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a)",
+          "n_calls": 28,
+          "n_evaluations": 12,
+          "unit_of_analysis": "case",
+          "formal_report": "docs/results/EXPLORATION_ROUND6_STAGE6C_REPORT.md",
+          "primary_metric": "Layer A Fidelity: N1 0.0%, N2 83.3%; Active Occurrence-Set Fidelity: N1 16.7%, N2 91.7%; Semantic State Fidelity: N1 16.7%, N2 16.7%; Normalized Extraction: 11/12 (91.7%); Normalized Replay Entitlement: 12/12 (100.0%)"
+        }
+      ],
+      "scope_limitations": "12 stratified coverage cases on Gemma 3:12B with platform-injected trusted metadata.",
       "replication_status": "same_model_verified"
     }
   ]

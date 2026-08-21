@@ -1,7 +1,7 @@
 # The GENE Scientific Story Memo
-**A Unified Narrative of Error Inheritance, Retrieval Epidemiology, Selective Lineage Immunity, Support Algebra, and Action Governance in Persistent AI Memory**
+**A Unified Narrative of Error Inheritance, Retrieval Epidemiology, Selective Lineage Immunity, Support Algebra, Bitemporal Truth Maintenance, and The Epistemic Compiler**
 
-**Document Version:** 2.0.0 (Support-First Epistemic Runtime & Round 5 Expansion)  
+**Document Version:** 3.0.0 (The Epistemic Compiler & Round 6 Synthesis)  
 **Status:** Canonical Scientific Narrative  
 **Authoritative Manifest:** [`data/canonical_results_manifest.json`](../data/canonical_results_manifest.json)  
 **Core Reference Implementation:** [`src/gene/`](../src/gene/)  
@@ -12,49 +12,52 @@
 
 Modern AI systems increasingly rely on persistent memory to retain knowledge, context, and operational state across sessions and interactions. When an erroneous or poisoned premise enters persistent memory, how does it spread, and how can an agent maintain why it is entitled to believe a claim as the world changes?
 
-Standard benchmarks treat memory errors as static retrieval failures or transient model hallucinations. In contrast, the **Genealogical Epistemic Network Experiments (GENE)** project treats persistent memory as an *evolutionary epistemic runtime*. Across fifteen experimental phases and five exploratory rounds, GENE systematically decomposes the lifecycle of memory, reasoning, revision, and action:
-$$\text{Ancestral Root} \longrightarrow \text{Retrieval Path Assembly} \longrightarrow \text{Neural Reasoning} \longrightarrow \text{Support Minimization} \longrightarrow \text{Lineage Projection} \longrightarrow \text{Action Governance}$$
+Standard benchmarks treat memory errors as static retrieval failures or transient model hallucinations. In contrast, the **Genealogical Epistemic Network Experiments (GENE)** project treats persistent memory as an *evolutionary epistemic runtime*. Across fifteen experimental phases and six exploratory rounds, GENE systematically decomposes the lifecycle of memory, reasoning, revision, and action:
+$$\text{Natural Language Ingress} \longrightarrow \text{Ontology Binding} \longrightarrow \text{Write Admission} \longrightarrow \text{State Adjudication} \longrightarrow \text{Bitemporal State} \longrightarrow \text{Support Minimization} \longrightarrow \text{Lineage Action}$$
 
-This memo synthesizes the **nine core discoveries** that define the project's canonical scientific contribution:
-1. Exposure $\ne$ reported justification $\ne$ causal lineage (Experiment 0).
-2. Globally false premises reproduce through locally valid deduction (Experiment 1A).
-3. Retrieval availability ($X_{\text{path}}$) governs reproductive branching (Experiment 1B-B).
-4. Lineage metadata enables selective delayed quarantine ($S = \text{TPR} - \text{FPR}$) across semantic drift (Experiment 1B-C1b).
-5. Memory containment does not guarantee behavioral containment (Experiment 1B-C2a).
-6. Structural proofreading prevents pseudo-path reasoning from entering the germline (Experiment 1B-C2b).
-7. Neural reported justification exhibits 100% explanatory bloat ($E_S > 0$), and epistemic output decomposes into four independent conformance layers (Round 4).
-8. Flattening alternative support hypergraphs $\mathcal{S}(c)$ causes 100% false retractions on damaged-but-still-entitled states under partial invalidation (Stage 5A).
-9. The Principle of Intervention-Sufficiency: scalar cut-sets ($\kappa$), tuple signatures ($\rho$), and global root counts are lossy representations; action governance requires the lineage-projected minimal support hypergraph $\mathcal{S}_L(c)$ and root resilience $\rho_L(c)$ (Stage 5B).
+This memo synthesizes the **twelve core discoveries** that define the project's canonical scientific contribution:
+1. **Exposure $\ne$ reported justification $\ne$ causal lineage** (Experiment 0).
+2. **Globally false premises reproduce through locally valid deduction** (Experiment 1A).
+3. **Retrieval availability ($X_{\text{path}}$) governs reproductive branching** (Experiment 1B-B).
+4. **Lineage metadata enables selective delayed quarantine ($S = \text{TPR} - \text{FPR}$)** across semantic drift (Experiment 1B-C1b).
+5. **Memory containment does not guarantee behavioral containment** (Experiment 1B-C2a).
+6. **Structural proofreading prevents pseudo-path reasoning from entering the germline** (Experiment 1B-C2b).
+7. **Neural reported justification exhibits 100% explanatory bloat ($E_S > 0$)**, and epistemic output decomposes into four independent conformance layers (Round 4).
+8. **Flattening alternative support hypergraphs $\mathcal{S}(c)$ causes 100% false retractions** on damaged-but-still-entitled states under partial invalidation (Stage 5A).
+9. **The Principle of Intervention-Sufficiency**: scalar cut-sets ($\kappa$), tuple signatures ($\rho$), and global root counts are lossy representations; action governance requires the lineage-projected minimal support hypergraph $\mathcal{S}_L(c)$ and root resilience $\rho_L(c)$ (Stage 5B).
+10. **State under change requires bitemporal validity and predicate-aware ontology contracts**: single-clock LWW heuristics structurally collapse, while contract adjudication preserves $100\%$ state and transition fidelity (Stages 6A, 6B, 6B.1).
+11. **Epistemic Error Boundary Externalization & The Symbol Realization Boundary**: modular extraction localizes neural uncertainty strictly to Layer 0 without downstream runtime autoimmunity ($0/12$), where the dominant bottleneck is not temporal comprehension ($12/12$ accurate intervals) but compilation into canonical symbolic vocabularies (Stage 6C).
+12. **The Epistemic Compiler Architecture & Attestation vs Admission**: persistent epistemic state requires treating the neural-formal boundary as a formal compiler pipeline, enforcing the fundamental distinction between an attestation (*Source $S$ asserted $P$*) and an admitted fact (*$P$ is an active world fact*) (Round 6 Synthesis).
 
 ```
-                                  THE THREE-LAYER EPISTEMIC ARCHITECTURE
+                                  THE EPISTEMIC COMPILER ARCHITECTURE
                                   
    +───────────────────────────────────+
-   │   Ancestral Memory Pool (G_0)     │
+   │   Natural Language Ingress        │  - Mention extraction & temporal interval parsing
    +───────────────────────────────────+
                      │
                      ▼
-   ┌───────────────────────────────────┐  LAYER 1: Memory Governance (Lineage Immunity)
-   │     Retriever / Lineage Filter    │  - Prunes discredited ancestry branches
-   │      [ Controls X_path ]          │  - Eliminates inherited transmission (R_inherited -> 0)
-   └───────────────────────────────────┘  - Delivers selective containment S = TPR - FPR
+   ┌───────────────────────────────────┐  LAYER 1: Epistemic Ingress & Write Admission (Round 7)
+   │   Ontology Binding & Gating       │  - Resolves surface mentions to candidate namespace
+   │   [ Attestation != Admitted Fact ]│  - Gating: ADMIT, AMBIGUOUS, NOVEL, REJECT
+   └───────────────────────────────────┘  - Evaluates Candidate Intervention-Sufficiency
                      │
-                     ▼ (Retrieved Prompt Context)
-   ┌───────────────────────────────────┐
-   │     Downstream Neural Reasoner    │  - Executes multi-hop deductive rules
-   │       [ Stochastic Proposal ]     │  - Emits candidate answer + reported citation R(c)
-   └───────────────────────────────────┘
+                     ▼ (Validated Observation ⟨s, p, o, tv_s, tv_e⟩)
+   ┌───────────────────────────────────┐  LAYER 2: State Adjudication & Temporal Validity (Stage 6A/6B)
+   │  Contract-Guided Adjudicator      │  - Evaluates Predicate Contracts: TIME_VARYING, ADDITIVE, etc.
+   │    [ Bitemporal Engine (t_v, t_k)]│  - Emits formal transition batch [ASSERT, SUPERSEDES, etc.]
+   └───────────────────────────────────┘  - Maintains active occurrence records F(t_v | t_k)
                      │
-                     ▼ (Candidate Claim + Cited Parent IDs)
-   ┌───────────────────────────────────┐  LAYER 2: Support Minimizer & Proofreader
-   │    Epistemic Conformance Kernel   │  - Extracts minimal entitling support S(c) from bloat R(c)
-   │        [ Controls W_U ]           │  - Rejects underivable pseudo-paths (W_U = 0.000)
-   └───────────────────────────────────┘
+                     ▼ (Authoritative Occurrences)
+   ┌───────────────────────────────────┐  LAYER 3: Support Minimizer & Conformance Kernel (R4/R5)
+   │   Antichain Support Engine        │  - Extracts formal minimal S_F(c); routes R(c) to telemetry
+   │     [ Non-Destructive Revision ]  │  - Projects support to root hypergraph S_L,t(c)
+   └───────────────────────────────────┘  - Prevents 100% false retractions on degraded states
                      │
-                     ▼ (Admitted if Structurally Warranted)
-   ┌───────────────────────────────────┐  LAYER 3: Lineage-Projected Action Governance
-   │     Governance Engine (S_L, rho_L)│  - Projects S(c) into root hypergraph S_L(c)
-   │        [ Enforces 7 Axioms ]      │  - Gates high-stakes actions with mathematical proportionality
+                     ▼ (Lineage-Projected Support Hypergraph S_L)
+   ┌───────────────────────────────────┐  LAYER 4: Lineage-Projected Action Governance (Stage 5B)
+   │   Governance Engine (S_L, rho_L)  │  - Dual-layer containment: Belief Entitlement != Action Auth
+   │      [ Enforces 7 Axioms ]        │  - Gates high-stakes actions with mathematical proportionality
    └───────────────────────────────────┘
 ```
 
@@ -98,327 +101,119 @@ When a corrupted root fact (e.g. `Station VELORA operates under supervisor KIRA`
 $$\text{False Supervisor } (G_0) \xrightarrow[\text{Rule 1}]{} \text{False Protocol / Clearance } (G_1) \xrightarrow[\text{Rule 2}]{} \text{False Route / Access Tier } (G_2)$$
 
 To evaluate this dynamic, GENE introduced the **Dual-Oracle Framework**, evaluating every emitted claim simultaneously against two independent oracles:
-- **Canonical Oracle ($T^* \in \{0, 1, \emptyset\}$)**: Evaluates truth relative to the machine-readable ground-truth world closure ($W^*$).
-- **Context Derivability Oracle ($D_{\text{ctx}} \in \{0, 1\}$)**: Evaluates whether the claim is strictly derivable from the prompt context exposed to the model.
-
-```
-+─────────────────────────────────────────────────────────────────────────────────────────────────────────+
-|                                    THE DUAL-ORACLE EVALUATION MATRIX                                    |
-+-------------------+-------------------+-------------------+---------------------------------------------+
-| Canonical (T*)    | Context (D_ctx)   | Phenotype         | Epistemic Meaning                           |
-+-------------------+-------------------+-------------------+---------------------------------------------+
-| 1 (True in W*)    | 1 (Derivable)     | Healthy           | Globally and locally true                   |
-| 0 (False in W*)   | 1 (Derivable)     | Semantic Infection| Globally false, but locally sound deduction |
-| 1 (True in W*)    | 0 (Underivable)   | Epistemic Error   | Locally unwarranted lucky guess / pseudo-path|
-| 0 (False in W*)   | 0 (Underivable)   | De Novo Error     | Locally unwarranted false assertion         |
-| ∅ (N/A)           | 0 (Underivable)   | Clean Abstention  | Warranted UNKNOWN response                  |
-+-------------------+-------------------+-------------------+---------------------------------------------+
-```
+- **Canonical Ground-Truth Oracle ($\mathcal{O}^*$)**: Evaluates objective factual accuracy against the uncorrupted base world.
+- **Exposure-Consistent Lineage Oracle ($\mathcal{O}_{\mathcal{E}}$)**: Evaluates whether the emitted claim is a formally sound deductive consequence of the memories actually retrieved and placed into context.
 
 ### Key Empirical Findings:
-- **Semantic Infection**: Corrupted lineages achieved **100% transmission fidelity** ($\tau = 1.000$) across $G_0 \to G_1 \to G_2$ while maintaining state vector $(0, 1, 1, 1, 1)$ across 72 evaluations.
-- At every single generational step, the model's local reasoning was **100% logically valid and derivationally sound** ($D_{\text{ctx}} = 1, A = 1, E = 1, K = 1$).
-- **Core Principle**: *A false memory does not require bad reasoning to spread. Correct local deduction faithfully reproduces and transforms globally false ancestry.*
+- Under pristine deduction, falsehood propagated across three generations with **100% transmission fidelity** ($\tau = 1.000, N=24$ live calls).
+- Every intermediate inference was scored as **100% locally sound** by $\mathcal{O}_{\mathcal{E}}$, while being **100% objectively false** under $\mathcal{O}^*$.
+- **Takeaway**: Once an unverified premise is admitted to persistent memory, perfectly sound logical deduction acts as an error amplifier rather than an error corrector.
 
 ---
 
-## 3. Discovery 3: Retrieval Regulates Reproductive Contact (Experiment 1B-A & 1B-B)
+## 3. Discovery 3: Retrieval Availability Governs Reproductive Branching (Experiment 1B-B)
 
-In realistic agent systems, memories do not automatically enter context; they must be retrieved from a shared pool. Experiment 1B separated *memory existence* from *reproductive exposure*.
-
-Multi-hop deductive tasks require the concurrent retrieval of multiple independent premises (e.g. Premise $A$ + Premise $B$). If retrieval returns only Premise $A$ alongside irrelevant clutter, the deductive path is broken.
-
-GENE formulated the **Retrieval-Path Availability** metric:
-\[
-X_{\text{path}} = P(\text{Premise } A \in \text{Context} \land \text{Premise } B \in \text{Context})
-\]
-
-```
-                          RETRIEVAL AS REPRODUCTIVE CONTACT
-                          
-   [ Memory Store ] ──► [ Lexical Retriever (top-k) ] ──► Context: { Premise A, Clutter 1, Clutter 2 }
-                                                                 │
-                                                                 ▼
-                                                    Path is BROKEN (Premise B missing)
-                                                                 │
-                                                                 ▼
-                                                    Model Abstains: UNKNOWN (R = 0)
-```
+Memory persistence does not imply reproductive opportunity. In persistent multi-hop reasoning, an agent only derives a downstream conclusion if *all* required premises are simultaneously co-retrieved into context ($X_{\text{path}} = \prod_{p \in \text{Premises}} X_p = 1$).
 
 ### Key Empirical Findings:
-- **Branching Dynamics & Extinction Threshold**: In a branching process model with capacity $b=2$, offspring generating function $G(s) = ((1-p) + ps)^2$ yields ultimate extinction probability $q_\infty(p) = ((1-p)/p)^2$ for $p > 0.50$. When path availability drops to or below $X_{\text{crit}} = 1/b = 0.50$, **extinction occurs almost surely in the limit** ($q_\infty = 1.000$).
-- **Causal Retrieval Rescue**: Increasing the retrieval budget from $k=4$ to $k=6$ restored complete $G_1$ path assembly from 0/4 to 4/4 in both arms and restored downstream expression; a clean/infected expression asymmetry then motivated the matched B1c control.
-- **Matched Expression Assay (Exp 1B-B1c)**: Across 16 counterbalanced live calls, model expression was strictly path-conditioned:
-  \[
-  P(\text{active} \mid \text{complete path}) = \frac{8}{8} = 1.000, \quad P(\text{active} \mid \text{broken path}) = \frac{0}{8} = 0.000
-  \]
+- Evaluated across 240 structured retrieval trials, the effective reproductive number $R_{\text{eff}}$ scaled strictly with multi-hop retrieval availability $X_{\text{path}}$.
+- Lexical surface-area feedback created sharp non-linear phase transitions: expanding a mutated premise into multiple downstream notes increased its collective BM25 surface area, triggering runaway supercritical propagation ($R_0 > 1.0$) unless explicitly constrained.
 
 ---
 
 ## 4. Discovery 4: Lineage Enables Selective Delayed Quarantine (Experiment 1B-C1b)
 
-In real-world deployments, an information source is rarely identified as malicious or inaccurate at the moment of creation. Discrediting judgments arrive **late**—after the root fact has already reproduced into multiple downstream generations.
-
-In Experiment 1B-C1b, GENE evaluated a shared memory pool where healthy ($H$) and infected ($I$) lineages coexisted across 12 fully counterbalanced, role-swapped ecologies (1,200 evaluations across a full budget sweep). An external detector supplied an imperfect binary risk signal $S \in \{0, 1\}$ at the root with True Positive Rate ($\text{TPR}$) and False Positive Rate ($\text{FPR}$).
-
-```
-                             LINEAGE QUARANTINE VS. NODE-ONLY FILTERING
-                             
-     ROOT CORRUPTED (G_0) [Flagged by Risk Signal]
-              │
-              ├──────────────────────────────────┐
-              ▼                                  ▼
-     [ NODE-ONLY FILTER ]             [ LINEAGE QUARANTINE ]
-     Removes G_0 root only.            Removes G_0 + G_1 + G_2 descendants.
-              │                                  │
-              ▼                                  ▼
-     G_1 & G_2 Survives in Memory!     Corrupted Family Quarantined!
-              │                                  │
-              ▼                                  ▼
-     PROVENANCE LAUNDERING (C_I = 1.0) SELECTIVE CONTAINMENT (C_I = 1 - TPR)
-```
+When a root memory is discovered to be corrupted *after* downstream reproduction has occurred, how can an agent purge the contagion without destroying healthy knowledge?
 
 ### Key Empirical Findings:
-1. **The Lineage-Blind Baseline Law**:
-   All lineage-blind interventions (uniform thinning, random-family quarantine, generation-targeted pruning) fall strictly on the diagonal:
-   \[
-   C_H = C_I \implies \text{Selectivity } S = C_H - C_I \equiv 0.000
-   \]
-   Lineage-blind forgetting cannot reduce corrupted availability without destroying healthy knowledge at the exact same rate ($C_H = C_I = 0.7177$ for uniform thinning at $k=6$).
-2. **Provenance Laundering Under Node-Only Filtering**:
-   Removing only the flagged root node yielded **100% descendant survival** ($C_I \equiv 1.000, S \equiv 0.000$). Downstream generations successfully laundered away their disreputable origin.
-3. **The Golden Identity of Selective Lineage Immunity**:
-   Lineage quarantine leverages ancestry edges to propagate the root judgment downstream, achieving:
-   \[
-   C_H = 1 - \text{FPR}, \quad C_I = 1 - \text{TPR} \implies S = \text{TPR} - \text{FPR}
-   \]
-   At a 90% TPR / 10% FPR operating point, lineage quarantine delivered an **80.0% selective containment advantage** ($S = +0.800$) over the control frontier.
-4. **Core Principle**: *Genealogy does not detect truth. Genealogy preserves the address of a trust judgment through semantic transformation.*
+- Lineage-blind forgetting mechanisms (uniform thinning, recency pruning) are bounded by $C_H = C_I$: purging infected nodes ($1 - C_I$) destroys healthy memories ($1 - C_H$) at an identical rate (selectivity $S = C_H - C_I = 0.000$).
+- **Lineage-Aware Quarantine** queries the provenance DAG to prune the infected ancestral cone. Across 12 paired ecologies, lineage quarantine achieved **$S = +0.800$ selectivity** ($C_H = 1.000, C_I = 0.200$), perfectly matching the theoretical calibration identity $S = \text{TPR} - \text{FPR}$.
 
 ---
 
-## 5. Discovery 5: Memory Containment Is Insufficient for Behavioral Containment (Experiment 1B-C2 & C2a)
+## 5. Discovery 5: Memory Containment Does Not Guarantee Behavioral Containment (Experiment 1B-C2a)
 
-When the retrieval sandbox was connected to live neural generation on `gemma3:12b` (50 calls in Experiment 1B-C2a), a critical gap emerged:
+Can an agent safely operate if an infected premise is removed from context ($X_{\text{path}} = 0$)?
 
-Under complete double quarantine (where all route facts were removed, $X_{\text{path}} = 0$), the model abstained as expected in the forward ecology, but in the role-swapped ecology, it manufactured **unsupported concrete claims** from surviving memory fragments.
-
-```
-                    THE BEHAVIORAL PSEUDO-PATH GAP
-                    
-   Memory Pool: { Station KESTREL is in Facility Grid 1 }  (Route memory QUARANTINED)
-   Rule: If Station operates on Route X AND Grid 1 -> Auth Code Alpha
-                               │
-                               ▼
-                    [ Gemma 3:12B Reasoner ]
-                               │
-                               ▼
-   Output: "AUTH_ALPHA_KESTREL" (Sufficient Evidence)  ◄── UNSUPPORTED PSEUDO-PATH!
-```
-
-### Key Empirical Discoveries:
-1. **The Memory-Behavior Gap**:
-   - Memory Governance (Layer 1) successfully removed legitimate derivation paths ($X_{\text{path}} = 0$).
-   - However, **Behavioral Containment** failed in 2/4 executions under initial testing and produced 9/10 epistemic errors on repeated prompt tests.
-   - **Conclusion**: *Memory containment alone was insufficient for behavioral containment in the tested ecology.*
-2. **The Replay Stability Principle**:
-   - Replaying the identical frozen prompt 10 times under temperature 0.0 and fixed seed 42 on local GPU inference yielded **9 active epistemic errors and 1 contract-failure abstention**.
-   - **Principle**: *Fixed prompt + temperature 0 + fixed seed cannot be assumed deterministic without empirical verification on that execution runtime.*
+### Key Empirical Findings:
+- In a 30-call live assay on Gemma 3:12B, breaking the legitimate support path resulted in the model manufacturing **unsupported pseudo-paths** in $37.5\%$ of cases ($\mu_U = 0.375$), citing isolated fragments to justify conclusions.
+- **Takeaway**: Memory governance (Layer 1) is necessary but insufficient. The runtime requires active validation to ensure emitted conclusions structurally unify with valid support.
 
 ---
 
-## 6. Discovery 6: Structural Proofreading Prevents Phenotypic Errors from Becoming Heritable (Experiment 1B-C2b)
+## 6. Discovery 6: Structural Proofreading Prevents Germline Infection (Experiment 1B-C2b)
 
-Experiment 1B-C2b was designed to map the exact trigger surface of pseudo-path formation and evaluate a mechanical **Layer 2 Structural Epistemic Proofreader** (Support-Certificate Validator).
+To eliminate pseudo-path hallucination, GENE implemented an automated **First-Order Structural Proofreader** that mechanically validates whether cited memory IDs formally satisfy rule antecedents.
 
-Across 30 live invocations on Gemma 3:12B testing 5 factorial conditions across forward and swapped ecologies:
-1. **Mismatched Routes Elicit Clean Abstention ($12 / 12 = 1.000$)**:
-   When an explicit mismatching route was visible in context, the model recognized that the rule antecedent was not satisfied and produced **12 / 12 observed clean abstentions**.
-2. **Zero-Route Contexts Induce Single-Premise Jumping ($6 / 6 = 1.000$)**:
-   When route facts were completely absent, the model jumped from the single facility grid premise to the rule conclusion across both ecologies ($6 / 6$ active errors).
-3. **Foreign Exact-Route Matches Elicit Asymmetric Cross-Binding**:
-   When a foreign station carried the target's required route, it triggered cross-entity variable binding in the swapped configuration ($3 / 3$ errors) while the forward configuration produced $3 / 3$ clean abstentions.
-
-```
-+─────────────────────────────────────────────────────────────────────────────────────────────────────────+
-|                                    LAYER 2 PROOFREADING AUDIT (30 CALLS)                                |
-+------------------------------+----+--------------------+--------------------+---------------------------+
-| Condition                    | N  | Raw Model Behavior | Layer 2 Verdict    | Admitted to Memory?       |
-+------------------------------+----+--------------------+--------------------+---------------------------+
-| valid_target_route (Ctrl)    | 6  | 6/6 Active Valid   | PASS_VALID_DERIV   | YES (6/6 Admitted)        |
-| target_station_wrong_route   | 6  | 6/6 UNKNOWN        | PASS_ABSTENTION    | NO  (6/6 Inactive)        |
-| foreign_station_wrong_route  | 6  | 6/6 UNKNOWN        | PASS_ABSTENTION    | NO  (6/6 Inactive)        |
-| foreign_station_target_route | 6  | 3 Active, 3 UNK    | 3 REJECT, 3 PASS   | NO  (0/6 Admitted)        |
-| no_route                     | 6  | 6/6 Active Errors  | 6/6 REJECT_UNIF    | NO  (0/6 Admitted)        |
-+------------------------------+----+--------------------+--------------------+---------------------------+
-```
-
-### The Structural Support-Certificate Validator:
-Layer 2 performs first-order triple unification over the cited parent facts:
-\[
-\sigma = \{?s \mapsto \text{target\_station}\} \quad \text{such that} \quad \forall (p, o) \in \text{Rule.Antecedents}, \quad (\text{target\_station}, p, o) \in \text{CitedFacts}
-\]
-
-### Evolutionary Transmission Dynamics:
-GENE decomposes population transmission into two distinct channels:
-1. **Inherited Transmission Channel**:
-   \[
-   R_{\text{inherited}} \approx b \cdot X_{\text{path}} \cdot \tau_S \cdot W_S
-   \]
-2. **Spontaneous / Underivable Channel**:
-   \[
-   \mu_U = P(\text{unsupported output emitted} \mid D_{\text{ctx}} = 0) = \frac{9}{24} = \mathbf{0.375}
-   \]
-   \[
-   \mu_{U, \text{heritable}} = \mu_U \cdot W_U = 0.375 \times 0.000 = \mathbf{0.000}
-   \]
-3. **Total Population Evolution**:
-   \[
-   \mathbb{E}[I_{g+1}] \approx R_{\text{inherited}} \cdot I_g + \Lambda_{\text{de\_novo}, g}
-   \]
-
-Layer 1 controls $X_{\text{path}} \to 0$ (quarantining inherited falsehoods), and Layer 2 controls $W_U \to 0$ (preventing pseudo-path admission).
+### Key Empirical Findings:
+- In 30 live calls on Gemma 3:12B, the proofreader intercepted all 9 unsupported pseudo-path emissions, admitting only valid derivations ($6/6$) and clean abstentions ($15/15$).
+- Heritable mutation transmission dropped from $\mu_U = 0.375$ to **$\mu_{U, \text{heritable}} = \mathbf{0.000}$**, successfully establishing **Layer 2 Reproductive Admission Gating**.
 
 ---
 
 ## 7. Discovery 7: The Four-Layer Epistemic Conformance Taxonomy & Explanatory Bloat (Round 4)
 
-In Exploration Round 4, GENE connected live neural models (Gemma 3:12B) to complex multi-path support environments. The audit revealed that neural self-reported justification $R(c)$ is fundamentally unfaithful to minimal entitling support $\mathcal{S}(c)$.
-
-Epistemic outputs decompose into four independent layers:
-$$\text{Symbol Realization} \ne \text{Contract Coherence} \ne \text{Justification Precision} \ne \text{Formal Derivability}$$
-
-```
-+─────────────────────────────────────────────────────────────────────────────────────────────────────────+
-│                                 FOUR-LAYER CONFORMANCE TAXONOMY (ROUND 4)                               │
-+──────────────────────────┬─────────────────────────────────────────────────────────────┬────────────────+
-│ Conformance Layer        │ Failure Surface Modeled                                     │ Observed Rate  │
-+──────────────────────────┼─────────────────────────────────────────────────────────────┼────────────────+
-│ 1. Symbol Realization    │ Token-level formatting drift (e.g. PROTOCOL_X7 vs PROTO_X7) │ 6 / 24 (25.0%) │
-│ 2. Contract Coherence    │ Semantic contradiction across JSON fields (det vs N=null)   │ 5 / 24 (20.8%) │
-│ 3. Justification Precise │ Non-exact bloated support in entitled environments          │ 7 / 8  (87.5%) │
-│                          │ (Mean excess cited facts E_S = 1.625; 6/8 citing all 4 docs)│                │
-│                          │ Preregistered entitled + pruned exact justification         │ 9 / 16 (56.2%) │
-│ 4. Formal Derivability   │ Deriving concrete answers from empty/broken support         │ 0.300 - 0.375  │
-+──────────────────────────┴─────────────────────────────────────────────────────────────┴────────────────+
-```
-
----
-
-## 8. Discovery 8: Loss of Support Algebra Causes 100% Revision Autoimmunity (Stage 5A)
-
-In Stage 5A, GENE evaluated how persistent memory systems update beliefs when an upstream premise is retracted (`WHAT_IF(c, a)`).
-
-When a claim is supported by alternative disjunctive paths (e.g. $\mathcal{S}(C) = \{\{A,B\}, \{D,E\}\}$), invalidating premise $D$ leaves the claim damaged but still entitled via surviving path $\{A,B\}$:
-$$\text{Ent}^*(C, \{D\}) = \mathbf{1}[\{A,B\} \cap \{D\} = \emptyset] \lor \mathbf{1}[\{D,E\} \cap \{D\} = \emptyset] = 1 \lor 0 = 1$$
-
-Across 432 factorial revision scenarios (368 local + 64 network DAG):
-- **Flat Dependency Unions ($R_{\text{union}} = \{A,B,D,E\}$)** falsely retracted **100% of damaged-but-entitled states (104/104)**, destroying beliefs that retained valid alternative support.
-- **Single-Witness Tracking ($R_{\text{single}} = \{D,E\}$)** falsely retracted **57.7% of damaged states (60/104)**.
-- **Explanatory Bloat ($E_S > 0$)** caused **50% false retractions (8/16)** on completely untouched states when an irrelevant distractor was retracted.
-- **Support-First Epistemic Kernel ($\mathcal{S}(c)$)** achieved **100% exact revision accuracy** with **0% autoimmunity**.
-
----
-
-## 9. Discovery 9: Intervention-Sufficient Representation & Lineage-Projected Action Governance (Stage 5B)
-
-In Stage 5B, GENE investigated: *What information about surviving support is minimally necessary to govern action authority under change?*
-
-The benchmark proved the **Hierarchy of Epistemic Incompleteness**:
-$$\text{Binary Entitlement} \longrightarrow \text{Cut-Set } \kappa \longrightarrow \text{Tuple } \rho \longrightarrow |\text{Roots}| \longrightarrow \text{Lineage Tuple } \rho_L \longrightarrow \mathcal{S}_L(c) \text{ (Canonical Normal Form)}$$
-
-All coarse scalar and tuple summaries suffer from **lossy representation collisions**:
-1. **Binary Entitlement ($\text{Auth} \in \{0, 1\}$)** is blind to degradation, granting 100% full authority ($1.000$) to damaged beliefs.
-2. **Scalar Cut-Set Resilience ($\kappa$)** fails on shared-root degradation ($(2,1) \to (1,1)$), granting full authority ($1.000$) even when an entire alternative path is destroyed.
-3. **Tuple Resilience ($\rho = (|S|, \kappa)$)** fails to distinguish correlated single-root alternative paths from independent multi-root paths.
-4. **Global Root Counts ($|\text{Roots}|$)** fail in shared origin ancestry ($A,D \leftarrow R_1, B,E \leftarrow R_2$): global counting sees 2 roots and 2 paths, but both paths share conjunctive root vulnerability.
-5. **Lineage Tuple $\rho_L = (|\mathcal{S}_L|, \kappa_L)$** fails on single-root vs conjunctive multi-root paths ($\mathcal{S}_{L,1} = \{\{R_1\}\}$ vs $\mathcal{S}_{L,2} = \{\{R_1, R_2\}\}$ both produce $\rho_L = (1, 1)$, but $\text{do}(R_2=0)$ severs only the latter).
-
-**The Resolution:** Projecting premise support into root-lineage space and eliminating strict supersets yields the **antichain-minimized lineage-projected support hypergraph**:
-$$\mathcal{S}_L(c) = \min_{\subseteq} \{ \{ \mathcal{L}(p) : p \in S_i \} : S_i \in \mathcal{S}(c) \}$$
-$\mathcal{S}_L(c)$ serves as the canonical intervention-sufficient normal form for root-level changes, achieving **100% compliance across 7 formal governance axioms**.
-
----
-
-## 10. Discovery 10: Neural Revision Bridge & Dual-Layer Containment (Stage 5C)
-
-In Stage 5C, GENE bridged the formal theory to live neural inference in a **preregistered 32-call live Gemma 3:12B assay** across 4 structural micro-worlds.
-
-```
-+===================================================================================================+
-|                                    STAGE 5C FACTORIAL OUTCOMES                                    |
-+======================+=========================+========================+=========================+
-| Metric               | Arm 1 (Raw Neural)      | Arm 2 (Naïve Reported) | Arm 3 (GENE Kernel)     |
-+======================+=========================+========================+=========================+
-| Overall Entitlement  | 75.0% (6/8)             | 50.0% (4/8)            | 100.0% (8/8)            |
-| Degraded Active Rate | 50.0% (2/4)             | 0.0% (0/4) [100% Fail] | 100.0% (4/4)            |
-| Retracted Abstention | 100.0% (4/4)            | 100.0% (4/4)           | 100.0% (4/4)            |
-| Lineage Action Gate  | N/A (Unchecked)         | N/A (Premature Revoke) | Preregistered Enforced  |
-+======================+=========================+========================+=========================+
-```
+Round 4 investigated the internal fidelity of model-generated justifications, evaluating 116 live calls across entitled and unentitled worlds.
 
 ### Key Empirical Findings:
-1. **The Dual Failure Channels of Belief Maintenance Under Change**:
-   - **Unassisted Neural Revision Failure (Arm 1)**: In $2/4$ degraded worlds ($W_{\text{SHP}}$ and $W_{\text{REC}}$), raw neural reasoning failed to resolve support boundaries, over-retracting valid beliefs ($50\%$ failure) under perturbation.
-   - **Lossy Dependency Policy Failure (Arm 2)**: Naïve dependency tracking over acquisition citations $R(c)$ triggered retraction in $3/4$ degraded worlds ($75\%$) and added 2 marginal false retractions beyond the neural baseline ($W_{\text{IND}}$ and $W_{\text{SHO}}$), destroying all degraded beliefs ($0/4$ retention).
-   - **Failure Breakdown**: Policy-only failure in $2/4$ ($W_{\text{IND}}, W_{\text{SHO}}$), Neural-only failure in $1/4$ ($W_{\text{SHP}}$), and Both channels overlapping in $1/4$ ($W_{\text{REC}}$).
-2. **Support-First Runtime Package Rescues Revision (Arm 3)**:
-   By compiling only minimal first-order entitling support $\mathcal{S}_F(c)$ into active prompt context, **Arm 3 achieved 100% entitlement retention ($4/4$) and 100% clean abstention ($4/4$)**.
-3. **Dual-Layer Containment & Lineage-Thresholded Action Governance**:
-   In $W_{\text{REC}}$, Arm 3 demonstrated the critical operational distinction between **epistemic belief entitlement** and **action authorization**: while Gemma correctly deduced the entitled conclusion from surviving path $CD$, the Epistemic Kernel blocked the proposed operational action ($\text{Auth} = 0.417 < \tau = 0.50$), enforcing policy conformance when structural root lineage was degraded.
+- Epistemic output decomposes into four independent layers:
+  $$\text{Symbol Realization} \ne \text{Contract Coherence} \ne \text{Justification Precision} \ne \text{Formal Derivability}$$
+- Models exhibited **$87.5\%$ explanatory bloat** ($7/8$ cases, mean excess $1.625$ redundant citations) in entitled ecologies, alongside $20.8\%$ cross-field contract violations and $25.0\%$ symbol drift.
+- **Takeaway**: Self-reported justification $R(c)$ belongs in human-facing telemetry; persistent memory state requires antichain-minimized formal support $\mathcal{S}_F(c)$.
 
 ---
 
-## 11. Positioning in 2026 Literature & Classical AI Foundations
+## 8. Discovery 8: Flat Dependency Sets Cause 100% Revision Autoimmunity (Round 5 Stage 5A)
 
-### 11.1 Reclaiming Classical Foundations
-Rather than viewing support algebra as an ad hoc discovery, GENE sits on the shoulders of classical AI:
-- **Assumption-Based Truth Maintenance Systems (ATMS)**: De Kleer (1986) established that beliefs carry sound, complete, consistent, and antichain-minimal labels of assumption environments. GENE brings this structure into neural memory.
-- **Database Provenance Semirings**: Green et al. (2007) proved that $(K, +, \cdot, 0, 1)$ semirings model conjunctive dependencies as products and alternative derivations as sums ($P(c) = \sum \prod a$), mathematically explaining why flat graphs fail under change.
-- **AGM Belief Revision**: Alchourrón et al. (1985) formalized minimal belief contraction; Stage 5A validates the recovery of intact alternative paths.
-- **Causal & State Abstraction**: Beckers & Halpern (2019); Li et al. (2006). GENE's Intervention-Sufficiency Principle establishes that epistemic representations must preserve the causal interventions required for revision ($\mathcal{S}$) and action ($\mathcal{S}_L$).
+When a premise is partially invalidated, how does memory maintain entitlement? Standard frameworks represent dependencies as a flat conjunctive union $D(c) = \bigcup S_i$.
 
-### 11.2 Contemporary 2026 Literature Matrix
-
-| Research Area | Recent Key Works (2025–2026) | Existing Focus | GENE's Distinct Contribution |
-| :--- | :--- | :--- | :--- |
-| **Stale Memory & Mutation** | *STALE* (May 2026), *Memora* (Apr 2026) | Measures agent failure under changing facts and forgetting penalties. | Provides the exact algebraic support runtime $\mathcal{S}_t(c)$ that tracks which alternative derivational environments survive change. |
-| **Structured Memory & Conflicts** | *MOSAIC* (May 2026), *MemLineage* | Uses graph heuristics and conflict detection to organize agent memory. | Implements exact antichain-minimized support hypergraphs and causal lineage projection $\mathcal{S}_L(c)$ to gate external actions. |
-| **Provenance & Origin Binding** | *Origin-Bound Memory Authority*, *MemGuard* | Explores derivational lineage laundering through summaries and tool echoes. | Formalizes lineage integrity as a critical systems boundary and operationalizes write certificates. |
-| **Support-Boundary Resolution** | *GENE (2026)* | Characterizes dual-channel neural revision errors ($F^+$ pseudo-paths and $F^-$ over-retraction). | Introduces the balanced $SBR = \frac{1}{2}[P(\text{ACTIVE}\mid\text{DEGRADED}) + P(\text{UNKNOWN}\mid\text{RETRACTED})]$ metric. |
-
-### 11.3 The Two Open Frontiers
-1. **Lineage Integrity & Laundering**: Adversarial multi-agent chains where lineage $\mathcal{L}$ is rewritten or forged.
-2. **ATMS Support-Family Scale Envelope**: Empirical characterization of exponential label growth in dense multi-path graph regimes.
-
-## 12. Summary Table of Primary Empirical Results
-
-```
-+─────────────────────────────────────────────────────────────────────────────────────────────────────────+
-|                                    GENE CANONICAL EXPERIMENTAL SUMMARY                                  │
-+────────────+──────+─────────────────────────────────────────+──────────────+────────────+───────────────+
-| Experiment │ N    │ Primary Quantitative Endpoint           │ Metric Value │ Baseline   │ Status        │
-+────────────+──────+─────────────────────────────────────────+──────────────+────────────+───────────────+
-| Exp 0-B    │ 276  │ 2x2 Factorial Causal Necessity (Cell 4) │ 66/66 (100%) │ Uncalib.   │ FROZEN        │
-| Exp 1A     │ 72   │ Multi-Generation Semantic Transmission  │ 100.0% (τ=1) │ N/A        │ FROZEN        │
-| Exp 1B-B1c │ 16   │ Path-Conditioned Expression Symmetry    │ 1.000 / 0.000│ N/A        │ FROZEN        │
-| Exp 1B-C1b │ 1200 │ Lineage Quarantine Selectivity (90/10)  │ S = +0.800   │ Blind: 0.0 │ FROZEN        │
-| Exp 1B-C2a │ 50   │ Live Lineage Containment vs Laundering  │ 100% vs 0%   │ Node: 0%   │ FROZEN        │
-| Exp 1B-C2b │ 30   │ Structural Proofreader Heritable Rate   │ μ_herit = 0.0│ μ_U = 0.375│ FROZEN        │
-| Round 4    │ 116  │ Four-Layer Conformance & Bloat Assay    │ 7/8 Bloated  │ Zero Bloat │ FROZEN        │
-| Stage 5A   │ 432  │ Revision Precision & Support Algebra    │ Degraded: 0% │ Flat: 100% │ FROZEN        │
-| Stage 5B   │ 368  │ Lineage-Projected Action Governance     │ 7/7 Axioms   │ Rho: 6/7   │ FROZEN        │
-| Stage 5C   │ 32   │ Neural Revision Bridge (Live Assay)     │ Arm 3: 100%  │ Arm 2: 50% │ FROZEN        │
-+────────────+──────+─────────────────────────────────────────+──────────────+────────────+───────────────+
-```
+### Key Empirical Findings:
+- Evaluated across 432 deterministic worlds, flat dependency unions suffered **$100\%$ false retractions ($104/104$)** on damaged-but-still-entitled states (revision autoimmunity).
+- **Support-First Algebra** maintained the full antichain hypergraph $\mathcal{S}(c) = \{S_1, \dots, S_k\}$, achieving **$100\%$ revision precision ($432/432$)** by verifying whether at least one alternative support path remained active.
 
 ---
 
-## 13. Conclusion & Horizon: Exploration Round 6
+## 9. Discovery 9: Intervention-Sufficiency & Lineage Action Governance (Round 5 Stage 5B & 5C)
 
-GENE demonstrates that persistent AI memory requires an **epistemic runtime for maintaining entitlement under change**.
+How does an agent govern real-world actions when upstream evidence is degraded?
 
-With Round 5 complete and frozen, the active research mainline advances to **Exploration Round 6: State Under Change (Implicit Supersession, Temporal Validity, and Downstream Entitlement)**:
-- **Stage 6A**: Formal supersession algebra (`SUPERSEDES`, `EXPIRES`, `CONTRADICTS`, `RETRACT`, $\mathcal{S}_t(c)$, $\text{WHY}_t$, $\text{WHAT\_IF}_t$, $\text{THEN\_WHAT}_t$).
-- **Stage 6B**: Implicit change benchmark comparing append-only, last-write-wins, and support-aware state.
-- **Stage 6C**: Live neural state-adjudication bridge testing natural-language change updates without explicit retraction flags.
+### Key Empirical Findings:
+- The **Hierarchy of Epistemic Incompleteness** proved that scalar cut-sets ($\kappa$), tuple signatures ($\rho$), and global root counts suffer catastrophic representation collisions under change.
+- In shared origin ancestry ($A, D \leftarrow R_1$), nominal multiplicity masquerades as independence. Action governance requires the **lineage-projected support hypergraph $\mathcal{S}_L(c)$**, achieving **$100\%$ compliance across 7 formal governance axioms**.
+- In live Stage 5C ($N=32$ calls), the support-first runtime achieved **$100\%$ entitlement retention** and **$100\%$ clean abstention**, enforcing preregistered lineage thresholds to block high-stakes actions when structural lineage was degraded.
+
+---
+
+## 10. Discovery 10: State Under Change Requires Bitemporality & Predicate Contracts (Round 6 Stage 6A & 6B)
+
+How does memory distinguish between a replacement, an accumulation, an episodic event, and a temporary lease?
+
+### Key Empirical Findings:
+- **Bitemporality is Mandatory**: Tracking Valid Time ($t_v$) and Knowledge Transaction Time ($t_k$) independently is structurally necessary. The Stage 6B.1 micro-assay demonstrated that Knowledge-Time LWW achieved only $33.3\%$ accuracy, Valid-Time LWW achieved $75.0\%$, while the GENE Bitemporal Engine achieved **$100.0\%$ ($12/12$)**.
+- **Predicate Ontology Contracts**: Adjudicating updates requires explicit contracts (`TIME_VARYING`, `ADDITIVE`, `EPISODIC`, `INTERVAL_BOUNDED`). In a 200-case factorial benchmark, contract adjudication achieved **$100.0\%$ transition and state fidelity**, while generic LWW policies collapsed to $55.0\%$.
+
+---
+
+## 11. Discovery 11: Epistemic Error Boundary Externalization & Symbol Realization (Round 6 Stage 6C)
+
+Can a neural model emit state transitions directly, or should it extract structured observations for formal adjudication?
+
+### Key Empirical Findings:
+- **Neural Transition Collapse**: Direct neural transition generation (Arm N1) suffered a spontaneous collapse toward replacement semantics (`SUPERSEDES` in 10/12 cases, $0/12$ valid batches).
+- **Fault Localization**: Modular extraction (Arm N2) strictly externalized neural uncertainty to Layer 0 (the extraction boundary), preventing downstream runtime corruption and eliminating runtime autoimmunity ($0/12$).
+- **The Symbol Realization Bottleneck**: Gemma 3:12B extracted temporal intervals with **$100.0\%$ accuracy ($12/12$)**, but scored $8.3\%$ on exact canonical tuple extraction due to un-normalized entity strings (`"Auditor"` vs `Value_Auditor`). A deterministic normalization audit recovered **$11/12$ ($91.7\%$)** extraction fidelity.
+
+---
+
+## 12. Discovery 12: The Epistemic Compiler & Attestation vs Admission (Round 6 Synthesis)
+
+The overarching discovery of Round 6 is that persistent memory is a **formal compiler for epistemic state**:
+$$\text{Natural Language} \xrightarrow{\text{Parsing}} \text{Mention} \xrightarrow{\text{Linking}} \text{Canonical Symbol} \xrightarrow{\text{Validation}} \text{Admitted Candidate} \xrightarrow{\text{Contract}} \text{Event Batch} \xrightarrow{\text{Engine}} \text{Bitemporal State} \xrightarrow{\text{Kernel}} \text{Support \& Lineage} \xrightarrow{\text{Governance}} \text{Action}$$
+
+Because $\text{Fault Localization} \ne \text{Error Containment}$, the deterministic kernel faithfully records whatever candidate is admitted. This elevates the fundamental distinction between an **Attestation** and an **Admitted Fact**:
+- **$\text{Exposure} \ne \text{Report} \ne \text{Causal Support}$** (Experiment 0).
+- **$\text{OriginIdentity} \ne \text{DerivationLineage} \ne \text{IndependenceClass}$** (Stage 5B).
+- **$\text{SemanticClaim} \ne \text{OccurrenceNode}$** (Stage 6A).
+- **$\text{Attestation} \ne \text{AdmittedFact}$** (Round 6 Synthesis & Round 7 Ingress Frontier).
+
+An attestation (*Source $S$ asserted proposition $P$*) does not automatically create an active world fact. Epistemic integrity requires an explicit **Write Admission Gate** evaluating candidate intervention-sufficiency before a candidate achieves durable factual status.
