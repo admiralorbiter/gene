@@ -2,8 +2,8 @@
 promotion_id: PROMOTION-CONTRACT-R8-8B-R1
 contract_id: CONTRACT-R8-8B-R1
 status: CANDIDATE
-candidate_sha: ddc1717103f6cde0abf757ed629638a7fedd7b88
-generated_at: "2026-08-21 23:32:00Z"
+candidate_sha: df777a41417cdf0265e8e62847b201599df4ae7d
+generated_at: "2026-08-21 23:40:00Z"
 repair_rounds: 0
 reviewed_by: codex
 authorized_by: null
@@ -17,9 +17,14 @@ authorized_by: null
 - **Target Contract**: `CONTRACT-R8-8B-R1`
 - **Phase / Milestone**: Exploration Round 8 Stage 8B-R1 Confirmatory Benchmark
 - **Candidate Branch**: `mb/CONTRACT-R8-8B-R1`
-- **Candidate Commit SHA**: ddc1717103f6cde0abf757ed629638a7fedd7b88
+- **Scientific Candidate Commit SHA**: `df777a41417cdf0265e8e62847b201599df4ae7d`
 - **Execution Base SHA**: `3da636d9ddd649160f24e8eb1074d8c7d260e2e8`
 - **Contract Acceptance Verifier**: `PASS` (`scripts/verify_contract_r8_8b_r1.py` executed with zero runner booleans, fresh sealed world manifest assertion, multi-document stream invariants, and independent occurrence-splitting bitemporal replay)
+- **Evidence Package**: Committed and verified in tree:
+  - `data/r8_stage8b_r1_raw_calls.jsonl` (145 raw model calls on `gemma3:12b`, SHA256: `16f7b679...`)
+  - `runs/r8_stage8b_r1_candidate_generation.db` (SQLite archive, SHA256: `873446a4...`)
+  - `data/r8_stage8b_r1_summary.json` (Canonical metrics summary, SHA256: `179cb160...`)
+  - `data/r8_stage8b_r1_evidence_manifest.json` (Full content-addressed evidence manifest)
 - **Auditor Verdict**: `PASS` (All 8 Estimands, Factorial Grid, 4-Point Timeline Queries, and Distractor Falsification Controls verified across 145 live `gemma3:12b` calls)
 - **Repair Iterations**: 0 rounds (clean first-pass confirmatory execution on fresh manifest).
 
@@ -37,6 +42,6 @@ authorized_by: null
 | **Downstream Probes Q1..Q4** | $N = 4 \times N_{\text{admitted}}$ ($400$ queries) | $\equiv 100.0\%$ | **400 / 400 queries ($100.0\%$)** | **PASS** |
 
 ## 3. Epistemic Invariants & Scope Ceilings
-- **Claim**: In multi-document asynchronous telemetry streams, `gemma3:12b` successfully resolves aliases against a pre-registered canonical entity registry and enables bitemporal fusion and supersession without false merges ($\text{FDAR} \equiv 0.0\%$).
+- **Claim**: In a controlled synthetic domain, registry-assisted neural extraction feeds a proof-carrying deterministic bitemporal system that safely resolves repeated entity mentions across asynchronous documents and correctly maintains overlap-specific supersession under late-arriving contradictory information without false merges ($\text{FDAR} \equiv 0.0\%$).
 - **Occurrence Splitting**: Conflicting overlapping telemetry $[5.0, 7.0]$ cleanly supersedes historical occurrence $[5.0, 10.0]$ from $t_v = 5.0$ while preserving un-superseded future tail $[7.0, 10.0]$ as a distinct active occurrence.
 - **Exclusions**: Does NOT claim unconstrained open-world entity induction or autonomous ontology expansion (unresolvable novel mentions trigger safe `DEFER`/`UNRESOLVED`). Predicate definitions remain fixed.
