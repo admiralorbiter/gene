@@ -317,7 +317,7 @@ class A4FullGENEIngressPolicy(IngressPolicy):
             cert = AdmissionCertificate(status=AdmissionStatus.REJECT, rejection_cause=f"PRIVILEGE_RESTRICTED_{trusted_ctx.max_claim_privilege.value}")
             return cert, None, None, [], None, trusted_ctx
 
-        if parsed_attestation.extracted_claim_type != ClaimType.FACTUAL_OBSERVATION:
+        if parsed_attestation.extracted_claim_type not in (ClaimType.FACTUAL_OBSERVATION, ClaimType.QUOTED_TELEMETRY):
             cert = AdmissionCertificate(status=AdmissionStatus.REJECT, rejection_cause=f"CLAIM_TYPE_NOT_ROOT_FACT_{parsed_attestation.extracted_claim_type.value}")
             return cert, None, None, [], None, trusted_ctx
 

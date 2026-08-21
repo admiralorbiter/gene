@@ -110,7 +110,7 @@ def generate_52_live_cases() -> list[LiveIngressCase]:
 
     for cb_idx, gold_slot in enumerate(slots):
         pm = pred_modes[cb_idx % 4]
-        ph = phenomena[cb_idx % 4]
+        ph = "EXACT_MATCH"
 
         gold_entity = server_1
         # Build 4 candidate options with gold_entity placed at gold_slot

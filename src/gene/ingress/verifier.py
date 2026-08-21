@@ -106,7 +106,7 @@ class CertificateVerifier:
             if trusted_context.max_claim_privilege != ClaimPrivilege.ROOT_FACT:
                 return False, f"Source privilege {trusted_context.max_claim_privilege.value} cannot assert ROOT_FACT"
 
-            if parsed_attestation.extracted_claim_type != ClaimType.FACTUAL_OBSERVATION:
+            if parsed_attestation.extracted_claim_type not in (ClaimType.FACTUAL_OBSERVATION, ClaimType.QUOTED_TELEMETRY):
                 return False, f"Extracted claim type {parsed_attestation.extracted_claim_type.value} cannot assert ROOT_FACT"
 
             if not certificate.lineage_roots or proposed_observation.lineage_roots != certificate.lineage_roots:

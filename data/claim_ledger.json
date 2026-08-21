@@ -462,14 +462,14 @@
     {
       "claim_id": "GENE-C17",
       "claim_status": "observed",
-      "headline": "Neural Candidate Generation without Write Authority & Live Epistemic Ingress",
-      "claim_text": "A small open-weight neural model (Gemma 3:12B) can extract semantic mention spans, valid-time intervals, and entity candidate hypotheses from unstructured text without acquiring durable-write authority. Across 52 live calls (32 primary factorial cases, 16 position-counterbalanced cases, 4 temperature=0 replays), Gemma 3:12B achieved 100.0% subject/object span extraction (52/52), 98.1% predicate extraction (51/52), and 100.0% candidate entity match (52/52). In 16 counterbalanced permutations across candidate list positions [0, 1, 2, 3], the model exhibited zero positional selection bias (normalized entropy = 1.0). When integrated with the proof-carrying GENE Ingress Kernel, downstream state, support, governance, and causal ablation probes achieved 100.0% fidelity (52/52) with FDAR = 0.0% and zero runtime autoimmunity.",
+      "headline": "Constrained Neural Candidate Extraction, Ingress Privilege Decoupling, and Ambiguity Deferral",
+      "claim_text": "A small open-weight neural model (Gemma 3:12B) operates reliably as a constrained semantic mention extractor and ontology candidate retriever without acquiring durable write authority. Across 52 live calls (32 primary factorial cases, 16 position-counterbalanced cases, 4 temperature=0 replays), Gemma 3:12B achieved 100.0% subject/object span extraction (52/52), 98.1% predicate schema adherence (51/52), and 100.0% candidate entity match (52/52). When candidate list order was permuted across slots [0, 1, 2, 3], the model exhibited zero positional selection bias (normalized entropy = 1.00). When interfaced with the proof-carrying GENE Ingress Kernel with zero oracle leakage, downstream state, support, governance, and causal ablation probes achieved 96.2% fidelity (50/52) with FDAR = 0.0%, UPR = 0.0%, and zero runtime autoimmunity. In a targeted 10-call micro-assay, Gemma achieved 100.0% ambiguity preservation (3/3) when the schema supported multi-candidate subsets, and 100.0% temporal extraction (5/5) with post-expiry state isolation (4/4).",
       "evidence_sources": [
         {
           "experiment": "Exploration Round 7 Stage 7B (Live Neural Ingress Interface & Candidate Disambiguation Benchmark)",
           "evidence_class": "live_neural_assay",
           "artifact": "data/exploration_round7_stage7b_summary.json",
-          "artifact_sha256": "a62209dbde0d892d4497598f623847af3a43020d8c63a26241bd7e194a0b7ba6",
+          "artifact_sha256": "f9c7a1142b38c46f5c89c68319330fa3c837db54a5a46a46bfc1763fc04fe70b",
           "execution_commit": "round7-stage7b-live-freeze",
           "git_tracked": true,
           "model": "gemma3:12b (Ollama digest: f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a)",
@@ -477,10 +477,10 @@
           "n_evaluations": 52,
           "unit_of_analysis": "call",
           "formal_report": "docs/results/EXPLORATION_ROUND7_STAGE7B_REPORT.md",
-          "primary_metric": "Field Accuracies: Subject 100%, Predicate 98.1%, Object 100%, TV_Start 100%, Candidate Match 100%; Positional Entropy: 1.00 (16/16); Downstream Probes: 52/52 (100.0%); FDAR: 0.0%; Canary Determinism: 4/4 semantic (100%), 3/4 raw (75%)"
+          "primary_metric": "Field Accuracies: Subject 100%, Predicate 98.1%, Object 100%, TV_Start 100%, Candidate Match 100%; Downstream Probes: 50/52 (96.2%); FDAR: 0.0%; UPR: 0.0%; Canary: 4/4 semantic (100%), 3/4 raw (75%); Micro-Assay: Ambiguity Preservation 100% (3/3), Explicit Temporal 100% (5/5)"
         }
       ],
-      "scope_limitations": "52 live calls on Gemma 3:12B spanning 4 predicate modes, 4 linguistic phenomena, and 2 privilege tiers under structured JSON prompting.",
+      "scope_limitations": "52 live calls on Gemma 3:12B spanning 4 predicate modes, 4 linguistic phenomena, and 2 privilege tiers under structured JSON prompting, plus 10 targeted micro-assay calls.",
       "replication_status": "same_model_verified"
     }
   ]

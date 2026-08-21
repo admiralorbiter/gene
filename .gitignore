@@ -61,6 +61,7 @@ data/*
 !data/exploration_round7_stage7b_summary.json
 !data/exploration_round7_stage7b_raw_calls.jsonl
 !runs/exploration_round7_stage7b_results.db
+!runs/exploration_round7_stage7b_micro_results.db
 
 # IDEs and Editors
 .vscode/
