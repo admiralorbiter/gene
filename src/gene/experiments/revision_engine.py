@@ -1,8 +1,8 @@
 """GENE Exploration Round 5: Support-First Epistemic Revision Engine.
 
-Implements reference entitlement semantics Ent*(c, I), resilience degradation kappa(c),
-candidate lossy memory representation policies, and root-expanded DAG dependency tracking.
-Composes the underlying MinimalSupportEngine from gene.experiments.multi_justification.
+Implements reference entitlement semantics Ent*(c, I), resilience signatures rho(c) = (|S(c)|, kappa(c)),
+candidate lossy memory representation policies, root-expanded DAG dependency tracking,
+and stale cached-parent baselines.
 """
 
 from __future__ import annotations
@@ -24,19 +24,7 @@ class RevisionImpact(str, Enum):
     """Granular network impact classification for a downstream belief under change."""
     UNAFFECTED = "UNAFFECTED"
     METADATA_UPDATE_ONLY = "METADATA_UPDATE_ONLY"  # Entitled, but S' or kappa changed
-    REDERIVATION_REQUIRED = "REDERIVATION_REQUIRED"  # Broken active derivation path
     RETRACTION_REQUIRED = "RETRACTION_REQUIRED"  # Lost all valid justification
-
-
-class RevisionCase(BaseModel):
-    """Definition of a single local revision scenario."""
-    case_id: str
-    target_claim: str
-    support_family: list[list[str]]  # Minimal support environments S(c)
-    reported_representations: dict[str, list[str]]  # representation_name -> evidence_list
-    lineage_map: dict[str, str]  # premise_id -> root_origin_id
-    invalidated_assumptions: list[str]  # Invalidation set I
-    all_assumptions: list[str]
 
 
 class ReferenceRevisionResult(BaseModel):
@@ -46,8 +34,12 @@ class ReferenceRevisionResult(BaseModel):
     is_entitled: bool
     initial_supports: list[list[str]]
     surviving_supports: list[list[str]]
+    initial_support_count: int
+    surviving_support_count: int
     initial_kappa: int
     surviving_kappa: int
+    initial_rho: tuple[int, int]  # (|S|, kappa)
+    surviving_rho: tuple[int, int]  # (|S'|, kappa')
     invalidated_assumptions: list[str]
 
 
@@ -77,6 +69,8 @@ def evaluate_reference_entitlement(
     
     init_active = [sorted(list(s)) for s in engine_init.active_support_sets(claim_name)]
     init_kappa = engine_init.epistemic_resilience(claim_name)
+    init_count = len(init_active)
+    init_rho = (init_count, init_kappa)
     
     # Engine after invalidation
     engine_post = MinimalSupportEngine()
@@ -87,7 +81,9 @@ def evaluate_reference_entitlement(
         
     surv_active = [sorted(list(s)) for s in engine_post.active_support_sets(claim_name)]
     surv_kappa = engine_post.epistemic_resilience(claim_name)
-    is_entitled = len(surv_active) > 0
+    surv_count = len(surv_active)
+    surv_rho = (surv_count, surv_kappa)
+    is_entitled = surv_count > 0
     
     # Determine tripartite status
     all_premises = set().union(*[set(s) for s in support_family])
@@ -104,8 +100,12 @@ def evaluate_reference_entitlement(
         is_entitled=is_entitled,
         initial_supports=sorted(init_active),
         surviving_supports=sorted(surv_active),
+        initial_support_count=init_count,
+        surviving_support_count=surv_count,
         initial_kappa=init_kappa,
         surviving_kappa=surv_kappa,
+        initial_rho=init_rho,
+        surviving_rho=surv_rho,
         invalidated_assumptions=sorted(list(inval_set)),
     )
 
@@ -144,19 +144,27 @@ def evaluate_policy_naive_conjunction(
 def evaluate_policy_lineage_quarantine(
     support_family: list[list[str]],
     lineage_map: dict[str, str],
-    invalidated_assumptions: set[str] | list[str],
+    invalidated_items: set[str] | list[str],
     reference: ReferenceRevisionResult,
     policy_name: str = "lineage_quarantine",
 ) -> PolicyRevisionResult:
-    """Evaluate lineage quarantine policy: claim lives iff NO ancestor root is tainted."""
-    inval_set = set(invalidated_assumptions)
+    """Evaluate lineage quarantine policy: claim is quarantined if ANY of its ancestral roots is tainted."""
+    inval_set = set(invalidated_items)
     
-    # Find all ancestral roots for any premise participating in S(c)
+    # 1. Identify all tainted ancestral roots from the invalidation set
+    tainted_roots = set()
+    for item in inval_set:
+        if item in lineage_map:
+            tainted_roots.add(lineage_map[item])
+        else:
+            tainted_roots.add(item)  # Item is itself a root ID
+            
+    # 2. Find all ancestral roots for all premises participating in S(c)
     all_premises = set().union(*[set(s) for s in support_family])
-    ancestral_roots = {lineage_map.get(p, p) for p in all_premises}
+    claim_roots = {lineage_map.get(p, p) for p in all_premises}
     
-    # Tainted if any premise OR its root is in invalidation set
-    is_tainted = bool(all_premises & inval_set) or bool(ancestral_roots & inval_set)
+    # 3. Claim is tainted if its roots intersect the tainted roots
+    is_tainted = bool(claim_roots & tainted_roots)
     predicted_entitled = not is_tainted
     
     is_false_retraction = (not predicted_entitled) and reference.is_entitled
@@ -171,7 +179,9 @@ def evaluate_policy_lineage_quarantine(
         is_correct_entitlement=is_correct,
         concordant_with_oracle=is_correct,
         details={
-            "ancestral_roots": sorted(list(ancestral_roots)),
+            "claim_roots": sorted(list(claim_roots)),
+            "tainted_roots": sorted(list(tainted_roots)),
+            "hit_roots": sorted(list(claim_roots & tainted_roots)),
             "is_tainted": is_tainted,
         }
     )
@@ -186,7 +196,7 @@ class DAGNode(BaseModel):
 
 
 class RevisionDAG(BaseModel):
-    """Multi-tier derivation graph with root-expanded support computation."""
+    """Multi-tier derivation graph with root-expanded support computation and stale-baseline contrast."""
     nodes: dict[str, DAGNode]
 
     def compute_root_supports(self, node_id: str) -> list[set[str]]:
@@ -198,31 +208,27 @@ class RevisionDAG(BaseModel):
         root_support_sets: list[set[str]] = []
         for direct_conjunct in node.direct_parent_supports:
             # direct_conjunct is e.g. ["G1", "E"]
-            # Get root supports for each parent in the conjunct
             parent_root_options = [self.compute_root_supports(p) for p in direct_conjunct]
             
-            # Cartesian product across the conjunct
             import itertools
             for combo in itertools.product(*parent_root_options):
-                # combo is e.g. ({A, B}, {E})
                 merged_root_env = set().union(*combo)
                 root_support_sets.append(merged_root_env)
                 
         # Minimize the root support sets (remove supersets)
         minimized: list[set[str]] = []
         for s in root_support_sets:
-            # Check if any strict subset is already present
             if not any(prior < s for prior in root_support_sets if prior != s):
                 if s not in minimized:
                     minimized.append(s)
                     
         return minimized
 
-    def evaluate_cascade_impact(
+    def evaluate_cascade_reference(
         self,
         invalidated_roots: set[str] | list[str],
     ) -> dict[str, RevisionImpact]:
-        """Evaluate exact network impact for all nodes under root invalidation."""
+        """Evaluate exact ground-truth network impact via root-expanded support algebra."""
         inval_set = set(invalidated_roots)
         impact_map: dict[str, RevisionImpact] = {}
         
@@ -246,8 +252,46 @@ class RevisionDAG(BaseModel):
             elif ref.status == EntitlementStatus.RETRACTED:
                 impact_map[node_id] = RevisionImpact.RETRACTION_REQUIRED
             elif ref.status == EntitlementStatus.DEGRADED:
-                # Check if currently active direct parent support was broken
-                # For simplicity in 5A, if entitled but degraded, classified as metadata update
                 impact_map[node_id] = RevisionImpact.METADATA_UPDATE_ONLY
+                
+        return impact_map
+
+    def evaluate_cascade_stale_cached(
+        self,
+        invalidated_roots: set[str] | list[str],
+        stale_cached_nodes: set[str],
+    ) -> dict[str, RevisionImpact]:
+        """Evaluate baseline revision where intermediate nodes rely on stale cached status."""
+        inval_set = set(invalidated_roots)
+        impact_map: dict[str, RevisionImpact] = {}
+        
+        # In a stale-cached policy, intermediate nodes that are stale are treated as valid/alive
+        for node_id, node in self.nodes.items():
+            if node.is_root:
+                if node_id in inval_set:
+                    impact_map[node_id] = RevisionImpact.RETRACTION_REQUIRED
+                else:
+                    impact_map[node_id] = RevisionImpact.UNAFFECTED
+                continue
+            
+            # Non-root node: checks immediate parents only
+            # A parent is available if not retracted; if in stale_cached_nodes, assumed alive!
+            parent_conjuncts = node.direct_parent_supports
+            surviving_conjuncts = 0
+            for conj in parent_conjuncts:
+                conj_valid = True
+                for p in conj:
+                    if p in inval_set and p not in stale_cached_nodes:
+                        conj_valid = False
+                        break
+                if conj_valid:
+                    surviving_conjuncts += 1
+                    
+            if surviving_conjuncts == len(parent_conjuncts):
+                impact_map[node_id] = RevisionImpact.UNAFFECTED
+            elif surviving_conjuncts > 0:
+                impact_map[node_id] = RevisionImpact.METADATA_UPDATE_ONLY
+            else:
+                impact_map[node_id] = RevisionImpact.RETRACTION_REQUIRED
                 
         return impact_map

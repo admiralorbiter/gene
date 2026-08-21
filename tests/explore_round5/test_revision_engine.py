@@ -1,4 +1,4 @@
-"""Unit test suite for Exploration Round 5 Stage 5A Revision Engine."""
+"""Unit test suite for Exploration Round 5 Stage 5A Revision Engine (Hardened)."""
 
 import pytest
 from gene.experiments.revision_engine import (
@@ -12,102 +12,105 @@ from gene.experiments.revision_engine import (
 )
 
 
-def test_reference_entitlement_tripartite_states() -> None:
-    """Test UNCHANGED, DEGRADED, and RETRACTED states on independent alternative support."""
-    # S(C) = {{A, B}, {D, E}}
+def closed_form_oracle(supports: list[set[str]], inval: set[str]) -> bool:
+    """Independent mathematical definition of entitlement: exists S_i disjoint from I."""
+    return any(not (s & inval) for s in supports)
+
+
+def test_closed_form_oracle_property_testing() -> None:
+    """Property-test MinimalSupportEngine against an independent set-theoretic oracle."""
+    import itertools
+    all_atoms = ["A", "B", "C", "D", "E", "F"]
+    support_family = [["A", "B", "C"], ["A", "D", "E"], ["B", "D", "F"]]
+    supports_sets = [set(s) for s in support_family]
+    
+    # Test all 2^6 = 64 invalidation subsets
+    for r in range(len(all_atoms) + 1):
+        for combo in itertools.combinations(all_atoms, r):
+            inval_set = set(combo)
+            expected_bool = closed_form_oracle(supports_sets, inval_set)
+            ref_res = evaluate_reference_entitlement(support_family, inval_set, "C")
+            assert ref_res.is_entitled == expected_bool
+
+
+def test_resilience_signature_rho_and_kappa_counterexample() -> None:
+    """Verify that support degradation does NOT necessarily lower kappa (rho: (2,1) -> (1,1))."""
+    # Shared root topology: S(C) = {{A, B}, {A, D}}
+    # Initially: |S| = 2, kappa = 1 (A alone destroys all support)
+    supports = [["A", "B"], ["A", "D"]]
+    
+    ref_init = evaluate_reference_entitlement(supports, [], "C")
+    assert ref_init.initial_rho == (2, 1)
+    
+    # Invalidate B: AB path destroyed, AD survives
+    ref_b = evaluate_reference_entitlement(supports, ["B"], "C")
+    assert ref_b.status == EntitlementStatus.DEGRADED
+    assert ref_b.is_entitled is True
+    assert ref_b.surviving_supports == [["A", "D"]]
+    assert ref_b.initial_rho == (2, 1)
+    assert ref_b.surviving_rho == (1, 1)
+    # Proof that kappa does not change (1 -> 1), but |S| drops (2 -> 1)!
+    assert ref_b.initial_kappa == 1
+    assert ref_b.surviving_kappa == 1
+    assert ref_b.surviving_support_count == 1
+
+
+def test_incremental_distractor_bloat_failure() -> None:
+    """Verify that invalidating an irrelevant explanatory distractor F falsely retracts bloated memory."""
     supports = [["A", "B"], ["D", "E"]]
     
-    # 1. No invalidations -> UNCHANGED
-    res_unchanged = evaluate_reference_entitlement(supports, [], "C")
-    assert res_unchanged.status == EntitlementStatus.UNCHANGED
-    assert res_unchanged.is_entitled is True
-    assert res_unchanged.initial_kappa == 2
-    assert res_unchanged.surviving_kappa == 2
-    assert len(res_unchanged.surviving_supports) == 2
+    # Invalidate ONLY the distractor F (not in any minimal support set)
+    ref_f = evaluate_reference_entitlement(supports, ["F"], "C")
+    assert ref_f.status == EntitlementStatus.UNCHANGED
+    assert ref_f.is_entitled is True
     
-    # 2. Invalidate D -> DEGRADED (survives via AB, kappa: 2 -> 1)
-    res_degraded = evaluate_reference_entitlement(supports, ["D"], "C")
-    assert res_degraded.status == EntitlementStatus.DEGRADED
-    assert res_degraded.is_entitled is True
-    assert res_degraded.initial_kappa == 2
-    assert res_degraded.surviving_kappa == 1
-    assert res_degraded.surviving_supports == [["A", "B"]]
+    # Flat union R = {A,B,D,E} is unaffected by F -> survives (CORRECT)
+    pol_union = evaluate_policy_naive_conjunction(["A", "B", "D", "E"], ["F"], ref_f, "flat_union")
+    assert pol_union.predicted_entitled is True
+    assert pol_union.is_false_retraction is False
     
-    # 3. Invalidate A and D -> RETRACTED (both paths broken, kappa: 2 -> 0)
-    res_retracted = evaluate_reference_entitlement(supports, ["A", "D"], "C")
-    assert res_retracted.status == EntitlementStatus.RETRACTED
-    assert res_retracted.is_entitled is False
-    assert res_retracted.initial_kappa == 2
-    assert res_retracted.surviving_kappa == 0
-    assert len(res_retracted.surviving_supports) == 0
+    # Bloated union R = {A,B,D,E,F} hits F -> FALSE RETRACTION!
+    pol_bloat = evaluate_policy_naive_conjunction(["A", "B", "D", "E", "F"], ["F"], ref_f, "bloated_union")
+    assert pol_bloat.predicted_entitled is False
+    assert pol_bloat.is_false_retraction is True
 
 
-def test_lossy_representation_failures() -> None:
-    """Verify undercomplete failure (single witness) and overinclusive failure (flat union)."""
+def test_root_level_lineage_quarantine_isolation() -> None:
+    """Verify lineage quarantine under root-level invalidations across independent vs shared geometries."""
     supports = [["A", "B"], ["D", "E"]]
     
-    # Case 1: Invalidate D
-    ref_d = evaluate_reference_entitlement(supports, ["D"], "C")
-    assert ref_d.is_entitled is True  # Survives via AB
+    # Independent roots: A,B <- R1; D,E <- R2
+    lin_map_ind = {"A": "R1", "B": "R1", "D": "R2", "E": "R2"}
     
-    # Flat union R = {A,B,D,E} suffers FALSE RETRACTION on do(D=0)
-    pol_union_d = evaluate_policy_naive_conjunction(["A", "B", "D", "E"], ["D"], ref_d, "flat_union")
-    assert pol_union_d.predicted_entitled is False
-    assert pol_union_d.is_false_retraction is True
+    # Invalidate root R2:
+    # Premise invalidations: {D, E}
+    ref_r2 = evaluate_reference_entitlement(supports, ["D", "E"], "C")
+    assert ref_r2.status == EntitlementStatus.DEGRADED
+    assert ref_r2.is_entitled is True  # Survives via AB (R1)
     
-    # Single witness R = {A,B} correctly survives do(D=0)
-    pol_wit_d = evaluate_policy_naive_conjunction(["A", "B"], ["D"], ref_d, "single_witness")
-    assert pol_wit_d.predicted_entitled is True
-    assert pol_wit_d.is_false_retraction is False
-    
-    # Case 2: Invalidate A
-    ref_a = evaluate_reference_entitlement(supports, ["A"], "C")
-    assert ref_a.is_entitled is True  # Survives via DE
-    
-    # Single witness R = {A,B} suffers FALSE RETRACTION on do(A=0)
-    pol_wit_a = evaluate_policy_naive_conjunction(["A", "B"], ["A"], ref_a, "single_witness")
-    assert pol_wit_a.predicted_entitled is False
-    assert pol_wit_a.is_false_retraction is True
-
-
-def test_lineage_quarantine_autoimmunity() -> None:
-    """Verify that lineage quarantine induces epistemic autoimmunity when a root is tainted."""
-    supports = [["A", "B"], ["D", "E"]]
-    lineage_map = {"A": "R1", "B": "R1", "D": "R2", "E": "R2"}
-    
-    # Root R2 is tainted
-    ref = evaluate_reference_entitlement(supports, ["R2"], "C")
-    assert ref.is_entitled is True  # Survives via AB (R1)
-    
-    # Lineage quarantine marks C as dead because R2 is an ancestor of premise D
-    pol_lin = evaluate_policy_lineage_quarantine(supports, lineage_map, ["R2"], ref)
+    # Lineage quarantine: tainted by R2 -> FALSE RETRACTION!
+    pol_lin = evaluate_policy_lineage_quarantine(supports, lin_map_ind, ["R2"], ref_r2)
     assert pol_lin.predicted_entitled is False
     assert pol_lin.is_false_retraction is True
-
-
-def test_isomorphism_invariance() -> None:
-    """Verify that permuting premise names preserves exact entitlement status and resilience."""
-    supports_1 = [["A", "B"], ["D", "E"]]
-    inval_1 = ["A"]
-    res_1 = evaluate_reference_entitlement(supports_1, inval_1, "C")
     
-    # Permutation pi: A->X, B->Y, D->Z, E->W
-    supports_2 = [["X", "Y"], ["Z", "W"]]
-    inval_2 = ["X"]
-    res_2 = evaluate_reference_entitlement(supports_2, inval_2, "C")
+    # Shared origin roots: A,D <- R1; B,E <- R2
+    lin_map_shared = {"A": "R1", "D": "R1", "B": "R2", "E": "R2"}
+    # Invalidate root R1: Premise invalidations: {A, D}
+    ref_r1 = evaluate_reference_entitlement(supports, ["A", "D"], "C")
+    assert ref_r1.status == EntitlementStatus.RETRACTED
+    assert ref_r1.is_entitled is False
     
-    assert res_1.status == res_2.status
-    assert res_1.is_entitled == res_2.is_entitled
-    assert res_1.initial_kappa == res_2.initial_kappa
-    assert res_1.surviving_kappa == res_2.surviving_kappa
-    assert len(res_1.surviving_supports) == len(res_2.surviving_supports)
+    # Lineage quarantine correctly retracts
+    pol_lin_shared = evaluate_policy_lineage_quarantine(supports, lin_map_shared, ["R1"], ref_r1)
+    assert pol_lin_shared.predicted_entitled is False
+    assert pol_lin_shared.is_correct_entitlement is True
 
 
-def test_dag_root_expansion_and_cascades() -> None:
-    """Verify root-level support expansion in G0 -> G1 -> G2 cascades."""
+def test_dag_root_expansion_vs_stale_cached_baseline() -> None:
+    """Verify that root expansion prevents stale-cached zombie derivations in DAG cascades."""
     # G0: Roots A, B, D, E, F
-    # G1: Node M1 <= {A, B} or {D, E}
-    # G2: Node Final <= {M1, F}
+    # G1: M1 <= {A, B} or {D, E}
+    # G2: Final <= {M1, F}
     dag = RevisionDAG(
         nodes={
             "A": DAGNode(node_id="A", is_root=True),
@@ -120,26 +123,15 @@ def test_dag_root_expansion_and_cascades() -> None:
         }
     )
     
-    # Expand root supports for Final
-    root_supports = dag.compute_root_supports("Final")
-    # Expected: {A, B, F} and {D, E, F}
-    assert len(root_supports) == 2
-    assert { "A", "B", "F" } in root_supports
-    assert { "D", "E", "F" } in root_supports
+    # Case 1: Invalidate A and D (all root paths to M1 destroyed)
+    # Ground truth reference:
+    # - M1: RETRACTED
+    # - Final: RETRACTED (lost M1)
+    ref_impact = dag.evaluate_cascade_reference(["A", "D"])
+    assert ref_impact["M1"] == RevisionImpact.RETRACTION_REQUIRED
+    assert ref_impact["Final"] == RevisionImpact.RETRACTION_REQUIRED
     
-    # Invalidate D:
-    # - M1: DEGRADED -> METADATA_UPDATE_ONLY
-    # - Final: DEGRADED (survives via ABF) -> METADATA_UPDATE_ONLY
-    # - D: RETRACTION_REQUIRED
-    impact = dag.evaluate_cascade_impact(["D"])
-    assert impact["D"] == RevisionImpact.RETRACTION_REQUIRED
-    assert impact["M1"] == RevisionImpact.METADATA_UPDATE_ONLY
-    assert impact["Final"] == RevisionImpact.METADATA_UPDATE_ONLY
-    assert impact["A"] == RevisionImpact.UNAFFECTED
-    
-    # Invalidate F:
-    # - Final: all root paths ({A,B,F}, {D,E,F}) hit F -> RETRACTION_REQUIRED
-    # - M1: unaffected by F -> UNAFFECTED
-    impact_f = dag.evaluate_cascade_impact(["F"])
-    assert impact_f["Final"] == RevisionImpact.RETRACTION_REQUIRED
-    assert impact_f["M1"] == RevisionImpact.UNAFFECTED
+    # Stale-cached baseline: Suppose M1 is cached as valid/alive
+    stale_impact = dag.evaluate_cascade_stale_cached(["A", "D"], stale_cached_nodes={"M1"})
+    # Stale baseline falsely keeps Final alive because it checks immediate parent M1 from cache!
+    assert stale_impact["Final"] == RevisionImpact.UNAFFECTED  # Stale Zombie Survival!

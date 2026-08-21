@@ -1,0 +1,51 @@
+{
+  "round": "Exploration Round 5: Entitlement Under Change — Support-First Epistemic Revision",
+  "evidence_class": "deterministic_zero_live_llm",
+  "base_tag": "round4-postreview-freeze",
+  "base_commit": "cf472ee",
+  "stage_5a_freeze_tag": "round5-stage5a-freeze",
+  "subassay_5a1_local_what_if": {
+    "total_cases": 368,
+    "entitled_cases": 120,
+    "degraded_cases": 104,
+    "unchanged_cases": 16,
+    "retracted_cases": 248,
+    "flat_union_autoimmunity_on_degraded": 1.0,
+    "single_witness_autoimmunity_on_degraded": 0.5769,
+    "bloat_incremental_false_retractions": 8,
+    "primary_discovery": "Loss of alternative-support algebra causes 100% false retraction on damaged-but-still-entitled states (104/104); explanatory bloat (E_S > 0) causes 8 additional false retractions on unchanged states."
+  },
+  "subassay_5a2_network_then_what": {
+    "total_cases": 64,
+    "ground_truth_retractions": 48,
+    "stale_cached_zombie_derivations": 36,
+    "stale_zombie_rate_on_retracted": 0.75,
+    "root_expansion_exactness": 1.0,
+    "primary_discovery": "Root-expanded support derivation (S_root) prevents stale-cached zombie derivations in 75.0% of retracted DAG cases (36/48)."
+  },
+  "resilience_signature": {
+    "transition_rho_to_rho_prime": {
+      "(2,1)->(1,1)": "Shared-root alternative lost: |S| drops (2->1), kappa STABLE (1->1)",
+      "(3,2)->(2,2)": "Tri-path branch lost: |S| drops (3->2), kappa STABLE (2->2)",
+      "(2,2)->(1,1)": "Independent alternative lost: |S| drops (2->1), kappa drops (2->1)",
+      "(3,2)->(1,1)": "Two tri-path branches lost: |S| drops (3->1), kappa drops (2->1)"
+    },
+    "theoretical_insight": "Cut-set size kappa alone is insufficient to track degradation; epistemic state requires the full signature rho(c) = (|S(c)|, kappa(c))."
+  },
+  "case_ledger": {
+    "path": "data/exploration_round5_stage5a_cases.jsonl",
+    "sha256": "606229a7dc1f6cf507869e67e247755a3f3bb89af1e5c8bb7aead4e5be1dcc8c",
+    "total_records": 432
+  },
+  "summary_json": {
+    "path": "data/exploration_round5_stage5a_summary.json",
+    "sha256": "88a1d14bd2ccb4990b895b2858182e0fddb587a9fab265236738ef97858465f9"
+  },
+  "results_report": {
+    "path": "docs/results/EXPLORATION_ROUND5_STAGE5A_REPORT.md"
+  },
+  "promotion_lifecycle": {
+    "stage_5a_status": "complete_and_verified",
+    "next_stage": "Stage 5B (Entitlement Degradation & Action Resilience Engine)"
+  }
+}
