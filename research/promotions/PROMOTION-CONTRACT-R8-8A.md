@@ -2,7 +2,7 @@
 promotion_id: PROMOTION-CONTRACT-R8-8A
 contract_id: CONTRACT-R8-8A
 status: CANDIDATE
-candidate_sha: PLACEHOLDER
+candidate_sha: 14653c9e2e83a239518e094049b4defd7dad4574
 generated_at: "2026-08-21 20:56:00Z"
 repair_rounds: 0
 reviewed_by: codex
