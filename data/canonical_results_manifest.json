@@ -1,7 +1,7 @@
 {
   "manifest_version": "2.0.0",
   "project": "GENE (Genealogical Epistemic Network Experiments)",
-  "generated_at": "2026-08-21T05:06:31.635955+00:00",
+  "generated_at": "2026-08-21T13:19:39.034255+00:00",
   "canonical_experiments": {
     "exp0": {
       "experiment": "Experiment 0 (Lineage Observability & Factorial Calibration)",
@@ -285,27 +285,46 @@
       "status": "COMPLETED_AND_FROZEN"
     },
     "stage_6c": {
-      "experiment": "Exploration Round 6 Stage 6C (Neural Semantic Observation Extraction & Upward Error Migration)",
+      "experiment": "Exploration Round 6 Stage 6C (Neural Semantic Observation Extraction & Fault Localization)",
       "summary_file": "exploration_round6_stage6c_summary.json",
       "database": "exploration_round6_stage6c_results.db",
+      "raw_calls_archive": "exploration_round6_stage6c_raw_calls.jsonl",
       "commit": "round6-stage6c-master-freeze",
       "model_name": "gemma3:12b",
       "model_digest": "f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a",
       "total_calls": 28,
+      "field_level_extraction": {
+        "subject_accuracy": 0.8333,
+        "predicate_accuracy": 1.0,
+        "object_accuracy": 0.0833,
+        "t_valid_start_accuracy": 1.0,
+        "t_valid_end_accuracy": 1.0,
+        "complete_tuple_accuracy": 0.0833
+      },
+      "zero_call_normalization_audit": {
+        "post_normalization_accuracy": 0.9167,
+        "normalized_exact_matches": "11 / 12"
+      },
       "arm_n1_direct_transition": {
         "layer_a_transition_fidelity": 0.0,
-        "layer_b_premise_state_fidelity": 0.1667,
+        "active_occurrence_set_fidelity": 0.1667,
+        "semantic_premise_state_fidelity": 0.1667,
         "layer_c_entitlement_accuracy": 0.1667,
         "primary_failure": "TRANSITION_EMISSION_ERROR (omits ASSERT baseline, violates bitemporal transition syntax)"
       },
       "arm_n2_modular_extraction": {
-        "layer_0_extraction_accuracy": 0.0833,
-        "layer_0_temporal_interval_accuracy": 1.0,
+        "layer_0_exact_extraction_accuracy": 0.0833,
         "layer_a_transition_fidelity": 0.8333,
-        "layer_b_premise_state_fidelity": 0.9167,
+        "active_occurrence_set_fidelity": 0.9167,
+        "semantic_premise_state_fidelity": 0.1667,
         "layer_c_entitlement_accuracy": 0.25,
-        "p_final_correct_given_observation_correct": 1.0,
-        "error_origin": "Strictly upward migration to Layer 0 semantic entity extraction (0 downstream runtime failures)"
+        "p_final_correct_given_exact_observation": {
+          "neural_empirical_sample": "1 / 1 (100.0%)",
+          "oracle_ceiling": "12 / 12 (100.0%)",
+          "runtime_autoimmunity": "0 / 12 (0.0%)"
+        },
+        "intervention_relevant_observation_fidelity": "3 / 12 (25.0%) (2 cases correct due to downstream query invariance to lexical suffix)",
+        "fault_localization": "Epistemic Error Boundary Externalization: uncertainty localized to Layer 0 without mutating durable state"
       },
       "canary_determinism": "4 / 4 raw string matches (100.0%), 4 / 4 semantic JSON matches (100.0%)",
       "status": "COMPLETED_AND_FROZEN"

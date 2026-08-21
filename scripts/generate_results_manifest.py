@@ -562,31 +562,48 @@ def extract_stage6c_metrics(summary_path: Path) -> dict[str, Any]:
     n1 = data.get("arm_n1_direct_transition", {})
     n2 = data.get("arm_n2_modular_extraction", {})
     canary = data.get("canary_determinism", {})
+    fields = data.get("field_level_extraction", {})
+    audit = data.get("zero_call_normalization_audit", {})
 
     return {
-        "experiment": "Exploration Round 6 Stage 6C (Neural Semantic Observation Extraction & Upward Error Migration)",
+        "experiment": "Exploration Round 6 Stage 6C (Neural Semantic Observation Extraction & Fault Localization)",
         "summary_file": summary_path.name,
         "database": "exploration_round6_stage6c_results.db",
-        "commit": "round6-stage6c-master-freeze",
-        "model_name": "gemma3:12b",
-        "model_digest": "f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a",
+        "raw_calls_archive": "exploration_round6_stage6c_raw_calls.jsonl",
+        "commit": data.get("commit", "round6-stage6c-master-freeze"),
+        "model_name": data.get("model_name", "gemma3:12b"),
+        "model_digest": data.get("model_digest", "f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a"),
         "total_calls": data.get("total_calls", 28),
+        "field_level_extraction": {
+            "subject_accuracy": fields.get("subject_accuracy", 0.0),
+            "predicate_accuracy": fields.get("predicate_accuracy", 0.0),
+            "object_accuracy": fields.get("object_accuracy", 0.0),
+            "t_valid_start_accuracy": fields.get("t_valid_start_accuracy", 0.0),
+            "t_valid_end_accuracy": fields.get("t_valid_end_accuracy", 0.0),
+            "complete_tuple_accuracy": fields.get("complete_tuple_accuracy", 0.0),
+        },
+        "zero_call_normalization_audit": {
+            "post_normalization_accuracy": audit.get("post_normalization_accuracy", 0.0),
+            "normalized_exact_matches": f"{audit.get('normalized_exact_matches', 0)} / {audit.get('total_cases', 12)}",
+        },
         "arm_n1_direct_transition": {
             "layer_a_transition_fidelity": n1.get("layer_a_transition_fidelity", 0.0),
-            "layer_b_premise_state_fidelity": n1.get("layer_b_premise_state_fidelity", 0.0833),
-            "layer_c_entitlement_accuracy": n1.get("layer_c_entitlement_accuracy", 0.1667),
+            "active_occurrence_set_fidelity": n1.get("active_occurrence_set_fidelity", 0.0),
+            "semantic_premise_state_fidelity": n1.get("semantic_premise_state_fidelity", 0.0),
+            "layer_c_entitlement_accuracy": n1.get("layer_c_entitlement_accuracy", 0.0),
             "primary_failure": "TRANSITION_EMISSION_ERROR (omits ASSERT baseline, violates bitemporal transition syntax)",
         },
         "arm_n2_modular_extraction": {
-            "layer_0_extraction_accuracy": n2.get("layer_0_extraction_accuracy", 0.0833),
-            "layer_0_temporal_interval_accuracy": 1.0,
-            "layer_a_transition_fidelity": n2.get("layer_a_transition_fidelity", 0.75),
-            "layer_b_premise_state_fidelity": n2.get("layer_b_premise_state_fidelity", 0.9167),
-            "layer_c_entitlement_accuracy": n2.get("layer_c_entitlement_accuracy", 0.25),
-            "p_final_correct_given_observation_correct": 1.0,
-            "error_origin": "Strictly upward migration to Layer 0 semantic entity extraction (0 downstream runtime failures)",
+            "layer_0_exact_extraction_accuracy": n2.get("layer_0_exact_extraction_accuracy", 0.0),
+            "layer_a_transition_fidelity": n2.get("layer_a_transition_fidelity", 0.0),
+            "active_occurrence_set_fidelity": n2.get("active_occurrence_set_fidelity", 0.0),
+            "semantic_premise_state_fidelity": n2.get("semantic_premise_state_fidelity", 0.0),
+            "layer_c_entitlement_accuracy": n2.get("layer_c_entitlement_accuracy", 0.0),
+            "p_final_correct_given_exact_observation": n2.get("p_final_correct_given_exact_observation", {}),
+            "intervention_relevant_observation_fidelity": n2.get("intervention_relevant_observation_fidelity", ""),
+            "fault_localization": data.get("fault_localization_principle", ""),
         },
-        "canary_determinism": f"{canary.get('raw_string_matches', 4)} / {canary.get('total_canaries', 4)} raw string matches (100.0%), {canary.get('semantic_json_matches', 4)} / {canary.get('total_canaries', 4)} semantic JSON matches (100.0%)",
+        "canary_determinism": f"{canary.get('raw_string_matches', 0)} / {canary.get('total_canaries', 4)} raw string matches ({canary.get('raw_determinism_rate', 0.0)*100:.1f}%), {canary.get('semantic_json_matches', 0)} / {canary.get('total_canaries', 4)} semantic JSON matches ({canary.get('semantic_determinism_rate', 0.0)*100:.1f}%)",
         "status": "COMPLETED_AND_FROZEN",
     }
 

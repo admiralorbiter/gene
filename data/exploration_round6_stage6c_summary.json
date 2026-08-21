@@ -1,6 +1,9 @@
 {
   "stage": "Exploration Round 6 Stage 6C",
   "run_id": "run_stage6c_1787288709",
+  "commit": "round6-stage6c-master-freeze",
+  "model_name": "gemma3:12b",
+  "model_digest": "f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a",
   "total_calls": 28,
   "canary_determinism": {
     "total_canaries": 4,
@@ -9,26 +12,55 @@
     "semantic_json_matches": 4,
     "semantic_determinism_rate": 1.0
   },
+  "field_level_extraction": {
+    "subject_accuracy": 0.8333,
+    "predicate_accuracy": 1.0,
+    "object_accuracy": 0.0833,
+    "t_valid_start_accuracy": 1.0,
+    "t_valid_end_accuracy": 1.0,
+    "complete_tuple_accuracy": 0.0833
+  },
+  "zero_call_normalization_audit": {
+    "total_cases": 12,
+    "normalized_exact_matches": 11,
+    "post_normalization_accuracy": 0.9167,
+    "unresolved_cases": [
+      "C6C_03 (Observer attribution: extracted reporting sensor 'Field Sensor Alpha' instead of 'Server_Node_1')"
+    ]
+  },
   "arm_n1_direct_transition": {
     "total_cases": 12,
-    "layer_0_extraction_accuracy": 0.0,
     "layer_a_transition_fidelity": 0.0,
-    "layer_b_premise_state_fidelity": 0.1667,
+    "active_occurrence_set_fidelity": 0.1667,
+    "semantic_premise_state_fidelity": 0.1667,
     "layer_c_support_fidelity": 0.1667,
     "layer_c_entitlement_accuracy": 0.1667,
     "error_origin_breakdown": {
       "TRANSITION_EMISSION_ERROR": 10
+    },
+    "transition_emission_failures": {
+      "omits_base_assert_on_supersession": 10,
+      "misclassifies_contradiction_as_supersession": 2
     }
   },
   "arm_n2_modular_extraction": {
     "total_cases": 12,
-    "layer_0_extraction_accuracy": 0.0833,
+    "layer_0_exact_extraction_accuracy": 0.0833,
+    "layer_0_temporal_interval_accuracy": 1.0,
     "layer_a_transition_fidelity": 0.8333,
-    "layer_b_premise_state_fidelity": 0.9167,
+    "active_occurrence_set_fidelity": 0.9167,
+    "semantic_premise_state_fidelity": 0.1667,
     "layer_c_support_fidelity": 0.25,
     "layer_c_entitlement_accuracy": 0.25,
+    "p_final_correct_given_exact_observation": {
+      "neural_empirical_sample": "1 / 1 (100.0%)",
+      "oracle_ceiling": "12 / 12 (100.0%)",
+      "runtime_autoimmunity": "0 / 12 (0.0%)"
+    },
+    "intervention_relevant_observation_fidelity": "3 / 12 (25.0%) (2 cases correct due to downstream query invariance to lexical suffix)",
     "error_origin_breakdown": {
       "OBSERVATION_EXTRACTION_ERROR": 9
     }
-  }
+  },
+  "fault_localization_principle": "Epistemic Error Boundary Externalization: uncertainty localized to Layer 0 without mutating durable state"
 }
