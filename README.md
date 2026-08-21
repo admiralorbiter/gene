@@ -71,6 +71,9 @@ $$\text{Ancestry} \longrightarrow \text{Retrieval Exposure} \longrightarrow \tex
 9. **Intervention-Sufficient Representation & Lineage-Projected Action Governance (Round 5 Stage 5B)**:
    The Hierarchy of Epistemic Incompleteness ($\text{binary} \to \kappa \to \rho \to |\text{Roots}| \to \rho_L \to \mathcal{S}_L(c)$) proves that all scalar and tuple signatures suffer lossy representation collisions under change. In shared origin ancestry ($A,D \leftarrow R_1, B,E \leftarrow R_2$), nominal multiplicity masquerades as independence. Action governance requires the **antichain-minimized lineage-projected support hypergraph $\mathcal{S}_L(c)$**, achieving 100% compliance across 7 formal governance axioms.
 
+10. **Support-First Epistemic Runtime Rescues Neural Revision & Governs Action (Round 5 Stage 5C)**:
+    In a 32-call live Gemma 3:12B assay, naïve reported dependency tracking ($R(c)$) suffered **100% false retractions ($0/4$)** on degraded states due to neural explanatory bloat. Compiling the minimal first-order entitling support family $\mathcal{S}_F(c)$ restored **100% entitlement retention ($4/4$)** and **100% clean abstention ($4/4$)**. Lineage-projected authority $\text{Auth}(\mathcal{S}_L)$ demonstrated **dual-layer containment**: maintaining belief entitlement while blocking operationally unsafe actions when structural root lineage was degraded.
+
 ---
 
 ## Frozen Milestone Roadmap Status
@@ -87,14 +90,14 @@ $$\text{Ancestry} \longrightarrow \text{Retrieval Exposure} \longrightarrow \tex
 | **Round 4** | Exploration Round 4 | Epistemic Context Compiler & Four-Layer Conformance Assay | **FROZEN** | `cf472ee` |
 | **Round 5A** | Exploration Round 5 Stage 5A | Revision Precision Assay & Loss of Support Algebra (432 cases) | **FROZEN** | `aff1baa` |
 | **Round 5B** | Exploration Round 5 Stage 5B | Action Governance & Lineage-Projected Epistemic Resilience (368 cases) | **FROZEN** | `round5-stage5b-freeze-v3` |
-| **Round 5C** | Exploration Round 5 Stage 5C | Neural Revision Bridge (Live Model Revision Assay) | **PREREGISTERED** | `round5-stage5c-design-freeze` |
+| **Round 5C** | Exploration Round 5 Stage 5C | Neural Revision Bridge (32-Call Live Model Revision Assay) | **FROZEN** | `round5-stage5c-runner-freeze` |
 
 ---
 
 ## Primary Documentation & Results Artifacts
 
 - **Authoritative Metrics Manifest:** [`data/canonical_results_manifest.json`](data/canonical_results_manifest.json)
-- **Claim & Evidence Ledger:** [`data/claim_ledger.json`](data/claim_ledger.json) (Exact empirical provenance of all scientific claims GENE-C01 through GENE-C11)
+- **Claim & Evidence Ledger:** [`data/claim_ledger.json`](data/claim_ledger.json) (Exact empirical provenance of all scientific claims GENE-C01 through GENE-C12)
 - **Foundational Project Vision:** [`docs/GENE_MOONSHOT.md`](docs/GENE_MOONSHOT.md)
 - **Canonical Scientific Narrative:** [`docs/GENE_STORY_MEMO.md`](docs/GENE_STORY_MEMO.md)
 - **System Architecture & Formalisms:** [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
@@ -102,6 +105,7 @@ $$\text{Ancestry} \longrightarrow \text{Retrieval Exposure} \longrightarrow \tex
 - **Round 5 Results Reports:**
   - [Stage 5A Revision Precision Report](docs/results/EXPLORATION_ROUND5_STAGE5A_REPORT.md)
   - [Stage 5B Action Governance Report](docs/results/EXPLORATION_ROUND5_STAGE5B_REPORT.md)
+  - [Stage 5C Neural Revision Bridge Report](docs/results/EXPLORATION_ROUND5_STAGE5C_REPORT.md)
   - [Round 5 Master Walkthrough](docs/results/EXPLORATION_ROUND5_WALKTHROUGH.md)
 
 ---
@@ -113,4 +117,4 @@ All experimental fixtures, oracle closures, statistical analyzers, revision engi
 ```bash
 pytest -v
 ```
-*Current test health: 159 passed in 26.38s (Zero warnings/errors).*
+*Current test health: 164 passed in 23.76s (Zero warnings/errors).*

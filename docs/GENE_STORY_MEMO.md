@@ -340,44 +340,69 @@ $\mathcal{S}_L(c)$ serves as the canonical intervention-sufficient normal form f
 
 ---
 
-## 10. Positioning in 2026 Literature & The Lineage Integrity Boundary
+## 10. Discovery 10: Neural Revision Bridge & Dual-Layer Containment (Stage 5C)
 
-### 10.1 Contemporary Literature Matrix
+In Stage 5C, GENE bridged the formal theory to live neural inference in a **32-call live Gemma 3:12B assay** across 4 structural micro-worlds.
+
+```
++===================================================================================================+
+|                                    STAGE 5C FACTORIAL OUTCOMES                                    |
++======================+=========================+========================+=========================+
+| Metric               | Arm 1 (Raw Neural)      | Arm 2 (Naïve Reported) | Arm 3 (GENE Kernel)     |
++======================+=========================+========================+=========================+
+| Overall Entitlement  | 75.0% (6/8)             | 50.0% (4/8)            | 100.0% (8/8)            |
+| Degraded Active Rate | 50.0% (2/4)             | 0.0% (0/4) [100% Fail] | 100.0% (4/4)            |
+| Retracted Abstention | 100.0% (4/4)            | 100.0% (4/4)           | 100.0% (4/4)            |
+| Action Governance    | N/A (Uncalibrated)      | N/A (Premature Revoke) | 100.0% Calibrated (4/4) |
++======================+=========================+========================+=========================+
+```
+### Key Empirical Findings:
+1. **Live Neural Explanatory Bloat Drives 100% Revision Autoimmunity (Arm 2)**:
+   In acquisition ($G_0$), Gemma 3:12B exhibited full explanatory bloat across $2/4$ worlds (citing all 4 premises across both alternative paths) and single-witness citation in $1/4$ worlds. When a single premise was invalidated under degraded-but-still-entitled conditions, **Arm 2 suffered 100% false retractions ($0/4$ retention)** because the naive dependency graph $\text{NaiveRetract}(c, I) = \mathbf{1}[R(c) \cap I \ne \emptyset]$ revoked the belief.
+2. **Minimal Support Compilation Restores Perfect Reasoning (Arm 3)**:
+   By dynamically enumerating minimal entitling support $\mathcal{S}_F(c)$ via first-order backward chaining and compiling only valid active facts into context, **Arm 3 achieved 100% entitlement retention ($4/4$) and 100% clean abstention ($4/4$)**.
+3. **Dual-Layer Containment & Action Gating**:
+   In $W_{\text{REC}}$ (where 2 of 3 paths and 2 of 4 roots were destroyed), Arm 3 demonstrated the critical operational distinction between **epistemic belief entitlement** and **action authorization**: while Gemma correctly deduced the entitled conclusion from surviving path $CD$, the Epistemic Kernel blocked the proposed operational action ($\text{Auth} = 0.417 < 0.50$), successfully protecting downstream execution from structural lineage degradation.
+
+---
+
+## 11. Positioning in 2026 Literature & The Lineage Integrity Boundary
+
+### 11.1 Contemporary Literature Matrix
 
 | Research Area | Recent Key Works (2025–2026) | Existing Focus | GENE's Distinct Contribution |
 | :--- | :--- | :--- | :--- |
 | **Persistent Memory Poisoning** | *Hidden in Memory*, *Remembering More, Risking More*, *Memory Contagion* | Measures attack success rates and downstream task degradation over long sessions. | Analytically decomposes transmission into exact constituent probabilities ($R_{\text{inherited}}$ and $\mu_U$), separating local deductive validity from global truth. |
 | **Provenance-Aware Memory** | *MemLineage*, *MAP-Graph*, *PPMF* | Attaches derivation DAGs and graphs for governance and access control. | Proves the theoretical limits of memory governance, showing that lineage quarantine achieves $S = \text{TPR} - \text{FPR}$ while exposing the pseudo-path reasoning gap. |
 | **Write-Time Defense & Origin Binding** | *ConsistencyGate*, *MemGuard*, *Louck's Origin-Binding Analysis* | Gating candidate memories via model self-reflection or typed boundaries. | Formally operationalizes write defense as an evolutionary filter ($W_U$) that reduces heritable corruption ($\mu_{U, \text{heritable}} = 0$) via first-order certificate unification. |
-| **Epistemic Runtime & Support Maintenance** | *GENE (2026)* | Support-first belief revision, lineage-projected minimal hypergraphs, and action governance under change. | Solves revision autoimmunity via minimal support sets $\mathcal{S}(c)$ and establishes the Principle of Intervention-Sufficiency for persistent agent runtime governance. |
+| **Epistemic Runtime & Support Maintenance** | *GENE (2026)* | Support-first belief revision, lineage-projected minimal hypergraphs, and action governance under change. | Solves revision autoimmunity via minimal support sets $\mathcal{S}(c)$, provides live neural validation on Gemma 3:12B, and establishes the Principle of Intervention-Sufficiency for persistent agent runtime governance. |
 
-### 10.2 The Lineage Integrity Assumption
+### 11.2 The Lineage Integrity Assumption
 GENE currently evaluates what lineage can achieve under the assumption that ancestry metadata is faithfully recorded by the experimental substrate. It does not yet claim that real-world multi-agent systems maintain trustworthy provenance under adversarial lineage forgery or lossy recursive summarization. Measuring provenance degradation over deep lineages ($G_5+$) defines the primary objective of future work.
 
----
-
-## 11. Summary Table of Primary Empirical Results
+## 12. Summary Table of Primary Empirical Results
 
 ```
 +─────────────────────────────────────────────────────────────────────────────────────────────────────────+
-│                                    GENE CANONICAL EXPERIMENTAL SUMMARY                                  │
+|                                    GENE CANONICAL EXPERIMENTAL SUMMARY                                  │
 +────────────+──────+─────────────────────────────────────────+──────────────+────────────+───────────────+
-│ Experiment │ N    │ Primary Quantitative Endpoint           │ Metric Value │ Baseline   │ Status        │
+| Experiment │ N    │ Primary Quantitative Endpoint           │ Metric Value │ Baseline   │ Status        │
 +────────────+──────+─────────────────────────────────────────+──────────────+────────────+───────────────+
-│ Exp 0-B    │ 276  │ 2x2 Factorial Causal Necessity (Cell 4) │ 66/66 (100%) │ Uncalib.   │ FROZEN        │
-│ Exp 1A     │ 72   │ Multi-Generation Semantic Transmission  │ 100.0% (τ=1) │ N/A        │ FROZEN        │
-│ Exp 1B-B1c │ 16   │ Path-Conditioned Expression Symmetry    │ 1.000 / 0.000│ N/A        │ FROZEN        │
-│ Exp 1B-C1b │ 1200 │ Lineage Quarantine Selectivity (90/10)  │ S = +0.800   │ Blind: 0.0 │ FROZEN        │
-│ Exp 1B-C2a │ 50   │ Live Lineage Containment vs Laundering  │ 100% vs 0%   │ Node: 0%   │ FROZEN        │
-│ Exp 1B-C2b │ 30   │ Structural Proofreader Heritable Rate   │ μ_herit = 0.0│ μ_U = 0.375│ FROZEN        │
-│ Round 4    │ 116  │ Four-Layer Conformance & Bloat Assay    │ 7/8 Bloated  │ Zero Bloat │ FROZEN        │
-│ Stage 5A   │ 432  │ Revision Precision & Support Algebra    │ Degraded: 0% │ Flat: 100% │ FROZEN        │
-│ Stage 5B   │ 368  │ Lineage-Projected Action Governance     │ 7/7 Axioms   │ Rho: 6/7   │ FROZEN        │
+| Exp 0-B    │ 276  │ 2x2 Factorial Causal Necessity (Cell 4) │ 66/66 (100%) │ Uncalib.   │ FROZEN        │
+| Exp 1A     │ 72   │ Multi-Generation Semantic Transmission  │ 100.0% (τ=1) │ N/A        │ FROZEN        │
+| Exp 1B-B1c │ 16   │ Path-Conditioned Expression Symmetry    │ 1.000 / 0.000│ N/A        │ FROZEN        │
+| Exp 1B-C1b │ 1200 │ Lineage Quarantine Selectivity (90/10)  │ S = +0.800   │ Blind: 0.0 │ FROZEN        │
+| Exp 1B-C2a │ 50   │ Live Lineage Containment vs Laundering  │ 100% vs 0%   │ Node: 0%   │ FROZEN        │
+| Exp 1B-C2b │ 30   │ Structural Proofreader Heritable Rate   │ μ_herit = 0.0│ μ_U = 0.375│ FROZEN        │
+| Round 4    │ 116  │ Four-Layer Conformance & Bloat Assay    │ 7/8 Bloated  │ Zero Bloat │ FROZEN        │
+| Stage 5A   │ 432  │ Revision Precision & Support Algebra    │ Degraded: 0% │ Flat: 100% │ FROZEN        │
+| Stage 5B   │ 368  │ Lineage-Projected Action Governance     │ 7/7 Axioms   │ Rho: 6/7   │ FROZEN        │
+| Stage 5C   │ 32   │ Neural Revision Bridge (Live Assay)     │ Arm 3: 100%  │ Arm 2: 50% │ FROZEN        │
 +────────────+──────+─────────────────────────────────────────+──────────────+────────────+───────────────+
 ```
 
 ---
 
-## 12. Conclusion & Horizon
+## 13. Conclusion & Horizon
 
 GENE demonstrates that persistent AI memory requires an **epistemic runtime for maintaining entitlement under change**. By maintaining minimal entitling support $\mathcal{S}(c)$ and lineage-projected hypergraphs $\mathcal{S}_L(c)$, persistent agents can perform non-destructive belief revision, avoid explanatory bloat autoimmunity, and govern high-stakes actions with mathematical proportionality.

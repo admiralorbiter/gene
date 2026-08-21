@@ -294,6 +294,29 @@
       ],
       "scope_limitations": "Evaluated across 368 factorial governance scenarios and 7 formal axiomatic invariants.",
       "replication_status": "deterministic_exact"
+    },
+    {
+      "claim_id": "GENE-C12",
+      "claim_status": "observed",
+      "headline": "Support-First Epistemic Runtime Rescues Neural Revision and Enables Risk-Calibrated Action Gating",
+      "claim_text": "In a 32-call live Gemma 3:12B assay across 4 structural micro-worlds, naive reported-dependency tracking over acquisition citations R(c) suffered 100% false retractions (0/4) on degraded states due to explanatory bloat. Compiling the minimal first-order entitling support family S_F(c) restored 100% entitlement retention (4/4) and 100% clean abstention (4/4). Lineage-projected authority Auth(S_L) successfully executed dual-layer containment: preserving belief entitlement while blocking operationally unsafe actions when root environments were degraded.",
+      "evidence_sources": [
+        {
+          "experiment": "Exploration Round 5 Stage 5C (Neural Revision Bridge)",
+          "evidence_class": "live_neural_assay",
+          "artifact": "data/exploration_round5_stage5c_summary.json",
+          "artifact_sha256": "2d8fe5637889e4de5c59a6a2c90e0f4279168f8897641249c923cda7cb11172c",
+          "execution_commit": "round5-stage5c-runner-freeze",
+          "model": "gemma3:12b (Ollama digest: f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a)",
+          "n_calls": 32,
+          "n_evaluations": 32,
+          "unit_of_analysis": "call",
+          "formal_report": "docs/results/EXPLORATION_ROUND5_STAGE5C_REPORT.md",
+          "primary_metric": "Overall Entitlement: Arm 1 (Raw Neural) 75.0% (6/8), Arm 2 (Naïve Reported) 50.0% (4/8, 0/4 degraded), Arm 3 (GENE Kernel) 100.0% (8/8); Action Gating: 100% calibrated"
+        }
+      ],
+      "scope_limitations": "Evaluated across 4 canonical structural micro-worlds on Gemma 3:12B under greedy decoding.",
+      "replication_status": "same_model_verified"
     }
   ]
 }

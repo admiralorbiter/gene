@@ -1,7 +1,7 @@
 {
   "manifest_version": "2.0.0",
   "project": "GENE (Genealogical Epistemic Network Experiments)",
-  "generated_at": "2026-08-21T02:56:47.871953+00:00",
+  "generated_at": "2026-08-21T03:15:14.348997+00:00",
   "canonical_experiments": {
     "exp0": {
       "experiment": "Experiment 0 (Lineage Observability & Factorial Calibration)",
@@ -193,6 +193,32 @@
       "degraded_permitted_rate_tau_0_5": "32 / 104 (30.8%)",
       "mean_degraded_lineage_authority": 0.4615,
       "status": "FROZEN"
+    },
+    "stage_5c": {
+      "experiment": "Exploration Round 5 Stage 5C (Neural Revision Bridge)",
+      "summary_file": "exploration_round5_stage5c_summary.json",
+      "commit": "round5-stage5c-runner-freeze",
+      "model_name": "gemma3:12b",
+      "model_digest": "f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a",
+      "total_calls": 32,
+      "overall_entitlement_accuracy": {
+        "arm1_raw_neural": 0.75,
+        "arm2_naive_reported": 0.5,
+        "arm3_gene_kernel": 1.0
+      },
+      "degraded_state_retention_rate": {
+        "arm1_raw_neural": 0.5,
+        "arm2_naive_reported": 0.0,
+        "arm3_gene_kernel": 1.0
+      },
+      "retracted_clean_abstention_rate": {
+        "arm1_raw_neural": 1.0,
+        "arm2_naive_reported": 1.0,
+        "arm3_gene_kernel": 1.0
+      },
+      "action_governance_arm3": "100.0% calibrated (3 permitted, 1 blocked under structural root degradation, 4 retracted)",
+      "replay_canary_stability": "3 / 4 exact raw token matches (75.0%), 4 / 4 semantic matches (100.0%)",
+      "status": "COMPLETED_AND_FROZEN"
     }
   }
 }
