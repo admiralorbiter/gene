@@ -2,7 +2,7 @@
 promotion_id: PROMOTION-CONTRACT-R8-8B-R1
 contract_id: CONTRACT-R8-8B-R1
 status: CANDIDATE
-candidate_sha: e86f2fc197b54c9a6d0b25b1c45e1d51a7927d1c
+candidate_sha: ddc1717103f6cde0abf757ed629638a7fedd7b88
 generated_at: "2026-08-21 23:32:00Z"
 repair_rounds: 0
 reviewed_by: codex
@@ -17,7 +17,7 @@ authorized_by: null
 - **Target Contract**: `CONTRACT-R8-8B-R1`
 - **Phase / Milestone**: Exploration Round 8 Stage 8B-R1 Confirmatory Benchmark
 - **Candidate Branch**: `mb/CONTRACT-R8-8B-R1`
-- **Candidate Commit SHA**: `e86f2fc197b54c9a6d0b25b1c45e1d51a7927d1c`
+- **Candidate Commit SHA**: ddc1717103f6cde0abf757ed629638a7fedd7b88
 - **Execution Base SHA**: `3da636d9ddd649160f24e8eb1074d8c7d260e2e8`
 - **Contract Acceptance Verifier**: `PASS` (`scripts/verify_contract_r8_8b_r1.py` executed with zero runner booleans, fresh sealed world manifest assertion, multi-document stream invariants, and independent occurrence-splitting bitemporal replay)
 - **Auditor Verdict**: `PASS` (All 8 Estimands, Factorial Grid, 4-Point Timeline Queries, and Distractor Falsification Controls verified across 145 live `gemma3:12b` calls)
