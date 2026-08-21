@@ -6,6 +6,7 @@ Freezes:
 2. 24 Factorial Revision calls (4 worlds x 2 interventions x 3 arms).
 3. 4 Replay Canaries.
 4. Exact prompt structures, matched serialization grammar, and deterministic oracles.
+5. Canonical request payload SHA-256 hashes and pinned model digest.
 """
 
 from __future__ import annotations
@@ -15,6 +16,20 @@ import json
 from pathlib import Path
 from typing import Any
 from pydantic import BaseModel, Field
+
+from src.gene.experiments.action_governance import project_lineage_support, minimize_antichain
+
+PINNED_STAGE5C_MODEL = "gemma3:12b"
+PINNED_STAGE5C_DIGEST = "f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a"
+CANONICAL_SYSTEM_PROMPT = "You are an epistemic reasoning engine. You must output valid JSON."
+
+
+class Stage5CRule(BaseModel):
+    rule_id: str
+    antecedent_fact_ids: list[str]
+    consequent_attribute: str
+    consequent_value: str
+    nl_text: str
 
 
 class Stage5CWorldSpec(BaseModel):
@@ -27,6 +42,7 @@ class Stage5CWorldSpec(BaseModel):
     facts: dict[str, str]  # fact_id -> natural language statement
     lineage_map: dict[str, str]  # fact_id -> root_id
     rules: list[str]
+    rule_specs: list[Stage5CRule] = Field(default_factory=list)
     initial_support_family: list[list[str]]
     initial_root_family: list[list[str]]
     degraded_intervention: list[str]  # premise IDs to invalidate
@@ -41,6 +57,10 @@ class Stage5CCallSpec(BaseModel):
     arm: str  # "acquisition", "arm1_raw_neural", "arm2_naive_reported", "arm3_gene_kernel"
     condition: str  # "baseline", "DEGRADED", "RETRACTED"
     invalidated_facts: list[str]
+    system_prompt: str = CANONICAL_SYSTEM_PROMPT
+    user_prompt: str
+    user_prompt_sha256: str
+    request_payload_sha256: str
     expected_entitled: bool
     expected_surviving_support: list[list[str]]
     expected_surviving_lineage: list[list[str]]
@@ -48,6 +68,159 @@ class Stage5CCallSpec(BaseModel):
     prompt_template_version: str = "stage5c_v1"
     matched_serialization_grammar: str = "structured_json_evidence_block"
     replay_target_call_id: str | None = None
+
+
+def render_acquisition_prompt(world: Stage5CWorldSpec) -> str:
+    """Render the structured prompt for Phase 1 Acquisition."""
+    facts_block = "\n".join([f"- [{fid}]: {text}" for fid, text in sorted(world.facts.items())])
+    rules_block = "\n".join([f"- {r}" for r in world.rules])
+
+    return f"""### SYSTEM INSTRUCTION
+You are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.
+If the facts and rules are sufficient to deduce a definite answer, status must be "DETERMINABLE" and answer must match the deduced value.
+If the facts and rules are insufficient, broken, or ambiguous, status must be "INDETERMINABLE" and answer must be null.
+
+### VERIFIED EVIDENCE
+{facts_block}
+
+### INFERENCE RULES
+{rules_block}
+
+### QUERY
+Target: {world.query_entity}
+Attribute: {world.target_attribute}
+
+### ACTION GOVERNANCE POLICY
+If the answer is determinable, propose an appropriate operational action (e.g. "AUTHORIZE_ENTRY", "EXECUTE_DISPATCH", "DEPLOY_PROTOCOL") and specify your action confidence in [0.0, 1.0].
+
+### OUTPUT FORMAT
+You must respond with ONLY valid JSON matching this schema:
+```json
+{{
+  "status": "DETERMINABLE" | "INDETERMINABLE",
+  "answer": "<STRING>" | null,
+  "cited_facts": ["<FACT_ID>", ...],
+  "proposed_action": "<ACTION_NAME>" | null,
+  "action_confidence": 0.95
+}}
+```"""
+
+
+def render_arm1_raw_revision_prompt(world: Stage5CWorldSpec, invalidated_facts: list[str]) -> str:
+    """Render the prompt for Arm 1 (Raw Neural Revision) with explicit retraction notices."""
+    facts_block = "\n".join([f"- [{fid}]: {text}" for fid, text in sorted(world.facts.items())])
+    rules_block = "\n".join([f"- {r}" for r in world.rules])
+    inval_block = "\n".join([f"- RETRACTED / INVALID: [{fid}]" for fid in sorted(invalidated_facts)])
+
+    return f"""### SYSTEM INSTRUCTION
+You are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.
+CRITICAL: Some previously known facts have been RETRACTED and are no longer valid. You MUST NOT use or cite any retracted facts.
+If the remaining active facts and rules are sufficient to deduce a definite answer, status must be "DETERMINABLE".
+If the remaining active facts are insufficient or all derivation paths are broken, status must be "INDETERMINABLE" and answer must be null.
+
+### PREVIOUSLY OBSERVED EVIDENCE
+{facts_block}
+
+### [SYSTEM ALERT] RETRACTION NOTICE
+The following facts have been formally invalidated and revoked:
+{inval_block}
+
+### INFERENCE RULES
+{rules_block}
+
+### QUERY
+Target: {world.query_entity}
+Attribute: {world.target_attribute}
+
+### ACTION GOVERNANCE POLICY
+If the answer is determinable under active valid facts, propose an operational action and state your confidence.
+
+### OUTPUT FORMAT
+You must respond with ONLY valid JSON matching this schema:
+```json
+{{
+  "status": "DETERMINABLE" | "INDETERMINABLE",
+  "answer": "<STRING>" | null,
+  "cited_facts": ["<FACT_ID>", ...],
+  "proposed_action": "<ACTION_NAME>" | null,
+  "action_confidence": 0.95
+}}
+```"""
+
+
+def render_arm3_minimal_support_prompt(world: Stage5CWorldSpec, surviving_support: list[list[str]]) -> str:
+    """Render the prompt for Arm 3 (GENE Kernel) containing only surviving minimal support."""
+    active_fact_ids = sorted(list({fid for s in surviving_support for fid in s}))
+    if not active_fact_ids:
+        facts_block = "No active valid facts remain in context."
+    else:
+        facts_block = "\n".join([f"- [{fid}]: {world.facts[fid]}" for fid in active_fact_ids])
+    
+    rules_block = "\n".join([f"- {r}" for r in world.rules])
+
+    return f"""### SYSTEM INSTRUCTION
+You are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.
+If the facts and rules are sufficient to deduce a definite answer, status must be "DETERMINABLE" and answer must match the deduced value.
+If the facts and rules are insufficient, status must be "INDETERMINABLE" and answer must be null.
+
+### COMPILED ACTIVE EVIDENCE
+{facts_block}
+
+### INFERENCE RULES
+{rules_block}
+
+### QUERY
+Target: {world.query_entity}
+Attribute: {world.target_attribute}
+
+### ACTION GOVERNANCE POLICY
+If the answer is determinable, propose an operational action and specify your action confidence in [0.0, 1.0].
+
+### OUTPUT FORMAT
+You must respond with ONLY valid JSON matching this schema:
+```json
+{{
+  "status": "DETERMINABLE" | "INDETERMINABLE",
+  "answer": "<STRING>" | null,
+  "cited_facts": ["<FACT_ID>", ...],
+  "proposed_action": "<ACTION_NAME>" | null,
+  "action_confidence": 0.95
+}}
+```"""
+
+
+def enumerate_entitling_supports(world: Stage5CWorldSpec, active_facts: set[str]) -> list[list[str]]:
+    """Perform first-order backward-chaining support enumeration over active facts and rules."""
+    valid_paths: list[list[str]] = []
+    for rule in world.rule_specs:
+        if all(ant in active_facts for ant in rule.antecedent_fact_ids):
+            valid_paths.append(sorted(rule.antecedent_fact_ids))
+
+    # Minimize into an antichain
+    unique_sets = [set(p) for p in valid_paths]
+    min_sets = minimize_antichain(unique_sets)
+    return sorted([sorted(list(s)) for s in min_sets])
+
+
+def compute_request_payload_hash(
+    model_name: str,
+    system_prompt: str,
+    user_prompt: str,
+    temperature: float = 0.0,
+    seed: int = 42,
+    fmt: str = "json",
+) -> str:
+    """Compute canonical cryptographic SHA-256 hash of the complete API request payload."""
+    canonical_dict = {
+        "model": model_name,
+        "system": system_prompt,
+        "user": user_prompt,
+        "temperature": temperature,
+        "seed": seed,
+        "format": fmt,
+    }
+    encoded = json.dumps(canonical_dict, sort_keys=True).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
 
 
 def build_stage5c_worlds() -> dict[str, Stage5CWorldSpec]:
@@ -76,6 +249,22 @@ def build_stage5c_worlds() -> dict[str, Stage5CWorldSpec]:
                 "Rule 1: IF (Station in Sector ALPHA) AND (Sector ALPHA operates under Rule 1) THEN Protocol is PROTOCOL_OMEGA",
                 "Rule 2: IF (Station carries BEACON_DELTA) AND (BEACON_DELTA authorizes Rule 2) THEN Protocol is PROTOCOL_OMEGA",
             ],
+            rule_specs=[
+                Stage5CRule(
+                    rule_id="RULE_IND_1",
+                    antecedent_fact_ids=["FACT_IND_A", "FACT_IND_B"],
+                    consequent_attribute="operating_protocol",
+                    consequent_value="PROTOCOL_OMEGA",
+                    nl_text="Rule 1",
+                ),
+                Stage5CRule(
+                    rule_id="RULE_IND_2",
+                    antecedent_fact_ids=["FACT_IND_D", "FACT_IND_E"],
+                    consequent_attribute="operating_protocol",
+                    consequent_value="PROTOCOL_OMEGA",
+                    nl_text="Rule 2",
+                ),
+            ],
             initial_support_family=[["FACT_IND_A", "FACT_IND_B"], ["FACT_IND_D", "FACT_IND_E"]],
             initial_root_family=[["ROOT_R1"], ["ROOT_R2"]],
             degraded_intervention=["FACT_IND_D"],
@@ -101,6 +290,22 @@ def build_stage5c_worlds() -> dict[str, Stage5CWorldSpec]:
             rules=[
                 "Rule 1: IF (Central Division) AND (Secondary Channel BLUE) THEN Tier is TIER_SIGMA",
                 "Rule 2: IF (Central Division) AND (Secondary Channel GOLD) THEN Tier is TIER_SIGMA",
+            ],
+            rule_specs=[
+                Stage5CRule(
+                    rule_id="RULE_SHP_1",
+                    antecedent_fact_ids=["FACT_SHP_A", "FACT_SHP_B"],
+                    consequent_attribute="clearance_tier",
+                    consequent_value="TIER_SIGMA",
+                    nl_text="Rule 1",
+                ),
+                Stage5CRule(
+                    rule_id="RULE_SHP_2",
+                    antecedent_fact_ids=["FACT_SHP_A", "FACT_SHP_D"],
+                    consequent_attribute="clearance_tier",
+                    consequent_value="TIER_SIGMA",
+                    nl_text="Rule 2",
+                ),
             ],
             initial_support_family=[["FACT_SHP_A", "FACT_SHP_B"], ["FACT_SHP_A", "FACT_SHP_D"]],
             initial_root_family=[["ROOT_R1", "ROOT_R2"], ["ROOT_R1", "ROOT_R3"]],
@@ -129,6 +334,22 @@ def build_stage5c_worlds() -> dict[str, Stage5CWorldSpec]:
             rules=[
                 "Rule 1: IF (Relay NORTH) AND (Port 1 verified) THEN Code is CODE_EPSILON",
                 "Rule 2: IF (Relay SOUTH) AND (Port 2 verified) THEN Code is CODE_EPSILON",
+            ],
+            rule_specs=[
+                Stage5CRule(
+                    rule_id="RULE_SHO_1",
+                    antecedent_fact_ids=["FACT_SHO_A", "FACT_SHO_B"],
+                    consequent_attribute="access_code",
+                    consequent_value="CODE_EPSILON",
+                    nl_text="Rule 1",
+                ),
+                Stage5CRule(
+                    rule_id="RULE_SHO_2",
+                    antecedent_fact_ids=["FACT_SHO_D", "FACT_SHO_E"],
+                    consequent_attribute="access_code",
+                    consequent_value="CODE_EPSILON",
+                    nl_text="Rule 2",
+                ),
             ],
             initial_support_family=[["FACT_SHO_A", "FACT_SHO_B"], ["FACT_SHO_D", "FACT_SHO_E"]],
             initial_root_family=[["ROOT_R1", "ROOT_R2"]],
@@ -159,6 +380,29 @@ def build_stage5c_worlds() -> dict[str, Stage5CWorldSpec]:
                 "Rule 2: IF (Corridor X) AND (Gate 3) THEN Lane is LANE_THETA",
                 "Rule 3: IF (Gate 3) AND (Channel 4) THEN Lane is LANE_THETA",
             ],
+            rule_specs=[
+                Stage5CRule(
+                    rule_id="RULE_REC_1",
+                    antecedent_fact_ids=["FACT_REC_A", "FACT_REC_B"],
+                    consequent_attribute="transit_lane",
+                    consequent_value="LANE_THETA",
+                    nl_text="Rule 1",
+                ),
+                Stage5CRule(
+                    rule_id="RULE_REC_2",
+                    antecedent_fact_ids=["FACT_REC_B", "FACT_REC_C"],
+                    consequent_attribute="transit_lane",
+                    consequent_value="LANE_THETA",
+                    nl_text="Rule 2",
+                ),
+                Stage5CRule(
+                    rule_id="RULE_REC_3",
+                    antecedent_fact_ids=["FACT_REC_C", "FACT_REC_D"],
+                    consequent_attribute="transit_lane",
+                    consequent_value="LANE_THETA",
+                    nl_text="Rule 3",
+                ),
+            ],
             initial_support_family=[
                 ["FACT_REC_A", "FACT_REC_B"],
                 ["FACT_REC_B", "FACT_REC_C"],
@@ -175,7 +419,7 @@ def build_stage5c_worlds() -> dict[str, Stage5CWorldSpec]:
     }
 
 
-def generate_stage5c_manifest() -> dict[str, Any]:
+def generate_stage5c_manifest(write: bool = True) -> dict[str, Any]:
     """Assemble all 32 calls with fixed parameters, matched grammar, and expected oracles."""
     worlds = build_stage5c_worlds()
     calls: list[Stage5CCallSpec] = []
@@ -184,6 +428,15 @@ def generate_stage5c_manifest() -> dict[str, Any]:
     # Phase 1: 4 Acquisition Calls
     for wid in ["W_IND", "W_SHP", "W_SHO", "W_REC"]:
         w = worlds[wid]
+        prompt = render_acquisition_prompt(w)
+        p_sha = hashlib.sha256(prompt.encode("utf-8")).hexdigest()
+        req_sha = compute_request_payload_hash(
+            model_name=PINNED_STAGE5C_MODEL,
+            system_prompt=CANONICAL_SYSTEM_PROMPT,
+            user_prompt=prompt,
+        )
+        init_lin = project_lineage_support(w.initial_support_family, w.lineage_map).support_family_roots
+
         calls.append(
             Stage5CCallSpec(
                 call_index=idx,
@@ -193,9 +446,13 @@ def generate_stage5c_manifest() -> dict[str, Any]:
                 arm="acquisition",
                 condition="baseline",
                 invalidated_facts=[],
+                system_prompt=CANONICAL_SYSTEM_PROMPT,
+                user_prompt=prompt,
+                user_prompt_sha256=p_sha,
+                request_payload_sha256=req_sha,
                 expected_entitled=True,
                 expected_surviving_support=w.initial_support_family,
-                expected_surviving_lineage=w.initial_root_family,
+                expected_surviving_lineage=init_lin,
                 expected_oracle_answer=w.ground_truth_answer,
             )
         )
@@ -211,21 +468,30 @@ def generate_stage5c_manifest() -> dict[str, Any]:
             inval = w.degraded_intervention if cond == "DEGRADED" else w.retracted_intervention
             is_entitled = (cond == "DEGRADED")
 
-            # Compute surviving support
-            surviving_s = [
-                s for s in w.initial_support_family if not any(p in inval for p in s)
-            ]
-            surviving_l = [
-                r for r in w.initial_root_family
-                if all(
-                    any(p in w.facts and p not in inval for p in path)
-                    for path in w.initial_support_family
-                )
-            ] if is_entitled else []
+            # Compute surviving support from rules and active facts
+            active_facts = set(w.facts.keys()) - set(inval)
+            surviving_s = enumerate_entitling_supports(w, active_facts)
+            surviving_l = (
+                project_lineage_support(surviving_s, w.lineage_map).support_family_roots
+                if is_entitled and surviving_s
+                else []
+            )
 
             expected_ans = w.ground_truth_answer if is_entitled else "UNKNOWN"
 
             for arm in arms:
+                if arm in ["arm1_raw_neural", "arm2_naive_reported"]:
+                    prompt = render_arm1_raw_revision_prompt(w, inval)
+                else:
+                    prompt = render_arm3_minimal_support_prompt(w, surviving_s)
+
+                p_sha = hashlib.sha256(prompt.encode("utf-8")).hexdigest()
+                req_sha = compute_request_payload_hash(
+                    model_name=PINNED_STAGE5C_MODEL,
+                    system_prompt=CANONICAL_SYSTEM_PROMPT,
+                    user_prompt=prompt,
+                )
+
                 calls.append(
                     Stage5CCallSpec(
                         call_index=idx,
@@ -235,6 +501,10 @@ def generate_stage5c_manifest() -> dict[str, Any]:
                         arm=arm,
                         condition=cond,
                         invalidated_facts=inval,
+                        system_prompt=CANONICAL_SYSTEM_PROMPT,
+                        user_prompt=prompt,
+                        user_prompt_sha256=p_sha,
+                        request_payload_sha256=req_sha,
                         expected_entitled=is_entitled,
                         expected_surviving_support=surviving_s,
                         expected_surviving_lineage=surviving_l,
@@ -255,9 +525,27 @@ def generate_stage5c_manifest() -> dict[str, Any]:
         w = worlds[wid]
         inval = w.degraded_intervention if cond == "DEGRADED" else w.retracted_intervention
         is_entitled = (cond == "DEGRADED")
-        surviving_s = [
-            s for s in w.initial_support_family if not any(p in inval for p in s)
-        ]
+        
+        active_facts = set(w.facts.keys()) - set(inval)
+        surviving_s = enumerate_entitling_supports(w, active_facts)
+        surviving_l = (
+            project_lineage_support(surviving_s, w.lineage_map).support_family_roots
+            if is_entitled and surviving_s
+            else []
+        )
+
+        if arm in ["arm1_raw_neural", "arm2_naive_reported"]:
+            prompt = render_arm1_raw_revision_prompt(w, inval)
+        else:
+            prompt = render_arm3_minimal_support_prompt(w, surviving_s)
+
+        p_sha = hashlib.sha256(prompt.encode("utf-8")).hexdigest()
+        req_sha = compute_request_payload_hash(
+            model_name=PINNED_STAGE5C_MODEL,
+            system_prompt=CANONICAL_SYSTEM_PROMPT,
+            user_prompt=prompt,
+        )
+
         calls.append(
             Stage5CCallSpec(
                 call_index=idx,
@@ -267,9 +555,13 @@ def generate_stage5c_manifest() -> dict[str, Any]:
                 arm=arm,
                 condition=cond,
                 invalidated_facts=inval,
+                system_prompt=CANONICAL_SYSTEM_PROMPT,
+                user_prompt=prompt,
+                user_prompt_sha256=p_sha,
+                request_payload_sha256=req_sha,
                 expected_entitled=is_entitled,
                 expected_surviving_support=surviving_s,
-                expected_surviving_lineage=[],
+                expected_surviving_lineage=surviving_l,
                 expected_oracle_answer=w.ground_truth_answer if is_entitled else "UNKNOWN",
                 replay_target_call_id=target_id,
             )
@@ -277,9 +569,11 @@ def generate_stage5c_manifest() -> dict[str, Any]:
         idx += 1
 
     manifest = {
-        "manifest_version": "1.0.0",
+        "manifest_version": "2.0.0",
         "experiment": "Exploration Round 5 Stage 5C: Neural Revision Bridge (32-Call Live Assay)",
-        "target_model": "gemma3:12b",
+        "target_model": PINNED_STAGE5C_MODEL,
+        "pinned_model_digest": PINNED_STAGE5C_DIGEST,
+        "canonical_system_prompt": CANONICAL_SYSTEM_PROMPT,
         "execution_parameters": {
             "temperature": 0.0,
             "seed": 42,
@@ -292,15 +586,15 @@ def generate_stage5c_manifest() -> dict[str, Any]:
         "calls": [c.model_dump() for c in calls],
     }
 
-    # Write to data/exploration_round5_stage5c_manifest.json
-    out_path = Path(__file__).resolve().parent.parent.parent.parent / "data" / "exploration_round5_stage5c_manifest.json"
-    out_path.parent.mkdir(exist_ok=True)
-    with open(out_path, "w", encoding="utf-8") as f:
-        json.dump(manifest, f, indent=2)
+    if write:
+        out_path = Path(__file__).resolve().parent.parent.parent.parent / "data" / "exploration_round5_stage5c_manifest.json"
+        out_path.parent.mkdir(exist_ok=True)
+        with open(out_path, "w", encoding="utf-8") as f:
+            json.dump(manifest, f, indent=2)
 
     return manifest
 
 
 if __name__ == "__main__":
-    m = generate_stage5c_manifest()
-    print(f"Stage 5C Execution Manifest successfully generated with {len(m['calls'])} calls.")
+    m = generate_stage5c_manifest(write=True)
+    print(f"Stage 5C Execution Manifest v2.0.0 successfully generated with {len(m['calls'])} calls.")

@@ -117,26 +117,27 @@ def test_claim_ledger_multi_source_integrity():
             assert report_path.exists(), f"Report {src['formal_report']} for claim {claim['claim_id']} does not exist"
 
             # Verify execution_commit resolves in git
-            commit_hash = src["execution_commit"]
-            if commit_hash and len(commit_hash) == 40 and not commit_hash.startswith("deterministic"):
+            commit_ref = src["execution_commit"]
+            if commit_ref and not commit_ref.startswith("deterministic"):
+                # Resolve tag, branch, or SHA to 40-char commit SHA
                 res = subprocess.run(
-                    ["git", "cat-file", "-e", f"{commit_hash}^{{commit}}"],
+                    ["git", "rev-parse", f"{commit_ref}^{{commit}}"],
                     cwd=root_dir,
                     capture_output=True,
+                    text=True,
                 )
-                assert res.returncode == 0, f"Commit {commit_hash} in {claim['claim_id']} does not resolve in Git!"
+                assert res.returncode == 0, f"Commit reference '{commit_ref}' in {claim['claim_id']} does not resolve in Git!"
+                resolved_sha = res.stdout.strip()
 
-            # If artifact is tracked in git at execution_commit, verify exact blob binding
-            commit_hash = src["execution_commit"]
-            if commit_hash and len(commit_hash) == 40 and not commit_hash.startswith("deterministic"):
+                # If artifact is tracked in git at execution_commit, verify exact blob binding
                 art_git_path = src["artifact"].replace("\\", "/")
-                res = subprocess.run(
-                    ["git", "show", f"{commit_hash}:{art_git_path}"],
+                res_show = subprocess.run(
+                    ["git", "show", f"{resolved_sha}:{art_git_path}"],
                     cwd=root_dir,
                     capture_output=True,
                 )
-                if res.returncode == 0:
-                    blob_raw = res.stdout
+                if res_show.returncode == 0:
+                    blob_raw = res_show.stdout
                     blob_lf = blob_raw.replace(b"\r\n", b"\n")
                     blob_crlf = blob_lf.replace(b"\n", b"\r\n")
                     expected_sha = src["artifact_sha256"].lower()
@@ -147,7 +148,7 @@ def test_claim_ledger_multi_source_integrity():
                     
                     matched = expected_sha in [raw_sha, lf_sha, crlf_sha]
                     assert matched, (
-                        f"Git commit binding mismatch for {claim['claim_id']} ({src['artifact']} at {commit_hash}): "
+                        f"Git commit binding mismatch for {claim['claim_id']} ({src['artifact']} at {commit_ref} / {resolved_sha}): "
                         f"expected {expected_sha}, git show produced (raw={raw_sha}, lf={lf_sha}, crlf={crlf_sha})"
                     )
 

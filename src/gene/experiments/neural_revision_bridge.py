@@ -1,12 +1,19 @@
-"""Stage 5C: Neural Revision Bridge (Live Model Revision Assay).
+"""Stage 5C: Neural Revision Bridge (Hardened Live Model Revision Assay).
 
 Evaluates belief maintenance, revision accuracy, and action governance under live LLM reasoning.
 Compares:
 1. Arm 1: Raw Neural Revision (Unassisted model reasoning under raw context + invalidation alerts).
 2. Arm 2: Naive Reported-Dependency (Flat dependency graph over live acquisition citations R(c)).
-3. Arm 3: GENE Support-First Epistemic Runtime (Support enumeration S_F(c), lineage hypergraph S_L(c), minimal context compilation, and deterministic Auth(S_L) gating).
+3. Arm 3: GENE Support-First Epistemic Runtime (Formal support enumeration S_F(c, I), lineage hypergraph S_L(c, I), minimal context compilation, and deterministic Auth(S_L) gating).
 
-Includes full SQLite logging and replay canary verification.
+Enforces:
+- Strict request-payload hash freezing.
+- Pinned model digest validation.
+- First-order backward chaining support enumeration in Arm 3 with oracle equality preflight check.
+- Explicit model-vs-runtime output separation.
+- Acquisition validity tagging.
+- Exact replay canary matching via replay_target_call_id.
+- Append-only run/call persistence.
 """
 
 from __future__ import annotations
@@ -22,12 +29,21 @@ from pydantic import BaseModel, Field
 
 from src.gene.experiments.action_governance import (
     project_lineage_support,
-    compute_policy_lineage_projected,
-    PolicyActionScore,
-    LineageProjectedState,
     minimize_antichain,
 )
-from src.gene.experiments.stage5c_manifest import Stage5CCallSpec, Stage5CWorldSpec, build_stage5c_worlds
+from src.gene.experiments.stage5c_manifest import (
+    Stage5CCallSpec,
+    Stage5CWorldSpec,
+    build_stage5c_worlds,
+    render_acquisition_prompt,
+    render_arm1_raw_revision_prompt,
+    render_arm3_minimal_support_prompt,
+    enumerate_entitling_supports,
+    compute_request_payload_hash,
+    PINNED_STAGE5C_MODEL,
+    PINNED_STAGE5C_DIGEST,
+    CANONICAL_SYSTEM_PROMPT,
+)
 
 
 class NeuralRevisionBridgeOutput(BaseModel):
@@ -39,168 +55,95 @@ class NeuralRevisionBridgeOutput(BaseModel):
     condition: str
     prompt_text: str
     prompt_sha256: str
+    request_payload_sha256: str
     raw_response: str
-    parsed_status: str  # "DETERMINABLE" | "INDETERMINABLE" | "MALFORMED"
-    parsed_answer: str | None
-    cited_facts: list[str]
-    proposed_action: str | None
-    action_confidence: float | None
+    
+    # Model Direct Outputs
+    status_model: str  # "DETERMINABLE" | "INDETERMINABLE" | "MALFORMED"
+    answer_model: str | None
+    cited_facts_model: list[str]
+    proposed_action_model: str | None
+    action_confidence_model: float | None
+
+    # Runtime Effective Outputs (post-policy)
+    status_runtime: str
+    answer_runtime: str | None
+    proposed_action_runtime: str | None
+    action_confidence_runtime: float | None
+
+    # Acquisition & Policy Metadata
+    acquisition_valid: bool
     expected_entitled: bool
     expected_oracle_answer: str
     is_correct_entitlement: bool
     is_correct_semantic_answer: bool
-    surviving_support: list[list[str]]
-    surviving_lineage: list[list[str]]
+    computed_surviving_support: list[list[str]]
+    computed_surviving_lineage: list[list[str]]
     lineage_authority: float
     gate_verdict: str  # "PERMIT" | "BLOCK" | "N/A"
     executed_action: str | None
     latency_ms: float
-
-
-def render_acquisition_prompt(world: Stage5CWorldSpec) -> str:
-    """Render the structured prompt for Phase 1 Acquisition."""
-    facts_block = "\n".join([f"- [{fid}]: {text}" for fid, text in sorted(world.facts.items())])
-    rules_block = "\n".join([f"- {r}" for r in world.rules])
-
-    return f"""### SYSTEM INSTRUCTION
-You are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.
-If the facts and rules are sufficient to deduce a definite answer, status must be "DETERMINABLE" and answer must match the deduced value.
-If the facts and rules are insufficient, broken, or ambiguous, status must be "INDETERMINABLE" and answer must be null.
-
-### VERIFIED EVIDENCE
-{facts_block}
-
-### INFERENCE RULES
-{rules_block}
-
-### QUERY
-Target: {world.query_entity}
-Attribute: {world.target_attribute}
-
-### ACTION GOVERNANCE POLICY
-If the answer is determinable, propose an appropriate operational action (e.g. "AUTHORIZE_ENTRY", "EXECUTE_DISPATCH", "DEPLOY_PROTOCOL") and specify your action confidence in [0.0, 1.0].
-
-### OUTPUT FORMAT
-You must respond with ONLY valid JSON matching this schema:
-```json
-{{
-  "status": "DETERMINABLE" | "INDETERMINABLE",
-  "answer": "<STRING>" | null,
-  "cited_facts": ["<FACT_ID>", ...],
-  "proposed_action": "<ACTION_NAME>" | null,
-  "action_confidence": 0.95
-}}
-```"""
-
-
-def render_arm1_raw_revision_prompt(world: Stage5CWorldSpec, invalidated_facts: list[str]) -> str:
-    """Render the prompt for Arm 1 (Raw Neural Revision) with explicit retraction notices."""
-    facts_block = "\n".join([f"- [{fid}]: {text}" for fid, text in sorted(world.facts.items())])
-    rules_block = "\n".join([f"- {r}" for r in world.rules])
-    inval_block = "\n".join([f"- RETRACTED / INVALID: [{fid}]" for fid in sorted(invalidated_facts)])
-
-    return f"""### SYSTEM INSTRUCTION
-You are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.
-CRITICAL: Some previously known facts have been RETRACTED and are no longer valid. You MUST NOT use or cite any retracted facts.
-If the remaining active facts and rules are sufficient to deduce a definite answer, status must be "DETERMINABLE".
-If the remaining active facts are insufficient or all derivation paths are broken, status must be "INDETERMINABLE" and answer must be null.
-
-### PREVIOUSLY OBSERVED EVIDENCE
-{facts_block}
-
-### [SYSTEM ALERT] RETRACTION NOTICE
-The following facts have been formally invalidated and revoked:
-{inval_block}
-
-### INFERENCE RULES
-{rules_block}
-
-### QUERY
-Target: {world.query_entity}
-Attribute: {world.target_attribute}
-
-### ACTION GOVERNANCE POLICY
-If the answer is determinable under active valid facts, propose an operational action and state your confidence.
-
-### OUTPUT FORMAT
-You must respond with ONLY valid JSON matching this schema:
-```json
-{{
-  "status": "DETERMINABLE" | "INDETERMINABLE",
-  "answer": "<STRING>" | null,
-  "cited_facts": ["<FACT_ID>", ...],
-  "proposed_action": "<ACTION_NAME>" | null,
-  "action_confidence": 0.95
-}}
-```"""
-
-
-def render_arm3_minimal_support_prompt(world: Stage5CWorldSpec, surviving_support: list[list[str]]) -> str:
-    """Render the prompt for Arm 3 (GENE Kernel) containing only surviving minimal support."""
-    active_fact_ids = sorted(list({fid for s in surviving_support for fid in s}))
-    if not active_fact_ids:
-        facts_block = "No active valid facts remain in context."
-    else:
-        facts_block = "\n".join([f"- [{fid}]: {world.facts[fid]}" for fid in active_fact_ids])
-    
-    rules_block = "\n".join([f"- {r}" for r in world.rules])
-
-    return f"""### SYSTEM INSTRUCTION
-You are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.
-If the facts and rules are sufficient to deduce a definite answer, status must be "DETERMINABLE" and answer must match the deduced value.
-If the facts and rules are insufficient, status must be "INDETERMINABLE" and answer must be null.
-
-### COMPILED ACTIVE EVIDENCE
-{facts_block}
-
-### INFERENCE RULES
-{rules_block}
-
-### QUERY
-Target: {world.query_entity}
-Attribute: {world.target_attribute}
-
-### ACTION GOVERNANCE POLICY
-If the answer is determinable, propose an operational action and specify your action confidence in [0.0, 1.0].
-
-### OUTPUT FORMAT
-You must respond with ONLY valid JSON matching this schema:
-```json
-{{
-  "status": "DETERMINABLE" | "INDETERMINABLE",
-  "answer": "<STRING>" | null,
-  "cited_facts": ["<FACT_ID>", ...],
-  "proposed_action": "<ACTION_NAME>" | null,
-  "action_confidence": 0.95
-}}
-```"""
+    replay_target_call_id: str | None = None
+    is_replay_exact_match: bool | None = None
 
 
 class NeuralRevisionBridgeRunner:
-    """Executes the 32-call Stage 5C Factorial Assay."""
+    """Executes the 32-call Stage 5C Factorial Assay with strict invariants."""
 
     def __init__(
         self,
         db_path: Path | str,
         manifest_path: Path | str,
-        client_fn: Callable[[str], str],
-        model_name: str = "gemma3:12b",
+        client_fn: Callable[[str, str], str],  # (system_prompt, user_prompt) -> raw_response
+        model_name: str = PINNED_STAGE5C_MODEL,
+        model_digest: str = PINNED_STAGE5C_DIGEST,
+        ollama_version: str = "unknown",
+        git_commit: str = "unknown",
+        fail_if_db_exists: bool = False,
     ):
         self.db_path = Path(db_path)
         self.manifest_path = Path(manifest_path)
         self.client_fn = client_fn
         self.model_name = model_name
+        self.model_digest = model_digest
+        self.ollama_version = ollama_version
+        self.git_commit = git_commit
         self.worlds = build_stage5c_worlds()
-        
+
         with open(self.manifest_path, "r", encoding="utf-8") as f:
             self.manifest = json.load(f)
 
-        self._init_db()
+        manifest_content = self.manifest_path.read_bytes()
+        self.manifest_sha256 = hashlib.sha256(manifest_content).hexdigest()
 
-    def _init_db(self) -> None:
-        """Initialize SQLite storage schema."""
+        # Pin Validation
+        expected_digest = self.manifest.get("pinned_model_digest", PINNED_STAGE5C_DIGEST)
+        if self.model_digest != expected_digest:
+            raise ValueError(
+                f"Model digest mismatch! Pinned: {expected_digest}, Actual: {self.model_digest}. "
+                "Halting execution to preserve experimental integrity."
+            )
+
+        self._init_db(fail_if_db_exists)
+
+    def _init_db(self, fail_if_exists: bool) -> None:
+        """Initialize SQLite storage schema with strict append-only tables."""
+        if fail_if_exists and self.db_path.exists():
+            raise FileExistsError(f"Execution DB {self.db_path} already exists. Append-only policy requires fresh DB.")
+
         self.db_path.parent.mkdir(exist_ok=True, parents=True)
         with sqlite3.connect(self.db_path) as conn:
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS stage5c_runs (
+                    run_id TEXT PRIMARY KEY,
+                    git_commit TEXT,
+                    manifest_sha256 TEXT,
+                    model_name TEXT,
+                    model_digest TEXT,
+                    ollama_version TEXT,
+                    timestamp REAL
+                )
+            """)
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS stage5c_calls (
                     call_id TEXT PRIMARY KEY,
@@ -211,25 +154,46 @@ class NeuralRevisionBridgeRunner:
                     condition TEXT,
                     prompt_text TEXT,
                     prompt_sha256 TEXT,
+                    request_payload_sha256 TEXT,
                     raw_response TEXT,
-                    parsed_status TEXT,
-                    parsed_answer TEXT,
-                    cited_facts TEXT,
-                    proposed_action TEXT,
-                    action_confidence REAL,
+                    status_model TEXT,
+                    answer_model TEXT,
+                    cited_facts_model TEXT,
+                    proposed_action_model TEXT,
+                    action_confidence_model REAL,
+                    status_runtime TEXT,
+                    answer_runtime TEXT,
+                    proposed_action_runtime TEXT,
+                    action_confidence_runtime REAL,
+                    acquisition_valid INTEGER,
                     expected_entitled INTEGER,
                     expected_oracle_answer TEXT,
                     is_correct_entitlement INTEGER,
                     is_correct_semantic_answer INTEGER,
-                    surviving_support TEXT,
-                    surviving_lineage TEXT,
+                    computed_surviving_support TEXT,
+                    computed_surviving_lineage TEXT,
                     lineage_authority REAL,
                     gate_verdict TEXT,
                     executed_action TEXT,
                     latency_ms REAL,
+                    replay_target_call_id TEXT,
+                    is_replay_exact_match INTEGER,
                     timestamp REAL
                 )
             """)
+            
+            run_id = f"RUN_5C_{int(time.time())}"
+            conn.execute("""
+                INSERT INTO stage5c_runs VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (
+                run_id,
+                self.git_commit,
+                self.manifest_sha256,
+                self.model_name,
+                self.model_digest,
+                self.ollama_version,
+                time.time(),
+            ))
             conn.commit()
 
     def parse_response(self, raw_resp: str) -> dict[str, Any]:
@@ -259,96 +223,146 @@ class NeuralRevisionBridgeRunner:
             }
 
     def run_all_calls(self, tau_gate: float = 0.5) -> list[NeuralRevisionBridgeOutput]:
-        """Execute all 32 calls in sequential order according to the manifest."""
+        """Execute all 32 calls in sequential order with live support enumeration & hash checking."""
         results: list[NeuralRevisionBridgeOutput] = []
+        call_outputs_by_id: dict[str, NeuralRevisionBridgeOutput] = {}
         acquisition_citations: dict[str, list[str]] = {}  # world_id -> cited_facts
+        acquisition_validity: dict[str, bool] = {}  # world_id -> bool
 
         for call_dict in self.manifest["calls"]:
             call_spec = Stage5CCallSpec(**call_dict)
             world = self.worlds[call_spec.world_id]
 
-            # 1. Determine Prompt Text
+            # 1. Epistemic Kernel Live Support Enumeration
+            active_facts = set(world.facts.keys()) - set(call_spec.invalidated_facts)
+            computed_s = enumerate_entitling_supports(world, active_facts)
+            
+            # Assert computed support matches manifest expected support
+            if computed_s != call_spec.expected_surviving_support:
+                raise AssertionError(
+                    f"Support enumeration discrepancy in call {call_spec.call_id}! "
+                    f"Computed: {computed_s}, Expected Oracle: {call_spec.expected_surviving_support}"
+                )
+
+            # Compute lineage projection S_L'(c)
+            if computed_s and call_spec.expected_entitled:
+                computed_l = project_lineage_support(computed_s, world.lineage_map).support_family_roots
+            else:
+                computed_l = []
+
+            # 2. Render Prompt & Verify Frozen Request Hashes
             if call_spec.phase == "acquisition":
                 prompt_text = render_acquisition_prompt(world)
-            elif call_spec.arm == "arm1_raw_neural":
-                prompt_text = render_arm1_raw_revision_prompt(world, call_spec.invalidated_facts)
-            elif call_spec.arm == "arm2_naive_reported":
-                # Arm 2 uses the acquisition citation as durable dependency
-                # We prompt the model as in Arm 1, but its logical entitlement is governed by R(c) intersection
+            elif call_spec.arm in ["arm1_raw_neural", "arm2_naive_reported"]:
                 prompt_text = render_arm1_raw_revision_prompt(world, call_spec.invalidated_facts)
             elif call_spec.arm == "arm3_gene_kernel":
-                prompt_text = render_arm3_minimal_support_prompt(world, call_spec.expected_surviving_support)
+                prompt_text = render_arm3_minimal_support_prompt(world, computed_s)
             elif call_spec.phase == "replay_canary":
-                # Replay canary uses target prompt
-                if call_spec.arm == "arm1_raw_neural":
+                if call_spec.arm in ["arm1_raw_neural", "arm2_naive_reported"]:
                     prompt_text = render_arm1_raw_revision_prompt(world, call_spec.invalidated_facts)
                 else:
-                    prompt_text = render_arm3_minimal_support_prompt(world, call_spec.expected_surviving_support)
+                    prompt_text = render_arm3_minimal_support_prompt(world, computed_s)
             else:
                 prompt_text = render_acquisition_prompt(world)
 
-            prompt_sha = hashlib.sha256(prompt_text.encode("utf-8")).hexdigest()
+            p_sha = hashlib.sha256(prompt_text.encode("utf-8")).hexdigest()
+            req_sha = compute_request_payload_hash(
+                model_name=self.model_name,
+                system_prompt=CANONICAL_SYSTEM_PROMPT,
+                user_prompt=prompt_text,
+            )
 
-            # 2. Invoke Model Client
+            # Assert request payload hash matches frozen manifest
+            if req_sha != call_spec.request_payload_sha256:
+                raise AssertionError(
+                    f"Request payload hash mismatch in call {call_spec.call_id}! "
+                    f"Actual: {req_sha}, Frozen: {call_spec.request_payload_sha256}"
+                )
+
+            # 3. Model Invocation
             t0 = time.perf_counter()
-            raw_response = self.client_fn(prompt_text)
+            raw_response = self.client_fn(CANONICAL_SYSTEM_PROMPT, prompt_text)
             latency_ms = (time.perf_counter() - t0) * 1000.0
 
-            # 3. Parse and Evaluate Output
+            # 4. Parse Model Output
             parsed = self.parse_response(raw_response)
+            m_status = parsed["status"]
+            m_answer = parsed["answer"]
+            m_cited = parsed["cited_facts"]
+            m_action = parsed["proposed_action"]
+            m_conf = parsed["action_confidence"]
 
-            # Record acquisition citation for Arm 2
+            # Phase 1: Track Acquisition Validity
             if call_spec.phase == "acquisition":
-                acquisition_citations[call_spec.world_id] = parsed["cited_facts"]
+                acquisition_citations[call_spec.world_id] = m_cited
+                is_valid = (
+                    m_status == "DETERMINABLE"
+                    and m_answer is not None
+                    and m_answer.strip().upper() == call_spec.expected_oracle_answer.strip().upper()
+                    and len(m_cited) > 0
+                )
+                acquisition_validity[call_spec.world_id] = is_valid
 
-            # Evaluate Entitlement and Arm 2 Invalidation
+            is_acq_valid = acquisition_validity.get(call_spec.world_id, True)
+
+            # 5. Determine Runtime Effective Outputs
             if call_spec.arm == "arm2_naive_reported":
                 acq_cited = acquisition_citations.get(call_spec.world_id, [])
                 naive_retracted = any(p in call_spec.invalidated_facts for p in acq_cited)
-                # Arm 2 retracts if any cited fact was invalidated
-                model_entitled = (parsed["status"] == "DETERMINABLE") and not naive_retracted
-                effective_status = "INDETERMINABLE" if naive_retracted else parsed["status"]
-                effective_answer = None if naive_retracted else parsed["answer"]
+                if naive_retracted:
+                    r_status = "INDETERMINABLE"
+                    r_answer = None
+                    r_action = None
+                    r_conf = 0.0
+                else:
+                    r_status = m_status
+                    r_answer = m_answer
+                    r_action = m_action
+                    r_conf = m_conf
             else:
-                model_entitled = (parsed["status"] == "DETERMINABLE")
-                effective_status = parsed["status"]
-                effective_answer = parsed["answer"]
+                r_status = m_status
+                r_answer = m_answer
+                r_action = m_action
+                r_conf = m_conf
 
-            # Dual-Oracle Ground Truth Match
-            is_correct_ent = (model_entitled == call_spec.expected_entitled)
+            # 6. Dual-Oracle Entitlement & Semantic Accuracy Evaluation
+            r_entitled = (r_status == "DETERMINABLE")
+            is_correct_ent = (r_entitled == call_spec.expected_entitled)
             if call_spec.expected_entitled:
-                is_correct_semantic = (
+                is_correct_sem = (
                     is_correct_ent
-                    and effective_answer is not None
-                    and effective_answer.strip().upper() == call_spec.expected_oracle_answer.strip().upper()
+                    and r_answer is not None
+                    and r_answer.strip().upper() == call_spec.expected_oracle_answer.strip().upper()
                 )
             else:
-                is_correct_semantic = (effective_status == "INDETERMINABLE" and effective_answer is None)
+                is_correct_sem = (r_status == "INDETERMINABLE" and r_answer is None)
 
-            # Lineage Authority & Action Gating
-            surviving_s = call_spec.expected_surviving_support
-            if surviving_s and call_spec.expected_entitled:
+            # 7. Lineage Authority & Deterministic Action Gating
+            if computed_s and call_spec.expected_entitled:
                 init_lin = project_lineage_support(world.initial_support_family, world.lineage_map)
-                surv_lin = project_lineage_support(surviving_s, world.lineage_map)
+                surv_lin = project_lineage_support(computed_s, world.lineage_map)
                 
-                kappa_init = init_lin.kappa_l
-                path_init = len(world.initial_support_family)
-                
-                kappa_ratio = surv_lin.kappa_l / max(1, kappa_init)
-                path_ratio = len(surv_lin.support_family_roots) / max(1, path_init)
+                kappa_ratio = surv_lin.kappa_l / max(1, init_lin.kappa_l)
+                path_ratio = len(surv_lin.support_family_roots) / max(1, len(world.initial_support_family))
                 auth_score = 0.5 * kappa_ratio + 0.5 * path_ratio
-                surviving_l = surv_lin.support_family_roots
             else:
-                surviving_l = []
                 auth_score = 0.0
 
-            # Action Gate Decision
-            if effective_status == "DETERMINABLE" and parsed["proposed_action"]:
+            if r_status == "DETERMINABLE" and r_action:
                 gate_verdict = "PERMIT" if auth_score >= tau_gate else "BLOCK"
-                executed_action = parsed["proposed_action"] if gate_verdict == "PERMIT" else None
+                executed_action = r_action if gate_verdict == "PERMIT" else None
             else:
                 gate_verdict = "N/A"
                 executed_action = None
+
+            # 8. Replay Canary Verification
+            is_replay_match = None
+            if call_spec.phase == "replay_canary" and call_spec.replay_target_call_id:
+                target = call_outputs_by_id.get(call_spec.replay_target_call_id)
+                if target:
+                    # Assert prompt hash exactness
+                    assert target.prompt_sha256 == p_sha
+                    is_replay_match = (target.raw_response.strip() == raw_response.strip())
 
             res = NeuralRevisionBridgeOutput(
                 call_id=call_spec.call_id,
@@ -358,35 +372,45 @@ class NeuralRevisionBridgeRunner:
                 arm=call_spec.arm,
                 condition=call_spec.condition,
                 prompt_text=prompt_text,
-                prompt_sha256=prompt_sha,
+                prompt_sha256=p_sha,
+                request_payload_sha256=req_sha,
                 raw_response=raw_response,
-                parsed_status=effective_status,
-                parsed_answer=effective_answer,
-                cited_facts=parsed["cited_facts"],
-                proposed_action=parsed["proposed_action"],
-                action_confidence=parsed["action_confidence"],
+                status_model=m_status,
+                answer_model=m_answer,
+                cited_facts_model=m_cited,
+                proposed_action_model=m_action,
+                action_confidence_model=m_conf,
+                status_runtime=r_status,
+                answer_runtime=r_answer,
+                proposed_action_runtime=r_action,
+                action_confidence_runtime=r_conf,
+                acquisition_valid=is_acq_valid,
                 expected_entitled=call_spec.expected_entitled,
                 expected_oracle_answer=call_spec.expected_oracle_answer,
                 is_correct_entitlement=is_correct_ent,
-                is_correct_semantic_answer=is_correct_semantic,
-                surviving_support=surviving_s,
-                surviving_lineage=surviving_l,
+                is_correct_semantic_answer=is_correct_sem,
+                computed_surviving_support=computed_s,
+                computed_surviving_lineage=computed_l,
                 lineage_authority=auth_score,
                 gate_verdict=gate_verdict,
                 executed_action=executed_action,
                 latency_ms=latency_ms,
+                replay_target_call_id=call_spec.replay_target_call_id,
+                is_replay_exact_match=is_replay_match,
             )
+
             results.append(res)
+            call_outputs_by_id[res.call_id] = res
             self._save_call_to_db(res)
 
         return results
 
     def _save_call_to_db(self, r: NeuralRevisionBridgeOutput) -> None:
-        """Persist individual evaluation to SQLite."""
+        """Persist individual evaluation to SQLite using strict append-only INSERT."""
         with sqlite3.connect(self.db_path) as conn:
             conn.execute("""
-                INSERT OR REPLACE INTO stage5c_calls VALUES (
-                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                INSERT INTO stage5c_calls VALUES (
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
                 )
             """, (
                 r.call_id,
@@ -397,22 +421,30 @@ class NeuralRevisionBridgeRunner:
                 r.condition,
                 r.prompt_text,
                 r.prompt_sha256,
+                r.request_payload_sha256,
                 r.raw_response,
-                r.parsed_status,
-                r.parsed_answer,
-                json.dumps(r.cited_facts),
-                r.proposed_action,
-                r.action_confidence,
+                r.status_model,
+                r.answer_model,
+                json.dumps(r.cited_facts_model),
+                r.proposed_action_model,
+                r.action_confidence_model,
+                r.status_runtime,
+                r.answer_runtime,
+                r.proposed_action_runtime,
+                r.action_confidence_runtime,
+                1 if r.acquisition_valid else 0,
                 1 if r.expected_entitled else 0,
                 r.expected_oracle_answer,
                 1 if r.is_correct_entitlement else 0,
                 1 if r.is_correct_semantic_answer else 0,
-                json.dumps(r.surviving_support),
-                json.dumps(r.surviving_lineage),
+                json.dumps(r.computed_surviving_support),
+                json.dumps(r.computed_surviving_lineage),
                 r.lineage_authority,
                 r.gate_verdict,
                 r.executed_action,
                 r.latency_ms,
+                r.replay_target_call_id,
+                1 if r.is_replay_exact_match is True else (0 if r.is_replay_exact_match is False else None),
                 time.time(),
             ))
             conn.commit()

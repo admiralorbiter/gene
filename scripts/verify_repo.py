@@ -43,14 +43,18 @@ def verify_atlas_sync() -> None:
 
 
 def verify_clean_worktree() -> None:
-    print("--> Checking git worktree status...")
-    res = subprocess.run(["git", "diff", "--name-only"], cwd=root_dir, capture_output=True, text=True)
-    if res.stdout.strip():
-        print(f"INFO: Worktree has {len(res.stdout.strip().splitlines())} unstaged modified files.")
-        for f in res.stdout.strip().splitlines()[:10]:
-            print(f"  - {f}")
+    print("--> Checking git worktree status (git status --porcelain)...")
+    res = subprocess.run(["git", "status", "--porcelain"], cwd=root_dir, capture_output=True, text=True)
+    out = res.stdout.strip()
+    if out:
+        lines = out.splitlines()
+        print(f"FAILED: Worktree has {len(lines)} dirty / untracked files:")
+        for line in lines[:15]:
+            print(f"  {line}")
+        print("\nERROR: Verification failed due to uncommitted or untracked worktree drift.")
+        sys.exit(1)
     else:
-        print("PASSED: Worktree tracked files have zero diff.\n")
+        print("PASSED: Worktree is 100% clean with zero drift.\n")
 
 
 def main() -> None:
