@@ -52,6 +52,7 @@ def main() -> None:
     raw_calls_file = Path("data/r8_stage8b_r1_raw_calls.jsonl")
     db_file = Path("runs/r8_stage8b_r1_candidate_generation.db")
     summary_file = Path("data/r8_stage8b_r1_summary.json")
+    manifest_file = Path("data/r8_stage8b_r1_evidence_manifest.json")
 
     violations: list[str] = []
 
@@ -61,6 +62,8 @@ def main() -> None:
         violations.append(f"Missing SQLite run DB: {db_file}")
     if not summary_file.exists():
         violations.append(f"Missing summary JSON: {summary_file}")
+    if not manifest_file.exists():
+        violations.append(f"Missing evidence manifest JSON: {manifest_file}")
 
     if violations:
         print("\nCONTRACT VERIFICATION FAILED (Missing Artifacts):")
@@ -68,9 +71,17 @@ def main() -> None:
             print(f"  - [VIOLATION] {v}")
         sys.exit(1)
 
-    # 1. Parse Summary JSON
+    # 1. Parse Summary JSON & Evidence Manifest
     with open(summary_file, encoding="utf-8") as f:
         canonical_summary = json.load(f)
+
+    with open(manifest_file, encoding="utf-8") as f:
+        evidence_manifest = json.load(f)
+
+    expected_digest = canonical_summary["model_digest"]
+    manifest_digest = evidence_manifest.get("model_digest")
+    if manifest_digest != expected_digest:
+        violations.append(f"Manifest model digest ({manifest_digest}) does not match canonical summary ({expected_digest})")
 
     # 2. Parse Raw Calls JSONL
     raw_calls = []
@@ -92,10 +103,13 @@ def main() -> None:
     if len(raw_calls) != 145:
         violations.append(f"Total live calls must be 145 (15 Dev + 100 Multi-Doc Eval + 30 Collision), observed {len(raw_calls)}")
 
-    # Audit Raw LLM Completion Success
+    # Audit Raw LLM Completion Success and Model Digest Consistency
     for idx, c in enumerate(raw_calls):
         if not c.get("call_succeeded", False):
             violations.append(f"Raw call {idx} ({c.get('call_id')}) failed model invocation: {c.get('failure_reason')}")
+        call_digest = c.get("model_digest")
+        if call_digest != expected_digest:
+            violations.append(f"Raw call {idx} model digest ({call_digest}) != expected summary digest ({expected_digest})")
 
     # 3. Reconstruct Immutable Benchmark Environment & Canonical Ontology
     dev_worlds, eval_worlds, collision_worlds = generate_stage8b_r1_benchmark_worlds()
