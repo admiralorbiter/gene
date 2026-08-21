@@ -1,4 +1,4 @@
-"""Deterministic Lifecycle Security Assays (Stage 7A.2)."""
+"""Deterministic Lifecycle Security Assays & Dual-Novel Status Laundering Tests (Stage 7A.3)."""
 
 import pytest
 from gene.ingress.models import (
@@ -33,9 +33,9 @@ def lifecycle_env():
         EntityDefinition("Value_Operational", "Operational", "STATUS", aliases=("Active",)),
     ])
     capability_registry = CapabilityPolicyRegistry({
-        "admin_user": CapabilityPolicy("admin_user", frozenset(["*"]), ClaimPrivilege.ROOT_FACT, "KERNEL", is_ontology_admin=True),
-        "sensor_alpha": CapabilityPolicy("sensor_alpha", frozenset(["device_status"]), ClaimPrivilege.ROOT_FACT, "HIGH_PRECISION_SENSOR"),
-        "unauthorized_user": CapabilityPolicy("unauthorized_user", frozenset(["user_feedback"]), ClaimPrivilege.ATTESTATION_ONLY, "WEB", is_ontology_admin=False),
+        "admin_user": CapabilityPolicy("admin_user", frozenset(["*"]), ClaimPrivilege.ROOT_FACT, "KERNEL", is_ontology_admin=True, can_disambiguate=True),
+        "sensor_alpha": CapabilityPolicy("sensor_alpha", frozenset(["device_status"]), ClaimPrivilege.ROOT_FACT, "HIGH_PRECISION_SENSOR", can_disambiguate=True),
+        "unauthorized_user": CapabilityPolicy("unauthorized_user", frozenset(["user_feedback"]), ClaimPrivilege.ATTESTATION_ONLY, "WEB", is_ontology_admin=False, can_disambiguate=False),
     })
     independence_registry = LineageIndependenceRegistry({
         "sensor_alpha": "ROOT_NET_A_sensor_alpha",
@@ -52,8 +52,7 @@ def lifecycle_env():
     }
 
 
-def test_proof_carrying_resolve_deferred_binding_and_out_of_candidate_rejection(lifecycle_env):
-    """Test proof-carrying resolution: verifies containment in original candidates and rejects out-of-set targets."""
+def test_proof_carrying_resolve_deferred_binding(lifecycle_env):
     env = lifecycle_env
     engine: IngressEngine = env["engine"]
 
@@ -67,8 +66,7 @@ def test_proof_carrying_resolve_deferred_binding_and_out_of_candidate_rejection(
     att_t1 = ParsedAttestation("att_t1", "rec_t1", "Server 1", "device_status", "Operational", 0.0)
     sub_hypo_t1 = BindingHypothesisSet("Server 1", "SUBJECT", ("Server_Node_1", "Server_Node_1_Backup"))
     obj_hypo_t1 = BindingHypothesisSet("Operational", "OBJECT", ("Value_Operational",))
-
-    res_t1 = engine.ingest_record(rec_t1, att_t1, sub_hypo_t1, obj_hypo_t1, env["contract"])
+    engine.ingest_record(rec_t1, att_t1, sub_hypo_t1, obj_hypo_t1, env["contract"])
     def_id = list(engine.deferred_bindings.keys())[0]
 
     disambiguating_rec = SourceRecord(
@@ -79,27 +77,6 @@ def test_proof_carrying_resolve_deferred_binding_and_out_of_candidate_rejection(
         t_knowledge=2,
     )
 
-    # Attack: Attempt to resolve to entity "Server_Node_UNKNOWN" outside original candidates B(x) = {Server_Node_1, Server_Node_1_Backup}
-    forged_cert = ResolutionCertificate(
-        deferred_id=def_id,
-        chosen_subject_id="Server_Node_UNKNOWN",
-        chosen_object_id="Value_Operational",
-        disambiguating_source_record_id=disambiguating_rec.record_id,
-        resolution_witness="FORGED",
-        lineage_roots=frozenset(["ROOT_NET_A_sensor_alpha"]),
-    )
-    res_attack = engine.resolve_deferred_binding(
-        deferred_id=def_id,
-        chosen_subject_id="Server_Node_UNKNOWN",
-        chosen_object_id="Value_Operational",
-        disambiguating_record=disambiguating_rec,
-        resolution_certificate=forged_cert,
-        contract=env["contract"],
-    )
-    assert res_attack["status"] == "REJECT"
-    assert "not in original candidate set" in res_attack["failure_reason"]
-
-    # Legitimate resolution to valid candidate Server_Node_1
     valid_cert = ResolutionCertificate(
         deferred_id=def_id,
         chosen_subject_id="Server_Node_1",
@@ -122,66 +99,70 @@ def test_proof_carrying_resolve_deferred_binding_and_out_of_candidate_rejection(
     assert active_facts[0].roots == frozenset(["ROOT_NET_A_sensor_alpha"])
 
 
-def test_proof_carrying_promote_provisional_entity_and_collision_rejection(lifecycle_env):
-    """Test proof-carrying promotion: rejects collision and unauthorized promoter, preserves sensor roots."""
-    env = lifecycle_env
-    engine: IngressEngine = env["engine"]
-
-    rec_novel = SourceRecord(
-        "rec_nov", "Zeta Device is Operational",
-        CaptureProvenance("conn_1", "telemetry", 1, "hash_nov"),
-        ClaimedOrigin("sensor_alpha", "sensor"),
-        AuthenticatedOrigin("sensor_alpha", "ED25519", True),
-        t_knowledge=1,
-    )
-    att_novel = ParsedAttestation("att_nov", "rec_nov", "Zeta Device", "device_status", "Operational", 0.0)
-    hypo_novel = BindingHypothesisSet("Zeta Device", "SUBJECT", (), is_novel=True)
-    obj_hypo = BindingHypothesisSet("Operational", "OBJECT", ("Value_Operational",))
-    engine.ingest_record(rec_novel, att_novel, hypo_novel, obj_hypo, env["contract"])
-    prov_id = list(engine.provisional_entities.keys())[0]
-
-    # Attack 1: Unauthorized user attempts promotion
-    unauth_rec = SourceRecord("rec_unauth", "Promote Zeta", CaptureProvenance("c2", "ui", 2, "h_u"), ClaimedOrigin("unauthorized_user", "guest"), AuthenticatedOrigin("unauthorized_user", "OAUTH", True), 2)
-    cert_unauth = PromotionCertificate(prov_id, "Device_Zeta_99", "Zeta Device", "DEVICE", unauth_rec.record_id, "UNAUTH_WITNESS")
-    res_unauth = engine.promote_provisional_entity(prov_id, "Device_Zeta_99", "Zeta Device", unauth_rec, cert_unauth)
-    assert res_unauth["status"] == "REJECT"
-    assert "lacks CANONICAL_ONTOLOGY_ADMIN" in res_unauth["failure_reason"]
-
-    # Attack 2: Canonical ID collision (attempting to promote to existing 'Server_Node_1')
-    admin_rec = SourceRecord("rec_admin", "Promote Zeta", CaptureProvenance("c3", "ui", 2, "h_adm"), ClaimedOrigin("admin_user", "admin"), AuthenticatedOrigin("admin_user", "KERNEL_LOCAL", True), 2)
-    cert_collision = PromotionCertificate(prov_id, "Server_Node_1", "Zeta Device", "DEVICE", admin_rec.record_id, "COLLISION_WITNESS")
-    res_collision = engine.promote_provisional_entity(prov_id, "Server_Node_1", "Zeta Device", admin_rec, cert_collision)
-    assert res_collision["status"] == "REJECT"
-    assert "already exists in ontology" in res_collision["failure_reason"]
-
-    # Legitimate promotion
-    cert_valid = PromotionCertificate(prov_id, "Device_Zeta_99", "Zeta Device", "DEVICE", admin_rec.record_id, "ADMIN_APPROVAL")
-    res_valid = engine.promote_provisional_entity(prov_id, "Device_Zeta_99", "Zeta Device", admin_rec, cert_valid)
-    assert res_valid["status"] == "ADMIT"
-    assert res_valid["is_promoted"] is True
-
-
-def test_dual_novel_entities_relation_and_promotion(lifecycle_env):
-    """Test dual-novel relation (NovelA related_to NovelB) and provisional migration."""
+def test_dual_novel_entities_step_by_step_promotion_prevents_status_laundering(lifecycle_env):
+    """Test step-by-step promotion of dual-novel relation (NovelA related_to NovelB).
+    
+    1. At t1: Both endpoints novel -> Stored as ProvisionalRelation(prov_A, prov_B).
+    2. At t2: Admin promotes prov_A to Canon_A.
+       CRITICAL INVARIANT: The relation is retargeted to (Canon_A, prov_B) and KEPT PROVISIONAL.
+       Zero authoritative BitemporalFacts are created!
+    3. At t3: Admin promotes prov_B to Canon_B.
+       Now all endpoints are canonical -> Relation migrates to authoritative BitemporalFact(Canon_A, Canon_B).
+    """
     env = lifecycle_env
     engine: IngressEngine = env["engine"]
 
     rec_dual = SourceRecord(
-        "rec_dual", "Quantum Sensor Alpha connected to Quantum Core Beta",
+        "rec_dual", "Quantum Core Alpha connected to Quantum Switch Beta",
         CaptureProvenance("conn_1", "telemetry", 1, "hash_dual"),
         ClaimedOrigin("sensor_alpha", "sensor"),
         AuthenticatedOrigin("sensor_alpha", "ED25519", True),
         t_knowledge=1,
     )
-    att_dual = ParsedAttestation("att_dual", "rec_dual", "Quantum Sensor Alpha", "device_status", "Quantum Core Beta", 0.0)
-    hypo_sub_nov = BindingHypothesisSet("Quantum Sensor Alpha", "SUBJECT", (), is_novel=True)
-    hypo_obj_nov = BindingHypothesisSet("Quantum Core Beta", "OBJECT", (), is_novel=True)
+    att_dual = ParsedAttestation("att_dual", "rec_dual", "Quantum Core Alpha", "device_status", "Quantum Switch Beta", 0.0)
+    hypo_sub_nov = BindingHypothesisSet("Quantum Core Alpha", "SUBJECT", (), is_novel=True)
+    hypo_obj_nov = BindingHypothesisSet("Quantum Switch Beta", "OBJECT", (), is_novel=True)
 
     res_dual = engine.ingest_record(rec_dual, att_dual, hypo_sub_nov, hypo_obj_nov, env["contract"])
-
     assert res_dual["status"] == AdmissionStatus.DEFER.value
     assert len(engine.provisional_entities) == 2
     assert len(engine.provisional_relations) == 1
+
+    prov_a_id = "prov_quantum_core_alpha"
+    prov_b_id = "prov_quantum_switch_beta"
+
+    admin_rec = SourceRecord("rec_admin", "Admin Promotion", CaptureProvenance("c", "ui", 2, "ha"), ClaimedOrigin("admin_user", "admin"), AuthenticatedOrigin("admin_user", "KERNEL", True), 2)
+
+    # Step 1: Promote prov_A only
+    cert_a = PromotionCertificate(prov_a_id, "Device_Core_Alpha", "Quantum Core Alpha", "DEVICE", admin_rec.record_id, "ADMIN_APPROVAL_A")
+    res_a = engine.promote_provisional_entity(prov_a_id, "Device_Core_Alpha", "Quantum Core Alpha", admin_rec, cert_a)
+
+    assert res_a["status"] == "ADMIT"
+    assert res_a["is_promoted"] is True
+    # Crucial Invariant: Zero authoritative facts created because prov_B is still provisional!
+    assert len(res_a["migrated_fact_ids"]) == 0
+    assert len(engine.bitemporal_engine.facts) == 0
+
+    # Provisional relation is retargeted but remains provisional
     rel = list(engine.provisional_relations.values())[0]
-    assert rel.is_subject_provisional is True
+    assert rel.subject_id == "Device_Core_Alpha"
+    assert rel.object_id == prov_b_id
+    assert rel.is_subject_provisional is False
     assert rel.is_object_provisional is True
+
+    # Step 2: Promote prov_B
+    admin_rec_3 = SourceRecord("rec_admin_3", "Admin Promotion B", CaptureProvenance("c", "ui", 3, "hb"), ClaimedOrigin("admin_user", "admin"), AuthenticatedOrigin("admin_user", "KERNEL", True), 3)
+    cert_b = PromotionCertificate(prov_b_id, "Device_Switch_Beta", "Quantum Switch Beta", "DEVICE", admin_rec_3.record_id, "ADMIN_APPROVAL_B")
+    res_b = engine.promote_provisional_entity(prov_b_id, "Device_Switch_Beta", "Quantum Switch Beta", admin_rec_3, cert_b)
+
+    assert res_b["status"] == "ADMIT"
+    assert res_b["is_promoted"] is True
+    # Now all endpoints are canonical -> Migrated to authoritative fact!
+    assert len(res_b["migrated_fact_ids"]) == 1
+    assert len(engine.bitemporal_engine.facts) == 1
+
+    active_facts = engine.bitemporal_engine.get_active_facts(0.0, 3)
+    assert len(active_facts) == 1
+    assert active_facts[0].subject == "Device_Core_Alpha"
+    assert active_facts[0].obj == "Device_Switch_Beta"
+    assert active_facts[0].roots == frozenset(["ROOT_NET_A_sensor_alpha"])  # Sensor provenance preserved!

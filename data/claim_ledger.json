@@ -424,22 +424,24 @@
     {
       "claim_id": "GENE-C16",
       "claim_status": "formally_specified_and_deterministically_demonstrated",
-      "headline": "Proof-Carrying Epistemic Ingress, Lifecycle Escalation, and Orthogonal Ingress Integrity",
-      "claim_text": "An epistemic ingress representation must preserve enough information to distinguish unresolved alternatives whenever future interventions can produce different responses under the supported runtime intervention class. Candidate ambiguity (B(x) = {b_1, ..., b_k}) and novel entities must be preserved under DEFERRED_BINDING and PROVISIONAL_ENTITY rather than collapsed to Top-1. In a 120-world stateful factorial benchmark (480 probe evaluations), blind write baselines (A0/A1) suffered 71.4% False Durable Admission Rate (FDAR) (100% on authorized collisions, 100% on resolved unauthorized claims). Candidate-aware only (A2) eliminated ambiguity collapse but suffered 100.0% conditional authority FDAR (36/36). Authority-aware only (A3) eliminated unauthorized promotion but collapsed 100.0% of authorized candidate collisions (12/12). Full proof-carrying GENE Ingress (A4) achieved 100.0% WorldPass rate (120/120), FDAR = 0.0%, SAC = 100.0%, and UPR = 100.0%. Furthermore, proof-carrying lifecycle gates (ResolutionCertificate, PromotionCertificate) guarantee candidate set containment, collision prevention, and origin provenance preservation across subsequent epistemic privilege elevations.",
+      "headline": "Proof-Carrying Epistemic Ingress, Lifecycle Privilege Escalation, and Orthogonal Ingress Integrity",
+      "claim_text": "An epistemic ingress representation must preserve enough information to distinguish unresolved alternatives whenever future interventions can produce different responses under the supported runtime intervention class. Candidate ambiguity (B(x) = {b_1, ..., b_k}) and novel entities must be preserved under DEFERRED_BINDING and PROVISIONAL_ENTITY rather than collapsed to Top-1. In a 120-world stateful factorial benchmark (480 probe evaluations), blind write baselines (A0/A1) suffered 71.4% False Durable Admission Rate (FDAR) (100% on authorized collisions, 100% on resolved unauthorized claims). Candidate-aware only (A2) eliminated ambiguity collapse but suffered 100.0% conditional authority FDAR (36/36). Authority-aware only (A3) eliminated unauthorized promotion but collapsed 100.0% of authorized candidate collisions (12/12). Full proof-carrying GENE Ingress (A4) achieved 100.0% WorldPass rate (120/120), FDAR = 0.0%, SAC = 100.0%, and UPR = 100.0%. Furthermore, proof-carrying lifecycle gates (ResolutionCertificate, PromotionCertificate) guarantee candidate set containment, collision prevention, dual-novel status laundering prevention, and origin provenance preservation across subsequent epistemic privilege elevations.",
       "evidence_sources": [
         {
-          "experiment": "Exploration Round 7 Stage 7A (Proof-Carrying Epistemic Ingress Benchmark)",
-          "evidence_class": "deterministic_zero_live_llm",
-          "artifact": "data/exploration_round7_stage7a_benchmark_summary.json",
-          "artifact_sha256": "60f82439f9863cd1f680a549c3afc1f5c51a8c8fd7a60c0192b77129086b8194",
-          "execution_commit": "round7-stage7a2-security-freeze",
-          "git_tracked": true,
-          "model": "None (Deterministic Ingress Engine)",
-          "n_calls": 0,
-          "n_evaluations": 480,
-          "unit_of_analysis": "case",
-          "formal_report": "docs/results/EXPLORATION_ROUND7_STAGE7A_REPORT.md",
-          "primary_metric": "WorldPass: A0 58.3% (70/120), A1 58.3% (70/120), A2 75.0% (90/120), A3 91.7% (110/120), A4 100.0% (120/120); Global FDAR: A0/A1 71.4%, A2 42.9%, A3 14.3%, A4 0.0%; Cond FDAR: A2_auth|res 100% (36/36), A3_ambig|auth 100% (12/12); SAC: 100.0%; UPR: 100.0%"
+          "source_type": "DETERMINISTIC_BENCHMARK",
+          "execution_commit": "round7-stage7a3-final-closure",
+          "artifact_path": "data/exploration_round7_stage7a_benchmark_summary.json",
+          "artifact_sha256": "6b76513256987f470797e6365fb0dd8b86d79611599b663a0d93aeb44c0f4731",
+          "primary_metric": "WorldPass: A0 58.3% (70/120), A1 58.3% (70/120), A2 75.0% (90/120), A3 91.7% (110/120), A4 100.0% (120/120); Global FDAR: A0/A1 71.4%, A2 42.9%, A3 14.3%, A4 0.0%; Cond FDAR: A2_auth|res 100% (36/36), A3_ambig|auth 100% (12/12); SAC: 100.0%; UPR: 100.0%",
+          "formal_report": "docs/results/EXPLORATION_ROUND7_STAGE7A_REPORT.md"
+        },
+        {
+          "source_type": "SECURITY_LIFECYCLE_ASSAY",
+          "execution_commit": "round7-stage7a3-final-closure",
+          "artifact_path": "data/exploration_round7_stage7a_security_summary.json",
+          "artifact_sha256": "ae4e861a951543175709e8d77a6d53e7aaeb0a4a29983933decc363eba8d2134",
+          "primary_metric": "Adversarial mutation fail-closed: 14/14 (100.0%); Probe separation: 8/8 worlds non-monotonically decoupled (Q1, Q2, Q3, Q4); Dual-novel status laundering prevention verified.",
+          "formal_report": "docs/results/EXPLORATION_ROUND7_STAGE7A_REPORT.md"
         }
       ],
       "scope_limitations": "Evaluated across 120 balanced synthetic worlds spanning 4 predicate modes, 5 binding conditions, 3 temporal relations, and 2 source role forms.",

@@ -88,7 +88,6 @@ class IngressEngine:
 
         self.certificates[source_record.record_id] = cert
 
-        # For proof-carrying policies (e.g. A4), verify certificate independently
         if isinstance(self.policy, A4FullGENEIngressPolicy):
             is_valid, failure_msg = CertificateVerifier.verify(
                 source_record=source_record,
@@ -117,7 +116,6 @@ class IngressEngine:
                     "failure_reason": failure_msg,
                 }
 
-        # Handle admission action
         events: list[TemporalEvent] = []
         if cert.status == AdmissionStatus.ADMIT and obs is not None:
             fid = f"fact_{source_record.record_id}"
@@ -176,14 +174,7 @@ class IngressEngine:
         resolution_certificate: ResolutionCertificate,
         contract: Optional[PredicateContract] = None,
     ) -> dict[str, Any]:
-        """Resolve an existing DeferredBinding under proof-carrying evidence.
-        
-        SECURITY INVARIANTS:
-        1. chosen_subject_id in deferred.subject_hypotheses.candidate_entity_ids
-        2. chosen_object_id in deferred.object_hypotheses.candidate_entity_ids
-        3. Independently verified via CertificateVerifier.verify_resolution()
-        4. Preserves original SourceRecord capture provenance roots without manufacturing arbitrary roots.
-        """
+        """Resolve an existing DeferredBinding under proof-carrying evidence."""
         if deferred_id not in self.deferred_bindings:
             raise KeyError(f"DeferredBinding '{deferred_id}' not found in store.")
 
@@ -191,7 +182,7 @@ class IngressEngine:
         if deferred.is_resolved:
             raise ValueError(f"DeferredBinding '{deferred_id}' is already resolved.")
 
-        # Store disambiguating source record
+        original_source_rec = self.source_records[deferred.source_record_id]
         self.source_records[disambiguating_record.record_id] = disambiguating_record
 
         # 1. Independent Certificate Verification for Resolution
@@ -200,6 +191,7 @@ class IngressEngine:
             chosen_subject_id=chosen_subject_id,
             chosen_object_id=chosen_object_id,
             disambiguating_record=disambiguating_record,
+            original_source_record=original_source_rec,
             capability_registry=self.capability_registry,
             ontology=self.ontology,
             certificate=resolution_certificate,
@@ -213,7 +205,6 @@ class IngressEngine:
                 "failure_reason": msg,
             }
 
-        original_source_rec = self.source_records[deferred.source_record_id]
         orig_ctx = derive_trusted_source_context(original_source_rec, self.capability_registry, self.independence_registry)
 
         obs = Observation(
@@ -246,7 +237,6 @@ class IngressEngine:
         for ev in events:
             self.bitemporal_engine.record_event(ev)
 
-        # Mark deferred binding resolved
         self.deferred_bindings[deferred_id] = DeferredBinding(
             deferred_id=deferred.deferred_id,
             source_record_id=deferred.source_record_id,
@@ -284,12 +274,10 @@ class IngressEngine:
     ) -> dict[str, Any]:
         """Promote a ProvisionalEntity to canonical status under proof-carrying authority.
         
-        SECURITY INVARIANTS:
-        1. Independently verified via CertificateVerifier.verify_promotion()
-        2. No canonical ID collision with existing ontology
-        3. Promotion authority authenticated and holds CANONICAL_ONTOLOGY_ADMIN capability
-        4. Underlying provisional relations from ATTESTATION_ONLY sources cannot become root facts
-        5. Retargets relations where subject, object, or BOTH were provisional.
+        CRITICAL DUAL-NOVEL STATUS LAUNDERING FIX:
+        When promoting entity A, relations involving A and another STILL-PROVISIONAL entity B
+        are retargeted to (canonical_A, pred, provisional_B) and KEPT PROVISIONAL.
+        They migrate to authoritative BitemporalFacts ONLY when ALL endpoints are canonical!
         """
         if provisional_id not in self.provisional_entities:
             raise KeyError(f"ProvisionalEntity '{provisional_id}' not found in store.")
@@ -300,7 +288,6 @@ class IngressEngine:
 
         self.source_records[promotion_authority_record.record_id] = promotion_authority_record
 
-        # Find associated provisional relations
         associated_rels = [
             rel for rel in self.provisional_relations.values()
             if rel.subject_id == provisional_id or rel.object_id == provisional_id
@@ -311,6 +298,7 @@ class IngressEngine:
             provisional=prov_ent,
             canonical_entity_id=canonical_entity_id,
             canonical_name=canonical_name,
+            entity_type=entity_type,
             promotion_authority_record=promotion_authority_record,
             capability_registry=self.capability_registry,
             ontology=self.ontology,
@@ -336,43 +324,66 @@ class IngressEngine:
         )
         self.ontology.register_entity(canonical_def)
 
-        # 3. Migrate associated ProvisionalRelations into authoritative BitemporalFacts
+        # 3. Retarget and migrate associated ProvisionalRelations
         migrated_facts: list[str] = []
         for rel in associated_rels:
+            # Determine retargeted IDs
             sub = canonical_entity_id if rel.subject_id == provisional_id else rel.subject_id
             obj = canonical_entity_id if rel.object_id == provisional_id else rel.object_id
-            orig_rec = self.source_records[rel.source_record_id]
 
-            obs = Observation(
-                subject=sub,
-                predicate=rel.predicate,
-                obj=obj,
-                t_valid_start=rel.t_valid_start,
-                t_valid_end=rel.t_valid_end,
-                t_knowledge=promotion_authority_record.t_knowledge,
-                source_id=orig_rec.claimed_origin.claimed_source_name,
-                origin_id=orig_rec.authenticated_origin.verified_id,
-                lineage_roots=rel.lineage_roots,  # Original provenance root preserved!
-                observation_id=f"obs_mig_{rel.relation_id}",
-            )
+            sub_prov = False if rel.subject_id == provisional_id else rel.is_subject_provisional
+            obj_prov = False if rel.object_id == provisional_id else rel.is_object_provisional
 
-            p_contract = contract or PredicateContract(predicate=rel.predicate, cardinality="SINGLE", temporal_mode="TIME_VARYING")
-            fid = f"fact_prom_{rel.relation_id}"
-            b_fact = BitemporalFact(
-                fact_id=fid,
-                subject=obs.subject,
-                predicate=obs.predicate,
-                obj=obs.obj,
-                roots=obs.lineage_roots,
-                source_id=obs.source_id,
-                origin_id=obs.origin_id,
-            )
-            self.bitemporal_engine.register_fact(b_fact)
-            evs = adjudicate_observation(obs=obs, engine=self.bitemporal_engine, contract=p_contract, new_fact_id=fid)
-            for ev in evs:
-                self.bitemporal_engine.record_event(ev)
+            # If both endpoints are now canonical, migrate to authoritative fact!
+            if not sub_prov and not obj_prov:
+                orig_rec = self.source_records[rel.source_record_id]
+                obs = Observation(
+                    subject=sub,
+                    predicate=rel.predicate,
+                    obj=obj,
+                    t_valid_start=rel.t_valid_start,
+                    t_valid_end=rel.t_valid_end,
+                    t_knowledge=promotion_authority_record.t_knowledge,
+                    source_id=orig_rec.claimed_origin.claimed_source_name,
+                    origin_id=orig_rec.authenticated_origin.verified_id,
+                    lineage_roots=rel.lineage_roots,  # Original provenance root preserved!
+                    observation_id=f"obs_mig_{rel.relation_id}",
+                )
 
-            migrated_facts.append(fid)
+                p_contract = contract or PredicateContract(predicate=rel.predicate, cardinality="SINGLE", temporal_mode="TIME_VARYING")
+                fid = f"fact_prom_{rel.relation_id}"
+                b_fact = BitemporalFact(
+                    fact_id=fid,
+                    subject=obs.subject,
+                    predicate=obs.predicate,
+                    obj=obs.obj,
+                    roots=obs.lineage_roots,
+                    source_id=obs.source_id,
+                    origin_id=obs.origin_id,
+                )
+                self.bitemporal_engine.register_fact(b_fact)
+                evs = adjudicate_observation(obs=obs, engine=self.bitemporal_engine, contract=p_contract, new_fact_id=fid)
+                for ev in evs:
+                    self.bitemporal_engine.record_event(ev)
+
+                migrated_facts.append(fid)
+                # Remove migrated relation from provisional store
+                if rel.relation_id in self.provisional_relations:
+                    del self.provisional_relations[rel.relation_id]
+            else:
+                # Still has at least one provisional endpoint -> Update provisional relation in place!
+                self.provisional_relations[rel.relation_id] = ProvisionalRelation(
+                    relation_id=rel.relation_id,
+                    subject_id=sub,
+                    predicate=rel.predicate,
+                    object_id=obj,
+                    t_valid_start=rel.t_valid_start,
+                    t_valid_end=rel.t_valid_end,
+                    source_record_id=rel.source_record_id,
+                    is_subject_provisional=sub_prov,
+                    is_object_provisional=obj_prov,
+                    lineage_roots=rel.lineage_roots,
+                )
 
         # 4. Mark provisional entity as promoted
         self.provisional_entities[provisional_id] = ProvisionalEntity(

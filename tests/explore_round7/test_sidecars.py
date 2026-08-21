@@ -1,4 +1,4 @@
-"""Tests for Round 7 Ingress Sidecars (Stage 7A.2)."""
+"""Tests for Round 7 Ingress Sidecars (Stage 7A.3)."""
 
 from gene.benchmarks.ingress_sidecars.candidate_miss import run_candidate_miss_assay
 from gene.benchmarks.ingress_sidecars.role_distractor import run_role_distractor_assay
@@ -27,8 +27,10 @@ def test_live_counterbalancing_schedule():
     assert len(schedule) == 16
 
 
-def test_probe_separation_sidecar():
+def test_probe_separation_8_worlds_sidecar():
     res = run_probe_separation_assay()
+    assert res["n_worlds"] == 8
     assert res["has_decoupled_governance"] is True
     assert res["has_decoupled_premise"] is True
     assert res["has_decoupled_causal"] is True
+    assert res["has_redundant_rescue"] is True

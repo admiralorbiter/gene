@@ -32,6 +32,7 @@ class CapabilityPolicy:
     max_claim_privilege: ClaimPrivilege = ClaimPrivilege.ROOT_FACT
     reliability_class: str = "HIGH_PRECISION_SENSOR"
     is_ontology_admin: bool = False
+    can_disambiguate: bool = True
 
 
 class CapabilityPolicyRegistry:
@@ -76,6 +77,14 @@ class CapabilityPolicyRegistry:
         pol = self.get_policy(verified_id)
         return pol.is_ontology_admin if pol else False
 
+    def can_disambiguate(self, verified_id: str, predicate: str) -> bool:
+        pol = self.get_policy(verified_id)
+        if not pol:
+            return False
+        if not pol.can_disambiguate:
+            return False
+        return predicate in pol.authorized_predicates or "*" in pol.authorized_predicates
+
 
 class LineageIndependenceRegistry:
     """Pure registry mapping authenticated origins to defensible independence classes.
@@ -93,7 +102,7 @@ class LineageIndependenceRegistry:
         self._mappings[verified_id] = independence_class
 
     def get_independence_class(self, verified_id: str) -> str:
-        return self._mappings.get(verified_id, f"ROOT_UNVERIFIED_INDEPENDENCE_{verified_id}")
+        return self._mappings.get(verified_id, f"ROOT_UNKNOWN_INDEPENDENCE_{verified_id}")
 
 
 def derive_trusted_source_context(
@@ -104,6 +113,9 @@ def derive_trusted_source_context(
     """Derive authentic TrustedSourceContext from platform record and principal capability policy.
     
     Enforces origin verification and prevents spoofed claimed origins or claimed roles.
+    STRICT SECURITY INVARIANT:
+    If independence_registry is missing or unmapped, strictly defaults to ROOT_UNKNOWN_INDEPENDENCE.
+    Never reconstructs independence from verified identity.
     """
     claimed = source_record.claimed_origin
     auth = source_record.authenticated_origin
@@ -126,7 +138,7 @@ def derive_trusted_source_context(
             authorization_scope=frozenset(["user_feedback", "feedback_only"]),
             max_claim_privilege=ClaimPrivilege.ATTESTATION_ONLY,
             reliability_class="UNTRUSTED_ANONYMOUS",
-            independence_class=f"ROOT_ANONYMOUS_{auth.verified_id}",
+            independence_class=f"ROOT_UNKNOWN_INDEPENDENCE_{auth.verified_id}",
             is_spoofed_origin=False,
         )
 
@@ -138,12 +150,12 @@ def derive_trusted_source_context(
             authorization_scope=frozenset(),
             max_claim_privilege=ClaimPrivilege.ATTESTATION_ONLY,
             reliability_class="UNREGISTERED_PRINCIPAL",
-            independence_class=f"ROOT_UNMAPPED_{auth.verified_id}",
+            independence_class=f"ROOT_UNKNOWN_INDEPENDENCE_{auth.verified_id}",
             is_spoofed_origin=False,
         )
 
-    # 3. Derive independence class from explicit registry (decoupled from identity)
-    ind_class = independence_registry.get_independence_class(auth.verified_id) if independence_registry else f"ROOT_NET_1_{auth.verified_id}"
+    # 3. Derive independence class from explicit registry (STRICT FAIL-CLOSED)
+    ind_class = independence_registry.get_independence_class(auth.verified_id) if independence_registry else f"ROOT_UNKNOWN_INDEPENDENCE_{auth.verified_id}"
 
     auth_type = "PLATFORM_LOCAL" if "LOCAL" in auth.auth_method else "CRYPTOGRAPHIC_VERIFIED"
     return TrustedSourceContext(
@@ -161,7 +173,6 @@ class IngressOntology:
 
     def __init__(self, entities: Optional[list[EntityDefinition]] = None):
         self._entities: dict[str, EntityDefinition] = {}
-        # Multimap: alias string -> set of entity IDs (preserves ambiguity!)
         self._alias_to_ids: dict[str, set[str]] = defaultdict(set)
         for ent in entities or []:
             self.register_entity(ent)
@@ -176,18 +187,15 @@ class IngressOntology:
         return self._entities.get(entity_id)
 
     def resolve_alias_candidates(self, alias_str: str) -> tuple[str, ...]:
-        """Resolve a surface alias string to all associated entity IDs."""
         cleaned = alias_str.strip().lower()
         return tuple(sorted(self._alias_to_ids.get(cleaned, set())))
 
     def find_candidates(self, mention_span: str) -> tuple[str, ...]:
-        """Find all candidate entity IDs for a mention span (exact or substring)."""
         span_lower = mention_span.strip().lower()
         exact = self.resolve_alias_candidates(span_lower)
         if exact:
             return exact
 
-        # Substring / partial matching
         candidates: set[str] = set()
         for alias, eids in self._alias_to_ids.items():
             if span_lower in alias or alias in span_lower:

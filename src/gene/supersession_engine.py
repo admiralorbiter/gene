@@ -514,6 +514,73 @@ class BitemporalEngine:
             "hypothetical_lineage_S_L": hypo_lin_sorted,
         }
 
+    def what_if_source_t(
+        self,
+        source_id: str,
+        query: tuple[str, str, str],
+        t_v: float,
+        t_k: int,
+        init_lineage_sets: set[frozenset[str]] | None = None,
+    ) -> dict[str, Any]:
+        """Evaluate hypothetical entitlement under causal source ablation do(source_id = 0).
+        
+        Discovers all facts originating from source_id, constructs simultaneous RETRACT
+        events for all of them, and computes counterfactual support and governance.
+        """
+        ablated_fids = [
+            f.fact_id for f in self.facts.values()
+            if f.source_id == source_id or f.origin_id == source_id or source_id in f.roots or any(source_id in r for r in f.roots)
+        ]
+
+        retract_events = [
+            TemporalEvent(
+                event_id=f"cf_ablate_source_{source_id}_{fid}",
+                event_type=EventType.RETRACT,
+                target_fact_id=fid,
+                t_knowledge=t_k,
+                t_valid_start=t_v,
+                event_seq=100 + i,
+            )
+            for i, fid in enumerate(ablated_fids)
+        ]
+
+        base_state = self.why_t(query, t_v, t_k, init_lineage_sets)
+        hypo_support = self.compute_temporal_support(query, t_v, t_k, extra_events=retract_events)
+        hypo_lineage = self.compute_temporal_lineage(query, t_v, t_k, extra_events=retract_events)
+        hypo_rel_auth = self.compute_relative_authority(query, t_v, t_k, init_lineage_sets, extra_events=retract_events)
+        hypo_bnd_auth = self.compute_bounded_authority(query, t_v, t_k, init_lineage_sets, extra_events=retract_events)
+
+        prior_supp = base_state["support_sets_S_t"]
+        hypo_supp_sorted = [sorted(list(s)) for s in sorted(hypo_support, key=lambda x: sorted(list(x)))]
+        prior_lin = base_state["lineage_sets_S_L_t"]
+        hypo_lin_sorted = [sorted(list(s)) for s in sorted(hypo_lineage, key=lambda x: sorted(list(x)))]
+
+        if base_state["is_entitled"] and not (len(hypo_support) > 0):
+            transition = "LOST_ENTITLEMENT"
+        elif not base_state["is_entitled"] and (len(hypo_support) > 0):
+            transition = "GAINED_ENTITLEMENT"
+        elif base_state["relative_authority"] > hypo_rel_auth:
+            transition = "DEGRADED_AUTHORITY"
+        elif base_state["relative_authority"] < hypo_rel_auth:
+            transition = "AUGMENTED_AUTHORITY"
+        else:
+            transition = "NO_CHANGE"
+
+        return {
+            "query": query,
+            "ablated_source_id": source_id,
+            "ablated_fact_ids": ablated_fids,
+            "t_valid": t_v,
+            "t_knowledge": t_k,
+            "prior_entitled": base_state["is_entitled"],
+            "hypothetical_entitled": len(hypo_support) > 0,
+            "prior_bounded_authority": base_state["bounded_authority"],
+            "hypothetical_bounded_authority": round(hypo_bnd_auth, 4),
+            "transition": transition,
+            "hypothetical_support_S": hypo_supp_sorted,
+            "hypothetical_lineage_S_L": hypo_lin_sorted,
+        }
+
     def then_what_t(
         self,
         event: TemporalEvent,
@@ -637,7 +704,8 @@ def adjudicate_observation(
     fid = new_fact_id or f"occ_{obs.observation_id}"
 
     events: list[TemporalEvent] = []
-    seq = 0
+    existing_seqs = [e.event_seq for e in engine.events if e.t_knowledge == t_k_in]
+    seq = (max(existing_seqs) + 1) if existing_seqs else 0
 
     rel = engine.get_relevant_occurrences(obs.subject, obs.predicate, t_v_in, t_k_in)
     active_matching = rel["active"]

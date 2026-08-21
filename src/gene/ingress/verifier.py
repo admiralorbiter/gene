@@ -51,7 +51,6 @@ class CertificateVerifier:
     ) -> Tuple[bool, Optional[str]]:
         """Verify that certificate legitimately justifies the proposed admission action."""
 
-        # Independently derive trusted context from platform record and capability policy
         trusted_context = derive_trusted_source_context(
             source_record=source_record,
             capability_registry=capability_registry,
@@ -74,52 +73,42 @@ class CertificateVerifier:
             if proposed_observation.subject != sub_id or proposed_observation.obj != obj_id:
                 return False, "ProposedObservation entities do not match binding_witness"
 
-            # Verify that bound entities were legitimate candidate hypotheses
             if sub_id not in subject_hypotheses.candidate_entity_ids:
                 return False, f"Bound subject {sub_id} not in subject candidate hypothesis set"
             if obj_id not in object_hypotheses.candidate_entity_ids:
                 return False, f"Bound object {obj_id} not in object candidate hypothesis set"
 
-            # Verify ontology existence
             if not ontology.contains_entity(sub_id):
                 return False, f"Subject entity {sub_id} does not exist in domain ontology"
             if not ontology.contains_entity(obj_id):
                 return False, f"Object entity {obj_id} does not exist in domain ontology"
 
-            # Verify predicate consistency
             if proposed_observation.predicate != parsed_attestation.predicate_span:
                 return False, f"ProposedObservation predicate '{proposed_observation.predicate}' != ParsedAttestation predicate '{parsed_attestation.predicate_span}'"
 
-            # Verify transaction knowledge time
             if proposed_observation.t_knowledge != source_record.t_knowledge:
                 return False, f"ProposedObservation t_k ({proposed_observation.t_knowledge}) != SourceRecord t_k ({source_record.t_knowledge})"
 
-            # Verify temporal consistency
             if proposed_observation.t_valid_start != parsed_attestation.t_valid_start:
                 return False, "ProposedObservation valid start does not match ParsedAttestation"
             if proposed_observation.t_valid_end != parsed_attestation.t_valid_end:
                 return False, "ProposedObservation valid end does not match ParsedAttestation"
 
-            # Verify origin authenticity and spoofing detection
             if trusted_context.is_spoofed_origin:
                 return False, "Spoofed claimed origin detected in SourceRecord"
             if trusted_context.authenticity == "UNVERIFIED" and not source_record.authenticated_origin.is_authenticated:
                 return False, "Unauthenticated origin cannot produce ADMIT certificate for root fact"
 
-            # Verify capability and authorization scope
             pred = parsed_attestation.predicate_span
             if pred not in trusted_context.authorization_scope and "*" not in trusted_context.authorization_scope:
                 return False, f"Source lacks authorization scope for predicate '{pred}'"
 
-            # Verify claim privilege (ATTESTATION_ONLY cannot become ROOT_FACT)
             if trusted_context.max_claim_privilege != ClaimPrivilege.ROOT_FACT:
                 return False, f"Source privilege {trusted_context.max_claim_privilege.value} cannot assert ROOT_FACT"
 
-            # Verify extracted claim type
             if parsed_attestation.extracted_claim_type != ClaimType.FACTUAL_OBSERVATION:
                 return False, f"Extracted claim type {parsed_attestation.extracted_claim_type.value} cannot assert ROOT_FACT"
 
-            # Verify lineage root integrity
             if not certificate.lineage_roots or proposed_observation.lineage_roots != certificate.lineage_roots:
                 return False, "ADMIT certificate and Observation lineage roots must match non-empty trusted context roots"
 
@@ -149,17 +138,24 @@ class CertificateVerifier:
         chosen_subject_id: str,
         chosen_object_id: str,
         disambiguating_record: SourceRecord,
+        original_source_record: SourceRecord,
         capability_registry: CapabilityPolicyRegistry,
         ontology: IngressOntology,
         certificate: ResolutionCertificate,
         independence_registry: Optional[LineageIndependenceRegistry] = None,
     ) -> Tuple[bool, Optional[str]]:
-        """Independently verify a ResolutionCertificate for a DeferredBinding."""
+        """Independently verify full ResolutionCertificate proof for a DeferredBinding."""
         if certificate.deferred_id != deferred.deferred_id:
             return False, f"Certificate deferred_id '{certificate.deferred_id}' != '{deferred.deferred_id}'"
 
         if certificate.chosen_subject_id != chosen_subject_id or certificate.chosen_object_id != chosen_object_id:
             return False, "Certificate chosen entities do not match requested resolution targets"
+
+        if certificate.disambiguating_source_record_id != disambiguating_record.record_id:
+            return False, f"Certificate disambiguating record ID '{certificate.disambiguating_source_record_id}' != '{disambiguating_record.record_id}'"
+
+        if not certificate.resolution_witness:
+            return False, "Certificate missing required resolution_witness"
 
         # Candidate Containment: chosen entity MUST be in original candidate hypothesis set!
         if chosen_subject_id not in deferred.subject_hypotheses.candidate_entity_ids:
@@ -174,10 +170,19 @@ class CertificateVerifier:
         if not ontology.contains_entity(chosen_object_id):
             return False, f"Resolved object '{chosen_object_id}' does not exist in domain ontology"
 
-        # Disambiguating record verification
+        # Disambiguating record verification & capability scope check
         dis_ctx = derive_trusted_source_context(disambiguating_record, capability_registry, independence_registry)
         if dis_ctx.is_spoofed_origin or dis_ctx.authenticity == "UNVERIFIED":
             return False, "Disambiguating record is unauthenticated or spoofed"
+
+        if not capability_registry.can_disambiguate(disambiguating_record.authenticated_origin.verified_id, deferred.predicate):
+            return False, f"Disambiguating principal '{disambiguating_record.authenticated_origin.verified_id}' lacks disambiguation authority for predicate '{deferred.predicate}'"
+
+        # Lineage root preservation check: roots must match original source record provenance
+        orig_ctx = derive_trusted_source_context(original_source_record, capability_registry, independence_registry)
+        expected_root = orig_ctx.independence_class
+        if certificate.lineage_roots != frozenset([expected_root]):
+            return False, f"Certificate lineage roots {certificate.lineage_roots} != expected original source root '{expected_root}'"
 
         return True, None
 
@@ -186,6 +191,7 @@ class CertificateVerifier:
         provisional: ProvisionalEntity,
         canonical_entity_id: str,
         canonical_name: str,
+        entity_type: str,
         promotion_authority_record: SourceRecord,
         capability_registry: CapabilityPolicyRegistry,
         ontology: IngressOntology,
@@ -194,12 +200,24 @@ class CertificateVerifier:
         source_records_map: dict[str, SourceRecord],
         independence_registry: Optional[LineageIndependenceRegistry] = None,
     ) -> Tuple[bool, Optional[str]]:
-        """Independently verify a PromotionCertificate for promoting a ProvisionalEntity."""
+        """Independently verify full PromotionCertificate proof for promoting a ProvisionalEntity."""
         if certificate.provisional_id != provisional.provisional_id:
             return False, f"Certificate provisional_id '{certificate.provisional_id}' != '{provisional.provisional_id}'"
 
         if certificate.canonical_entity_id != canonical_entity_id:
-            return False, "Certificate canonical_entity_id does not match target"
+            return False, f"Certificate canonical_entity_id '{certificate.canonical_entity_id}' != '{canonical_entity_id}'"
+
+        if certificate.canonical_name != canonical_name:
+            return False, f"Certificate canonical_name '{certificate.canonical_name}' != '{canonical_name}'"
+
+        if certificate.entity_type != entity_type:
+            return False, f"Certificate entity_type '{certificate.entity_type}' != '{entity_type}'"
+
+        if certificate.promotion_authority_record_id != promotion_authority_record.record_id:
+            return False, f"Certificate promotion_authority_record_id '{certificate.promotion_authority_record_id}' != '{promotion_authority_record.record_id}'"
+
+        if not certificate.authority_witness:
+            return False, "Certificate missing required authority_witness"
 
         # Collision Check: Canonical entity ID must NOT already exist in ontology
         if ontology.contains_entity(canonical_entity_id):
