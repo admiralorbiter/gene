@@ -11,10 +11,13 @@
 | Estimand / Metric | Pre-registered Floor | Observed Empirical Result | Verdict |
 | :--- | :--- | :--- | :--- |
 | **Candidate Recall ($M_1$)** | $\ge 90.0\%$ ($90 / 100$) | **100 / 100 (100.0\%)** | **PASS** |
+| **High-Salience Recall** | $\ge 90.0\%$ | **50 / 50 (100.0\%)** | **PASS** |
+| **Low-Salience Recall** | $\ge 85.0\%$ | **50 / 50 (100.0\%)** | **PASS** |
 | **Candidate Precision ($M_2$)** | $\ge 85.0\%$ | **100.0\%** | **PASS** |
 | **Useful Admission Coverage ($M_3$)** | $\ge 85.0\%$ | **100 / 100 (100.0\%)** | **PASS** |
-| **Global False Discovery ($	ext{FDAR}_{\text{global}}$)** | $\equiv 0.0\%$ ($0 / N$) | **0 false admissions (0.0\%)** | **PASS** |
+| **Global False Discovery ($	ext{FDAR}_{\text{global}}$)** | $\equiv 0.0\%$ ($0 / N$) | **0 incorrect durable admissions (0.0\%)** | **PASS** |
 | **Paired Relative Drop vs Menu Control** | $\le 10.0\%$ | **0.0\%** | **PASS** |
+| **Downstream Probes Q1..Q4 Passed** | $\equiv 100.0\%$ | **100.0\%** | **PASS** |
 
-## 2. Epistemic Proof-Carrying Validation
-All candidate relations generated autonomously by `gemma3:12b` from raw narrative text without candidate menus were submitted to `IngressEngine`, maintaining zero false fact admissions in the bitemporal store.
+## 2. Epistemic Proof-Carrying Validation & Downstream Invariants
+All candidate relations generated autonomously by `gemma3:12b` from raw narrative text without candidate menus were submitted to `IngressEngine`, admitted under `A4FullGENEIngressPolicy`, committed to `BitemporalEngine`, and verified across all four downstream query probes with zero false fact admissions in the bitemporal store.
