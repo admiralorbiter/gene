@@ -92,7 +92,7 @@ $$\text{Ancestry} \longrightarrow \text{Retrieval Exposure} \longrightarrow \tex
 | **Round 5B** | Exploration Round 5 Stage 5B | Action Governance & Lineage-Projected Epistemic Resilience (368 cases) | **FROZEN** | `round5-stage5b-freeze-v3` |
 | **Round 5C** | Exploration Round 5 Stage 5C | Neural Revision Bridge (32-Call Live Model Revision Assay) | **FROZEN** | `round5-stage5c-postreview-freeze` |
 | **Round 6A** | Exploration Round 6 Stage 6A-v2 | Bitemporal Supersession Algebra & State Transition Semantics | **VERIFIED** | `main` |
-| **Round 6B** | Exploration Round 6 Stage 6B | Implicit State Adjudication & Predicate Contract Benchmark | **PREREGISTERED** | `main` |
+| **Round 6B** | Exploration Round 6 Stage 6B | Contract-Guided State Adjudication Factorial Benchmark (200 cases) | **VERIFIED** | `main` |
 
 ---
 
@@ -105,7 +105,8 @@ $$\text{Ancestry} \longrightarrow \text{Retrieval Exposure} \longrightarrow \tex
 - **Round 5 Retrospective & 2026 Literature Memo:** [`docs/results/EXPLORATION_ROUND5_RETROSPECTIVE.md`](docs/results/EXPLORATION_ROUND5_RETROSPECTIVE.md)
 - **Round 6 Experiments & Reports:**
   - [Stage 6A-v2 Bitemporal Specification](docs/experiments/STAGE_6A_PREREGISTRATION.md)
-  - [Stage 6B Implicit Adjudication Preregistration](docs/experiments/STAGE_6B_PREREGISTRATION.md)
+  - [Stage 6B Adjudication Preregistration](docs/experiments/STAGE_6B_PREREGISTRATION.md)
+  - [Stage 6B Benchmark Report (200 cases)](docs/results/EXPLORATION_ROUND6_STAGE6B_REPORT.md)
   - [Scale Envelope Benchmark Report v1](docs/results/SCALE_ENVELOPE_REPORT.md)
   - [Lineage Threat Model & Attack Matrix Report v1](docs/results/LINEAGE_INTEGRITY_THREAT_MATRIX.md)
 - **System Architecture & Formalisms:** [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
