@@ -4,7 +4,7 @@ Enforces:
 1. Existence vs Identity Decoupling (Deterministic Existence Authority on Asserted Commissioning).
 2. Refined Structural First Refusal (Requires grounded parent AND discriminating sub-identifier).
 3. Explicit Registered Parenthetical Identity Evidence (Resolves structural-looking mentions lacking sub-IDs).
-4. Full Hypothesis Accumulation Lifecycle (Unresolved, Retargeted, Confirmed, Resolved Existing, Resolved Novel).
+4. World-Scoped Hypothesis Accumulation Lifecycle (Unresolved, Retargeted, Confirmed, Resolved Existing, Resolved Novel).
 """
 
 import hashlib
@@ -94,7 +94,8 @@ def call_gemma_api(prompt: str) -> Dict[str, Any]:
 
 
 class EpistemicIngressSessionR3:
-    def __init__(self, base_registry: Dict[str, Any]):
+    def __init__(self, base_registry: Dict[str, Any], world_id: str = "world_default"):
+        self.world_id = world_id
         self.durable_registry = {k: dict(v) for k, v in base_registry.items()}
         self.provenance_edges: List[Dict[str, Any]] = []
         self.hypothesis_ledger: Dict[str, Any] = {}
@@ -107,29 +108,29 @@ class EpistemicIngressSessionR3:
         return [m.strip() for m in re.findall(r"\(([^)]+)\)", text) if m.strip()]
 
     def _resolve_open_hypotheses(self, doc_id: str, mention: str, action: str, target_id: str, rule: str):
-        """Updates open UNRESOLVED hypotheses in this session when evidence resolves an identity."""
-        for hid, hypo in self.hypothesis_ledger.items():
-            if hypo.get("status") == "UNRESOLVED":
-                cand = hypo.get("candidate_target")
-                if action == "LINK":
-                    if cand is not None and cand != target_id:
-                        hypo["status"] = "RETARGETED"
-                    elif cand is not None and cand == target_id:
-                        hypo["status"] = "CONFIRMED"
-                    else:
-                        hypo["status"] = "RESOLVED_EXISTING"
-                elif action == "CREATE_PROVISIONAL":
-                    hypo["status"] = "RESOLVED_NOVEL"
-                
-                hypo["resolved_target"] = target_id
-                hypo["resolving_doc_id"] = doc_id
-                hypo.setdefault("evidence_history", []).append({
-                    "resolving_doc_id": doc_id,
-                    "resolving_mention": mention,
-                    "rule": rule,
-                    "action": action,
-                    "target_id": target_id,
-                })
+        """Updates open UNRESOLVED hypothesis in this world session when evidence resolves an identity."""
+        hypo = self.hypothesis_ledger.get(self.world_id)
+        if hypo and hypo.get("status") == "UNRESOLVED":
+            cand = hypo.get("candidate_target")
+            if action == "LINK":
+                if cand is not None and cand != target_id:
+                    hypo["status"] = "RETARGETED"
+                elif cand is not None and cand == target_id:
+                    hypo["status"] = "CONFIRMED"
+                else:
+                    hypo["status"] = "RESOLVED_EXISTING"
+            elif action == "CREATE_PROVISIONAL":
+                hypo["status"] = "RESOLVED_NOVEL"
+            
+            hypo["resolved_target"] = target_id
+            hypo["resolving_doc_id"] = doc_id
+            hypo.setdefault("evidence_history", []).append({
+                "resolving_doc_id": doc_id,
+                "resolving_mention": mention,
+                "rule": rule,
+                "action": action,
+                "target_id": target_id,
+            })
 
     def process_mention(
         self,
@@ -345,21 +346,34 @@ class EpistemicIngressSessionR3:
                 }
 
         # ---------------------------------------------------------------------
-        # Rule 5: Fail-Closed Ambiguous / Adversarial Deferral
+        # Rule 5: Fail-Closed Ambiguous / Adversarial Deferral (World-Scoped Hypothesis Ledger)
         # ---------------------------------------------------------------------
-        hypo_entry = {
-            "hypothesis_id": f"hypo_{doc_id}",
-            "world_id": doc_id.rsplit("_doc_", 1)[0] if "_doc_" in doc_id else doc_id,
-            "doc_id": doc_id,
-            "surface_form": mention,
-            "candidate_target": neural_proposal.get("target_entity_id"),
-            "status": "UNRESOLVED",
-            "resolved_target": None,
-            "resolving_doc_id": None,
-            "context_excerpt": context[:120],
-            "evidence_history": [{"doc_id": doc_id, "mention": mention, "context": context[:120]}],
-        }
-        self.hypothesis_ledger[doc_id] = hypo_entry
+        if self.world_id not in self.hypothesis_ledger:
+            # First deferral in this world -> create world-local hypothesis
+            hypo_entry = {
+                "hypothesis_id": f"hypo_{self.world_id}",
+                "world_id": self.world_id,
+                "originating_doc_id": doc_id,
+                "surface_form": mention,
+                "candidate_target": neural_proposal.get("target_entity_id"),
+                "status": "UNRESOLVED",
+                "resolved_target": None,
+                "resolving_doc_id": None,
+                "evidence_history": [{"doc_id": doc_id, "mention": mention, "context": context[:120], "action": "DEFER"}],
+            }
+            self.hypothesis_ledger[self.world_id] = hypo_entry
+        else:
+            # Subsequent deferral in the same world -> accumulate evidence without creating a new row
+            hypo = self.hypothesis_ledger[self.world_id]
+            hypo.setdefault("evidence_history", []).append({
+                "doc_id": doc_id,
+                "mention": mention,
+                "context": context[:120],
+                "action": "DEFER",
+            })
+            if hypo.get("candidate_target") is None and neural_proposal.get("target_entity_id"):
+                hypo["candidate_target"] = neural_proposal.get("target_entity_id")
+
         self.mutation_log.append(
             {"doc_id": doc_id, "action": "DEFER", "target": None, "durable": False}
         )
@@ -372,7 +386,7 @@ class EpistemicIngressSessionR3:
 
 
 def init_database(db_path: Path):
-    """Initializes the relational SQLite database with strict foreign key constraints."""
+    """Initializes the relational SQLite database with strict foreign key constraints and seeds base registry once."""
     if db_path.exists():
         db_path.unlink()
     conn = sqlite3.connect(str(db_path))
@@ -391,6 +405,7 @@ def init_database(db_path: Path):
             alias_id INTEGER PRIMARY KEY AUTOINCREMENT,
             entity_id TEXT NOT NULL,
             alias TEXT NOT NULL,
+            UNIQUE(entity_id, alias),
             FOREIGN KEY (entity_id) REFERENCES entities(entity_id)
         )
     """)
@@ -411,8 +426,8 @@ def init_database(db_path: Path):
     cur.execute("""
         CREATE TABLE hypothesis_ledger (
             hypothesis_id TEXT PRIMARY KEY,
-            world_id TEXT NOT NULL,
-            doc_id TEXT NOT NULL,
+            world_id TEXT NOT NULL UNIQUE,
+            originating_doc_id TEXT NOT NULL,
             surface_form TEXT NOT NULL,
             candidate_target TEXT,
             status TEXT NOT NULL,
@@ -425,7 +440,7 @@ def init_database(db_path: Path):
         CREATE TABLE execution_records (
             record_id INTEGER PRIMARY KEY AUTOINCREMENT,
             world_id TEXT NOT NULL,
-            doc_id TEXT NOT NULL,
+            doc_id TEXT NOT NULL UNIQUE,
             arm TEXT NOT NULL,
             source_id TEXT NOT NULL,
             mention TEXT NOT NULL,
@@ -436,6 +451,17 @@ def init_database(db_path: Path):
             timestamp REAL NOT NULL
         )
     """)
+
+    # Seed base registry once
+    base_registry = get_stage8c_r3_base_registry()
+    for eid, edata in base_registry.items():
+        cur.execute(
+            "INSERT INTO entities (entity_id, canonical_name, status, parent_entity) VALUES (?, ?, ?, ?)",
+            (eid, edata["canonical_name"], edata["status"], edata.get("parent_entity")),
+        )
+        for a in edata.get("aliases", []):
+            cur.execute("INSERT OR IGNORE INTO aliases (entity_id, alias) VALUES (?, ?)", (eid, a))
+
     conn.commit()
     conn.close()
 
@@ -468,16 +494,7 @@ def run_stage8c_r3_benchmark(
     for w_idx, world in enumerate(worlds, start=1):
         wid = world["world_id"]
         arm = world["arm"]
-        session = EpistemicIngressSessionR3(base_registry)
-
-        # Pre-seed base registry in DB
-        for eid, edata in session.durable_registry.items():
-            cur.execute(
-                "INSERT OR IGNORE INTO entities (entity_id, canonical_name, status, parent_entity) VALUES (?, ?, ?, ?)",
-                (eid, edata["canonical_name"], edata["status"], edata.get("parent_entity")),
-            )
-            for a in edata.get("aliases", []):
-                cur.execute("INSERT INTO aliases (entity_id, alias) VALUES (?, ?)", (eid, a))
+        session = EpistemicIngressSessionR3(base_registry, world_id=wid)
 
         print(f"[{w_idx:02d}/60] Executing World: {wid} ({arm})...")
 
@@ -554,7 +571,7 @@ def run_stage8c_r3_benchmark(
             with open(evidence_path, "a", encoding="utf-8") as f_jsonl:
                 f_jsonl.write(json.dumps(record) + "\n")
 
-        # Persist session entities
+        # Persist newly created session entities
         for eid, edata in session.durable_registry.items():
             cur.execute(
                 "INSERT OR REPLACE INTO entities (entity_id, canonical_name, status, parent_entity) VALUES (?, ?, ?, ?)",
@@ -581,16 +598,16 @@ def run_stage8c_r3_benchmark(
                 ),
             )
 
-        # Persist session hypothesis ledger
-        for doc_k, hyp in session.hypothesis_ledger.items():
+        # Persist world hypothesis ledger (at most 1 per world)
+        for world_k, hyp in session.hypothesis_ledger.items():
             cur.execute(
                 """INSERT OR REPLACE INTO hypothesis_ledger
-                   (hypothesis_id, world_id, doc_id, surface_form, candidate_target, status, resolved_target, resolving_doc_id, evidence_history_json)
+                   (hypothesis_id, world_id, originating_doc_id, surface_form, candidate_target, status, resolved_target, resolving_doc_id, evidence_history_json)
                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                 (
                     hyp["hypothesis_id"],
-                    wid,
-                    hyp["doc_id"],
+                    hyp["world_id"],
+                    hyp["originating_doc_id"],
                     hyp["surface_form"],
                     hyp.get("candidate_target"),
                     hyp["status"],

@@ -7,7 +7,7 @@ Verifies:
 5. Gate 4: Permanent Non-Resolution Invariant >= 7/8 (87.5%) worlds in Arm 4A (both docs defer).
 6. Gate 5: Evidence Accumulation Lifecycle Matrix == 7/7 exact world lifecycle transitions in Arm 4B.
 7. Gate 6: Useful Resolvable Coverage >= 85.0% across N=97 resolvable decisions.
-8. Gate 7: Full Relational SQLite Schema & Hypothesis Ledger Reconciliation.
+8. Gate 7: Full Relational SQLite Schema & Hypothesis Ledger Reconciliation (Strict 8 UNRESOLVED + 7 Resolved == 15 Total).
 9. Paired Offline R2 Comparative Replay (invoking genuine frozen EpistemicIngressSessionR2 with R3 base registry).
 """
 
@@ -149,31 +149,33 @@ def verify_stage8c_r3_contract(
     conn = sqlite3.connect(str(db_path))
     cur = conn.cursor()
 
-    # 6. Gate 5: Evidence Accumulation Lifecycle Matrix (7 World Lifecycles in Arm 4B)
+    # 6. Gate 5: Evidence Accumulation Lifecycle Matrix (Exact 7/7 World Transitions in Arm 4B)
     expected_lifecycles = {
-        "world_r3_arm4b_01": ("gateway_router_beta", ["RETARGETED", "RESOLVED_EXISTING"]),
-        "world_r3_arm4b_02": ("compute_cluster_beta", ["RETARGETED", "RESOLVED_EXISTING"]),
-        "world_r3_arm4b_03": ("storage_array_alpha", ["RETARGETED", "RESOLVED_EXISTING"]),
-        "world_r3_arm4b_04": ("gateway_router_alpha", ["RESOLVED_EXISTING", "RETARGETED"]),
-        "world_r3_arm4b_05": ("compute_cluster_alpha", ["RESOLVED_EXISTING", "RETARGETED"]),
-        "world_r3_arm4b_06": ("prov_sensor_mesh_omega", ["RESOLVED_NOVEL"]),
-        "world_r3_arm4b_07": ("compute_cluster_beta", ["CONFIRMED", "RESOLVED_EXISTING"]),
+        "world_r3_arm4b_01": ("gateway_router_beta", "RETARGETED"),
+        "world_r3_arm4b_02": ("compute_cluster_beta", "RETARGETED"),
+        "world_r3_arm4b_03": ("storage_array_alpha", "RETARGETED"),
+        "world_r3_arm4b_04": ("gateway_router_alpha", "RESOLVED_EXISTING"),
+        "world_r3_arm4b_05": ("compute_cluster_alpha", "RESOLVED_EXISTING"),
+        "world_r3_arm4b_06": ("prov_sensor_mesh_omega", "RESOLVED_NOVEL"),
+        "world_r3_arm4b_07": ("compute_cluster_beta", "CONFIRMED"),
     }
 
     arm4b_lifecycles_passed = 0
-    for wid, (expected_target, valid_statuses) in sorted(expected_lifecycles.items()):
+    for wid, (expected_target, expected_status) in sorted(expected_lifecycles.items()):
         cur.execute(
-            """SELECT hypothesis_id, doc_id, surface_form, status, resolved_target, resolving_doc_id, evidence_history_json
+            """SELECT hypothesis_id, originating_doc_id, surface_form, status, resolved_target, resolving_doc_id, evidence_history_json
                FROM hypothesis_ledger WHERE world_id = ?""",
             (wid,),
         )
         rows = cur.fetchall()
         if len(rows) == 1:
-            hid, doc_id, s_form, status, res_target, res_doc, ev_json = rows[0]
-            status_valid = (status in valid_statuses)
+            hid, orig_doc, s_form, status, res_target, res_doc, ev_json = rows[0]
+            status_valid = (status == expected_status)
             target_valid = (res_target == expected_target)
             doc_valid = (res_doc == f"{wid}_doc_2")
-            if status_valid and target_valid and doc_valid:
+            ev_history = json.loads(ev_json) if ev_json else []
+            history_valid = (len(ev_history) == 2)
+            if status_valid and target_valid and doc_valid and history_valid:
                 arm4b_lifecycles_passed += 1
 
     gate_5_pass = (len(expected_lifecycles) == 7 and arm4b_lifecycles_passed == 7)
@@ -206,15 +208,19 @@ def verify_stage8c_r3_contract(
     rec_count = cur.fetchone()[0]
 
     # Reconcile exact hypothesis ledger statuses:
-    # Exactly 8 Arm 4A hypotheses permanently UNRESOLVED with resolved_target IS NULL
-    cur.execute("SELECT COUNT(*) FROM hypothesis_ledger WHERE world_id LIKE '%arm4a%' AND status == 'UNRESOLVED' AND resolved_target IS NULL")
-    arm4a_unresolved_count = cur.fetchone()[0]
+    # Exactly 8 Arm 4A hypotheses permanently UNRESOLVED with resolved_target IS NULL and 2 accumulated doc evidence
+    cur.execute("SELECT hypothesis_id, evidence_history_json FROM hypothesis_ledger WHERE world_id LIKE '%arm4a%' AND status == 'UNRESOLVED' AND resolved_target IS NULL AND resolving_doc_id IS NULL")
+    arm4a_rows = cur.fetchall()
+    arm4a_unresolved_count = len(arm4a_rows)
+    arm4a_evidence_valid = all(len(json.loads(r[1])) == 2 for r in arm4a_rows)
 
     # Exactly 7 Arm 4B hypotheses correctly transitioned out of UNRESOLVED with matching resolved targets
-    cur.execute("SELECT COUNT(*) FROM hypothesis_ledger WHERE world_id LIKE '%arm4b%' AND status != 'UNRESOLVED' AND resolved_target IS NOT NULL")
-    arm4b_resolved_count = cur.fetchone()[0]
+    cur.execute("SELECT hypothesis_id, evidence_history_json FROM hypothesis_ledger WHERE world_id LIKE '%arm4b%' AND status != 'UNRESOLVED' AND resolved_target IS NOT NULL AND resolving_doc_id IS NOT NULL")
+    arm4b_rows = cur.fetchall()
+    arm4b_resolved_count = len(arm4b_rows)
+    arm4b_evidence_valid = all(len(json.loads(r[1])) == 2 for r in arm4b_rows)
 
-    # Total rows in hypothesis ledger must be exactly 15 (8 + 7)
+    # Total rows in hypothesis ledger must be strictly 15 (8 + 7)
     cur.execute("SELECT COUNT(*) FROM hypothesis_ledger")
     total_hypo_count = cur.fetchone()[0]
 
@@ -226,7 +232,9 @@ def verify_stage8c_r3_contract(
         and (entity_count >= 6)
         and (edge_count > 0)
         and (arm4a_unresolved_count == 8)
+        and arm4a_evidence_valid
         and (arm4b_resolved_count == 7)
+        and arm4b_evidence_valid
         and (total_hypo_count == 15)
         and (rec_count == 120)
     )
