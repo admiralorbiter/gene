@@ -1,0 +1,71 @@
+{
+  "round": "Exploration Round 4: Compiling Belief \u2014 Preserving Epistemic Structure Across Neural Interfaces",
+  "evidence_class": "exploratory_local",
+  "base_tag": "gene-exploration-round4-base",
+  "base_commit": "bbbdb92",
+  "design_freeze_commit": "d13c0a7",
+  "raw_results_commit": "b3a5a29",
+  "post_review_tag": "round4-postreview-freeze",
+  "model": {
+    "name": "gemma3:12b",
+    "ollama_id": "f4031aab637d",
+    "digest": "f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a",
+    "digest_provenance": "captured_post_execution_via_api_tags_from_unchanged_local_ollama_instance",
+    "architecture": "gemma3 (12.2B parameters, Q4_K_M quantization)",
+    "family": "gemma3",
+    "context_window": 4096,
+    "temperature": 0.0,
+    "seed": 42
+  },
+  "database": {
+    "path": "data/exploration_round4_results.db",
+    "raw_execution_sha256": "b07580c52d526efe03d342f257fd776d0210b6b823c4afb9ba898dc356f9401b",
+    "postreview_augmented_sha256": "820e574e6d3a0196dfec13ffc392d68d399791b210fd65187795dd834046269e",
+    "total_calls": 116,
+    "total_evaluations": 116,
+    "evaluation_parity": true,
+    "valid_json_rate": 1.0
+  },
+  "summary_json": {
+    "path": "data/exploration_round4_summary.json",
+    "sha256": "8984076c22033ed79628138fbd18a44d650dc479796632dcf02bc9e501be5949"
+  },
+  "tracks": {
+    "track_r": {
+      "focus": "Role Equivariance & Shortcut Dissection",
+      "total_calls": 24,
+      "phenotype": "AD and BD active across all 3 conditions; AE activated under swap and opaque; BE rejected across all 3",
+      "interpretation": "Truth table consistent with role-anchored predicate-class heuristic; predicate-level anonymization needed for mechanism proof"
+    },
+    "track_p": {
+      "focus": "Permutation Invariance & Representation Spread",
+      "total_calls": 28,
+      "symbolic_disagreement": 0.3913,
+      "semantic_disagreement": 0.0,
+      "replay_disagreement": 0.0,
+      "interpretation": "Premise order changes exact symbolic realization (PROTO_X7 vs PROTOCOL_X7; D_perm=0.3913) without altering semantic belief (D_perm,sem=0.0)"
+    },
+    "track_m": {
+      "focus": "Support-Preserving Monotonic Scaffolding",
+      "total_calls": 32,
+      "symbolic_s_to_e_transitions": 2,
+      "semantic_s_to_e_transitions": 0,
+      "interpretation": "Positional Asymmetry: 8/8 chains semantically monotonic; prepending distractor occ_F induced surface label shift at Step 3"
+    },
+    "track_c": {
+      "focus": "Epistemic Context Compiler Conformance Benchmark",
+      "total_calls": 32,
+      "registered_calls": 16,
+      "answer_conformance_k_a": 1.0,
+      "registered_k_s_suff": 1.0,
+      "registered_k_s_exact": 0.5625,
+      "registered_k_s_exact_fraction": "9/16",
+      "registered_mean_excess": 0.8125,
+      "interpretation": "Epistemic Precision Gap: models achieve K_A=100% and K_S_suff=100% but drag redundant evidence into justification (E_S=1.625 mean excess in entitled ecologies)"
+    }
+  },
+  "promotion_lifecycle": {
+    "phase11_status": "not_earned",
+    "promotion_rule": "Exploratory results are local research evidence. Claims require deterministic replication, release asset checksums, and role/representation-counterbalanced verification before canonical core promotion."
+  }
+}

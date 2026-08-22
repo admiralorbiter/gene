@@ -1,0 +1,62 @@
+{
+  "manifest_version": "1.0.0",
+  "round": "Exploration Round 1",
+  "base_commit": "9353005",
+  "artifacts": {
+    "track_a_recovery.db": {
+      "file_path": "runs/explore/track_a_recovery.db",
+      "sha256": "7a3a87cba2acacca27977c22a00145a76e10e02803bb26580eb47368392b5a4c",
+      "size_bytes": 20480,
+      "tables": [
+        "track_a_results"
+      ],
+      "row_counts": {
+        "track_a_results": 16
+      }
+    },
+    "track_b_monoculture.db": {
+      "file_path": "runs/explore/track_b_monoculture.db",
+      "sha256": "ea50d188cefa7683cfe7f643315f8d945b97a5f491d3ed9bc7a125d477c46370",
+      "size_bytes": 20480,
+      "tables": [
+        "track_b_results"
+      ],
+      "row_counts": {
+        "track_b_results": 12
+      }
+    },
+    "track_c_provenance_depth.db": {
+      "file_path": "runs/explore/track_c_provenance_depth.db",
+      "sha256": "f3f57f192d4ff8a6a4ffbc513330e31d2bd3915856cbfd37ac95870d87853ab9",
+      "size_bytes": 12288,
+      "tables": [
+        "track_c_results"
+      ],
+      "row_counts": {
+        "track_c_results": 12
+      }
+    },
+    "track_d_model_sentinel.db": {
+      "file_path": "runs/explore/track_d_model_sentinel.db",
+      "sha256": "4459f83f45de74b5d9a3bd042e373f6e0933d75546d7dc252d83d1380e2bec71",
+      "size_bytes": 20480,
+      "tables": [
+        "track_d_results"
+      ],
+      "row_counts": {
+        "track_d_results": 25
+      }
+    },
+    "track_f_id_equivariance.db": {
+      "file_path": "runs/explore/track_f_id_equivariance.db",
+      "sha256": "4047ed0ff3b0c9148eec173d130dbc74c5c98bdad62f8c7c3904a798e297058c",
+      "size_bytes": 12288,
+      "tables": [
+        "track_f_results"
+      ],
+      "row_counts": {
+        "track_f_results": 12
+      }
+    }
+  }
+}

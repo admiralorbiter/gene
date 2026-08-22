@@ -1,0 +1,71 @@
+{
+  "stage": "Exploration Round 6 Stage 6C",
+  "run_id": "run_stage6c_1787288709",
+  "commit": "round6-stage6c-postreview-freeze",
+  "model_name": "gemma3:12b",
+  "model_digest": "f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a",
+  "total_calls": 28,
+  "benchmark_design": {
+    "total_cases": 12,
+    "stratification": "12 stratified coverage cases across 4 predicate modes (TIME_VARYING: 4, ADDITIVE: 4, EPISODIC: 2, INTERVAL_BOUNDED: 2)"
+  },
+  "canary_determinism": {
+    "total_canaries": 4,
+    "raw_string_matches": 4,
+    "raw_determinism_rate": 1.0,
+    "semantic_json_matches": 4,
+    "semantic_determinism_rate": 1.0,
+    "scope_note": "Exact stability observed on 4/4 frozen replay canaries under temp 0, seed 42"
+  },
+  "field_level_extraction": {
+    "subject_accuracy": 0.8333,
+    "predicate_accuracy": 1.0,
+    "predicate_accuracy_note": "12/12 predicate reflects prompt reproduction / schema compliance (target predicate was supplied in prompt)",
+    "object_accuracy": 0.0833,
+    "t_valid_start_accuracy": 1.0,
+    "t_valid_end_accuracy": 1.0,
+    "temporal_interval_note": "12/12 temporal interval extraction reflects accurate start time and open-vs-bounded interval discrimination (including 2/2 bounded leases)",
+    "complete_tuple_accuracy": 0.0833
+  },
+  "zero_call_normalization_audit": {
+    "total_cases": 12,
+    "normalized_exact_matches": 11,
+    "post_normalization_accuracy": 0.9167,
+    "unresolved_cases": [
+      "C6C_03 (Semantic-role attribution error: extracted reporting sensor 'Field Sensor Alpha' rather than monitored entity 'Server_Node_1')"
+    ],
+    "conclusion": "Under deterministic ontology-normalization, 11/12 frozen outputs map to canonical observations; the sole failure is semantic-role assignment rather than surface symbol realization"
+  },
+  "counterfactual_normalized_n2_replay": {
+    "layer_a_transition_fidelity": 0.9167,
+    "active_occurrence_set_fidelity": 0.9167,
+    "semantic_premise_state_fidelity": 0.9167,
+    "layer_c_support_fidelity": 1.0,
+    "layer_c_entitlement_accuracy": 1.0
+  },
+  "arm_n1_direct_transition": {
+    "total_cases": 12,
+    "layer_a_transition_fidelity": 0.0,
+    "active_occurrence_set_fidelity": 0.1667,
+    "semantic_premise_state_fidelity": 0.1667,
+    "layer_c_support_fidelity": 0.1667,
+    "layer_c_entitlement_accuracy": 0.1667,
+    "phenotype": "Neural transition-policy collapse toward replacement semantics (spontaneous bias emitting SUPERSEDES across 10/12 cases regardless of ADDITIVE/EPISODIC modes)"
+  },
+  "arm_n2_modular_extraction": {
+    "total_cases": 12,
+    "layer_0_exact_extraction_accuracy": 0.0833,
+    "layer_a_transition_fidelity": 0.8333,
+    "active_occurrence_set_fidelity": 0.9167,
+    "semantic_premise_state_fidelity": 0.1667,
+    "layer_c_support_fidelity": 0.25,
+    "layer_c_entitlement_accuracy": 0.25,
+    "p_final_correct_given_exact_observation": {
+      "neural_empirical_sample": "1 / 1 (100.0%) (sole exact extraction case remained 100% correct downstream)",
+      "oracle_ceiling": "12 / 12 (100.0%)",
+      "runtime_autoimmunity": "0 / 12 (0.0%)"
+    },
+    "query_level_outcome_invariance": "3 / 12 (25.0%) final entitlement correct despite 1/12 exact extraction (query-level outcome invariance under surface lexical differences)"
+  },
+  "fault_localization_principle": "Epistemic Error Boundary Externalization: Error origin is localized to Layer 0; deterministic runtime contains error propagation after admission without runtime autoimmunity"
+}

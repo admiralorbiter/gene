@@ -1,0 +1,1441 @@
+{
+  "benchmark": "SCOUT-C",
+  "total_cases": 40,
+  "neural_correct": 18,
+  "hybrid_correct": 26,
+  "false_merges_raw": 10,
+  "false_merges_hybrid": 1,
+  "guardrail_overrides": 14,
+  "category_neural_stats": {
+    "suffix": {
+      "correct": 1,
+      "total": 2
+    },
+    "partition": {
+      "correct": 0,
+      "total": 1
+    },
+    "slice": {
+      "correct": 0,
+      "total": 1
+    },
+    "blade": {
+      "correct": 0,
+      "total": 1
+    },
+    "module": {
+      "correct": 0,
+      "total": 1
+    },
+    "alias": {
+      "correct": 2,
+      "total": 2
+    },
+    "auxiliary": {
+      "correct": 0,
+      "total": 1
+    },
+    "secondary": {
+      "correct": 0,
+      "total": 1
+    },
+    "number": {
+      "correct": 0,
+      "total": 7
+    },
+    "legitimate": {
+      "correct": 3,
+      "total": 3
+    },
+    "location": {
+      "correct": 1,
+      "total": 3
+    },
+    "rack": {
+      "correct": 1,
+      "total": 1
+    },
+    "bay": {
+      "correct": 0,
+      "total": 1
+    },
+    "firmware": {
+      "correct": 1,
+      "total": 2
+    },
+    "site": {
+      "correct": 1,
+      "total": 2
+    },
+    "exact": {
+      "correct": 1,
+      "total": 1
+    },
+    "bare": {
+      "correct": 7,
+      "total": 10
+    }
+  },
+  "category_hybrid_stats": {
+    "suffix": {
+      "correct": 2,
+      "total": 2
+    },
+    "partition": {
+      "correct": 1,
+      "total": 1
+    },
+    "slice": {
+      "correct": 1,
+      "total": 1
+    },
+    "blade": {
+      "correct": 1,
+      "total": 1
+    },
+    "module": {
+      "correct": 1,
+      "total": 1
+    },
+    "alias": {
+      "correct": 2,
+      "total": 2
+    },
+    "auxiliary": {
+      "correct": 1,
+      "total": 1
+    },
+    "secondary": {
+      "correct": 1,
+      "total": 1
+    },
+    "number": {
+      "correct": 0,
+      "total": 7
+    },
+    "legitimate": {
+      "correct": 2,
+      "total": 3
+    },
+    "location": {
+      "correct": 1,
+      "total": 3
+    },
+    "rack": {
+      "correct": 0,
+      "total": 1
+    },
+    "bay": {
+      "correct": 1,
+      "total": 1
+    },
+    "firmware": {
+      "correct": 0,
+      "total": 2
+    },
+    "site": {
+      "correct": 1,
+      "total": 2
+    },
+    "exact": {
+      "correct": 1,
+      "total": 1
+    },
+    "bare": {
+      "correct": 10,
+      "total": 10
+    }
+  },
+  "cases": [
+    {
+      "case_id": "C1-01",
+      "mention": "Cluster 4-B",
+      "category": "suffix_partition",
+      "gold": {
+        "judgment": "NOVEL",
+        "mutation": "CREATE_PROVISIONAL",
+        "target_id": null,
+        "must_not_link": [
+          "compute_cluster_4"
+        ]
+      },
+      "raw_neural": {
+        "identity_judgment": "EXISTING",
+        "registry_mutation": "LINK",
+        "target_id": "compute_cluster_4",
+        "must_not_link": [],
+        "confidence": 0.95,
+        "rationale": "The mention 'Cluster 4' strongly suggests a link to 'Compute Cluster 4'. The '-B' suffix likely indicates a specific instance or component within the cluster."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "NOVEL",
+        "registry_mutation": "CREATE_PROVISIONAL",
+        "target_id": null,
+        "must_not_link": [
+          "compute_cluster_4"
+        ],
+        "confidence": 0.95,
+        "rationale": "The mention 'Cluster 4' strongly suggests a link to 'Compute Cluster 4'. The '-B' suffix likely indicates a specific instance or component within the cluster.",
+        "guardrail_actions": [
+          "OVERRIDE_PARTITION_MERGE: blocked merge of 'Cluster 4-B' into parent 'compute_cluster_4'"
+        ]
+      },
+      "neural_correct": false,
+      "hybrid_correct": true
+    },
+    {
+      "case_id": "C1-02",
+      "mention": "Model X-B",
+      "category": "suffix_model_variant",
+      "gold": {
+        "judgment": "EXISTING",
+        "mutation": "LINK",
+        "target_id": "model_x",
+        "must_not_link": []
+      },
+      "raw_neural": {
+        "identity_judgment": "EXISTING",
+        "registry_mutation": "LINK",
+        "target_id": "model_x",
+        "must_not_link": [],
+        "confidence": 0.95,
+        "rationale": "The mention 'Model X-B' is described as a revision alias of 'Model X', strongly indicating a relationship to the existing entity 'model_x'."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "EXISTING",
+        "registry_mutation": "LINK",
+        "target_id": "model_x",
+        "must_not_link": [],
+        "confidence": 0.95,
+        "rationale": "The mention 'Model X-B' is described as a revision alias of 'Model X', strongly indicating a relationship to the existing entity 'model_x'.",
+        "guardrail_actions": []
+      },
+      "neural_correct": true,
+      "hybrid_correct": true
+    },
+    {
+      "case_id": "C1-03",
+      "mention": "Compute Cluster 1 Partition 2",
+      "category": "partition_explicit",
+      "gold": {
+        "judgment": "NOVEL",
+        "mutation": "CREATE_PROVISIONAL",
+        "target_id": null,
+        "must_not_link": [
+          "compute_cluster_1"
+        ]
+      },
+      "raw_neural": {
+        "identity_judgment": "EXISTING",
+        "registry_mutation": "LINK",
+        "target_id": "compute_cluster_1",
+        "must_not_link": [],
+        "confidence": 0.95,
+        "rationale": "The mention 'Compute Cluster 1' is an exact match for the canonical name of the existing entity 'compute_cluster_1'."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "NOVEL",
+        "registry_mutation": "CREATE_PROVISIONAL",
+        "target_id": null,
+        "must_not_link": [
+          "compute_cluster_1"
+        ],
+        "confidence": 0.95,
+        "rationale": "The mention 'Compute Cluster 1' is an exact match for the canonical name of the existing entity 'compute_cluster_1'.",
+        "guardrail_actions": [
+          "OVERRIDE_PARTITION_MERGE: blocked merge of 'Compute Cluster 1 Partition 2' into parent 'compute_cluster_1'"
+        ]
+      },
+      "neural_correct": false,
+      "hybrid_correct": true
+    },
+    {
+      "case_id": "C1-04",
+      "mention": "Node 1 Slice A",
+      "category": "slice_explicit",
+      "gold": {
+        "judgment": "NOVEL",
+        "mutation": "CREATE_PROVISIONAL",
+        "target_id": null,
+        "must_not_link": [
+          "aurora_node_1"
+        ]
+      },
+      "raw_neural": {
+        "identity_judgment": "EXISTING",
+        "registry_mutation": "LINK",
+        "target_id": "aurora_node_1",
+        "must_not_link": [],
+        "confidence": 0.95,
+        "rationale": "The mention 'Node 1' is an alias for 'Aurora Node 1'."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "NOVEL",
+        "registry_mutation": "CREATE_PROVISIONAL",
+        "target_id": null,
+        "must_not_link": [
+          "aurora_node_1"
+        ],
+        "confidence": 0.95,
+        "rationale": "The mention 'Node 1' is an alias for 'Aurora Node 1'.",
+        "guardrail_actions": [
+          "OVERRIDE_PARTITION_MERGE: blocked merge of 'Node 1 Slice A' into parent 'aurora_node_1'"
+        ]
+      },
+      "neural_correct": false,
+      "hybrid_correct": true
+    },
+    {
+      "case_id": "C1-05",
+      "mention": "Cluster 1 Blade 3",
+      "category": "blade_explicit",
+      "gold": {
+        "judgment": "NOVEL",
+        "mutation": "CREATE_PROVISIONAL",
+        "target_id": null,
+        "must_not_link": [
+          "compute_cluster_1"
+        ]
+      },
+      "raw_neural": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "CREATE_PROVISIONAL",
+        "target_id": "compute_cluster_1",
+        "must_not_link": [],
+        "confidence": 0.7,
+        "rationale": "The mention 'Cluster 1' is an alias for 'Compute Cluster 1'. However, 'Blade 3' suggests a more specific entity within the cluster, which may or may not be represented in the registry. Creating a provisional entry allows for further investigation."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "NOVEL",
+        "registry_mutation": "CREATE_PROVISIONAL",
+        "target_id": null,
+        "must_not_link": [
+          "compute_cluster_1"
+        ],
+        "confidence": 0.7,
+        "rationale": "The mention 'Cluster 1' is an alias for 'Compute Cluster 1'. However, 'Blade 3' suggests a more specific entity within the cluster, which may or may not be represented in the registry. Creating a provisional entry allows for further investigation.",
+        "guardrail_actions": [
+          "OVERRIDE_PARTITION_MERGE: blocked merge of 'Cluster 1 Blade 3' into parent 'compute_cluster_1'"
+        ]
+      },
+      "neural_correct": false,
+      "hybrid_correct": true
+    },
+    {
+      "case_id": "C1-06",
+      "mention": "Storage Array Alpha Module 2",
+      "category": "module_explicit",
+      "gold": {
+        "judgment": "NOVEL",
+        "mutation": "CREATE_PROVISIONAL",
+        "target_id": null,
+        "must_not_link": [
+          "storage_array_alpha"
+        ]
+      },
+      "raw_neural": {
+        "identity_judgment": "EXISTING",
+        "registry_mutation": "LINK",
+        "target_id": "storage_array_alpha",
+        "must_not_link": [],
+        "confidence": 0.95,
+        "rationale": "The mention 'Storage Array Alpha' directly matches the canonical name of the existing entity 'storage_array_alpha'."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "NOVEL",
+        "registry_mutation": "CREATE_PROVISIONAL",
+        "target_id": null,
+        "must_not_link": [
+          "storage_array_alpha"
+        ],
+        "confidence": 0.95,
+        "rationale": "The mention 'Storage Array Alpha' directly matches the canonical name of the existing entity 'storage_array_alpha'.",
+        "guardrail_actions": [
+          "OVERRIDE_PARTITION_MERGE: blocked merge of 'Storage Array Alpha Module 2' into parent 'storage_array_alpha'"
+        ]
+      },
+      "neural_correct": false,
+      "hybrid_correct": true
+    },
+    {
+      "case_id": "C1-07",
+      "mention": "Cluster One Main",
+      "category": "alias_variant",
+      "gold": {
+        "judgment": "EXISTING",
+        "mutation": "LINK",
+        "target_id": "compute_cluster_1",
+        "must_not_link": []
+      },
+      "raw_neural": {
+        "identity_judgment": "EXISTING",
+        "registry_mutation": "LINK",
+        "target_id": "compute_cluster_1",
+        "must_not_link": [],
+        "confidence": 0.95,
+        "rationale": "The mention 'Cluster One' is a direct alias of 'Compute Cluster 1'."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "EXISTING",
+        "registry_mutation": "LINK",
+        "target_id": "compute_cluster_1",
+        "must_not_link": [],
+        "confidence": 0.95,
+        "rationale": "The mention 'Cluster One' is a direct alias of 'Compute Cluster 1'.",
+        "guardrail_actions": []
+      },
+      "neural_correct": true,
+      "hybrid_correct": true
+    },
+    {
+      "case_id": "C1-08",
+      "mention": "AN-1 Primary",
+      "category": "alias_variant",
+      "gold": {
+        "judgment": "EXISTING",
+        "mutation": "LINK",
+        "target_id": "aurora_node_1",
+        "must_not_link": []
+      },
+      "raw_neural": {
+        "identity_judgment": "EXISTING",
+        "registry_mutation": "LINK",
+        "target_id": "aurora_node_1",
+        "must_not_link": [],
+        "confidence": 0.95,
+        "rationale": "The mention 'AN-1' is a direct alias of 'aurora_node_1'."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "EXISTING",
+        "registry_mutation": "LINK",
+        "target_id": "aurora_node_1",
+        "must_not_link": [],
+        "confidence": 0.95,
+        "rationale": "The mention 'AN-1' is a direct alias of 'aurora_node_1'.",
+        "guardrail_actions": []
+      },
+      "neural_correct": true,
+      "hybrid_correct": true
+    },
+    {
+      "case_id": "C1-09",
+      "mention": "Cluster 4 Aux Unit",
+      "category": "auxiliary_partition",
+      "gold": {
+        "judgment": "NOVEL",
+        "mutation": "CREATE_PROVISIONAL",
+        "target_id": null,
+        "must_not_link": [
+          "compute_cluster_4"
+        ]
+      },
+      "raw_neural": {
+        "identity_judgment": "EXISTING",
+        "registry_mutation": "LINK",
+        "target_id": "compute_cluster_4",
+        "must_not_link": [],
+        "confidence": 0.95,
+        "rationale": "The mention 'Cluster 4' strongly aligns with the canonical name of 'Compute Cluster 4'. 'Aux Unit' is likely a descriptive term and doesn't preclude the match."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "NOVEL",
+        "registry_mutation": "CREATE_PROVISIONAL",
+        "target_id": null,
+        "must_not_link": [
+          "compute_cluster_4"
+        ],
+        "confidence": 0.95,
+        "rationale": "The mention 'Cluster 4' strongly aligns with the canonical name of 'Compute Cluster 4'. 'Aux Unit' is likely a descriptive term and doesn't preclude the match.",
+        "guardrail_actions": [
+          "OVERRIDE_PARTITION_MERGE: blocked merge of 'Cluster 4 Aux Unit' into parent 'compute_cluster_4'"
+        ]
+      },
+      "neural_correct": false,
+      "hybrid_correct": true
+    },
+    {
+      "case_id": "C1-10",
+      "mention": "Storage Array Alpha Secondary",
+      "category": "secondary_partition",
+      "gold": {
+        "judgment": "NOVEL",
+        "mutation": "CREATE_PROVISIONAL",
+        "target_id": null,
+        "must_not_link": [
+          "storage_array_alpha"
+        ]
+      },
+      "raw_neural": {
+        "identity_judgment": "EXISTING",
+        "registry_mutation": "LINK",
+        "target_id": "storage_array_alpha",
+        "must_not_link": [],
+        "confidence": 0.95,
+        "rationale": "The mention 'Storage Array Alpha Secondary' strongly aligns with the canonical name 'Storage Array Alpha' and its aliases. The 'Secondary' suffix suggests a related entity, justifying a link."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "NOVEL",
+        "registry_mutation": "CREATE_PROVISIONAL",
+        "target_id": null,
+        "must_not_link": [
+          "storage_array_alpha"
+        ],
+        "confidence": 0.95,
+        "rationale": "The mention 'Storage Array Alpha Secondary' strongly aligns with the canonical name 'Storage Array Alpha' and its aliases. The 'Secondary' suffix suggests a related entity, justifying a link.",
+        "guardrail_actions": [
+          "OVERRIDE_PARTITION_MERGE: blocked merge of 'Storage Array Alpha Secondary' into parent 'storage_array_alpha'"
+        ]
+      },
+      "neural_correct": false,
+      "hybrid_correct": true
+    },
+    {
+      "case_id": "C2-01",
+      "mention": "Node 10",
+      "category": "number_collision",
+      "gold": {
+        "judgment": "NOVEL",
+        "mutation": "CREATE_PROVISIONAL",
+        "target_id": null,
+        "must_not_link": [
+          "aurora_node_1"
+        ]
+      },
+      "raw_neural": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": [],
+        "confidence": 0.6,
+        "rationale": "The mention 'Node 10' is similar to 'Node 1' which is an existing entity. However, the lack of context makes it ambiguous whether it refers to the existing entity or a new one. Deferring allows for further context to resolve."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": [],
+        "confidence": 0.6,
+        "rationale": "The mention 'Node 10' is similar to 'Node 1' which is an existing entity. However, the lack of context makes it ambiguous whether it refers to the existing entity or a new one. Deferring allows for further context to resolve.",
+        "guardrail_actions": []
+      },
+      "neural_correct": false,
+      "hybrid_correct": false
+    },
+    {
+      "case_id": "C2-02",
+      "mention": "Cluster 10",
+      "category": "number_collision",
+      "gold": {
+        "judgment": "NOVEL",
+        "mutation": "CREATE_PROVISIONAL",
+        "target_id": null,
+        "must_not_link": [
+          "compute_cluster_1"
+        ]
+      },
+      "raw_neural": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": [],
+        "confidence": 0.6,
+        "rationale": "The mention 'Cluster 10' is similar to 'Cluster 1' which exists in the registry, but the difference in number suggests it might be a distinct entity. Further context is needed to confirm."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": [],
+        "confidence": 0.6,
+        "rationale": "The mention 'Cluster 10' is similar to 'Cluster 1' which exists in the registry, but the difference in number suggests it might be a distinct entity. Further context is needed to confirm.",
+        "guardrail_actions": []
+      },
+      "neural_correct": false,
+      "hybrid_correct": false
+    },
+    {
+      "case_id": "C2-03",
+      "mention": "CC-10",
+      "category": "number_collision",
+      "gold": {
+        "judgment": "NOVEL",
+        "mutation": "CREATE_PROVISIONAL",
+        "target_id": null,
+        "must_not_link": [
+          "compute_cluster_1"
+        ]
+      },
+      "raw_neural": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": [],
+        "confidence": 0.7,
+        "rationale": "The mention 'CC-10' is similar to existing aliases 'CC-1' and 'CC-4', but the suffix '10' suggests a potential new entity. Deferring resolution until more context is available."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": [],
+        "confidence": 0.7,
+        "rationale": "The mention 'CC-10' is similar to existing aliases 'CC-1' and 'CC-4', but the suffix '10' suggests a potential new entity. Deferring resolution until more context is available.",
+        "guardrail_actions": []
+      },
+      "neural_correct": false,
+      "hybrid_correct": false
+    },
+    {
+      "case_id": "C2-04",
+      "mention": "Aurora Node 11",
+      "category": "number_collision",
+      "gold": {
+        "judgment": "NOVEL",
+        "mutation": "CREATE_PROVISIONAL",
+        "target_id": null,
+        "must_not_link": [
+          "aurora_node_1"
+        ]
+      },
+      "raw_neural": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "CREATE_PROVISIONAL",
+        "target_id": "aurora_node_11",
+        "must_not_link": [
+          "aurora_node_1"
+        ],
+        "confidence": 0.6,
+        "rationale": "The mention 'Aurora Node 11' is similar to 'Aurora Node 1' but the number suffix suggests a potentially new entity. Creating a provisional entry allows for further investigation."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "CREATE_PROVISIONAL",
+        "target_id": "aurora_node_11",
+        "must_not_link": [
+          "aurora_node_1"
+        ],
+        "confidence": 0.6,
+        "rationale": "The mention 'Aurora Node 11' is similar to 'Aurora Node 1' but the number suffix suggests a potentially new entity. Creating a provisional entry allows for further investigation.",
+        "guardrail_actions": []
+      },
+      "neural_correct": false,
+      "hybrid_correct": false
+    },
+    {
+      "case_id": "C2-05",
+      "mention": "Cluster 40",
+      "category": "number_collision",
+      "gold": {
+        "judgment": "NOVEL",
+        "mutation": "CREATE_PROVISIONAL",
+        "target_id": null,
+        "must_not_link": [
+          "compute_cluster_4"
+        ]
+      },
+      "raw_neural": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": [],
+        "confidence": 0.6,
+        "rationale": "The mention 'Cluster 40' is similar to 'Cluster 4' in the registry, but the difference in the number suggests it might be a distinct entity. Further context is needed to confirm."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": [],
+        "confidence": 0.6,
+        "rationale": "The mention 'Cluster 40' is similar to 'Cluster 4' in the registry, but the difference in the number suggests it might be a distinct entity. Further context is needed to confirm.",
+        "guardrail_actions": []
+      },
+      "neural_correct": false,
+      "hybrid_correct": false
+    },
+    {
+      "case_id": "C2-06",
+      "mention": "Cluster 1",
+      "category": "legitimate_exact",
+      "gold": {
+        "judgment": "EXISTING",
+        "mutation": "LINK",
+        "target_id": "compute_cluster_1",
+        "must_not_link": []
+      },
+      "raw_neural": {
+        "identity_judgment": "EXISTING",
+        "registry_mutation": "LINK",
+        "target_id": "compute_cluster_1",
+        "must_not_link": [],
+        "confidence": 0.95,
+        "rationale": "The mention 'Cluster 1' is an alias for 'Compute Cluster 1' as defined in the registry."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "EXISTING",
+        "registry_mutation": "LINK",
+        "target_id": "compute_cluster_1",
+        "must_not_link": [],
+        "confidence": 0.95,
+        "rationale": "The mention 'Cluster 1' is an alias for 'Compute Cluster 1' as defined in the registry.",
+        "guardrail_actions": []
+      },
+      "neural_correct": true,
+      "hybrid_correct": true
+    },
+    {
+      "case_id": "C2-07",
+      "mention": "CC-4",
+      "category": "legitimate_exact",
+      "gold": {
+        "judgment": "EXISTING",
+        "mutation": "LINK",
+        "target_id": "compute_cluster_4",
+        "must_not_link": []
+      },
+      "raw_neural": {
+        "identity_judgment": "EXISTING",
+        "registry_mutation": "LINK",
+        "target_id": "compute_cluster_4",
+        "must_not_link": [],
+        "confidence": 0.95,
+        "rationale": "Mention 'CC-4' is an alias of 'Compute Cluster 4' according to the registry."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "NOVEL",
+        "registry_mutation": "CREATE_PROVISIONAL",
+        "target_id": null,
+        "must_not_link": [
+          "compute_cluster_4"
+        ],
+        "confidence": 0.95,
+        "rationale": "Mention 'CC-4' is an alias of 'Compute Cluster 4' according to the registry.",
+        "guardrail_actions": [
+          "OVERRIDE_PARTITION_MERGE: blocked merge of 'CC-4' into parent 'compute_cluster_4'"
+        ]
+      },
+      "neural_correct": true,
+      "hybrid_correct": false
+    },
+    {
+      "case_id": "C2-08",
+      "mention": "Aurora Node 1",
+      "category": "legitimate_exact",
+      "gold": {
+        "judgment": "EXISTING",
+        "mutation": "LINK",
+        "target_id": "aurora_node_1",
+        "must_not_link": []
+      },
+      "raw_neural": {
+        "identity_judgment": "EXISTING",
+        "registry_mutation": "LINK",
+        "target_id": "aurora_node_1",
+        "must_not_link": [],
+        "confidence": 0.95,
+        "rationale": "The mention 'Aurora Node 1' exactly matches the canonical name of the existing entity 'aurora_node_1'."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "EXISTING",
+        "registry_mutation": "LINK",
+        "target_id": "aurora_node_1",
+        "must_not_link": [],
+        "confidence": 0.95,
+        "rationale": "The mention 'Aurora Node 1' exactly matches the canonical name of the existing entity 'aurora_node_1'.",
+        "guardrail_actions": []
+      },
+      "neural_correct": true,
+      "hybrid_correct": true
+    },
+    {
+      "case_id": "C2-09",
+      "mention": "Node 100",
+      "category": "number_collision",
+      "gold": {
+        "judgment": "NOVEL",
+        "mutation": "CREATE_PROVISIONAL",
+        "target_id": null,
+        "must_not_link": [
+          "aurora_node_1"
+        ]
+      },
+      "raw_neural": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": [],
+        "confidence": 0.6,
+        "rationale": "The mention 'Node 100' is similar to 'Node 1' (alias of aurora_node_1), but lacks sufficient context to confirm a match. Deferring for further investigation."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": [],
+        "confidence": 0.6,
+        "rationale": "The mention 'Node 100' is similar to 'Node 1' (alias of aurora_node_1), but lacks sufficient context to confirm a match. Deferring for further investigation.",
+        "guardrail_actions": []
+      },
+      "neural_correct": false,
+      "hybrid_correct": false
+    },
+    {
+      "case_id": "C2-10",
+      "mention": "CC-100",
+      "category": "number_collision",
+      "gold": {
+        "judgment": "NOVEL",
+        "mutation": "CREATE_PROVISIONAL",
+        "target_id": null,
+        "must_not_link": [
+          "compute_cluster_1"
+        ]
+      },
+      "raw_neural": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": [],
+        "confidence": 0.6,
+        "rationale": "The mention 'CC-100' shares the prefix 'CC-' with 'CC-1' (Compute Cluster 1), but the suffix '100' is novel. Further context is needed to determine if it's a related entity or a completely new one."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": [],
+        "confidence": 0.6,
+        "rationale": "The mention 'CC-100' shares the prefix 'CC-' with 'CC-1' (Compute Cluster 1), but the suffix '100' is novel. Further context is needed to determine if it's a related entity or a completely new one.",
+        "guardrail_actions": []
+      },
+      "neural_correct": false,
+      "hybrid_correct": false
+    },
+    {
+      "case_id": "C3-01",
+      "mention": "Cluster 1 (DC-West)",
+      "category": "location_qualifier_same",
+      "gold": {
+        "judgment": "EXISTING",
+        "mutation": "LINK",
+        "target_id": "compute_cluster_1",
+        "must_not_link": []
+      },
+      "raw_neural": {
+        "identity_judgment": "EXISTING",
+        "registry_mutation": "LINK",
+        "target_id": "compute_cluster_1",
+        "must_not_link": [],
+        "confidence": 0.95,
+        "rationale": "The mention 'Cluster 1' is an alias for 'Compute Cluster 1'."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "EXISTING",
+        "registry_mutation": "LINK",
+        "target_id": "compute_cluster_1",
+        "must_not_link": [],
+        "confidence": 0.95,
+        "rationale": "The mention 'Cluster 1' is an alias for 'Compute Cluster 1'.",
+        "guardrail_actions": []
+      },
+      "neural_correct": true,
+      "hybrid_correct": true
+    },
+    {
+      "case_id": "C3-02",
+      "mention": "Cluster 1 DC-East Branch",
+      "category": "location_qualifier_diff",
+      "gold": {
+        "judgment": "NOVEL",
+        "mutation": "CREATE_PROVISIONAL",
+        "target_id": null,
+        "must_not_link": [
+          "compute_cluster_1"
+        ]
+      },
+      "raw_neural": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": [],
+        "confidence": 0.7,
+        "rationale": "The mention 'Cluster 1' is an alias for 'Compute Cluster 1'. However, the addition of 'DC-East Branch' introduces a potential specificity not captured in the existing registry. Further investigation is needed to determine if this is a distinct entity or a sub-component of an existing one."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": [],
+        "confidence": 0.7,
+        "rationale": "The mention 'Cluster 1' is an alias for 'Compute Cluster 1'. However, the addition of 'DC-East Branch' introduces a potential specificity not captured in the existing registry. Further investigation is needed to determine if this is a distinct entity or a sub-component of an existing one.",
+        "guardrail_actions": []
+      },
+      "neural_correct": false,
+      "hybrid_correct": false
+    },
+    {
+      "case_id": "C3-03",
+      "mention": "Storage Array Alpha [Building 4]",
+      "category": "location_qualifier_same",
+      "gold": {
+        "judgment": "EXISTING",
+        "mutation": "LINK",
+        "target_id": "storage_array_alpha",
+        "must_not_link": []
+      },
+      "raw_neural": {
+        "identity_judgment": "EXISTING",
+        "registry_mutation": "DEFER",
+        "target_id": "storage_array_alpha",
+        "must_not_link": [],
+        "confidence": 0.95,
+        "rationale": "The mention 'Storage Array Alpha' directly matches an existing entity in the registry. The location information '[Building 4]' is contextual and doesn't necessitate a new entity or link."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "EXISTING",
+        "registry_mutation": "DEFER",
+        "target_id": "storage_array_alpha",
+        "must_not_link": [],
+        "confidence": 0.95,
+        "rationale": "The mention 'Storage Array Alpha' directly matches an existing entity in the registry. The location information '[Building 4]' is contextual and doesn't necessitate a new entity or link.",
+        "guardrail_actions": []
+      },
+      "neural_correct": false,
+      "hybrid_correct": false
+    },
+    {
+      "case_id": "C3-04",
+      "mention": "Rack 12 Node 1",
+      "category": "rack_identifier",
+      "gold": {
+        "judgment": "EXISTING",
+        "mutation": "LINK",
+        "target_id": "aurora_node_1",
+        "must_not_link": []
+      },
+      "raw_neural": {
+        "identity_judgment": "EXISTING",
+        "registry_mutation": "LINK",
+        "target_id": "aurora_node_1",
+        "must_not_link": [],
+        "confidence": 0.95,
+        "rationale": "The mention 'Node 1' is an alias for 'Aurora Node 1'."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "NOVEL",
+        "registry_mutation": "CREATE_PROVISIONAL",
+        "target_id": null,
+        "must_not_link": [
+          "aurora_node_1"
+        ],
+        "confidence": 0.95,
+        "rationale": "The mention 'Node 1' is an alias for 'Aurora Node 1'.",
+        "guardrail_actions": [
+          "OVERRIDE_NUMBER_COLLISION: mention digits ['12', '1'] != target digits ['1']"
+        ]
+      },
+      "neural_correct": true,
+      "hybrid_correct": false
+    },
+    {
+      "case_id": "C3-05",
+      "mention": "Cluster 4 Bay 2 Unit",
+      "category": "bay_partition",
+      "gold": {
+        "judgment": "NOVEL",
+        "mutation": "CREATE_PROVISIONAL",
+        "target_id": null,
+        "must_not_link": [
+          "compute_cluster_4"
+        ]
+      },
+      "raw_neural": {
+        "identity_judgment": "EXISTING",
+        "registry_mutation": "LINK",
+        "target_id": "compute_cluster_4",
+        "must_not_link": [],
+        "confidence": 0.95,
+        "rationale": "The mention 'Cluster 4' strongly matches the canonical name and aliases of compute_cluster_4."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "NOVEL",
+        "registry_mutation": "CREATE_PROVISIONAL",
+        "target_id": null,
+        "must_not_link": [
+          "compute_cluster_4"
+        ],
+        "confidence": 0.95,
+        "rationale": "The mention 'Cluster 4' strongly matches the canonical name and aliases of compute_cluster_4.",
+        "guardrail_actions": [
+          "OVERRIDE_NUMBER_COLLISION: mention digits ['4', '2'] != target digits ['4']"
+        ]
+      },
+      "neural_correct": false,
+      "hybrid_correct": true
+    },
+    {
+      "case_id": "C3-06",
+      "mention": "Cluster 1 running Firmware v3.2",
+      "category": "firmware_qualifier",
+      "gold": {
+        "judgment": "EXISTING",
+        "mutation": "LINK",
+        "target_id": "compute_cluster_1",
+        "must_not_link": []
+      },
+      "raw_neural": {
+        "identity_judgment": "EXISTING",
+        "registry_mutation": "LINK",
+        "target_id": "compute_cluster_1",
+        "must_not_link": [],
+        "confidence": 0.95,
+        "rationale": "The mention 'Cluster 1' is an alias for 'Compute Cluster 1' in the registry."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "NOVEL",
+        "registry_mutation": "CREATE_PROVISIONAL",
+        "target_id": null,
+        "must_not_link": [
+          "compute_cluster_1"
+        ],
+        "confidence": 0.95,
+        "rationale": "The mention 'Cluster 1' is an alias for 'Compute Cluster 1' in the registry.",
+        "guardrail_actions": [
+          "OVERRIDE_NUMBER_COLLISION: mention digits ['1', '3', '2'] != target digits ['1']"
+        ]
+      },
+      "neural_correct": true,
+      "hybrid_correct": false
+    },
+    {
+      "case_id": "C3-07",
+      "mention": "Cluster 1 Prototype v4",
+      "category": "firmware_variant_novel",
+      "gold": {
+        "judgment": "NOVEL",
+        "mutation": "CREATE_PROVISIONAL",
+        "target_id": null,
+        "must_not_link": [
+          "compute_cluster_1"
+        ]
+      },
+      "raw_neural": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": [],
+        "confidence": 0.7,
+        "rationale": "The mention 'Cluster 1 Prototype v4' shares 'Cluster 1' with the existing entity 'Compute Cluster 1', but the 'Prototype v4' portion suggests a potential variant or sub-entity. Further investigation is needed to determine if it's a distinct entity or a version of an existing one."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": [],
+        "confidence": 0.7,
+        "rationale": "The mention 'Cluster 1 Prototype v4' shares 'Cluster 1' with the existing entity 'Compute Cluster 1', but the 'Prototype v4' portion suggests a potential variant or sub-entity. Further investigation is needed to determine if it's a distinct entity or a version of an existing one.",
+        "guardrail_actions": []
+      },
+      "neural_correct": false,
+      "hybrid_correct": false
+    },
+    {
+      "case_id": "C3-08",
+      "mention": "SAN Alpha West",
+      "category": "site_alias",
+      "gold": {
+        "judgment": "EXISTING",
+        "mutation": "LINK",
+        "target_id": "storage_array_alpha",
+        "must_not_link": []
+      },
+      "raw_neural": {
+        "identity_judgment": "EXISTING",
+        "registry_mutation": "LINK",
+        "target_id": "storage_array_alpha",
+        "must_not_link": [],
+        "confidence": 0.95,
+        "rationale": "The mention 'SAN Alpha West' is a regional alias for 'Storage Array Alpha', which is already present in the registry."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "EXISTING",
+        "registry_mutation": "LINK",
+        "target_id": "storage_array_alpha",
+        "must_not_link": [],
+        "confidence": 0.95,
+        "rationale": "The mention 'SAN Alpha West' is a regional alias for 'Storage Array Alpha', which is already present in the registry.",
+        "guardrail_actions": []
+      },
+      "neural_correct": true,
+      "hybrid_correct": true
+    },
+    {
+      "case_id": "C3-09",
+      "mention": "SAN Alpha Standby Enclave",
+      "category": "site_novel",
+      "gold": {
+        "judgment": "NOVEL",
+        "mutation": "CREATE_PROVISIONAL",
+        "target_id": null,
+        "must_not_link": [
+          "storage_array_alpha"
+        ]
+      },
+      "raw_neural": {
+        "identity_judgment": "EXISTING",
+        "registry_mutation": "LINK",
+        "target_id": "storage_array_alpha",
+        "must_not_link": [],
+        "confidence": 0.95,
+        "rationale": "The mention 'SAN Alpha' is a direct alias of 'Storage Array Alpha'."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "EXISTING",
+        "registry_mutation": "LINK",
+        "target_id": "storage_array_alpha",
+        "must_not_link": [],
+        "confidence": 0.95,
+        "rationale": "The mention 'SAN Alpha' is a direct alias of 'Storage Array Alpha'.",
+        "guardrail_actions": []
+      },
+      "neural_correct": false,
+      "hybrid_correct": false
+    },
+    {
+      "case_id": "C3-10",
+      "mention": "Cluster One",
+      "category": "exact_alias",
+      "gold": {
+        "judgment": "EXISTING",
+        "mutation": "LINK",
+        "target_id": "compute_cluster_1",
+        "must_not_link": []
+      },
+      "raw_neural": {
+        "identity_judgment": "EXISTING",
+        "registry_mutation": "LINK",
+        "target_id": "compute_cluster_1",
+        "must_not_link": [],
+        "confidence": 0.95,
+        "rationale": "Mention 'Cluster One' is an alias for 'Compute Cluster 1'."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "EXISTING",
+        "registry_mutation": "LINK",
+        "target_id": "compute_cluster_1",
+        "must_not_link": [],
+        "confidence": 0.95,
+        "rationale": "Mention 'Cluster One' is an alias for 'Compute Cluster 1'.",
+        "guardrail_actions": []
+      },
+      "neural_correct": true,
+      "hybrid_correct": true
+    },
+    {
+      "case_id": "C4-01",
+      "mention": "The System",
+      "category": "bare_token",
+      "gold": {
+        "judgment": "AMBIGUOUS",
+        "mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": []
+      },
+      "raw_neural": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": [],
+        "confidence": 0.6,
+        "rationale": "The phrase 'The System' is too generic and could refer to any system within the environment. More context is needed to resolve."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": [],
+        "confidence": 0.6,
+        "rationale": "The phrase 'The System' is too generic and could refer to any system within the environment. More context is needed to resolve.",
+        "guardrail_actions": []
+      },
+      "neural_correct": true,
+      "hybrid_correct": true
+    },
+    {
+      "case_id": "C4-02",
+      "mention": "The Node",
+      "category": "bare_token",
+      "gold": {
+        "judgment": "AMBIGUOUS",
+        "mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": []
+      },
+      "raw_neural": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": [],
+        "confidence": 0.6,
+        "rationale": "The mention 'The Node' is ambiguous. It could refer to any node in the system. Further context is needed to disambiguate."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": [],
+        "confidence": 0.6,
+        "rationale": "The mention 'The Node' is ambiguous. It could refer to any node in the system. Further context is needed to disambiguate.",
+        "guardrail_actions": []
+      },
+      "neural_correct": true,
+      "hybrid_correct": true
+    },
+    {
+      "case_id": "C4-03",
+      "mention": "The Cluster",
+      "category": "bare_token",
+      "gold": {
+        "judgment": "AMBIGUOUS",
+        "mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": []
+      },
+      "raw_neural": {
+        "identity_judgment": "EXISTING",
+        "registry_mutation": "LINK",
+        "target_id": "compute_cluster_1",
+        "must_not_link": [],
+        "confidence": 0.95,
+        "rationale": "The mention 'The Cluster' strongly aligns with the canonical name and aliases of 'Compute Cluster 1'. The context 'load rebalanced' is consistent with a cluster environment."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": [],
+        "confidence": 0.95,
+        "rationale": "The mention 'The Cluster' strongly aligns with the canonical name and aliases of 'Compute Cluster 1'. The context 'load rebalanced' is consistent with a cluster environment.",
+        "guardrail_actions": [
+          "OVERRIDE_BARE_TOKEN: generic token 'The Cluster' must be DEFER"
+        ]
+      },
+      "neural_correct": false,
+      "hybrid_correct": true
+    },
+    {
+      "case_id": "C4-04",
+      "mention": "The Array",
+      "category": "bare_token",
+      "gold": {
+        "judgment": "AMBIGUOUS",
+        "mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": []
+      },
+      "raw_neural": {
+        "identity_judgment": "EXISTING",
+        "registry_mutation": "LINK",
+        "target_id": "storage_array_alpha",
+        "must_not_link": [],
+        "confidence": 0.95,
+        "rationale": "The mention 'The Array' strongly aligns with the canonical name 'Storage Array Alpha' and its alias 'Array Alpha'."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": [],
+        "confidence": 0.95,
+        "rationale": "The mention 'The Array' strongly aligns with the canonical name 'Storage Array Alpha' and its alias 'Array Alpha'.",
+        "guardrail_actions": [
+          "OVERRIDE_BARE_TOKEN: generic token 'The Array' must be DEFER"
+        ]
+      },
+      "neural_correct": false,
+      "hybrid_correct": true
+    },
+    {
+      "case_id": "C4-05",
+      "mention": "Host Unit",
+      "category": "bare_token",
+      "gold": {
+        "judgment": "AMBIGUOUS",
+        "mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": []
+      },
+      "raw_neural": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": [],
+        "confidence": 0.6,
+        "rationale": "The mention 'Host Unit' is vague and could refer to a compute cluster, a node, or another type of resource. More context is needed to disambiguate."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": [],
+        "confidence": 0.6,
+        "rationale": "The mention 'Host Unit' is vague and could refer to a compute cluster, a node, or another type of resource. More context is needed to disambiguate.",
+        "guardrail_actions": []
+      },
+      "neural_correct": true,
+      "hybrid_correct": true
+    },
+    {
+      "case_id": "C4-06",
+      "mention": "Primary Unit",
+      "category": "bare_token",
+      "gold": {
+        "judgment": "AMBIGUOUS",
+        "mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": []
+      },
+      "raw_neural": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": [],
+        "confidence": 0.6,
+        "rationale": "The mention 'Primary Unit' is vague and could refer to multiple entities. More context is needed to determine the correct match."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": [],
+        "confidence": 0.6,
+        "rationale": "The mention 'Primary Unit' is vague and could refer to multiple entities. More context is needed to determine the correct match.",
+        "guardrail_actions": []
+      },
+      "neural_correct": true,
+      "hybrid_correct": true
+    },
+    {
+      "case_id": "C4-07",
+      "mention": "Backup Node",
+      "category": "bare_token",
+      "gold": {
+        "judgment": "AMBIGUOUS",
+        "mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": []
+      },
+      "raw_neural": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "CREATE_PROVISIONAL",
+        "target_id": null,
+        "must_not_link": [],
+        "confidence": 0.6,
+        "rationale": "The mention 'Backup Node' doesn't directly match any existing canonical names or aliases. It's likely a node, but could be a cluster or other resource. Creating a provisional entry allows for further investigation."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": [],
+        "confidence": 0.6,
+        "rationale": "The mention 'Backup Node' doesn't directly match any existing canonical names or aliases. It's likely a node, but could be a cluster or other resource. Creating a provisional entry allows for further investigation.",
+        "guardrail_actions": [
+          "OVERRIDE_BARE_TOKEN: generic token 'Backup Node' must be DEFER"
+        ]
+      },
+      "neural_correct": false,
+      "hybrid_correct": true
+    },
+    {
+      "case_id": "C4-08",
+      "mention": "Standby Cluster",
+      "category": "bare_token",
+      "gold": {
+        "judgment": "AMBIGUOUS",
+        "mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": []
+      },
+      "raw_neural": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": [],
+        "confidence": 0.6,
+        "rationale": "The mention 'Standby Cluster' is similar to 'Cluster 1' and 'Cluster 4', but not an exact match. Requires human review to determine if it refers to an existing cluster or a new one."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": [],
+        "confidence": 0.6,
+        "rationale": "The mention 'Standby Cluster' is similar to 'Cluster 1' and 'Cluster 4', but not an exact match. Requires human review to determine if it refers to an existing cluster or a new one.",
+        "guardrail_actions": []
+      },
+      "neural_correct": true,
+      "hybrid_correct": true
+    },
+    {
+      "case_id": "C4-09",
+      "mention": "Hardware Appliance",
+      "category": "bare_token",
+      "gold": {
+        "judgment": "AMBIGUOUS",
+        "mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": []
+      },
+      "raw_neural": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": [],
+        "confidence": 0.6,
+        "rationale": "The mention 'Hardware Appliance' is generic and could refer to any of several entities. More context is needed to determine the specific entity."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": [],
+        "confidence": 0.6,
+        "rationale": "The mention 'Hardware Appliance' is generic and could refer to any of several entities. More context is needed to determine the specific entity.",
+        "guardrail_actions": []
+      },
+      "neural_correct": true,
+      "hybrid_correct": true
+    },
+    {
+      "case_id": "C4-10",
+      "mention": "Target Device",
+      "category": "bare_token",
+      "gold": {
+        "judgment": "AMBIGUOUS",
+        "mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": []
+      },
+      "raw_neural": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": [],
+        "confidence": 0.6,
+        "rationale": "The mention 'Target Device' is vague and could refer to any device within the system. More context is needed to determine the specific entity."
+      },
+      "hybrid_decision": {
+        "identity_judgment": "AMBIGUOUS",
+        "registry_mutation": "DEFER",
+        "target_id": null,
+        "must_not_link": [],
+        "confidence": 0.6,
+        "rationale": "The mention 'Target Device' is vague and could refer to any device within the system. More context is needed to determine the specific entity.",
+        "guardrail_actions": []
+      },
+      "neural_correct": true,
+      "hybrid_correct": true
+    }
+  ]
+}

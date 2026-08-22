@@ -1,0 +1,487 @@
+{
+  "ledger_version": "3.0.0",
+  "project": "GENE (Genealogical Epistemic Network Experiments)",
+  "description": "Authoritative claim-evidence ledger mapping each core scientific claim in GENE to its empirical evidence sources, SHA-256 database checksums, execution commits, sample sizes, and boundary scope.",
+  "claims": [
+    {
+      "claim_id": "GENE-C01",
+      "claim_status": "observed",
+      "headline": "Exposure Is Not Ancestry",
+      "claim_text": "Informational ancestry in persistent LLM memory decomposes into three non-equivalent relations: exposure lineage (context presence), reported-support lineage (model citations), and causal lineage (interventional necessity). Self-reported citations under uncalibrated prompts frequently exhibit post-hoc confabulation and are not causal ground truth.",
+      "evidence_sources": [
+        {
+          "experiment": "Experiment 0-A (Lineage Observability & Citation Audit)",
+          "evidence_class": "live_neural_assay",
+          "artifact": "gene_exp0_20260819_180922.db",
+          "artifact_sha256": "9acd7d2877f650e7985e883680fadb4997267c1592b3c4538bdcfe075fb56938",
+          "execution_commit": "79b94cddfba49d0c2a2ebd916911db34ef3e0361",
+          "model": "gemma3:12b",
+          "n_calls": 200,
+          "n_evaluations": 152,
+          "unit_of_analysis": "call",
+          "formal_report": "docs/results/EXPERIMENT_0_WALKTHROUGH.md",
+          "primary_metric": "C_nec = 1.000 (causal necessity), H_D = 0.000 (hallucinated distractor rate)",
+          "git_tracked": false
+        },
+        {
+          "experiment": "Experiment 0-B (2x2 Factorial Calibration Assay)",
+          "evidence_class": "live_neural_assay",
+          "artifact": "gene_d1_c_v2_20260820_001206.db",
+          "artifact_sha256": "074b6665f622e1ca5a33397ff2a5ee9faaba1ecde72880c890132959d03f4ed2",
+          "execution_commit": "3c102bf7fc141ed65fe2bdd61194db1291a00520",
+          "model": "gemma3:12b",
+          "n_calls": 72,
+          "n_evaluations": 66,
+          "unit_of_analysis": "call",
+          "formal_report": "docs/results/EXPERIMENT_0_WALKTHROUGH.md",
+          "primary_metric": "Cell 4 Pass Rate = 66 / 66 (100.0% calibration across 276 total matrix calls)",
+          "git_tracked": false
+        }
+      ],
+      "scope_limitations": "Evaluated on synthetic worlds with deterministic ground-truth closure rules under structured JSON contracts with an explicit UNKNOWN rejection option.",
+      "replication_status": "same_model_verified"
+    },
+    {
+      "claim_id": "GENE-C02",
+      "claim_status": "observed",
+      "headline": "Semantic Infection via Sound Local Deduction",
+      "claim_text": "A corrupted root fact reproduces across successive generations of semantic transformation (supervisor -> protocol/clearance -> route/access tier) with 100% transmission fidelity (tau = 1.000) while every intermediate inference step remains 100% locally logically valid (D_ctx = 1, A = 1, E = 1, K = 1). Globally false information reproduces without requiring repeated reasoning failures.",
+      "evidence_sources": [
+        {
+          "experiment": "Experiment 1A (Multi-Generational Mutation Cascades)",
+          "evidence_class": "live_neural_assay",
+          "artifact": "gene_exp1_branching_v2_tal_20260820_013936.db",
+          "artifact_sha256": "907ee6a4ff1b428d98f744d5b4056e0ad96790f4a199c9b17f92d8fd77e36919",
+          "execution_commit": "69d3570feb0a687f19aedbe71c2871ad6d1c65eb",
+          "model": "gemma3:12b",
+          "n_calls": 72,
+          "n_evaluations": 72,
+          "unit_of_analysis": "call",
+          "formal_report": "docs/results/EXPERIMENT_1A_REPORT.md",
+          "primary_metric": "tau = 1.000, D_ctx = 1.000, Phenotype = semantic (0, 1, 1, 1, 1) across G1 and G2",
+          "git_tracked": false
+        }
+      ],
+      "scope_limitations": "Provides a controlled counterexample in synthetic procedural domains with 2-premise first-order Horn clause derivations.",
+      "replication_status": "same_model_verified"
+    },
+    {
+      "claim_id": "GENE-C03",
+      "claim_status": "derived_and_observed",
+      "headline": "Retrieval Governs Reproductive Opportunity",
+      "claim_text": "Memory node existence does not imply reproductive opportunity. Multi-hop deduction requires simultaneous co-retrieval of all supporting premises (X_path). When lexical competition or clutter reduces path availability below X_crit = 1/b, extinction occurs almost surely in the limit under the branching process.",
+      "evidence_sources": [
+        {
+          "experiment": "Experiment 1B-A2 (Branching Dynamics & Extinction Analysis)",
+          "evidence_class": "branching_simulation",
+          "artifact": "gene_exp1b_branching_sim.py",
+          "artifact_sha256": "deterministic_pgf_recursions",
+          "execution_commit": "9c9e7cad9457eff75464574127477bb1d81fd412",
+          "model": "None (Mathematical Branching Process)",
+          "n_calls": 0,
+          "n_evaluations": 150000,
+          "unit_of_analysis": "family_tree",
+          "formal_report": "docs/results/EXPERIMENT_1B_A2_REPORT.md",
+          "primary_metric": "q_inf(0.60) = 4/9 ~ 0.44444; q_inf(0.75) = 1/9 ~ 0.11111; q_inf(0.50) = 1.00000",
+          "git_tracked": false
+        },
+        {
+          "experiment": "Experiment 1B-B1c (Matched Path Sufficiency Assay)",
+          "evidence_class": "live_neural_assay",
+          "artifact": "gene_exp1b_b1c_matched_expression_20260820_140941.db",
+          "artifact_sha256": "b9c8dcbc47ff87154cf9f86c40238ce9ad19ed86550e46b02e184a866b365962",
+          "execution_commit": "b7182d3d86ee4c323bdea14e178749181f6b6fb6",
+          "model": "gemma3:12b",
+          "n_calls": 16,
+          "n_evaluations": 16,
+          "unit_of_analysis": "call",
+          "formal_report": "docs/results/EXP1B_B1C_MATCHED_EXPRESSION_REPORT.md",
+          "primary_metric": "P(active | complete path) = 8/8 = 1.000, P(active | broken path) = 0/8 = 0.000",
+          "git_tracked": false
+        }
+      ],
+      "scope_limitations": "Evaluated using BM25 tokenized lexical retrieval over synthetic memory ecologies with controlled distractor density.",
+      "replication_status": "same_model_verified"
+    },
+    {
+      "claim_id": "GENE-C04",
+      "claim_status": "derived_and_observed",
+      "headline": "The Lineage-Blind Null-Selectivity Baseline Law",
+      "claim_text": "Without ancestry metadata, all lineage-blind memory reduction policies (uniform thinning, random-family quarantine, generation-targeted pruning) fall strictly on the diagonal C_H = C_I, delivering zero selective containment advantage (S = C_H - C_I = 0.000). Blind forgetting cannot suppress infected paths without destroying healthy coverage at the identical rate.",
+      "evidence_sources": [
+        {
+          "experiment": "Experiment 1B-C1b (Shared-Ecology Delayed Adjudication Sandbox)",
+          "evidence_class": "deterministic_sandbox",
+          "artifact": "gene_exp1b_c1b_shared_ecology_9f58315.db",
+          "artifact_sha256": "942cd56e6fae2f62e4ad0c2fabf61e7cdd1679287a1c1b2f61ec185ad67f3bfb",
+          "execution_commit": "9f58315eaab83929db49bf58c2f126b79a1fb788",
+          "model": "None (Deterministic BM25 Shared-Ecology Sandbox)",
+          "n_calls": 0,
+          "n_evaluations": 1200,
+          "unit_of_analysis": "evaluation_cell",
+          "formal_report": "docs/results/EXP1B_C1B_SHARED_ECOLOGY_REPORT.md",
+          "primary_metric": "C_H = C_I = 0.7177 for blind uniform thinning at k=6; S = 0.0000 across all blind controls",
+          "git_tracked": false
+        }
+      ],
+      "scope_limitations": "Evaluated on symmetric counterbalanced 2-family ecologies with balanced role assignments.",
+      "replication_status": "exact_deterministic_reproducible"
+    },
+    {
+      "claim_id": "GENE-C05",
+      "claim_status": "observed",
+      "headline": "Selective Lineage Quarantine Overcomes Provenance Laundering",
+      "claim_text": "Node-only filtering suffers 100% provenance laundering (C_I = 1.000, S = 0.000) because descendants retain unflagged support. Selective lineage quarantine propagates delayed distrust signals across ancestry edges, achieving the Golden Identity S = C_H - C_I = TPR - FPR (+0.800 selective advantage at a 90/10 operating point).",
+      "evidence_sources": [
+        {
+          "experiment": "Experiment 1B-C1b (Shared-Ecology Delayed Adjudication Sandbox)",
+          "evidence_class": "deterministic_sandbox",
+          "artifact": "gene_exp1b_c1b_shared_ecology_9f58315.db",
+          "artifact_sha256": "942cd56e6fae2f62e4ad0c2fabf61e7cdd1679287a1c1b2f61ec185ad67f3bfb",
+          "execution_commit": "9f58315eaab83929db49bf58c2f126b79a1fb788",
+          "model": "None (Deterministic BM25 Shared-Ecology Sandbox)",
+          "n_calls": 0,
+          "n_evaluations": 1200,
+          "unit_of_analysis": "evaluation_cell",
+          "formal_report": "docs/results/EXP1B_C1B_SHARED_ECOLOGY_REPORT.md",
+          "primary_metric": "S = +0.8000 at TPR=0.9/FPR=0.1; Node-Only C_I = 1.0000 (0% containment)",
+          "git_tracked": false
+        },
+        {
+          "experiment": "Experiment 1B-C2a.1 (Live Behavioral Immunity Assay)",
+          "evidence_class": "live_neural_assay",
+          "artifact": "gene_exp1b_c2a_live_assay_a1474d6.db",
+          "artifact_sha256": "69b20662173ff2b9a6abbbea74806fa3175eb246e12ae17deafc5213403c378a",
+          "execution_commit": "a1474d66e1434b075ee11c5888bafad9638c9057",
+          "model": "gemma3:12b",
+          "n_calls": 50,
+          "n_evaluations": 50,
+          "unit_of_analysis": "call",
+          "formal_report": "docs/results/EXP1B_C2A_LIVE_ASSAY_REPORT.md",
+          "primary_metric": "Lineage Quarantine: 100% path elimination vs Node-Only: 0% containment",
+          "git_tracked": false
+        }
+      ],
+      "scope_limitations": "Assumes tamper-proof lineage graph preservation (Lineage Integrity Assumption).",
+      "replication_status": "same_model_verified"
+    },
+    {
+      "claim_id": "GENE-C06",
+      "claim_status": "observed",
+      "headline": "Memory Containment Is Insufficient for Behavioral Containment",
+      "claim_text": "Quarantining legitimate derivation paths (X_path = 0) is insufficient to guarantee behavioral abstention. Downstream neural reasoners can manufacture unsupported pseudo-paths from surviving fragments via single-premise conclusion jumping or cross-entity variable binding shortcuts.",
+      "evidence_sources": [
+        {
+          "experiment": "Experiment 1B-C2a.1 (Live Behavioral Immunity & Replay Stability)",
+          "evidence_class": "live_neural_assay",
+          "artifact": "gene_exp1b_c2a_live_assay_a1474d6.db",
+          "artifact_sha256": "69b20662173ff2b9a6abbbea74806fa3175eb246e12ae17deafc5213403c378a",
+          "execution_commit": "a1474d66e1434b075ee11c5888bafad9638c9057",
+          "model": "gemma3:12b",
+          "n_calls": 50,
+          "n_evaluations": 50,
+          "unit_of_analysis": "call",
+          "formal_report": "docs/results/EXP1B_C2A_LIVE_ASSAY_REPORT.md",
+          "primary_metric": "X_path = 0 yielded 2/4 behavioral expressions in initial assay; 9/10 epistemic errors on repeated broken prompt",
+          "git_tracked": false
+        }
+      ],
+      "scope_limitations": "Evaluated on Gemma 3:12B under greedy decoding (T=0, seed=42) on local GPU execution stacks.",
+      "replication_status": "same_model_verified"
+    },
+    {
+      "claim_id": "GENE-C07",
+      "claim_status": "observed",
+      "headline": "Structural Support-Certificate Proofreading Prevents Germline Infection",
+      "claim_text": "A mechanical Layer 2 Support-Certificate Validator performing first-order triple unification over cited parent facts rejects 100% of unsupported concrete claims (9/9) while admitting 100% of valid derivations (6/6) and preserving clean abstentions (15/15). Across 30 live calls, the proofreader reduced a phenotypic expression rate of mu_expression = 0.300 (0.375 on broken paths) to a heritable mutation rate of mu_heritable = 0.000.",
+      "evidence_sources": [
+        {
+          "experiment": "Experiment 1B-C2b (Binding Disambiguation & Layer 2 Proofreading)",
+          "evidence_class": "live_neural_assay",
+          "artifact": "gene_exp1b_c2b_binding_assay_1f62908.db",
+          "artifact_sha256": "9eb49d17b9e4e95968ebd22cd064a382f8ec5caecca482c974ea8c02c8e4b7b4",
+          "execution_commit": "1f62908583081f910405859c0c89721c1c997446",
+          "model": "gemma3:12b",
+          "n_calls": 30,
+          "n_evaluations": 30,
+          "unit_of_analysis": "call",
+          "formal_report": "docs/results/EXP1B_C2B_BINDING_REPORT.md",
+          "primary_metric": "mu_expression = 0.300 (9/30) -> mu_heritable = 0.000 (0/30); W_proofread = 1.0 (valid), 0.0 (unsupported)",
+          "git_tracked": false
+        }
+      ],
+      "scope_limitations": "Proofreading verifies structural support certificates; it does not verify causal generation mechanisms (P_reported != P_causal).",
+      "replication_status": "same_model_verified"
+    },
+    {
+      "claim_id": "GENE-C08",
+      "claim_status": "methodological_principle",
+      "headline": "The Replay Stability Principle",
+      "claim_text": "In local GPU execution environments running quantized open-weight models, fixed prompt + temperature 0.0 + fixed seed cannot be presumed deterministic without empirical verification. Replay stability must be explicitly instrumented via prompt-hash equivalence classes.",
+      "evidence_sources": [
+        {
+          "experiment": "Experiment 1B-C2a.1 (Live Behavioral Immunity & Replay Stability)",
+          "evidence_class": "live_neural_assay",
+          "artifact": "gene_exp1b_c2a_live_assay_a1474d6.db",
+          "artifact_sha256": "69b20662173ff2b9a6abbbea74806fa3175eb246e12ae17deafc5213403c378a",
+          "execution_commit": "a1474d66e1434b075ee11c5888bafad9638c9057",
+          "model": "gemma3:12b",
+          "n_calls": 20,
+          "n_evaluations": 20,
+          "unit_of_analysis": "prompt_hash_repetition",
+          "formal_report": "docs/results/EXP1B_C2A_LIVE_ASSAY_REPORT.md",
+          "primary_metric": "9/10 epistemic errors + 1/10 contract failure on identical prompt hash",
+          "git_tracked": false
+        }
+      ],
+      "scope_limitations": "Observed on local Ollama execution stacks running quantized Gemma 3:12B under greedy decoding.",
+      "replication_status": "same_model_verified"
+    },
+    {
+      "claim_id": "GENE-C09",
+      "claim_status": "observed",
+      "headline": "The Four-Layer Epistemic Conformance Taxonomy & Explanatory Bloat",
+      "claim_text": "Neural self-reported justification R(c) is not a faithful representation of minimal entitling support S(c). Epistemic outputs decompose into four distinct layers: symbol realization != contract coherence != justification precision != formal derivability. In 116 live Gemma 3:12B calls under multi-path support environments, the model exhibited non-exact bloated support in 7/8 entitled cases (mean excess 1.625), 20.8% cross-field contract violations, and 25% symbol-form drift under permutation.",
+      "evidence_sources": [
+        {
+          "experiment": "Exploration Round 4 (Epistemic Context Compiler & Four-Layer Assay)",
+          "evidence_class": "live_neural_assay",
+          "artifact": "data/exploration_round4_results.db",
+          "artifact_sha256": "820e574e6d3a0196dfec13ffc392d68d399791b210fd65187795dd834046269e",
+          "execution_commit": "cf472ee76abb9af839bb5b102301de3302df9b87",
+          "model": "gemma3:12b (Ollama digest: f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a)",
+          "n_calls": 116,
+          "n_evaluations": 116,
+          "unit_of_analysis": "call",
+          "formal_report": "docs/results/EXPLORATION_ROUND4_REPORT.md",
+          "primary_metric": "Entitled non-exact support: 7/8 (87.5%, 6/8 citing all 4 docs, mean excess 1.625); Preregistered entitled+pruned exact: 9/16 (56.2%); Contract violations: 5/24 (20.8%); Symbol drift: 6/24 (25.0%)",
+          "git_tracked": false
+        }
+      ],
+      "scope_limitations": "Evaluated on Gemma 3:12B under structured JSON contracts across 24 isomorphic topological permutations.",
+      "replication_status": "same_model_verified"
+    },
+    {
+      "claim_id": "GENE-C10",
+      "claim_status": "mathematically_proven_and_observed",
+      "headline": "Loss of Alternative-Support Algebra Causes 100% False Retractions on Degraded States",
+      "claim_text": "Representing alternative multi-path support environments S(c) = {S_1, ..., S_k} as a flat conjunctive dependency union causes 100% false retractions (104/104) on damaged-but-still-entitled states. Single-witness tracking falsely retracts 57.7% (60/104). Explanatory bloat (E_S > 0) causes 50% false retractions (8/16) on completely untouched states. Minimal entitling support S(c) eliminates 100% of revision errors without live compute.",
+      "evidence_sources": [
+        {
+          "experiment": "Exploration Round 5 Stage 5A (Revision Precision Assay)",
+          "evidence_class": "deterministic_zero_live_llm",
+          "artifact": "data/exploration_round5_stage5a_cases.jsonl",
+          "artifact_sha256": "1499305d197cf53ad624fc65a6626a0d5fc9ea87993184583930ce952692548e",
+          "execution_commit": "aff1baa34e55f371bfe710628f25abf9113c2f03",
+          "model": "None (Deterministic Support Algebra)",
+          "n_calls": 0,
+          "n_evaluations": 432,
+          "unit_of_analysis": "revision_scenario",
+          "formal_report": "docs/results/EXPLORATION_ROUND5_STAGE5A_REPORT.md",
+          "primary_metric": "Flat Union Autoimmunity: 104/104 (100.0%); Single Witness: 60/104 (57.7%); S(c) Reference: 0/104 (0.0%)",
+          "git_tracked": true
+        }
+      ],
+      "scope_limitations": "Evaluated across all powerset invalidation subsets over 4 canonical support hypergraph topologies.",
+      "replication_status": "deterministic_exact"
+    },
+    {
+      "claim_id": "GENE-C11",
+      "claim_status": "mathematically_proven_and_observed",
+      "headline": "Intervention-Sufficient Epistemic Representation & Lineage-Projected Action Governance",
+      "claim_text": "Scalar cut-sets (kappa), tuple signatures (rho), and global root counts (|Roots|) all suffer lossy representation collisions under change. In shared origin ancestry (A,D<-R1, B,E<-R2), nominal multiplicity masquerades as independence while sharing common conjunctive root failure. Action authority governance requires the antichain-minimized lineage-projected support hypergraph S_L(c) = min_{subset} {{L(p) : p in S_i}}, achieving 100% compliance across 7 formal governance axioms.",
+      "evidence_sources": [
+        {
+          "experiment": "Exploration Round 5 Stage 5B (Action Governance Assay)",
+          "evidence_class": "deterministic_zero_live_llm",
+          "artifact": "data/exploration_round5_stage5b_cases.jsonl",
+          "artifact_sha256": "d08e1c5d58d430a2e087e4a3318f12ed67193fc80699146a6b27025a2ecefc3d",
+          "execution_commit": "round5-stage5b-freeze-v3",
+          "model": "None (Deterministic Axiomatic Engine)",
+          "n_calls": 0,
+          "n_evaluations": 368,
+          "unit_of_analysis": "governance_scenario",
+          "formal_report": "docs/results/EXPLORATION_ROUND5_STAGE5B_REPORT.md",
+          "primary_metric": "Axiomatic Compliance: P_binary 5/7, P_kappa 5/7, P_rho 6/7, P_lineage (S_L) 7/7 (100.0%)",
+          "git_tracked": true
+        }
+      ],
+      "scope_limitations": "Evaluated across 368 factorial governance scenarios and 7 formal axiomatic invariants.",
+      "replication_status": "deterministic_exact"
+    },
+    {
+      "claim_id": "GENE-C12",
+      "claim_status": "observed",
+      "headline": "Support-First Compilation Improves Live Neural Revision Under Partial Invalidation",
+      "claim_text": "In a preregistered 32-call Gemma 3:12B mechanism assay across four structural worlds, raw neural revision retained 2/4 damaged-but-entitled claims, while the support-first GENE runtime retained 4/4 and abstained on 4/4 completely severed states. Acquisition self-reports exhibited overcomplete, undercomplete, and single-witness support representations. A na\u00efve flat policy over acquisition R(c) triggered retraction in 3/4 degraded worlds and introduced two additional false retractions beyond the neural baseline; the combined na\u00efve runtime retained 0/4. In one degraded recombinant world, GENE preserved belief entitlement while the preregistered lineage-authority gate blocked the proposed external action.",
+      "evidence_sources": [
+        {
+          "experiment": "Exploration Round 5 Stage 5C (Neural Revision Bridge)",
+          "evidence_class": "live_neural_assay",
+          "artifact": "data/exploration_round5_stage5c_summary.json",
+          "artifact_sha256": "568a0135941316019b7885dc482dade4843e73b985a2125fd28025a24a66be1e",
+          "execution_commit": "4203e91c70a0eead8c36def4a7dcfcab53fd584b",
+          "results_commit": "round5-stage5c-postreview-freeze",
+          "model": "gemma3:12b (Ollama digest: f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a)",
+          "n_calls": 32,
+          "n_evaluations": 32,
+          "unit_of_analysis": "call",
+          "formal_report": "docs/results/EXPLORATION_ROUND5_STAGE5C_REPORT.md",
+          "primary_metric": "Overall Entitlement: Arm 1 (Raw Neural) 75.0% (6/8), Arm 2 (Na\u00efve Reported) 50.0% (4/8, 0/4 degraded), Arm 3 (GENE Kernel) 100.0% (8/8); Failure Channels: Policy-Only 2/4, Neural-Only 1/4, Both 1/4; Action Gating: Preregistered Lineage Enforced",
+          "git_tracked": true
+        }
+      ],
+      "scope_limitations": "Bounded direct rule-antecedent enumeration over shallow Horn worlds evaluated on Gemma 3:12B under greedy decoding.",
+      "replication_status": "same_model_verified"
+    },
+    {
+      "claim_id": "GENE-C13",
+      "claim_status": "formally_specified_and_deterministically_demonstrated",
+      "headline": "Bitemporal State Maintenance & Valid-Time Conflict Windows",
+      "claim_text": "Separating Valid Time (t_v) from Knowledge Transaction Time (t_k) is structurally necessary for truth maintenance under retroactive, out-of-order, and disputed updates. Bitemporal occurrence tracking with cautious conflict window isolation resolves pairwise disputes without destroying orthogonal active assertions. Single-clock heuristics structurally collapse on multi-update histories (KT-LWW 33.3%, VT-LWW 75.0%), whereas bitemporal reconstruction achieves 100% (12/12) for the tested temporal query class.",
+      "evidence_sources": [
+        {
+          "experiment": "Exploration Round 6 Stage 6A-v2 (Bitemporal Supersession Engine)",
+          "evidence_class": "deterministic_zero_live_llm",
+          "artifact": "src/gene/supersession_engine.py",
+          "artifact_sha256": "b96411549ad7201c9ff9e373b729e5d0a81bbd7dfdfa7e0d8fa4e013b6ee76de",
+          "execution_commit": "round6-stage6a-v2-freeze",
+          "git_tracked": true,
+          "model": "None (Deterministic Bitemporal Algebra)",
+          "n_calls": 0,
+          "n_evaluations": 175,
+          "unit_of_analysis": "property_test",
+          "formal_report": "docs/results/EXPLORATION_ROUND6_STAGE6B_REPORT.md",
+          "primary_metric": "Exhaustive small-world permutation modelcheck passed (100% invariant preservation)"
+        },
+        {
+          "experiment": "Exploration Round 6 Stage 6B.1 (Multi-Update Temporal Ordering Micro-Assay)",
+          "evidence_class": "deterministic_zero_live_llm",
+          "artifact": "data/exploration_round6_stage6b1_temporal_summary.json",
+          "artifact_sha256": "ecca1369df8de0e472df02cd422476f29514a084bd82ec8114d8e98eb6a8ca7f",
+          "execution_commit": "round6-stage6b-master-freeze",
+          "git_tracked": true,
+          "model": "None (Deterministic Engine)",
+          "n_calls": 0,
+          "n_evaluations": 12,
+          "unit_of_analysis": "coordinate",
+          "formal_report": "docs/results/EXPLORATION_ROUND6_STAGE6B_REPORT.md",
+          "primary_metric": "Policy Separation: KT-LWW 4/12 (33.3%), VT-LWW 9/12 (75.0%), Bitemporal 12/12 (100.0%)"
+        }
+      ],
+      "scope_limitations": "Evaluated on bounded bitemporal event sequences and discrete transaction clocks.",
+      "replication_status": "deterministic_exact"
+    },
+    {
+      "claim_id": "GENE-C14",
+      "claim_status": "formally_specified_and_deterministically_demonstrated",
+      "headline": "Predicate-Aware State Adjudication & State vs Support Decoupling",
+      "claim_text": "Timestamp ordering alone is insufficient for state transition deduction; transition semantics require predicate-semantic information. PredicateContract (specifying cardinality, temporal mode, conflict policy, and duration) is a sufficient formalization demonstrated by the assay. In a 200-case factorial benchmark, contract adjudication achieved 100% transition and state fidelity, while generic LWW collapsed to 55.0%. Flat dependency tracking caused 100% revision autoimmunity on alternative derivations, proving state fidelity does not equal support fidelity.",
+      "evidence_sources": [
+        {
+          "experiment": "Exploration Round 6 Stage 6B (Contract-Guided State Adjudication)",
+          "evidence_class": "deterministic_zero_live_llm",
+          "artifact": "data/exploration_round6_stage6b_results_summary.json",
+          "artifact_sha256": "8d20e1945c7fac86783b14feb2eba76285790ee53b5765d0bc2455f201071218",
+          "execution_commit": "round6-stage6b-master-freeze",
+          "git_tracked": true,
+          "model": "None (Deterministic Adjudication Engine)",
+          "n_calls": 0,
+          "n_evaluations": 200,
+          "unit_of_analysis": "case",
+          "formal_report": "docs/results/EXPLORATION_ROUND6_STAGE6B_REPORT.md",
+          "primary_metric": "Layer A Fidelity: Arm 1-4 55.0%, Arm 5-6 100.0%; Layer C Entitlement: Arm 5 64.0%, Arm 6 (GENE Kernel) 100.0%; Arm 5 Autoimmunity: 72/72 (100.0%)"
+        }
+      ],
+      "scope_limitations": "Evaluated across 200 balanced synthetic update scenarios spanning 4 predicate modes, 5 update topologies, and 2 derivation structures.",
+      "replication_status": "deterministic_exact"
+    },
+    {
+      "claim_id": "GENE-C15",
+      "claim_status": "observed",
+      "headline": "Epistemic Error Boundary Externalization & Symbol Realization in Neural Extraction",
+      "claim_text": "Direct neural transition generation suffered spontaneous collapse toward replacement semantics (SUPERSEDES in 10/12 cases, 0/12 valid batches). Modular observation extraction externalized neural uncertainty strictly to Layer 0, preventing downstream runtime autoimmunity (0/12). Gemma 3:12B extracted temporal intervals with 100% accuracy (12/12), while exact canonical tuple extraction scored 8.3% (1/12) due to un-normalized entity strings. A deterministic normalization audit recovered 91.7% (11/12) extraction fidelity, isolating semantic-role assignment as the remaining failure.",
+      "evidence_sources": [
+        {
+          "experiment": "Exploration Round 6 Stage 6C (Neural Extraction & Fault Localization)",
+          "evidence_class": "live_neural_assay",
+          "artifact": "data/exploration_round6_stage6c_summary.json",
+          "artifact_sha256": "668e4db9120d1768b776755b96d725383fd63f167b8a10370b8c06839419f924",
+          "execution_commit": "round6-stage6c-execution-freeze",
+          "results_commit": "round6-stage6c-postreview-freeze",
+          "model": "gemma3:12b (Ollama digest: f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a)",
+          "n_calls": 28,
+          "n_evaluations": 12,
+          "unit_of_analysis": "case",
+          "formal_report": "docs/results/EXPLORATION_ROUND6_STAGE6C_REPORT.md",
+          "primary_metric": "Layer A Fidelity: N1 0.0%, N2 83.3%; Active Occurrence-Set Fidelity: N1 16.7%, N2 91.7%; Semantic State Fidelity: N1 16.7%, N2 16.7%; Normalized Extraction: 11/12 (91.7%); Normalized Replay Entitlement: 12/12 (100.0%)",
+          "git_tracked": true
+        }
+      ],
+      "scope_limitations": "12 stratified coverage cases on Gemma 3:12B with platform-injected trusted metadata.",
+      "replication_status": "same_model_verified"
+    },
+    {
+      "claim_id": "GENE-C16",
+      "claim_status": "formally_specified_and_deterministically_demonstrated",
+      "headline": "Proof-Carrying Epistemic Ingress, Lifecycle Privilege Escalation, and Orthogonal Ingress Integrity",
+      "claim_text": "An epistemic ingress representation must preserve enough information to distinguish unresolved alternatives whenever future interventions can produce different responses under the supported runtime intervention class. Candidate ambiguity (B(x) = {b_1, ..., b_k}) and novel entities must be preserved under DEFERRED_BINDING and PROVISIONAL_ENTITY rather than collapsed to Top-1. In a 120-world stateful factorial benchmark (480 probe evaluations), blind write baselines (A0/A1) suffered 71.4% False Durable Admission Rate (FDAR) (100% on authorized collisions, 100% on resolved unauthorized claims). Candidate-aware only (A2) eliminated ambiguity collapse but suffered 100.0% conditional authority FDAR (36/36). Authority-aware only (A3) eliminated unauthorized promotion but collapsed 100.0% of authorized candidate collisions (12/12). Full proof-carrying GENE Ingress (A4) achieved 100.0% WorldPass rate (120/120), FDAR = 0.0%, SAC = 100.0%, and UPR = 100.0%. Furthermore, proof-carrying lifecycle gates (ResolutionCertificate, PromotionCertificate) guarantee candidate set containment, collision prevention, dual-novel status laundering prevention, and origin provenance preservation across subsequent epistemic privilege elevations.",
+      "evidence_sources": [
+        {
+          "experiment": "Exploration Round 7 Stage 7A (Proof-Carrying Epistemic Ingress Benchmark)",
+          "evidence_class": "deterministic_zero_live_llm",
+          "artifact": "data/exploration_round7_stage7a_benchmark_summary.json",
+          "artifact_sha256": "93dd421f900f29c9fbec3dc95a601bcd446afb2c2074139d0ffdaec13b529236",
+          "execution_commit": "round7-stage7a-errata-freeze",
+          "git_tracked": true,
+          "model": "None (Deterministic Ingress & Verification Engine)",
+          "n_calls": 0,
+          "n_evaluations": 480,
+          "unit_of_analysis": "probe_evaluation",
+          "formal_report": "docs/results/EXPLORATION_ROUND7_STAGE7A_REPORT.md",
+          "primary_metric": "WorldPass: A0 58.3% (70/120), A1 58.3% (70/120), A2 75.0% (90/120), A3 91.7% (110/120), A4 100.0% (120/120); Global FDAR: A0/A1 71.4%, A2 42.9%, A3 14.3%, A4 0.0%; Cond FDAR: A2_auth|res 100% (36/36), A3_ambig|auth 100% (12/12); SAC: 100.0%; UPR: 100.0%"
+        },
+        {
+          "experiment": "Exploration Round 7 Stage 7A (Lifecycle Security & Probe Separation Assay)",
+          "evidence_class": "deterministic_zero_live_llm",
+          "artifact": "data/exploration_round7_stage7a_security_summary.json",
+          "artifact_sha256": "18081edff907bfc8725f00c818de4b90a589b444d59896f8d3da574ad77c1c43",
+          "execution_commit": "round7-stage7a-errata-freeze",
+          "git_tracked": true,
+          "model": "None (Deterministic Ingress & Verification Engine)",
+          "n_calls": 0,
+          "n_evaluations": 46,
+          "unit_of_analysis": "security_assay",
+          "formal_report": "docs/results/EXPLORATION_ROUND7_STAGE7A_REPORT.md",
+          "primary_metric": "Programmatic multi-family adversarial mutation suite: 14/14 rejected fail-closed (100.0%); Probe separation: Eight-world assay containing three explicitly decoupled mechanism profiles plus full-pass, redundancy, conflict-isolation, and rejection controls; Dual-novel status laundering prevention verified."
+        }
+      ],
+      "scope_limitations": "Evaluated across 120 balanced synthetic worlds spanning 4 predicate modes, 5 binding conditions, 3 temporal relations, and 2 source role forms.",
+      "replication_status": "deterministic_exact"
+    },
+    {
+      "claim_id": "GENE-C17",
+      "claim_status": "observed",
+      "headline": "Constrained Neural Candidate Extraction, Ingress Privilege Decoupling, and Ambiguity Deferral",
+      "claim_text": "A small open-weight neural model (Gemma 3:12B) operates reliably as a constrained semantic mention extractor and ontology candidate retriever without acquiring durable write authority. Across 52 live calls (32 primary factorial cases, 16 position-counterbalanced cases, 4 temperature=0 replays), Gemma 3:12B achieved 100.0% subject/object span extraction (52/52), 98.1% predicate schema adherence (51/52), and 100.0% candidate entity match (52/52). When candidate list order was permuted across slots [0, 1, 2, 3], the model exhibited zero positional selection bias (normalized entropy = 1.00). When interfaced with the proof-carrying GENE Ingress Kernel with zero oracle leakage, downstream state, support, governance, and causal ablation probes achieved 96.2% fidelity (50/52) with FDAR = 0.0%, UPR = 0.0%, and zero runtime autoimmunity. In a targeted 10-call micro-assay, Gemma achieved 100.0% ambiguity preservation (3/3) when the schema supported multi-candidate subsets, and 100.0% temporal extraction (5/5) with post-expiry state isolation (4/4).",
+      "evidence_sources": [
+        {
+          "experiment": "Exploration Round 7 Stage 7B (Live Neural Ingress Interface & Candidate Disambiguation Benchmark)",
+          "evidence_class": "live_neural_assay",
+          "artifact": "data/exploration_round7_stage7b_summary.json",
+          "artifact_sha256": "f9c7a1142b38c46f5c89c68319330fa3c837db54a5a46a46bfc1763fc04fe70b",
+          "execution_commit": "round7-stage7b-live-freeze",
+          "git_tracked": true,
+          "model": "gemma3:12b (Ollama digest: f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a)",
+          "n_calls": 52,
+          "n_evaluations": 52,
+          "unit_of_analysis": "call",
+          "formal_report": "docs/results/EXPLORATION_ROUND7_STAGE7B_REPORT.md",
+          "primary_metric": "Field Accuracies: Subject 100%, Predicate 98.1%, Object 100%, TV_Start 100%, Candidate Match 100%; Downstream Probes: 50/52 (96.2%); FDAR: 0.0%; UPR: 0.0%; Canary: 4/4 semantic (100%), 3/4 raw (75%); Micro-Assay: Ambiguity Preservation 100% (3/3), Explicit Temporal 100% (5/5)"
+        }
+      ],
+      "scope_limitations": "52 live calls on Gemma 3:12B spanning 4 predicate modes, 4 linguistic phenomena, and 2 privilege tiers under structured JSON prompting, plus 10 targeted micro-assay calls.",
+      "replication_status": "same_model_verified"
+    }
+  ]
+}

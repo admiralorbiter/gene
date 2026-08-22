@@ -1,0 +1,56 @@
+{
+  "gene_exp0_20260819_180922.db": {
+    "filename": "gene_exp0_20260819_180922.db",
+    "sha256": "9acd7d2877f650e7985e883680fadb4997267c1592b3c4538bdcfe075fb56938",
+    "size_bytes": 1138688,
+    "download_uri": "https://github.com/admiralorbiter/gene/releases/download/v0.9.0/gene_exp0_20260819_180922.db"
+  },
+  "gene_d1_s_v2_20260820_002016.db": {
+    "filename": "gene_d1_s_v2_20260820_002016.db",
+    "sha256": "a0e9b770ab7724ea168a2ed9255e545a767310b481ec9e25b3e81cf06a74fb59",
+    "size_bytes": 458752,
+    "download_uri": "https://github.com/admiralorbiter/gene/releases/download/v0.9.0/gene_d1_s_v2_20260820_002016.db"
+  },
+  "gene_d1_c_v2_20260820_001206.db": {
+    "filename": "gene_d1_c_v2_20260820_001206.db",
+    "sha256": "074b6665f622e1ca5a33397ff2a5ee9faaba1ecde72880c890132959d03f4ed2",
+    "size_bytes": 503808,
+    "download_uri": "https://github.com/admiralorbiter/gene/releases/download/v0.9.0/gene_d1_c_v2_20260820_001206.db"
+  },
+  "gene_exp1_branching_v2_tal_20260820_013936.db": {
+    "filename": "gene_exp1_branching_v2_tal_20260820_013936.db",
+    "sha256": "907ee6a4ff1b428d98f744d5b4056e0ad96790f4a199c9b17f92d8fd77e36919",
+    "size_bytes": 1396736,
+    "download_uri": "https://github.com/admiralorbiter/gene/releases/download/v0.9.0/gene_exp1_branching_v2_tal_20260820_013936.db"
+  },
+  "gene_exp1_branching_v2_mira_20260820_014834.db": {
+    "filename": "gene_exp1_branching_v2_mira_20260820_014834.db",
+    "sha256": "89baf9916340b9cf7cd25bc17a83a178aab1d4b84f5f87dbdb4fa989bec3bb97",
+    "size_bytes": 552960,
+    "download_uri": "https://github.com/admiralorbiter/gene/releases/download/v0.9.0/gene_exp1_branching_v2_mira_20260820_014834.db"
+  },
+  "gene_exp1b_b1c_matched_expression_20260820_140941.db": {
+    "filename": "gene_exp1b_b1c_matched_expression_20260820_140941.db",
+    "sha256": "b9c8dcbc47ff87154cf9f86c40238ce9ad19ed86550e46b02e184a866b365962",
+    "size_bytes": 360448,
+    "download_uri": "https://github.com/admiralorbiter/gene/releases/download/v0.9.0/gene_exp1b_b1c_matched_expression_20260820_140941.db"
+  },
+  "gene_exp1b_c1b_shared_ecology_9f58315.db": {
+    "filename": "gene_exp1b_c1b_shared_ecology_9f58315.db",
+    "sha256": "942cd56e6fae2f62e4ad0c2fabf61e7cdd1679287a1c1b2f61ec185ad67f3bfb",
+    "size_bytes": 716800,
+    "download_uri": "https://github.com/admiralorbiter/gene/releases/download/v0.9.0/gene_exp1b_c1b_shared_ecology_9f58315.db"
+  },
+  "gene_exp1b_c2a_live_assay_a1474d6.db": {
+    "filename": "gene_exp1b_c2a_live_assay_a1474d6.db",
+    "sha256": "69b20662173ff2b9a6abbbea74806fa3175eb246e12ae17deafc5213403c378a",
+    "size_bytes": 708608,
+    "download_uri": "https://github.com/admiralorbiter/gene/releases/download/v0.9.0/gene_exp1b_c2a_live_assay_a1474d6.db"
+  },
+  "gene_exp1b_c2b_binding_assay_1f62908.db": {
+    "filename": "gene_exp1b_c2b_binding_assay_1f62908.db",
+    "sha256": "9eb49d17b9e4e95968ebd22cd064a382f8ec5caecca482c974ea8c02c8e4b7b4",
+    "size_bytes": 454656,
+    "download_uri": "https://github.com/admiralorbiter/gene/releases/download/v0.9.0/gene_exp1b_c2b_binding_assay_1f62908.db"
+  }
+}

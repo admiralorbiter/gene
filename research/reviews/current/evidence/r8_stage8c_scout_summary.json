@@ -1,0 +1,267 @@
+{
+  "timestamp": "2026-08-21 18:54:28Z",
+  "model": "gemma3:12b",
+  "total_cases": 20,
+  "total_correct": 17,
+  "overall_accuracy": 85.0,
+  "breakdown_by_category": {
+    "novel_entity": {
+      "correct": 5,
+      "total": 5
+    },
+    "new_alias": {
+      "correct": 5,
+      "total": 5
+    },
+    "near_collision": {
+      "correct": 3,
+      "total": 5
+    },
+    "ambiguous": {
+      "correct": 4,
+      "total": 5
+    }
+  },
+  "cases": [
+    {
+      "case_id": "scout_novel_01",
+      "category": "novel_entity",
+      "mention_span": "Aurora Node 1",
+      "ground_truth_decision": "CREATE_PROVISIONAL",
+      "predicted_decision": "CREATE_PROVISIONAL",
+      "predicted_target": null,
+      "confidence": 0.95,
+      "rationale": "Aurora Node 1 is a new entity not present in the registry and the context suggests a specific hardware component.",
+      "correct": true,
+      "elapsed_seconds": 4.634819746017456
+    },
+    {
+      "case_id": "scout_novel_02",
+      "category": "novel_entity",
+      "mention_span": "Borealis Gateway Alpha",
+      "ground_truth_decision": "CREATE_PROVISIONAL",
+      "predicted_decision": "CREATE_PROVISIONAL",
+      "predicted_target": null,
+      "confidence": 0.95,
+      "rationale": "The mention 'Borealis Gateway Alpha' does not match any existing canonical IDs or known aliases, and appears to be a distinct entity.",
+      "correct": true,
+      "elapsed_seconds": 4.740657091140747
+    },
+    {
+      "case_id": "scout_novel_03",
+      "category": "novel_entity",
+      "mention_span": "Stellar Transceiver 9",
+      "ground_truth_decision": "CREATE_PROVISIONAL",
+      "predicted_decision": "CREATE_PROVISIONAL",
+      "predicted_target": null,
+      "confidence": 0.95,
+      "rationale": "The mention 'Stellar Transceiver 9' does not match any existing canonical IDs or known aliases, and appears to be a distinct hardware component.",
+      "correct": true,
+      "elapsed_seconds": 4.774091005325317
+    },
+    {
+      "case_id": "scout_novel_04",
+      "category": "novel_entity",
+      "mention_span": "Helios Ingress Unit",
+      "ground_truth_decision": "CREATE_PROVISIONAL",
+      "predicted_decision": "CREATE_PROVISIONAL",
+      "predicted_target": null,
+      "confidence": 0.9,
+      "rationale": "The term 'Helios Ingress Unit' does not match any existing canonical IDs or known aliases, and appears to describe a specific hardware component.",
+      "correct": true,
+      "elapsed_seconds": 4.734516143798828
+    },
+    {
+      "case_id": "scout_novel_05",
+      "category": "novel_entity",
+      "mention_span": "Nova Storage Fabric 3",
+      "ground_truth_decision": "CREATE_PROVISIONAL",
+      "predicted_decision": "CREATE_PROVISIONAL",
+      "predicted_target": null,
+      "confidence": 0.95,
+      "rationale": "Nova Storage Fabric 3 is a distinct storage entity not present in the existing registry, and the name suggests a specific hardware component.",
+      "correct": true,
+      "elapsed_seconds": 4.6430840492248535
+    },
+    {
+      "case_id": "scout_alias_01",
+      "category": "new_alias",
+      "mention_span": "CC-1 Prime",
+      "ground_truth_decision": "LINK_TO_EXISTING",
+      "predicted_decision": "LINK_TO_EXISTING",
+      "predicted_target": "compute_cluster_1",
+      "confidence": 0.95,
+      "rationale": "The mention 'CC-1 Prime' is a clear variation of the known alias 'CC-1' for Compute Cluster 1.",
+      "correct": true,
+      "elapsed_seconds": 4.789353847503662
+    },
+    {
+      "case_id": "scout_alias_02",
+      "category": "new_alias",
+      "mention_span": "Compute-01 Unit",
+      "ground_truth_decision": "LINK_TO_EXISTING",
+      "predicted_decision": "LINK_TO_EXISTING",
+      "predicted_target": "compute_cluster_1",
+      "confidence": 0.95,
+      "rationale": "The mention 'Compute-01 Unit' is likely an operational alias for 'Compute Cluster 1', given the 'Compute' prefix and the presence of a unit identifier.",
+      "correct": true,
+      "elapsed_seconds": 4.957577705383301
+    },
+    {
+      "case_id": "scout_alias_03",
+      "category": "new_alias",
+      "mention_span": "Array PA-2 Main",
+      "ground_truth_decision": "LINK_TO_EXISTING",
+      "predicted_decision": "LINK_TO_EXISTING",
+      "predicted_target": "processing_array_2",
+      "confidence": 0.95,
+      "rationale": "The mention 'Array PA-2 Main' is a clear variation of the known alias 'PA-2' for Processing Array 2.",
+      "correct": true,
+      "elapsed_seconds": 4.81781005859375
+    },
+    {
+      "case_id": "scout_alias_04",
+      "category": "new_alias",
+      "mention_span": "Cluster One Subsystem",
+      "ground_truth_decision": "LINK_TO_EXISTING",
+      "predicted_decision": "LINK_TO_EXISTING",
+      "predicted_target": "compute_cluster_1",
+      "confidence": 0.85,
+      "rationale": "The mention 'Cluster One Subsystem' is likely a variation of the known alias 'Cluster Unit 1' for Compute Cluster 1.",
+      "correct": true,
+      "elapsed_seconds": 4.796208143234253
+    },
+    {
+      "case_id": "scout_alias_05",
+      "category": "new_alias",
+      "mention_span": "Proc-Array-2 Secondary",
+      "ground_truth_decision": "LINK_TO_EXISTING",
+      "predicted_decision": "LINK_TO_EXISTING",
+      "predicted_target": "processing_array_2",
+      "confidence": 0.95,
+      "rationale": "The mention 'Proc-Array-2 Secondary' is a clear variation of the known alias 'PA-2' for Processing Array 2.",
+      "correct": true,
+      "elapsed_seconds": 4.870990037918091
+    },
+    {
+      "case_id": "scout_collision_01",
+      "category": "near_collision",
+      "mention_span": "Compute Cluster 10",
+      "ground_truth_decision": "KEEP_DISTINCT",
+      "predicted_decision": "CREATE_PROVISIONAL",
+      "predicted_target": null,
+      "confidence": 0.95,
+      "rationale": "The mention 'Compute Cluster 10' is distinct from 'Compute Cluster 1' and likely represents a separate, new compute cluster.",
+      "correct": false,
+      "elapsed_seconds": 4.718607187271118
+    },
+    {
+      "case_id": "scout_collision_02",
+      "category": "near_collision",
+      "mention_span": "Compute Cluster 1-B",
+      "ground_truth_decision": "KEEP_DISTINCT",
+      "predicted_decision": "LINK_TO_EXISTING",
+      "predicted_target": "compute_cluster_1",
+      "confidence": 0.95,
+      "rationale": "The mention 'Compute Cluster 1-B' is likely a specific partition or variant of the already registered 'Compute Cluster 1', indicated by the '-B' suffix.",
+      "correct": false,
+      "elapsed_seconds": 4.975741386413574
+    },
+    {
+      "case_id": "scout_collision_03",
+      "category": "near_collision",
+      "mention_span": "PA-20",
+      "ground_truth_decision": "KEEP_DISTINCT",
+      "predicted_decision": "KEEP_DISTINCT",
+      "predicted_target": null,
+      "confidence": 0.85,
+      "rationale": "The mention 'PA-20' closely resembles the alias 'PA-2' but the numerical suffix suggests a distinct processing array.",
+      "correct": true,
+      "elapsed_seconds": 4.615216970443726
+    },
+    {
+      "case_id": "scout_collision_04",
+      "category": "near_collision",
+      "mention_span": "Compute Cluster 11",
+      "ground_truth_decision": "KEEP_DISTINCT",
+      "predicted_decision": "KEEP_DISTINCT",
+      "predicted_target": null,
+      "confidence": 0.85,
+      "rationale": "The mention 'Compute Cluster 11' is numerically distinct from the existing 'Compute Cluster 1', indicating a separate entity.",
+      "correct": true,
+      "elapsed_seconds": 4.574202299118042
+    },
+    {
+      "case_id": "scout_collision_05",
+      "category": "near_collision",
+      "mention_span": "Processing Array 22",
+      "ground_truth_decision": "KEEP_DISTINCT",
+      "predicted_decision": "KEEP_DISTINCT",
+      "predicted_target": null,
+      "confidence": 0.85,
+      "rationale": "The mention 'Processing Array 22' is similar to 'Processing Array 2', but the numerical suffix indicates a distinct, separate hardware entity.",
+      "correct": true,
+      "elapsed_seconds": 4.70177435874939
+    },
+    {
+      "case_id": "scout_ambig_01",
+      "category": "ambiguous",
+      "mention_span": "The Cluster",
+      "ground_truth_decision": "DEFER",
+      "predicted_decision": "DEFER",
+      "predicted_target": null,
+      "confidence": 0.8,
+      "rationale": "The mention 'The Cluster' is too vague and lacks sufficient context to determine which specific compute cluster is being referenced.",
+      "correct": true,
+      "elapsed_seconds": 4.3639817237854
+    },
+    {
+      "case_id": "scout_ambig_02",
+      "category": "ambiguous",
+      "mention_span": "Array",
+      "ground_truth_decision": "DEFER",
+      "predicted_decision": "KEEP_DISTINCT",
+      "predicted_target": null,
+      "confidence": 0.85,
+      "rationale": "The mention 'Array' likely refers to a processing array, but distinct from 'Processing Array 2' and warrants a new provisional ID to avoid ambiguity.",
+      "correct": false,
+      "elapsed_seconds": 4.688847541809082
+    },
+    {
+      "case_id": "scout_ambig_03",
+      "category": "ambiguous",
+      "mention_span": "Node",
+      "ground_truth_decision": "DEFER",
+      "predicted_decision": "DEFER",
+      "predicted_target": null,
+      "confidence": 0.8,
+      "rationale": "The term 'Node' is too generic and lacks sufficient context to determine which specific entity it refers to within the existing registry.",
+      "correct": true,
+      "elapsed_seconds": 4.547116756439209
+    },
+    {
+      "case_id": "scout_ambig_04",
+      "category": "ambiguous",
+      "mention_span": "Target Unit",
+      "ground_truth_decision": "DEFER",
+      "predicted_decision": "DEFER",
+      "predicted_target": null,
+      "confidence": 0.8,
+      "rationale": "The term 'Target Unit' is too generic without further context to determine which specific entity it refers to within the system.",
+      "correct": true,
+      "elapsed_seconds": 4.512827634811401
+    },
+    {
+      "case_id": "scout_ambig_05",
+      "category": "ambiguous",
+      "mention_span": "System",
+      "ground_truth_decision": "DEFER",
+      "predicted_decision": "DEFER",
+      "predicted_target": null,
+      "confidence": 0.9,
+      "rationale": "The term 'System' is too vague without further context to determine which specific entity it refers to within the registry.",
+      "correct": true,
+      "elapsed_seconds": 4.430543422698975
+    }
+  ]
+}

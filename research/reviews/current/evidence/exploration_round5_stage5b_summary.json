@@ -1,0 +1,138 @@
+{
+  "experiment": "GENE Exploration Round 5 Stage 5B: Action Governance & Epistemic Resilience Assay (Hardened v2)",
+  "evidence_class": "deterministic_zero_live_llm",
+  "total_cases": 368,
+  "oracle_breakdown": {
+    "total_cases": 368,
+    "unchanged": 16,
+    "degraded": 104,
+    "retracted": 248,
+    "total_entitled": 120
+  },
+  "axiomatic_compliance": {
+    "binary_entitlement": {
+      "policy_name": "binary_entitlement",
+      "axiom_1_monotonicity": true,
+      "axiom_2_zero_on_retraction": true,
+      "axiom_3_effective_degradation_sensitivity": false,
+      "axiom_4_no_duplication_inflation": true,
+      "axiom_5_bloat_invariance_by_construction": true,
+      "axiom_6_lineage_independence_ordering": false,
+      "axiom_7_isomorphism_invariance": true,
+      "total_passed": 5,
+      "is_fully_compliant": false,
+      "failure_reasons": [
+        "Axiom 3 failed: Degraded state received Auth=1.0 vs Unchanged=1.0",
+        "Axiom 6 failed: Ordering violated. Independent (1.0) vs Shared (1.0) vs Single (1.0)"
+      ]
+    },
+    "scalar_resilience_kappa": {
+      "policy_name": "scalar_resilience_kappa",
+      "axiom_1_monotonicity": true,
+      "axiom_2_zero_on_retraction": true,
+      "axiom_3_effective_degradation_sensitivity": false,
+      "axiom_4_no_duplication_inflation": true,
+      "axiom_5_bloat_invariance_by_construction": true,
+      "axiom_6_lineage_independence_ordering": false,
+      "axiom_7_isomorphism_invariance": true,
+      "total_passed": 5,
+      "is_fully_compliant": false,
+      "failure_reasons": [
+        "Axiom 3 failed: Degraded state received Auth=1.0 vs Unchanged=1.0",
+        "Axiom 6 failed: Ordering violated. Independent (1.0) vs Shared (1.0) vs Single (1.0)"
+      ]
+    },
+    "tuple_resilience_rho": {
+      "policy_name": "tuple_resilience_rho",
+      "axiom_1_monotonicity": true,
+      "axiom_2_zero_on_retraction": true,
+      "axiom_3_effective_degradation_sensitivity": true,
+      "axiom_4_no_duplication_inflation": true,
+      "axiom_5_bloat_invariance_by_construction": true,
+      "axiom_6_lineage_independence_ordering": false,
+      "axiom_7_isomorphism_invariance": true,
+      "total_passed": 6,
+      "is_fully_compliant": false,
+      "failure_reasons": [
+        "Axiom 6 failed: Ordering violated. Independent (1.0) vs Shared (1.0) vs Single (1.0)"
+      ]
+    },
+    "lineage_projected_resilience": {
+      "policy_name": "lineage_projected_resilience",
+      "axiom_1_monotonicity": true,
+      "axiom_2_zero_on_retraction": true,
+      "axiom_3_effective_degradation_sensitivity": true,
+      "axiom_4_no_duplication_inflation": true,
+      "axiom_5_bloat_invariance_by_construction": true,
+      "axiom_6_lineage_independence_ordering": true,
+      "axiom_7_isomorphism_invariance": true,
+      "total_passed": 7,
+      "is_fully_compliant": true,
+      "failure_reasons": []
+    }
+  },
+  "mean_degraded_authority": {
+    "binary_entitlement": 1.0,
+    "scalar_resilience_kappa": 0.5384615384615384,
+    "tuple_resilience_rho": 0.4807692307692308,
+    "lineage_projected_resilience": 0.46153846153846156
+  },
+  "operating_threshold_sweep": {
+    "tau_0.2": {
+      "binary_entitlement": {
+        "permitted_count": 104,
+        "permitted_rate": 1.0
+      },
+      "scalar_resilience_kappa": {
+        "permitted_count": 104,
+        "permitted_rate": 1.0
+      },
+      "tuple_resilience_rho": {
+        "permitted_count": 104,
+        "permitted_rate": 1.0
+      },
+      "lineage_projected_resilience": {
+        "permitted_count": 104,
+        "permitted_rate": 1.0
+      }
+    },
+    "tau_0.5": {
+      "binary_entitlement": {
+        "permitted_count": 104,
+        "permitted_rate": 1.0
+      },
+      "scalar_resilience_kappa": {
+        "permitted_count": 104,
+        "permitted_rate": 1.0
+      },
+      "tuple_resilience_rho": {
+        "permitted_count": 44,
+        "permitted_rate": 0.4230769230769231
+      },
+      "lineage_projected_resilience": {
+        "permitted_count": 32,
+        "permitted_rate": 0.3076923076923077
+      }
+    },
+    "tau_0.8": {
+      "binary_entitlement": {
+        "permitted_count": 104,
+        "permitted_rate": 1.0
+      },
+      "scalar_resilience_kappa": {
+        "permitted_count": 8,
+        "permitted_rate": 0.07692307692307693
+      },
+      "tuple_resilience_rho": {
+        "permitted_count": 0,
+        "permitted_rate": 0.0
+      },
+      "lineage_projected_resilience": {
+        "permitted_count": 0,
+        "permitted_rate": 0.0
+      }
+    }
+  },
+  "case_ledger_path": "data\\exploration_round5_stage5b_cases.jsonl",
+  "case_ledger_sha256": "d08e1c5d58d430a2e087e4a3318f12ed67193fc80699146a6b27025a2ecefc3d"
+}

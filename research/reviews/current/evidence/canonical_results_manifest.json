@@ -1,0 +1,417 @@
+{
+  "manifest_version": "2.0.0",
+  "project": "GENE (Genealogical Epistemic Network Experiments)",
+  "generated_at": "2026-08-21T18:59:23.913817+00:00",
+  "canonical_experiments": {
+    "exp0": {
+      "experiment": "Experiment 0 (Lineage Observability & Factorial Calibration)",
+      "sub_experiments": {
+        "exp0_a_observability_audit": {
+          "description": "Initial lineage observability and citation confabulation assay",
+          "database": "gene_exp0_20260819_180922.db",
+          "commit": "79b94cddfba49d0c2a2ebd916911db34ef3e0361",
+          "model_name": "gemma3:12b",
+          "total_calls": 200,
+          "causal_tests_executed": 152,
+          "causal_necessity_calibrated": 1.0,
+          "hallucinated_distractor_rate": 0.0
+        },
+        "exp0_b_factorial_calibration": {
+          "description": "2x2 factorial counterbalanced calibration (Ecology C x Schema v2)",
+          "database": "gene_d1_c_v2_20260820_001206.db",
+          "commit": "3c102bf7fcc2e1f40d85adceb57223b2d1872df8",
+          "model_name": "gemma3:12b",
+          "cell_4_total_calls": 72,
+          "cell_4_causal_tests": 66,
+          "cell_4_pass_rate": "66 / 66 (100.0%)",
+          "matrix_total_calls": 276
+        }
+      },
+      "status": "FROZEN"
+    },
+    "exp1a": {
+      "experiment": "Experiment 1A (Multi-Generational Mutation Cascades)",
+      "database": "gene_exp1_branching_v2_tal_20260820_013936.db",
+      "commit": "69d3570feb0a687f19aedbe71c2871ad6d1c65eb",
+      "model_name": "gemma3:12b",
+      "total_evaluations": 72,
+      "healthy_derivations": 36,
+      "semantic_infections": 36,
+      "transmission_fidelity_tau": 1.0,
+      "local_derivability_rate_D_ctx": 1.0,
+      "generations_covered": "G0 (Founder) -> G1 (Protocol/Clearance) -> G2 (Route/Tier)",
+      "status": "FROZEN"
+    },
+    "exp1b_a": {
+      "experiment": "Experiment 1B-A (Multi-Generation Branching Dynamics & Extinction Matrix)",
+      "method": "Exact Galton-Watson Generating Function & 150,000 Monte Carlo Trajectories",
+      "branching_capacity_b": 2.0,
+      "critical_path_availability_X_crit": 0.5,
+      "extinction_formula": "q_inf(p) = ((1 - p) / p)^2 for p > 0.50; 1.0 for p <= 0.50",
+      "analytical_extinction_probabilities": {
+        "subcritical_exposure_p0.40": 1.0,
+        "critical_boundary_p0.50": 1.0,
+        "supercritical_p0.60": 0.44444,
+        "supercritical_p0.75": 0.11111,
+        "deterministic_p1.00": 0.0
+      },
+      "monte_carlo_trials_total": 150000,
+      "status": "FROZEN"
+    },
+    "exp1b_b1c": {
+      "experiment": "Experiment 1B-B1c (Matched Path Sufficiency Assay)",
+      "database": "gene_exp1b_b1c_matched_expression_20260820_140941.db",
+      "commit": "b7182d3d86ee4c323bdea14e178749181f6b6fb6",
+      "model_name": "gemma3:12b",
+      "total_calls": 16,
+      "p_active_given_complete_path": 1.0,
+      "complete_active_count": 8,
+      "complete_total_count": 8,
+      "p_active_given_broken_path": 0.0,
+      "broken_active_count": 0,
+      "broken_total_count": 8,
+      "status": "FROZEN"
+    },
+    "exp1b_c1b": {
+      "experiment": "Experiment 1B-C1b (Shared-Ecology Delayed Adjudication Sandbox)",
+      "database": "gene_exp1b_c1b_shared_ecology_9f58315.db",
+      "commit": "9f58315eaab83929db49bf58c2f126b79a1fb788",
+      "total_evaluations_in_envelope": 1200,
+      "ecologies_count": 12,
+      "monte_carlo_draws_per_cell": 100,
+      "canonical_operating_point_k6_tpr90_fpr10": {
+        "top_k": 6,
+        "lineage_quarantine": {
+          "C_H": 0.9,
+          "C_I": 0.1,
+          "selectivity_S": 0.8
+        },
+        "signal_blind_uniform_thinning": {
+          "C_H": 0.7177,
+          "C_I": 0.7177,
+          "selectivity_S": -0.0
+        },
+        "random_family_quarantine": {
+          "C_H": 0.5,
+          "C_I": 0.5,
+          "selectivity_S": 0.0
+        },
+        "node_only_quarantine": {
+          "C_H": 1.0,
+          "C_I": 1.0,
+          "selectivity_S": 0.0
+        }
+      },
+      "budget_sweep_k_values": [
+        4,
+        6,
+        8
+      ],
+      "status": "FROZEN"
+    },
+    "exp1b_c2a": {
+      "experiment": "Experiment 1B-C2a.1 (Live Behavioral Immunity & Replay Stability)",
+      "database": "gene_exp1b_c2a_live_assay_a1474d6.db",
+      "commit": "a1474d66e1434b075ee11c5888bafad9638c9057",
+      "model_name": "gemma3:12b",
+      "total_calls": 50,
+      "reproductive_status_distribution": {
+        "active": 31,
+        "inactive": 19
+      },
+      "epistemic_phenotype_distribution": {
+        "clean_abstention": 17,
+        "contract_failure": 2,
+        "de_novo_error": 2,
+        "epistemic": 15,
+        "healthy": 6,
+        "semantic": 8
+      },
+      "replay_stability_swapped_broken": {
+        "total_repetitions": 10,
+        "active_epistemic_errors": 9,
+        "contract_failure_abstentions": 1
+      },
+      "replay_stability_forward_broken": {
+        "total_repetitions": 10,
+        "clean_abstentions": 10
+      },
+      "status": "FROZEN"
+    },
+    "exp1b_c2b": {
+      "experiment": "Experiment 1B-C2b (Binding Disambiguation & Layer 2 Proofreading)",
+      "database": "gene_exp1b_c2b_binding_assay_1f62908.db",
+      "commit": "1f62908583081f910405859c0c89721c1c997446",
+      "model_name": "gemma3:12b",
+      "sample_size_total": 30,
+      "sample_size_broken_paths": 24,
+      "sample_size_complete_paths": 6,
+      "valid_concrete_derivations": 6,
+      "unsupported_concrete_emitted": 9,
+      "clean_abstentions": 15,
+      "proofreader_rejected_unification": 9,
+      "proofreader_passed_valid": 6,
+      "proofreader_passed_abstention": 15,
+      "proofreader_admitted_unsupported": 0,
+      "mu_expression_overall": 0.3,
+      "mu_expression_on_broken_paths": 0.375,
+      "mu_heritable_overall": 0.0,
+      "mu_heritable_on_broken_paths": 0.0,
+      "status": "FROZEN"
+    },
+    "round4": {
+      "experiment": "Exploration Round 4 (Epistemic Context Compiler & Four-Layer Assay)",
+      "database": "exploration_round4_results.db",
+      "commit": "cf472ee76abb9af839bb5b102301de3302df9b87",
+      "model_digest": "f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a",
+      "total_calls": 116,
+      "total_evaluations": 116,
+      "bloat_rate_entitled": "7 / 8 (87.5%, mean excess = 1.625)",
+      "contract_violation_rate": "5 / 24 (20.8%)",
+      "symbol_drift_rate": "6 / 24 (25.0%)",
+      "status": "FROZEN"
+    },
+    "stage_5a": {
+      "experiment": "Exploration Round 5 Stage 5A (Support-First Revision Precision)",
+      "summary_file": "exploration_round5_stage5a_summary.json",
+      "commit": "aff1baa34e55f371bfe710628f25abf9113c2f03",
+      "total_cases": 432,
+      "subassay_5a1_local_what_if_cases": 368,
+      "subassay_5a2_network_then_what_cases": 64,
+      "degraded_cases": 104,
+      "flat_union_autoimmunity_on_degraded": 1.0,
+      "single_witness_autoimmunity_on_degraded": 0.5769,
+      "bloat_incremental_false_retractions": 8,
+      "status": "FROZEN"
+    },
+    "stage_5b": {
+      "experiment": "Exploration Round 5 Stage 5B (Lineage-Projected Action Governance)",
+      "summary_file": "exploration_round5_stage5b_summary.json",
+      "commit": "round5-stage5b-freeze-v3",
+      "total_cases": 368,
+      "axiomatic_compliance_p_lineage": "7 / 7 (100.0% fully compliant via antichain-minimized S_L and rho_L)",
+      "degraded_permitted_rate_tau_0_5": "32 / 104 (30.8%)",
+      "mean_degraded_lineage_authority": 0.4615,
+      "status": "FROZEN"
+    },
+    "stage_5c": {
+      "experiment": "Exploration Round 5 Stage 5C (Neural Revision Bridge)",
+      "summary_file": "exploration_round5_stage5c_summary.json",
+      "commit": "round5-stage5c-runner-freeze",
+      "model_name": "gemma3:12b",
+      "model_digest": "f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a",
+      "total_calls": 32,
+      "overall_entitlement_accuracy": {
+        "arm1_raw_neural": 0.75,
+        "arm2_naive_reported": 0.5,
+        "arm3_gene_kernel": 1.0
+      },
+      "degraded_state_retention_rate": {
+        "arm1_raw_neural": 0.5,
+        "arm2_naive_reported": 0.0,
+        "arm3_gene_kernel": 1.0
+      },
+      "degraded_failure_channel_decomposition": {
+        "naive_policy_trigger_rate": 0.75,
+        "raw_neural_degraded_failure_rate": 0.5,
+        "marginal_policy_induced_error_rate": 0.5,
+        "policy_only_failure_worlds": [
+          "W_IND",
+          "W_SHO"
+        ],
+        "neural_only_failure_worlds": [
+          "W_SHP"
+        ],
+        "both_channels_failure_worlds": [
+          "W_REC"
+        ]
+      },
+      "retracted_clean_abstention_rate": {
+        "arm1_raw_neural": 1.0,
+        "arm2_naive_reported": 1.0,
+        "arm3_gene_kernel": 1.0
+      },
+      "action_governance_arm3": "Preregistered Lineage Gating Enforced (3 permitted, 1 blocked under structural root degradation, 4 retracted)",
+      "replay_canary_stability": "3 / 4 raw matches (75.0%), 4 / 4 semantic matches (100.0%)",
+      "status": "COMPLETED_AND_FROZEN"
+    },
+    "stage_6b": {
+      "experiment": "Exploration Round 6 Stage 6B (Contract-Guided State Adjudication)",
+      "summary_file": "exploration_round6_stage6b_results_summary.json",
+      "commit": "round6-stage6b-master-freeze",
+      "total_cases": 200,
+      "layer_a_transition_fidelity": {
+        "arm1_append_only": 0.55,
+        "arm2_kt_lww": 0.55,
+        "arm3_vt_lww": 0.55,
+        "arm4_bitemporal_latest": 0.55,
+        "arm5_predicate_contract_flat": 1.0,
+        "arm6_gene_kernel": 1.0
+      },
+      "layer_b_premise_state_fidelity": {
+        "arm1_append_only": 0.4,
+        "arm2_kt_lww": 0.55,
+        "arm3_vt_lww": 0.55,
+        "arm4_bitemporal_latest": 0.55,
+        "arm5_predicate_contract_flat": 1.0,
+        "arm6_gene_kernel": 1.0
+      },
+      "layer_c_entitlement_accuracy": {
+        "arm1_append_only": 0.76,
+        "arm2_kt_lww": 0.76,
+        "arm3_vt_lww": 0.76,
+        "arm4_bitemporal_latest": 0.76,
+        "arm5_predicate_contract_flat": 0.64,
+        "arm6_gene_kernel": 1.0
+      },
+      "layer_c_revision_autoimmunity_decomposition": {
+        "arm5_total_autoimmune_retractions": "72 / 72 (100.0% failure on alternative support opportunities)",
+        "alternative_derivation_survival_failures": 32,
+        "occurrence_substitution_survival_failures": 40,
+        "arm6_gene_kernel": "0 / 72 (0.0% autoimmunity, 100.0% support fidelity)"
+      },
+      "status": "COMPLETED_AND_FROZEN"
+    },
+    "stage_6b1": {
+      "experiment": "Exploration Round 6 Stage 6B.1 (Multi-Update Temporal Ordering Micro-Assay)",
+      "summary_file": "exploration_round6_stage6b1_temporal_summary.json",
+      "commit": "round6-stage6b-master-freeze",
+      "total_test_coordinates": 12,
+      "policy_accuracies": {
+        "knowledge_time_lww": 0.3333,
+        "valid_time_lww": 0.75,
+        "bitemporal_engine": 1.0
+      },
+      "status": "COMPLETED_AND_FROZEN"
+    },
+    "stage_6c": {
+      "experiment": "Exploration Round 6 Stage 6C (Neural Semantic Observation Extraction & Fault Localization)",
+      "summary_file": "exploration_round6_stage6c_summary.json",
+      "database": "exploration_round6_stage6c_results.db",
+      "raw_calls_archive": "exploration_round6_stage6c_raw_calls.jsonl",
+      "commit": "round6-stage6c-postreview-freeze",
+      "model_name": "gemma3:12b",
+      "model_digest": "f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a",
+      "total_calls": 28,
+      "field_level_extraction": {
+        "subject_accuracy": 0.8333,
+        "predicate_accuracy": 1.0,
+        "object_accuracy": 0.0833,
+        "t_valid_start_accuracy": 1.0,
+        "t_valid_end_accuracy": 1.0,
+        "complete_tuple_accuracy": 0.0833
+      },
+      "zero_call_normalization_audit": {
+        "post_normalization_accuracy": 0.9167,
+        "normalized_exact_matches": "11 / 12"
+      },
+      "arm_n1_direct_transition": {
+        "layer_a_transition_fidelity": 0.0,
+        "active_occurrence_set_fidelity": 0.1667,
+        "semantic_premise_state_fidelity": 0.1667,
+        "layer_c_entitlement_accuracy": 0.1667,
+        "primary_failure": "TRANSITION_EMISSION_ERROR (omits ASSERT baseline, violates bitemporal transition syntax)"
+      },
+      "arm_n2_modular_extraction": {
+        "layer_0_exact_extraction_accuracy": 0.0833,
+        "layer_a_transition_fidelity": 0.8333,
+        "active_occurrence_set_fidelity": 0.9167,
+        "semantic_premise_state_fidelity": 0.1667,
+        "layer_c_entitlement_accuracy": 0.25,
+        "p_final_correct_given_exact_observation": {
+          "neural_empirical_sample": "1 / 1 (100.0%) (sole exact extraction case remained 100% correct downstream)",
+          "oracle_ceiling": "12 / 12 (100.0%)",
+          "runtime_autoimmunity": "0 / 12 (0.0%)"
+        },
+        "query_level_outcome_invariance": "3 / 12 (25.0%) final entitlement correct despite 1/12 exact extraction (query-level outcome invariance under surface lexical differences)",
+        "fault_localization": "Epistemic Error Boundary Externalization: Error origin is localized to Layer 0; deterministic runtime contains error propagation after admission without runtime autoimmunity"
+      },
+      "canary_determinism": "4 / 4 raw string matches (100.0%), 4 / 4 semantic JSON matches (100.0%)",
+      "status": "COMPLETED_AND_FROZEN"
+    },
+    "stage_7a": {
+      "experiment": "Exploration Round 7 Stage 7A (Proof-Carrying Epistemic Ingress Benchmark)",
+      "artifact": "exploration_round7_stage7a_benchmark_summary.json",
+      "n_worlds": 120,
+      "total_probe_evaluations": 480,
+      "arms": {
+        "a0_top1_blind_write": {
+          "world_pass_rate": 0.5833333333333334,
+          "fdar_global": 0.7142857142857143,
+          "sac_rate": 1.0,
+          "upr_rate": 0.0
+        },
+        "a1_canonicalize_only": {
+          "world_pass_rate": 0.5833333333333334,
+          "fdar_global": 0.7142857142857143,
+          "sac_rate": 1.0,
+          "upr_rate": 0.0
+        },
+        "a2_candidate_aware": {
+          "world_pass_rate": 0.75,
+          "fdar_global": 0.42857142857142855,
+          "fdar_authority_conditional_resolved": 1.0,
+          "sac_rate": 1.0,
+          "upr_rate": 1.0
+        },
+        "a3_authority_aware": {
+          "world_pass_rate": 0.9166666666666666,
+          "fdar_global": 0.14285714285714285,
+          "fdar_ambiguity_conditional_authorized": 1.0,
+          "sac_rate": 1.0,
+          "upr_rate": 0.0
+        },
+        "a4_full_gene_ingress": {
+          "world_pass_rate": 1.0,
+          "fdar_global": 0.0,
+          "sac_rate": 1.0,
+          "upr_rate": 1.0
+        }
+      },
+      "status": "COMPLETED_AND_FROZEN"
+    },
+    "stage_7b": {
+      "experiment": "Exploration Round 7 Stage 7B (Live Neural Ingress Interface & Candidate Disambiguation Benchmark)",
+      "summary_file": "exploration_round7_stage7b_summary.json",
+      "database": "exploration_round7_stage7b_results.db",
+      "raw_calls_archive": "exploration_round7_stage7b_raw_calls.jsonl",
+      "commit": "round7-stage7b-live-freeze",
+      "model_name": "gemma3:12b",
+      "model_digest": "f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a",
+      "total_calls": 52,
+      "primary_factorial_calls": 32,
+      "counterbalanced_calls": 16,
+      "canary_replay_calls": 4,
+      "field_level_accuracies": {
+        "subject_span": 1.0,
+        "predicate_span": 0.9808,
+        "object_span": 1.0,
+        "t_valid_start": 1.0,
+        "candidate_entity_match": 1.0,
+        "novelty_detection": 1.0
+      },
+      "canary_determinism": {
+        "raw_string_exact_matches": "3 / 4 (75.0%)",
+        "semantic_structural_exact_matches": "4 / 4 (100.0%)"
+      },
+      "counterbalancing_slot_distribution": {
+        "slot_0": 4,
+        "slot_1": 4,
+        "slot_2": 4,
+        "slot_3": 4,
+        "positional_entropy": 1.0,
+        "is_positionally_invariant": true
+      },
+      "downstream_probe_metrics": {
+        "overall_probe_pass_rate": 0.9615,
+        "fdar_global": 0.0,
+        "sac_rate": 0.0,
+        "upr_rate": 0.0,
+        "runtime_autoimmunity_rate": 0.0,
+        "candidate_preservation_fidelity": 1.0,
+        "authority_gating_fidelity": 1.0
+      },
+      "status": "COMPLETED_AND_FROZEN"
+    }
+  }
+}

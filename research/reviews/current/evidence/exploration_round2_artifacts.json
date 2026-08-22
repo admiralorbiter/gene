@@ -1,0 +1,78 @@
+{
+  "manifest_version": "1.0.0",
+  "round": "Exploration Round 2",
+  "evidence_class": "exploratory_local",
+  "base_commit": "2685987",
+  "original_call_commit": "a2f933a",
+  "evaluation_provenance": {
+    "evaluation_origin": "retrospective_backfill",
+    "evaluation_commit": "9aa06b1",
+    "note": "Evaluations backfilled post-review to match harness evaluation layer schema; original calls logged in a2f933a."
+  },
+  "promotion_lifecycle": {
+    "is_canonical": false,
+    "prerequisite": "Requires frozen public database export, SHA-256 validation, and unconfounded protocol replication before promotion to canonical_results_manifest.json."
+  },
+  "artifacts": {
+    "track_a2_dynamic_repair.db": {
+      "file_path": "runs/explore_round2/track_a2_dynamic_repair.db",
+      "sha256": "d2ac19dfb0c4cb4e4b810c9643f752a847925aa5ee947eac018c120198e6841d",
+      "size_bytes": 65536,
+      "tables": [
+        "exploration_runs",
+        "exploration_calls",
+        "exploration_evaluations"
+      ],
+      "row_counts": {
+        "exploration_runs": 1,
+        "exploration_calls": 12,
+        "exploration_evaluations": 12
+      }
+    },
+    "track_b2_monoculture.db": {
+      "file_path": "runs/explore_round2/track_b2_monoculture.db",
+      "sha256": "ed9ee90cf6eab5d7008dda5558daa516761790aba6a81d7667f1a60c0b221e86",
+      "size_bytes": 65536,
+      "tables": [
+        "exploration_runs",
+        "exploration_calls",
+        "exploration_evaluations"
+      ],
+      "row_counts": {
+        "exploration_runs": 1,
+        "exploration_calls": 16,
+        "exploration_evaluations": 16
+      }
+    },
+    "track_g_multi_justification.db": {
+      "file_path": "runs/explore_round2/track_g_multi_justification.db",
+      "sha256": "9b905ce349c0281fa4186607d98fa15ea2781106fabb938272d1658e42de1e1d",
+      "size_bytes": 65536,
+      "tables": [
+        "exploration_runs",
+        "exploration_calls",
+        "exploration_evaluations"
+      ],
+      "row_counts": {
+        "exploration_runs": 1,
+        "exploration_calls": 12,
+        "exploration_evaluations": 12
+      }
+    },
+    "track_m_calibration.db": {
+      "file_path": "runs/explore_round2/track_m_calibration.db",
+      "sha256": "9b597e48f95feab44f9929129e4d06df35b451cf779128d1b388b269fe101f6e",
+      "size_bytes": 53248,
+      "tables": [
+        "exploration_runs",
+        "exploration_calls",
+        "exploration_evaluations"
+      ],
+      "row_counts": {
+        "exploration_runs": 1,
+        "exploration_calls": 8,
+        "exploration_evaluations": 8
+      }
+    }
+  }
+}

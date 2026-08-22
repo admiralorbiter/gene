@@ -1,0 +1,32 @@
+{
+  "experiment_name": "Stage 6B Contract-Guided State Adjudication Factorial Benchmark",
+  "total_cases": 200,
+  "grid_dimensions": {
+    "predicate_modes": [
+      "functional_time_varying",
+      "multivalued_additive",
+      "episodic_point",
+      "interval_bounded"
+    ],
+    "update_patterns": [
+      "forward_update",
+      "delayed_report",
+      "retroactive_correction",
+      "contemporaneous_disagreement",
+      "recurrence_expiry"
+    ],
+    "source_relations": [
+      "same_source",
+      "independent_source"
+    ],
+    "support_topologies": [
+      "direct_fact",
+      "single_derived_path",
+      "independent_alternatives",
+      "shared_premise_alternatives",
+      "recombinant_paths"
+    ]
+  },
+  "cases_file": "exploration_round6_stage6b_cases.jsonl",
+  "cases_sha256": "27d7edd5d629e941c9138a44d06237defd46ce877e7432f406bc8e2346851af7"
+}

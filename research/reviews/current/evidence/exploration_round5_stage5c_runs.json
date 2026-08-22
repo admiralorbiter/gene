@@ -1,0 +1,11 @@
+[
+  {
+    "run_id": "RUN_5C_1787281974",
+    "git_commit": "4203e91c70a0eead8c36def4a7dcfcab53fd584b",
+    "manifest_sha256": "ce963fde7e1771bb16a31209fdda84777596d567bc08b9079252dd58c5cf3f8e",
+    "model_name": "gemma3:12b",
+    "model_digest": "f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a",
+    "ollama_version": "0.32.15",
+    "timestamp": 1787281974.099026
+  }
+]

@@ -1,0 +1,48 @@
+{
+  "benchmark_name": "Exploration Round 7 Stage 7B Live Neural Ingress Benchmark (Deterministic Replay & Interface Hardening)",
+  "protocol_version": "1.3.1",
+  "freeze_tag": "round7-stage7b-live-freeze",
+  "model_name": "gemma3:12b",
+  "model_digest": "f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a",
+  "total_calls": 52,
+  "primary_factorial_calls": 32,
+  "counterbalanced_calls": 16,
+  "canary_replay_calls": 4,
+  "field_level_accuracies": {
+    "subject_span": 1.0,
+    "predicate_span": 0.9808,
+    "object_span": 1.0,
+    "t_valid_start": 1.0,
+    "candidate_entity_match": 1.0,
+    "novelty_detection": 1.0
+  },
+  "canary_determinism": {
+    "raw_string_exact_matches": "3 / 4 (75.0%)",
+    "semantic_structural_exact_matches": "4 / 4 (100.0%)"
+  },
+  "counterbalancing_slot_distribution": {
+    "slot_0": 4,
+    "slot_1": 4,
+    "slot_2": 4,
+    "slot_3": 4,
+    "positional_entropy": 1.0,
+    "is_positionally_invariant": true
+  },
+  "downstream_probe_metrics": {
+    "overall_probe_pass_rate": 0.9615,
+    "fdar_global": 0.0,
+    "sac_rate": 0.0,
+    "upr_rate": 0.0,
+    "runtime_autoimmunity_rate": 0.0,
+    "candidate_preservation_fidelity": 1.0,
+    "authority_gating_fidelity": 1.0
+  },
+  "stage7b2_targeted_micro_assay": {
+    "total_calls": 10,
+    "explicit_ambiguity_preservation_rate": "3 / 3 (100.0%) when schema permits multi-candidate subsets",
+    "explicit_temporal_endpoint_accuracy": "5 / 5 (100.0%) on explicitly stated valid-time boundaries",
+    "post_expiry_temporal_isolation_rate": "4 / 4 (100.0%) inactive after interval expiry"
+  },
+  "database_file": "exploration_round7_stage7b_results.db",
+  "raw_calls_file": "exploration_round7_stage7b_raw_calls.jsonl"
+}

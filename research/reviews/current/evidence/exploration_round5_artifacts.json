@@ -1,0 +1,84 @@
+{
+  "round": "Exploration Round 5: Entitlement Under Change — Support-First Epistemic Revision & Action Governance",
+  "evidence_class": "deterministic_zero_live_llm",
+  "base_tag": "round4-postreview-freeze",
+  "base_commit": "cf472ee76abb9af839bb5b102301de3302df9b87",
+  "stage_5a_freeze_tag": "round5-stage5a-freeze-v2",
+  "stage_5a_freeze_commit": "aff1baa34e55f371bfe710628f25abf9113c2f03",
+  "stage_5b_freeze_tag": "round5-stage5b-freeze-v2",
+  "stage_5b_freeze_commit": "316de0280e6325bfb411ade658763bf02b19dac6",
+  "subassay_5a1_local_what_if": {
+    "total_cases": 368,
+    "entitled_cases": 120,
+    "degraded_cases": 104,
+    "unchanged_cases": 16,
+    "retracted_cases": 248,
+    "flat_union_autoimmunity_on_degraded": 1.0,
+    "single_witness_autoimmunity_on_degraded": 0.5769230769230769,
+    "bloat_incremental_false_retractions_on_unchanged": 8,
+    "bloat_all_entitled_autoimmunity": 0.9333333333333333,
+    "topology_breakdown": {
+      "single_conjunctive": { "degraded": 0, "flat_union_auto": 0.0, "single_witness_auto": 0.0 },
+      "independent_alternatives": { "degraded": 24, "flat_union_auto": 1.0, "single_witness_auto": 0.5 },
+      "shared_root_alternatives": { "degraded": 8, "flat_union_auto": 1.0, "single_witness_auto": 0.5 },
+      "recombinant_tri_path": { "degraded": 72, "flat_union_auto": 1.0, "single_witness_auto": 0.6111111111111112 }
+    },
+    "primary_discovery": "Loss of alternative-support algebra causes 100% false retraction on damaged-but-still-entitled states (104/104); single witness causes 57.7% (60/104); explanatory bloat causes 8 additional false retractions on unchanged states."
+  },
+  "subassay_5a2_network_then_what": {
+    "total_cases": 64,
+    "ground_truth_retractions": 48,
+    "staleness_factorial": {
+      "none_stale": { "zombie_count": 0, "zombie_rate": 0.0, "exact_agreement": 64, "exact_agreement_rate": 1.0 },
+      "only_m1_stale": { "zombie_count": 12, "zombie_rate": 0.25, "exact_agreement": 52, "exact_agreement_rate": 0.8125 },
+      "only_m2_stale": { "zombie_count": 12, "zombie_rate": 0.25, "exact_agreement": 52, "exact_agreement_rate": 0.8125 },
+      "both_stale": { "zombie_count": 48, "zombie_rate": 1.0, "exact_agreement": 16, "exact_agreement_rate": 0.25 }
+    },
+    "primary_discovery": "Staleness factorial demonstrates that intermediate cache staleness causes zombie derivations (25% when single lemma is stale, 100% when both are stale). Root-expanded support derivation (S_root) guarantees 100% exact agreement with zero zombie derivations."
+  },
+  "subassay_5b_action_governance": {
+    "total_cases": 368,
+    "axiomatic_compliance": {
+      "binary_entitlement": "5/7 passed (fails Axiom 3: Degradation Sensitivity, Axiom 6: Lineage Independence)",
+      "scalar_resilience_kappa": "5/7 passed (fails Axiom 3 on shared-root (2,1)->(1,1), Axiom 6: Lineage Independence)",
+      "tuple_resilience_rho": "6/7 passed (passes Axiom 3, fails Axiom 6: Lineage Independence)",
+      "lineage_projected_resilience": "7/7 passed (fully compliant with all 7 formal invariants via antichain-minimized S_L and rho_L)"
+    },
+    "operating_threshold_sweep_tau_0_5": {
+      "binary_entitlement": "104 / 104 (100.0% permitted, mean auth = 1.000)",
+      "scalar_resilience_kappa": "104 / 104 (100.0% permitted, mean auth = 0.538)",
+      "tuple_resilience_rho": "44 / 104 (42.3% permitted, mean auth = 0.481)",
+      "lineage_projected_resilience": "32 / 104 (30.8% permitted, mean auth = 0.462)"
+    },
+    "primary_discovery": "Hierarchy of representation incompleteness proves that binary, scalar kappa, tuple rho, and global root counts are all lossy; the antichain-minimized lineage-projected support hypergraph S_L(c) is the canonical intervention-sufficient lineage normal form."
+  },
+  "artifacts": {
+    "stage_5a_cases_ledger": {
+      "path": "data/exploration_round5_stage5a_cases.jsonl",
+      "sha256": "1499305d197cf53ad624fc65a6626a0d5fc9ea87993184583930ce952692548e"
+    },
+    "stage_5a_summary": {
+      "path": "data/exploration_round5_stage5a_summary.json",
+      "sha256": "dc39becc57dfed03ee772095d75a1fd7342f84342745428a1cedb7b7231e56eb"
+    },
+    "stage_5a_report": {
+      "path": "docs/results/EXPLORATION_ROUND5_STAGE5A_REPORT.md"
+    },
+    "stage_5b_cases_ledger": {
+      "path": "data/exploration_round5_stage5b_cases.jsonl",
+      "sha256": "d08e1c5d58d430a2e087e4a3318f12ed67193fc80699146a6b27025a2ecefc3d"
+    },
+    "stage_5b_summary": {
+      "path": "data/exploration_round5_stage5b_summary.json",
+      "sha256": "43765284fd35991cc297ea15d93e97a01268bf21eaca191ebe468f136304dbb6"
+    },
+    "stage_5b_report": {
+      "path": "docs/results/EXPLORATION_ROUND5_STAGE5B_REPORT.md"
+    }
+  },
+  "promotion_lifecycle": {
+    "stage_5a_status": "complete_and_verified",
+    "stage_5b_status": "complete_and_verified",
+    "next_stage": "Stage 5C (Neural Revision Bridge — Live Model Revision Assay)"
+  }
+}

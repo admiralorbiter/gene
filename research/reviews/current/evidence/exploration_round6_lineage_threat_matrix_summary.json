@@ -1,0 +1,57 @@
+{
+  "assay_name": "Lineage Integrity Threat Model & Attack Matrix v1",
+  "attacks_evaluated": [
+    {
+      "attack_name": "Root Splitting (Sybil Roots Inflation)",
+      "mechanism": "Adversary splits single root R_1 into {R_1a, R_1b, R_1c}",
+      "honest_S_L": [
+        [
+          "R_1"
+        ]
+      ],
+      "honest_kappa_L": 1,
+      "honest_policy_decision": "BLOCK",
+      "attacked_S_L": [
+        [
+          "R_1a"
+        ],
+        [
+          "R_1c"
+        ],
+        [
+          "R_1b"
+        ]
+      ],
+      "attacked_kappa_L": 3,
+      "attacked_policy_decision": "PERMIT",
+      "policy_breach_detected": true,
+      "cryptographic_defense": "Write-time digital origin binding: Origin certificates signed by private source keys prevent sybil root synthesis."
+    },
+    {
+      "attack_name": "Root Merging (Denial of Service Suppression)",
+      "mechanism": "Adversary or summarizer collapses {R_1, R_2, R_3} into {R_COMMON}",
+      "honest_S_L": [
+        [
+          "R_2"
+        ],
+        [
+          "R_1"
+        ],
+        [
+          "R_3"
+        ]
+      ],
+      "honest_kappa_L": 3,
+      "honest_policy_decision": "PERMIT",
+      "attacked_S_L": [
+        [
+          "R_COMMON"
+        ]
+      ],
+      "attacked_kappa_L": 1,
+      "attacked_policy_decision": "BLOCK",
+      "policy_breach_detected": true,
+      "defense": "Immutable root preservation across summarization and transformations."
+    }
+  ]
+}

@@ -1,0 +1,1243 @@
+{
+  "manifest_version": "2.0.0",
+  "experiment": "Exploration Round 5 Stage 5C: Neural Revision Bridge (32-Call Live Assay)",
+  "target_model": "gemma3:12b",
+  "pinned_model_digest": "f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a",
+  "canonical_system_prompt": "You are an epistemic reasoning engine. You must output valid JSON.",
+  "execution_parameters": {
+    "temperature": 0.0,
+    "seed": 42,
+    "total_calls": 32,
+    "acquisition_calls": 4,
+    "factorial_revision_calls": 24,
+    "replay_canaries": 4
+  },
+  "worlds": {
+    "W_IND": {
+      "world_id": "W_IND",
+      "topology_name": "independent_alternatives",
+      "description": "Two independent 2-premise derivation paths from distinct roots R1, R2.",
+      "query_entity": "Station KESTREL",
+      "target_attribute": "operating_protocol",
+      "ground_truth_answer": "PROTOCOL_OMEGA",
+      "facts": {
+        "FACT_IND_A": "Station KESTREL is located in Sector ALPHA.",
+        "FACT_IND_B": "Sector ALPHA operates under protocol Rule 1 producing PROTOCOL_OMEGA.",
+        "FACT_IND_D": "Station KESTREL carries telemetry beacon BEACON_DELTA.",
+        "FACT_IND_E": "Telemetry beacon BEACON_DELTA authorizes protocol Rule 2 producing PROTOCOL_OMEGA."
+      },
+      "lineage_map": {
+        "FACT_IND_A": "ROOT_R1",
+        "FACT_IND_B": "ROOT_R1",
+        "FACT_IND_D": "ROOT_R2",
+        "FACT_IND_E": "ROOT_R2"
+      },
+      "rules": [
+        "Rule 1: IF (Station in Sector ALPHA) AND (Sector ALPHA operates under Rule 1) THEN Protocol is PROTOCOL_OMEGA",
+        "Rule 2: IF (Station carries BEACON_DELTA) AND (BEACON_DELTA authorizes Rule 2) THEN Protocol is PROTOCOL_OMEGA"
+      ],
+      "rule_specs": [
+        {
+          "rule_id": "RULE_IND_1",
+          "antecedent_fact_ids": [
+            "FACT_IND_A",
+            "FACT_IND_B"
+          ],
+          "consequent_attribute": "operating_protocol",
+          "consequent_value": "PROTOCOL_OMEGA",
+          "nl_text": "Rule 1"
+        },
+        {
+          "rule_id": "RULE_IND_2",
+          "antecedent_fact_ids": [
+            "FACT_IND_D",
+            "FACT_IND_E"
+          ],
+          "consequent_attribute": "operating_protocol",
+          "consequent_value": "PROTOCOL_OMEGA",
+          "nl_text": "Rule 2"
+        }
+      ],
+      "initial_support_family": [
+        [
+          "FACT_IND_A",
+          "FACT_IND_B"
+        ],
+        [
+          "FACT_IND_D",
+          "FACT_IND_E"
+        ]
+      ],
+      "initial_root_family": [
+        [
+          "ROOT_R1"
+        ],
+        [
+          "ROOT_R2"
+        ]
+      ],
+      "degraded_intervention": [
+        "FACT_IND_D"
+      ],
+      "retracted_intervention": [
+        "FACT_IND_A",
+        "FACT_IND_D"
+      ]
+    },
+    "W_SHP": {
+      "world_id": "W_SHP",
+      "topology_name": "shared_premise_alternatives",
+      "description": "Two alternative derivation paths sharing premise Fact_A (kappa-blindness boundary).",
+      "query_entity": "Station ORION",
+      "target_attribute": "clearance_tier",
+      "ground_truth_answer": "TIER_SIGMA",
+      "facts": {
+        "FACT_SHP_A": "Station ORION is certified under Central Division.",
+        "FACT_SHP_B": "Central Division with secondary channel BLUE assigns TIER_SIGMA.",
+        "FACT_SHP_D": "Central Division with secondary channel GOLD assigns TIER_SIGMA."
+      },
+      "lineage_map": {
+        "FACT_SHP_A": "ROOT_R1",
+        "FACT_SHP_B": "ROOT_R2",
+        "FACT_SHP_D": "ROOT_R3"
+      },
+      "rules": [
+        "Rule 1: IF (Central Division) AND (Secondary Channel BLUE) THEN Tier is TIER_SIGMA",
+        "Rule 2: IF (Central Division) AND (Secondary Channel GOLD) THEN Tier is TIER_SIGMA"
+      ],
+      "rule_specs": [
+        {
+          "rule_id": "RULE_SHP_1",
+          "antecedent_fact_ids": [
+            "FACT_SHP_A",
+            "FACT_SHP_B"
+          ],
+          "consequent_attribute": "clearance_tier",
+          "consequent_value": "TIER_SIGMA",
+          "nl_text": "Rule 1"
+        },
+        {
+          "rule_id": "RULE_SHP_2",
+          "antecedent_fact_ids": [
+            "FACT_SHP_A",
+            "FACT_SHP_D"
+          ],
+          "consequent_attribute": "clearance_tier",
+          "consequent_value": "TIER_SIGMA",
+          "nl_text": "Rule 2"
+        }
+      ],
+      "initial_support_family": [
+        [
+          "FACT_SHP_A",
+          "FACT_SHP_B"
+        ],
+        [
+          "FACT_SHP_A",
+          "FACT_SHP_D"
+        ]
+      ],
+      "initial_root_family": [
+        [
+          "ROOT_R1",
+          "ROOT_R2"
+        ],
+        [
+          "ROOT_R1",
+          "ROOT_R3"
+        ]
+      ],
+      "degraded_intervention": [
+        "FACT_SHP_B"
+      ],
+      "retracted_intervention": [
+        "FACT_SHP_A"
+      ]
+    },
+    "W_SHO": {
+      "world_id": "W_SHO",
+      "topology_name": "shared_origin_ancestry",
+      "description": "Two alternative premise paths whose premises share common conjunctive roots R1, R2.",
+      "query_entity": "Station VANGUARD",
+      "target_attribute": "access_code",
+      "ground_truth_answer": "CODE_EPSILON",
+      "facts": {
+        "FACT_SHO_A": "Station VANGUARD connects to Relay NORTH.",
+        "FACT_SHO_B": "Relay NORTH with Port 1 verifies CODE_EPSILON.",
+        "FACT_SHO_D": "Station VANGUARD connects to Relay SOUTH.",
+        "FACT_SHO_E": "Relay SOUTH with Port 2 verifies CODE_EPSILON."
+      },
+      "lineage_map": {
+        "FACT_SHO_A": "ROOT_R1",
+        "FACT_SHO_D": "ROOT_R1",
+        "FACT_SHO_B": "ROOT_R2",
+        "FACT_SHO_E": "ROOT_R2"
+      },
+      "rules": [
+        "Rule 1: IF (Relay NORTH) AND (Port 1 verified) THEN Code is CODE_EPSILON",
+        "Rule 2: IF (Relay SOUTH) AND (Port 2 verified) THEN Code is CODE_EPSILON"
+      ],
+      "rule_specs": [
+        {
+          "rule_id": "RULE_SHO_1",
+          "antecedent_fact_ids": [
+            "FACT_SHO_A",
+            "FACT_SHO_B"
+          ],
+          "consequent_attribute": "access_code",
+          "consequent_value": "CODE_EPSILON",
+          "nl_text": "Rule 1"
+        },
+        {
+          "rule_id": "RULE_SHO_2",
+          "antecedent_fact_ids": [
+            "FACT_SHO_D",
+            "FACT_SHO_E"
+          ],
+          "consequent_attribute": "access_code",
+          "consequent_value": "CODE_EPSILON",
+          "nl_text": "Rule 2"
+        }
+      ],
+      "initial_support_family": [
+        [
+          "FACT_SHO_A",
+          "FACT_SHO_B"
+        ],
+        [
+          "FACT_SHO_D",
+          "FACT_SHO_E"
+        ]
+      ],
+      "initial_root_family": [
+        [
+          "ROOT_R1",
+          "ROOT_R2"
+        ]
+      ],
+      "degraded_intervention": [
+        "FACT_SHO_D"
+      ],
+      "retracted_intervention": [
+        "FACT_SHO_A",
+        "FACT_SHO_D"
+      ]
+    },
+    "W_REC": {
+      "world_id": "W_REC",
+      "topology_name": "recombinant_tri_path",
+      "description": "Three overlapping alternative derivation paths across four roots.",
+      "query_entity": "Station DRAKE",
+      "target_attribute": "transit_lane",
+      "ground_truth_answer": "LANE_THETA",
+      "facts": {
+        "FACT_REC_A": "Station DRAKE aligns with Beacon 1.",
+        "FACT_REC_B": "Beacon 1 with Corridor X assigns LANE_THETA.",
+        "FACT_REC_C": "Corridor X with Gate 3 assigns LANE_THETA.",
+        "FACT_REC_D": "Gate 3 with Channel 4 assigns LANE_THETA."
+      },
+      "lineage_map": {
+        "FACT_REC_A": "ROOT_R1",
+        "FACT_REC_B": "ROOT_R2",
+        "FACT_REC_C": "ROOT_R3",
+        "FACT_REC_D": "ROOT_R4"
+      },
+      "rules": [
+        "Rule 1: IF (Beacon 1) AND (Corridor X) THEN Lane is LANE_THETA",
+        "Rule 2: IF (Corridor X) AND (Gate 3) THEN Lane is LANE_THETA",
+        "Rule 3: IF (Gate 3) AND (Channel 4) THEN Lane is LANE_THETA"
+      ],
+      "rule_specs": [
+        {
+          "rule_id": "RULE_REC_1",
+          "antecedent_fact_ids": [
+            "FACT_REC_A",
+            "FACT_REC_B"
+          ],
+          "consequent_attribute": "transit_lane",
+          "consequent_value": "LANE_THETA",
+          "nl_text": "Rule 1"
+        },
+        {
+          "rule_id": "RULE_REC_2",
+          "antecedent_fact_ids": [
+            "FACT_REC_B",
+            "FACT_REC_C"
+          ],
+          "consequent_attribute": "transit_lane",
+          "consequent_value": "LANE_THETA",
+          "nl_text": "Rule 2"
+        },
+        {
+          "rule_id": "RULE_REC_3",
+          "antecedent_fact_ids": [
+            "FACT_REC_C",
+            "FACT_REC_D"
+          ],
+          "consequent_attribute": "transit_lane",
+          "consequent_value": "LANE_THETA",
+          "nl_text": "Rule 3"
+        }
+      ],
+      "initial_support_family": [
+        [
+          "FACT_REC_A",
+          "FACT_REC_B"
+        ],
+        [
+          "FACT_REC_B",
+          "FACT_REC_C"
+        ],
+        [
+          "FACT_REC_C",
+          "FACT_REC_D"
+        ]
+      ],
+      "initial_root_family": [
+        [
+          "ROOT_R1",
+          "ROOT_R2"
+        ],
+        [
+          "ROOT_R2",
+          "ROOT_R3"
+        ],
+        [
+          "ROOT_R3",
+          "ROOT_R4"
+        ]
+      ],
+      "degraded_intervention": [
+        "FACT_REC_A",
+        "FACT_REC_B"
+      ],
+      "retracted_intervention": [
+        "FACT_REC_B",
+        "FACT_REC_C"
+      ]
+    }
+  },
+  "calls": [
+    {
+      "call_index": 1,
+      "call_id": "CALL_ACQ_W_IND",
+      "phase": "acquisition",
+      "world_id": "W_IND",
+      "arm": "acquisition",
+      "condition": "baseline",
+      "invalidated_facts": [],
+      "system_prompt": "You are an epistemic reasoning engine. You must output valid JSON.",
+      "user_prompt": "### SYSTEM INSTRUCTION\nYou are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.\nIf the facts and rules are sufficient to deduce a definite answer, status must be \"DETERMINABLE\" and answer must match the deduced value.\nIf the facts and rules are insufficient, broken, or ambiguous, status must be \"INDETERMINABLE\" and answer must be null.\n\n### VERIFIED EVIDENCE\n- [FACT_IND_A]: Station KESTREL is located in Sector ALPHA.\n- [FACT_IND_B]: Sector ALPHA operates under protocol Rule 1 producing PROTOCOL_OMEGA.\n- [FACT_IND_D]: Station KESTREL carries telemetry beacon BEACON_DELTA.\n- [FACT_IND_E]: Telemetry beacon BEACON_DELTA authorizes protocol Rule 2 producing PROTOCOL_OMEGA.\n\n### INFERENCE RULES\n- Rule 1: IF (Station in Sector ALPHA) AND (Sector ALPHA operates under Rule 1) THEN Protocol is PROTOCOL_OMEGA\n- Rule 2: IF (Station carries BEACON_DELTA) AND (BEACON_DELTA authorizes Rule 2) THEN Protocol is PROTOCOL_OMEGA\n\n### QUERY\nTarget: Station KESTREL\nAttribute: operating_protocol\n\n### ACTION GOVERNANCE POLICY\nIf the answer is determinable, propose an appropriate operational action (e.g. \"AUTHORIZE_ENTRY\", \"EXECUTE_DISPATCH\", \"DEPLOY_PROTOCOL\") and specify your action confidence in [0.0, 1.0].\n\n### OUTPUT FORMAT\nYou must respond with ONLY valid JSON matching this schema:\n```json\n{\n  \"status\": \"DETERMINABLE\" | \"INDETERMINABLE\",\n  \"answer\": \"<STRING>\" | null,\n  \"cited_facts\": [\"<FACT_ID>\", ...],\n  \"proposed_action\": \"<ACTION_NAME>\" | null,\n  \"action_confidence\": 0.95\n}\n```",
+      "user_prompt_sha256": "923b363e6c70f9342b5d1d48f975d6bb55e4f148d079bc9ddfb346dbd040f9d5",
+      "request_payload_sha256": "13112ecbcc82d23e22343131285ce35489eb0f18a23a0ff505be05b3254de19f",
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_IND_A",
+          "FACT_IND_B"
+        ],
+        [
+          "FACT_IND_D",
+          "FACT_IND_E"
+        ]
+      ],
+      "expected_surviving_lineage": [
+        [
+          "ROOT_R1"
+        ],
+        [
+          "ROOT_R2"
+        ]
+      ],
+      "expected_oracle_answer": "PROTOCOL_OMEGA",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 2,
+      "call_id": "CALL_ACQ_W_SHP",
+      "phase": "acquisition",
+      "world_id": "W_SHP",
+      "arm": "acquisition",
+      "condition": "baseline",
+      "invalidated_facts": [],
+      "system_prompt": "You are an epistemic reasoning engine. You must output valid JSON.",
+      "user_prompt": "### SYSTEM INSTRUCTION\nYou are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.\nIf the facts and rules are sufficient to deduce a definite answer, status must be \"DETERMINABLE\" and answer must match the deduced value.\nIf the facts and rules are insufficient, broken, or ambiguous, status must be \"INDETERMINABLE\" and answer must be null.\n\n### VERIFIED EVIDENCE\n- [FACT_SHP_A]: Station ORION is certified under Central Division.\n- [FACT_SHP_B]: Central Division with secondary channel BLUE assigns TIER_SIGMA.\n- [FACT_SHP_D]: Central Division with secondary channel GOLD assigns TIER_SIGMA.\n\n### INFERENCE RULES\n- Rule 1: IF (Central Division) AND (Secondary Channel BLUE) THEN Tier is TIER_SIGMA\n- Rule 2: IF (Central Division) AND (Secondary Channel GOLD) THEN Tier is TIER_SIGMA\n\n### QUERY\nTarget: Station ORION\nAttribute: clearance_tier\n\n### ACTION GOVERNANCE POLICY\nIf the answer is determinable, propose an appropriate operational action (e.g. \"AUTHORIZE_ENTRY\", \"EXECUTE_DISPATCH\", \"DEPLOY_PROTOCOL\") and specify your action confidence in [0.0, 1.0].\n\n### OUTPUT FORMAT\nYou must respond with ONLY valid JSON matching this schema:\n```json\n{\n  \"status\": \"DETERMINABLE\" | \"INDETERMINABLE\",\n  \"answer\": \"<STRING>\" | null,\n  \"cited_facts\": [\"<FACT_ID>\", ...],\n  \"proposed_action\": \"<ACTION_NAME>\" | null,\n  \"action_confidence\": 0.95\n}\n```",
+      "user_prompt_sha256": "0d525eee64e871a474d0f11252acce7828d0ee8c94a9080b9ecb3e5d98880dbd",
+      "request_payload_sha256": "9b0f249c0eb7d382cbafde446dba7c7a92e3d50262ea384051edd3d9165a06f7",
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_SHP_A",
+          "FACT_SHP_B"
+        ],
+        [
+          "FACT_SHP_A",
+          "FACT_SHP_D"
+        ]
+      ],
+      "expected_surviving_lineage": [
+        [
+          "ROOT_R1",
+          "ROOT_R2"
+        ],
+        [
+          "ROOT_R1",
+          "ROOT_R3"
+        ]
+      ],
+      "expected_oracle_answer": "TIER_SIGMA",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 3,
+      "call_id": "CALL_ACQ_W_SHO",
+      "phase": "acquisition",
+      "world_id": "W_SHO",
+      "arm": "acquisition",
+      "condition": "baseline",
+      "invalidated_facts": [],
+      "system_prompt": "You are an epistemic reasoning engine. You must output valid JSON.",
+      "user_prompt": "### SYSTEM INSTRUCTION\nYou are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.\nIf the facts and rules are sufficient to deduce a definite answer, status must be \"DETERMINABLE\" and answer must match the deduced value.\nIf the facts and rules are insufficient, broken, or ambiguous, status must be \"INDETERMINABLE\" and answer must be null.\n\n### VERIFIED EVIDENCE\n- [FACT_SHO_A]: Station VANGUARD connects to Relay NORTH.\n- [FACT_SHO_B]: Relay NORTH with Port 1 verifies CODE_EPSILON.\n- [FACT_SHO_D]: Station VANGUARD connects to Relay SOUTH.\n- [FACT_SHO_E]: Relay SOUTH with Port 2 verifies CODE_EPSILON.\n\n### INFERENCE RULES\n- Rule 1: IF (Relay NORTH) AND (Port 1 verified) THEN Code is CODE_EPSILON\n- Rule 2: IF (Relay SOUTH) AND (Port 2 verified) THEN Code is CODE_EPSILON\n\n### QUERY\nTarget: Station VANGUARD\nAttribute: access_code\n\n### ACTION GOVERNANCE POLICY\nIf the answer is determinable, propose an appropriate operational action (e.g. \"AUTHORIZE_ENTRY\", \"EXECUTE_DISPATCH\", \"DEPLOY_PROTOCOL\") and specify your action confidence in [0.0, 1.0].\n\n### OUTPUT FORMAT\nYou must respond with ONLY valid JSON matching this schema:\n```json\n{\n  \"status\": \"DETERMINABLE\" | \"INDETERMINABLE\",\n  \"answer\": \"<STRING>\" | null,\n  \"cited_facts\": [\"<FACT_ID>\", ...],\n  \"proposed_action\": \"<ACTION_NAME>\" | null,\n  \"action_confidence\": 0.95\n}\n```",
+      "user_prompt_sha256": "4b25f895ba83d0ed83f130c5a5e6d9594a36498ec56c388bebfa02b863f0ecc3",
+      "request_payload_sha256": "a974b056da9379a1954a0a53684afc4e54af31e509f7d76a85e7dc806e671807",
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_SHO_A",
+          "FACT_SHO_B"
+        ],
+        [
+          "FACT_SHO_D",
+          "FACT_SHO_E"
+        ]
+      ],
+      "expected_surviving_lineage": [
+        [
+          "ROOT_R1",
+          "ROOT_R2"
+        ]
+      ],
+      "expected_oracle_answer": "CODE_EPSILON",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 4,
+      "call_id": "CALL_ACQ_W_REC",
+      "phase": "acquisition",
+      "world_id": "W_REC",
+      "arm": "acquisition",
+      "condition": "baseline",
+      "invalidated_facts": [],
+      "system_prompt": "You are an epistemic reasoning engine. You must output valid JSON.",
+      "user_prompt": "### SYSTEM INSTRUCTION\nYou are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.\nIf the facts and rules are sufficient to deduce a definite answer, status must be \"DETERMINABLE\" and answer must match the deduced value.\nIf the facts and rules are insufficient, broken, or ambiguous, status must be \"INDETERMINABLE\" and answer must be null.\n\n### VERIFIED EVIDENCE\n- [FACT_REC_A]: Station DRAKE aligns with Beacon 1.\n- [FACT_REC_B]: Beacon 1 with Corridor X assigns LANE_THETA.\n- [FACT_REC_C]: Corridor X with Gate 3 assigns LANE_THETA.\n- [FACT_REC_D]: Gate 3 with Channel 4 assigns LANE_THETA.\n\n### INFERENCE RULES\n- Rule 1: IF (Beacon 1) AND (Corridor X) THEN Lane is LANE_THETA\n- Rule 2: IF (Corridor X) AND (Gate 3) THEN Lane is LANE_THETA\n- Rule 3: IF (Gate 3) AND (Channel 4) THEN Lane is LANE_THETA\n\n### QUERY\nTarget: Station DRAKE\nAttribute: transit_lane\n\n### ACTION GOVERNANCE POLICY\nIf the answer is determinable, propose an appropriate operational action (e.g. \"AUTHORIZE_ENTRY\", \"EXECUTE_DISPATCH\", \"DEPLOY_PROTOCOL\") and specify your action confidence in [0.0, 1.0].\n\n### OUTPUT FORMAT\nYou must respond with ONLY valid JSON matching this schema:\n```json\n{\n  \"status\": \"DETERMINABLE\" | \"INDETERMINABLE\",\n  \"answer\": \"<STRING>\" | null,\n  \"cited_facts\": [\"<FACT_ID>\", ...],\n  \"proposed_action\": \"<ACTION_NAME>\" | null,\n  \"action_confidence\": 0.95\n}\n```",
+      "user_prompt_sha256": "c66bfc868cee861f6a111a509458278e667f19e26ec4d71b70acd947e8d5e668",
+      "request_payload_sha256": "146c740dd6e9b8c7cd334426fdf7a2b2ea8a258f1fc840dd5a766b772691e46b",
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_REC_A",
+          "FACT_REC_B"
+        ],
+        [
+          "FACT_REC_B",
+          "FACT_REC_C"
+        ],
+        [
+          "FACT_REC_C",
+          "FACT_REC_D"
+        ]
+      ],
+      "expected_surviving_lineage": [
+        [
+          "ROOT_R1",
+          "ROOT_R2"
+        ],
+        [
+          "ROOT_R2",
+          "ROOT_R3"
+        ],
+        [
+          "ROOT_R3",
+          "ROOT_R4"
+        ]
+      ],
+      "expected_oracle_answer": "LANE_THETA",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 5,
+      "call_id": "CALL_REV_W_IND_DEGRADED_arm1_raw_neural",
+      "phase": "revision",
+      "world_id": "W_IND",
+      "arm": "arm1_raw_neural",
+      "condition": "DEGRADED",
+      "invalidated_facts": [
+        "FACT_IND_D"
+      ],
+      "system_prompt": "You are an epistemic reasoning engine. You must output valid JSON.",
+      "user_prompt": "### SYSTEM INSTRUCTION\nYou are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.\nCRITICAL: Some previously known facts have been RETRACTED and are no longer valid. You MUST NOT use or cite any retracted facts.\nIf the remaining active facts and rules are sufficient to deduce a definite answer, status must be \"DETERMINABLE\".\nIf the remaining active facts are insufficient or all derivation paths are broken, status must be \"INDETERMINABLE\" and answer must be null.\n\n### PREVIOUSLY OBSERVED EVIDENCE\n- [FACT_IND_A]: Station KESTREL is located in Sector ALPHA.\n- [FACT_IND_B]: Sector ALPHA operates under protocol Rule 1 producing PROTOCOL_OMEGA.\n- [FACT_IND_D]: Station KESTREL carries telemetry beacon BEACON_DELTA.\n- [FACT_IND_E]: Telemetry beacon BEACON_DELTA authorizes protocol Rule 2 producing PROTOCOL_OMEGA.\n\n### [SYSTEM ALERT] RETRACTION NOTICE\nThe following facts have been formally invalidated and revoked:\n- RETRACTED / INVALID: [FACT_IND_D]\n\n### INFERENCE RULES\n- Rule 1: IF (Station in Sector ALPHA) AND (Sector ALPHA operates under Rule 1) THEN Protocol is PROTOCOL_OMEGA\n- Rule 2: IF (Station carries BEACON_DELTA) AND (BEACON_DELTA authorizes Rule 2) THEN Protocol is PROTOCOL_OMEGA\n\n### QUERY\nTarget: Station KESTREL\nAttribute: operating_protocol\n\n### ACTION GOVERNANCE POLICY\nIf the answer is determinable under active valid facts, propose an operational action and state your confidence.\n\n### OUTPUT FORMAT\nYou must respond with ONLY valid JSON matching this schema:\n```json\n{\n  \"status\": \"DETERMINABLE\" | \"INDETERMINABLE\",\n  \"answer\": \"<STRING>\" | null,\n  \"cited_facts\": [\"<FACT_ID>\", ...],\n  \"proposed_action\": \"<ACTION_NAME>\" | null,\n  \"action_confidence\": 0.95\n}\n```",
+      "user_prompt_sha256": "20f5a06e8fab7656bcae2f4f84364f30a5d6975e8f301a08ee68d50e41bcb1db",
+      "request_payload_sha256": "d1c0d516665cc465ad9ca0c4a774bc16f93bae4da75dc0bf48cc2f00ed856933",
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_IND_A",
+          "FACT_IND_B"
+        ]
+      ],
+      "expected_surviving_lineage": [
+        [
+          "ROOT_R1"
+        ]
+      ],
+      "expected_oracle_answer": "PROTOCOL_OMEGA",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 6,
+      "call_id": "CALL_REV_W_IND_DEGRADED_arm2_naive_reported",
+      "phase": "revision",
+      "world_id": "W_IND",
+      "arm": "arm2_naive_reported",
+      "condition": "DEGRADED",
+      "invalidated_facts": [
+        "FACT_IND_D"
+      ],
+      "system_prompt": "You are an epistemic reasoning engine. You must output valid JSON.",
+      "user_prompt": "### SYSTEM INSTRUCTION\nYou are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.\nCRITICAL: Some previously known facts have been RETRACTED and are no longer valid. You MUST NOT use or cite any retracted facts.\nIf the remaining active facts and rules are sufficient to deduce a definite answer, status must be \"DETERMINABLE\".\nIf the remaining active facts are insufficient or all derivation paths are broken, status must be \"INDETERMINABLE\" and answer must be null.\n\n### PREVIOUSLY OBSERVED EVIDENCE\n- [FACT_IND_A]: Station KESTREL is located in Sector ALPHA.\n- [FACT_IND_B]: Sector ALPHA operates under protocol Rule 1 producing PROTOCOL_OMEGA.\n- [FACT_IND_D]: Station KESTREL carries telemetry beacon BEACON_DELTA.\n- [FACT_IND_E]: Telemetry beacon BEACON_DELTA authorizes protocol Rule 2 producing PROTOCOL_OMEGA.\n\n### [SYSTEM ALERT] RETRACTION NOTICE\nThe following facts have been formally invalidated and revoked:\n- RETRACTED / INVALID: [FACT_IND_D]\n\n### INFERENCE RULES\n- Rule 1: IF (Station in Sector ALPHA) AND (Sector ALPHA operates under Rule 1) THEN Protocol is PROTOCOL_OMEGA\n- Rule 2: IF (Station carries BEACON_DELTA) AND (BEACON_DELTA authorizes Rule 2) THEN Protocol is PROTOCOL_OMEGA\n\n### QUERY\nTarget: Station KESTREL\nAttribute: operating_protocol\n\n### ACTION GOVERNANCE POLICY\nIf the answer is determinable under active valid facts, propose an operational action and state your confidence.\n\n### OUTPUT FORMAT\nYou must respond with ONLY valid JSON matching this schema:\n```json\n{\n  \"status\": \"DETERMINABLE\" | \"INDETERMINABLE\",\n  \"answer\": \"<STRING>\" | null,\n  \"cited_facts\": [\"<FACT_ID>\", ...],\n  \"proposed_action\": \"<ACTION_NAME>\" | null,\n  \"action_confidence\": 0.95\n}\n```",
+      "user_prompt_sha256": "20f5a06e8fab7656bcae2f4f84364f30a5d6975e8f301a08ee68d50e41bcb1db",
+      "request_payload_sha256": "d1c0d516665cc465ad9ca0c4a774bc16f93bae4da75dc0bf48cc2f00ed856933",
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_IND_A",
+          "FACT_IND_B"
+        ]
+      ],
+      "expected_surviving_lineage": [
+        [
+          "ROOT_R1"
+        ]
+      ],
+      "expected_oracle_answer": "PROTOCOL_OMEGA",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 7,
+      "call_id": "CALL_REV_W_IND_DEGRADED_arm3_gene_kernel",
+      "phase": "revision",
+      "world_id": "W_IND",
+      "arm": "arm3_gene_kernel",
+      "condition": "DEGRADED",
+      "invalidated_facts": [
+        "FACT_IND_D"
+      ],
+      "system_prompt": "You are an epistemic reasoning engine. You must output valid JSON.",
+      "user_prompt": "### SYSTEM INSTRUCTION\nYou are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.\nIf the facts and rules are sufficient to deduce a definite answer, status must be \"DETERMINABLE\" and answer must match the deduced value.\nIf the facts and rules are insufficient, status must be \"INDETERMINABLE\" and answer must be null.\n\n### COMPILED ACTIVE EVIDENCE\n- [FACT_IND_A]: Station KESTREL is located in Sector ALPHA.\n- [FACT_IND_B]: Sector ALPHA operates under protocol Rule 1 producing PROTOCOL_OMEGA.\n\n### INFERENCE RULES\n- Rule 1: IF (Station in Sector ALPHA) AND (Sector ALPHA operates under Rule 1) THEN Protocol is PROTOCOL_OMEGA\n- Rule 2: IF (Station carries BEACON_DELTA) AND (BEACON_DELTA authorizes Rule 2) THEN Protocol is PROTOCOL_OMEGA\n\n### QUERY\nTarget: Station KESTREL\nAttribute: operating_protocol\n\n### ACTION GOVERNANCE POLICY\nIf the answer is determinable, propose an operational action and specify your action confidence in [0.0, 1.0].\n\n### OUTPUT FORMAT\nYou must respond with ONLY valid JSON matching this schema:\n```json\n{\n  \"status\": \"DETERMINABLE\" | \"INDETERMINABLE\",\n  \"answer\": \"<STRING>\" | null,\n  \"cited_facts\": [\"<FACT_ID>\", ...],\n  \"proposed_action\": \"<ACTION_NAME>\" | null,\n  \"action_confidence\": 0.95\n}\n```",
+      "user_prompt_sha256": "547c0fe6d5cca41749240d48daf3322bbd3af6ee09b07b15266c9d588102825f",
+      "request_payload_sha256": "5cea55cabc1dcfee7af917c09e953882a9bac21653e04c537cfc5e65015ba85b",
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_IND_A",
+          "FACT_IND_B"
+        ]
+      ],
+      "expected_surviving_lineage": [
+        [
+          "ROOT_R1"
+        ]
+      ],
+      "expected_oracle_answer": "PROTOCOL_OMEGA",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 8,
+      "call_id": "CALL_REV_W_IND_RETRACTED_arm1_raw_neural",
+      "phase": "revision",
+      "world_id": "W_IND",
+      "arm": "arm1_raw_neural",
+      "condition": "RETRACTED",
+      "invalidated_facts": [
+        "FACT_IND_A",
+        "FACT_IND_D"
+      ],
+      "system_prompt": "You are an epistemic reasoning engine. You must output valid JSON.",
+      "user_prompt": "### SYSTEM INSTRUCTION\nYou are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.\nCRITICAL: Some previously known facts have been RETRACTED and are no longer valid. You MUST NOT use or cite any retracted facts.\nIf the remaining active facts and rules are sufficient to deduce a definite answer, status must be \"DETERMINABLE\".\nIf the remaining active facts are insufficient or all derivation paths are broken, status must be \"INDETERMINABLE\" and answer must be null.\n\n### PREVIOUSLY OBSERVED EVIDENCE\n- [FACT_IND_A]: Station KESTREL is located in Sector ALPHA.\n- [FACT_IND_B]: Sector ALPHA operates under protocol Rule 1 producing PROTOCOL_OMEGA.\n- [FACT_IND_D]: Station KESTREL carries telemetry beacon BEACON_DELTA.\n- [FACT_IND_E]: Telemetry beacon BEACON_DELTA authorizes protocol Rule 2 producing PROTOCOL_OMEGA.\n\n### [SYSTEM ALERT] RETRACTION NOTICE\nThe following facts have been formally invalidated and revoked:\n- RETRACTED / INVALID: [FACT_IND_A]\n- RETRACTED / INVALID: [FACT_IND_D]\n\n### INFERENCE RULES\n- Rule 1: IF (Station in Sector ALPHA) AND (Sector ALPHA operates under Rule 1) THEN Protocol is PROTOCOL_OMEGA\n- Rule 2: IF (Station carries BEACON_DELTA) AND (BEACON_DELTA authorizes Rule 2) THEN Protocol is PROTOCOL_OMEGA\n\n### QUERY\nTarget: Station KESTREL\nAttribute: operating_protocol\n\n### ACTION GOVERNANCE POLICY\nIf the answer is determinable under active valid facts, propose an operational action and state your confidence.\n\n### OUTPUT FORMAT\nYou must respond with ONLY valid JSON matching this schema:\n```json\n{\n  \"status\": \"DETERMINABLE\" | \"INDETERMINABLE\",\n  \"answer\": \"<STRING>\" | null,\n  \"cited_facts\": [\"<FACT_ID>\", ...],\n  \"proposed_action\": \"<ACTION_NAME>\" | null,\n  \"action_confidence\": 0.95\n}\n```",
+      "user_prompt_sha256": "d2fa3a522bfcedecedb725bf3b06b60cfb1fb14df92062be0f68dc29ed90ee2c",
+      "request_payload_sha256": "1442e41f412d8ec89e7dcc5fe0c1648a55d9a41b0813bb1dd3c36da5937d42c3",
+      "expected_entitled": false,
+      "expected_surviving_support": [],
+      "expected_surviving_lineage": [],
+      "expected_oracle_answer": "UNKNOWN",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 9,
+      "call_id": "CALL_REV_W_IND_RETRACTED_arm2_naive_reported",
+      "phase": "revision",
+      "world_id": "W_IND",
+      "arm": "arm2_naive_reported",
+      "condition": "RETRACTED",
+      "invalidated_facts": [
+        "FACT_IND_A",
+        "FACT_IND_D"
+      ],
+      "system_prompt": "You are an epistemic reasoning engine. You must output valid JSON.",
+      "user_prompt": "### SYSTEM INSTRUCTION\nYou are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.\nCRITICAL: Some previously known facts have been RETRACTED and are no longer valid. You MUST NOT use or cite any retracted facts.\nIf the remaining active facts and rules are sufficient to deduce a definite answer, status must be \"DETERMINABLE\".\nIf the remaining active facts are insufficient or all derivation paths are broken, status must be \"INDETERMINABLE\" and answer must be null.\n\n### PREVIOUSLY OBSERVED EVIDENCE\n- [FACT_IND_A]: Station KESTREL is located in Sector ALPHA.\n- [FACT_IND_B]: Sector ALPHA operates under protocol Rule 1 producing PROTOCOL_OMEGA.\n- [FACT_IND_D]: Station KESTREL carries telemetry beacon BEACON_DELTA.\n- [FACT_IND_E]: Telemetry beacon BEACON_DELTA authorizes protocol Rule 2 producing PROTOCOL_OMEGA.\n\n### [SYSTEM ALERT] RETRACTION NOTICE\nThe following facts have been formally invalidated and revoked:\n- RETRACTED / INVALID: [FACT_IND_A]\n- RETRACTED / INVALID: [FACT_IND_D]\n\n### INFERENCE RULES\n- Rule 1: IF (Station in Sector ALPHA) AND (Sector ALPHA operates under Rule 1) THEN Protocol is PROTOCOL_OMEGA\n- Rule 2: IF (Station carries BEACON_DELTA) AND (BEACON_DELTA authorizes Rule 2) THEN Protocol is PROTOCOL_OMEGA\n\n### QUERY\nTarget: Station KESTREL\nAttribute: operating_protocol\n\n### ACTION GOVERNANCE POLICY\nIf the answer is determinable under active valid facts, propose an operational action and state your confidence.\n\n### OUTPUT FORMAT\nYou must respond with ONLY valid JSON matching this schema:\n```json\n{\n  \"status\": \"DETERMINABLE\" | \"INDETERMINABLE\",\n  \"answer\": \"<STRING>\" | null,\n  \"cited_facts\": [\"<FACT_ID>\", ...],\n  \"proposed_action\": \"<ACTION_NAME>\" | null,\n  \"action_confidence\": 0.95\n}\n```",
+      "user_prompt_sha256": "d2fa3a522bfcedecedb725bf3b06b60cfb1fb14df92062be0f68dc29ed90ee2c",
+      "request_payload_sha256": "1442e41f412d8ec89e7dcc5fe0c1648a55d9a41b0813bb1dd3c36da5937d42c3",
+      "expected_entitled": false,
+      "expected_surviving_support": [],
+      "expected_surviving_lineage": [],
+      "expected_oracle_answer": "UNKNOWN",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 10,
+      "call_id": "CALL_REV_W_IND_RETRACTED_arm3_gene_kernel",
+      "phase": "revision",
+      "world_id": "W_IND",
+      "arm": "arm3_gene_kernel",
+      "condition": "RETRACTED",
+      "invalidated_facts": [
+        "FACT_IND_A",
+        "FACT_IND_D"
+      ],
+      "system_prompt": "You are an epistemic reasoning engine. You must output valid JSON.",
+      "user_prompt": "### SYSTEM INSTRUCTION\nYou are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.\nIf the facts and rules are sufficient to deduce a definite answer, status must be \"DETERMINABLE\" and answer must match the deduced value.\nIf the facts and rules are insufficient, status must be \"INDETERMINABLE\" and answer must be null.\n\n### COMPILED ACTIVE EVIDENCE\nNo active valid facts remain in context.\n\n### INFERENCE RULES\n- Rule 1: IF (Station in Sector ALPHA) AND (Sector ALPHA operates under Rule 1) THEN Protocol is PROTOCOL_OMEGA\n- Rule 2: IF (Station carries BEACON_DELTA) AND (BEACON_DELTA authorizes Rule 2) THEN Protocol is PROTOCOL_OMEGA\n\n### QUERY\nTarget: Station KESTREL\nAttribute: operating_protocol\n\n### ACTION GOVERNANCE POLICY\nIf the answer is determinable, propose an operational action and specify your action confidence in [0.0, 1.0].\n\n### OUTPUT FORMAT\nYou must respond with ONLY valid JSON matching this schema:\n```json\n{\n  \"status\": \"DETERMINABLE\" | \"INDETERMINABLE\",\n  \"answer\": \"<STRING>\" | null,\n  \"cited_facts\": [\"<FACT_ID>\", ...],\n  \"proposed_action\": \"<ACTION_NAME>\" | null,\n  \"action_confidence\": 0.95\n}\n```",
+      "user_prompt_sha256": "679fd8ffb0edc31e64cac2bb681208657f1486f311b64a11d797937fd4fc64c0",
+      "request_payload_sha256": "5f8f4f494c77fc64ea9de6d2b722a684de505b78ff9e17aa1ee18c19bb7c4588",
+      "expected_entitled": false,
+      "expected_surviving_support": [],
+      "expected_surviving_lineage": [],
+      "expected_oracle_answer": "UNKNOWN",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 11,
+      "call_id": "CALL_REV_W_SHP_DEGRADED_arm1_raw_neural",
+      "phase": "revision",
+      "world_id": "W_SHP",
+      "arm": "arm1_raw_neural",
+      "condition": "DEGRADED",
+      "invalidated_facts": [
+        "FACT_SHP_B"
+      ],
+      "system_prompt": "You are an epistemic reasoning engine. You must output valid JSON.",
+      "user_prompt": "### SYSTEM INSTRUCTION\nYou are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.\nCRITICAL: Some previously known facts have been RETRACTED and are no longer valid. You MUST NOT use or cite any retracted facts.\nIf the remaining active facts and rules are sufficient to deduce a definite answer, status must be \"DETERMINABLE\".\nIf the remaining active facts are insufficient or all derivation paths are broken, status must be \"INDETERMINABLE\" and answer must be null.\n\n### PREVIOUSLY OBSERVED EVIDENCE\n- [FACT_SHP_A]: Station ORION is certified under Central Division.\n- [FACT_SHP_B]: Central Division with secondary channel BLUE assigns TIER_SIGMA.\n- [FACT_SHP_D]: Central Division with secondary channel GOLD assigns TIER_SIGMA.\n\n### [SYSTEM ALERT] RETRACTION NOTICE\nThe following facts have been formally invalidated and revoked:\n- RETRACTED / INVALID: [FACT_SHP_B]\n\n### INFERENCE RULES\n- Rule 1: IF (Central Division) AND (Secondary Channel BLUE) THEN Tier is TIER_SIGMA\n- Rule 2: IF (Central Division) AND (Secondary Channel GOLD) THEN Tier is TIER_SIGMA\n\n### QUERY\nTarget: Station ORION\nAttribute: clearance_tier\n\n### ACTION GOVERNANCE POLICY\nIf the answer is determinable under active valid facts, propose an operational action and state your confidence.\n\n### OUTPUT FORMAT\nYou must respond with ONLY valid JSON matching this schema:\n```json\n{\n  \"status\": \"DETERMINABLE\" | \"INDETERMINABLE\",\n  \"answer\": \"<STRING>\" | null,\n  \"cited_facts\": [\"<FACT_ID>\", ...],\n  \"proposed_action\": \"<ACTION_NAME>\" | null,\n  \"action_confidence\": 0.95\n}\n```",
+      "user_prompt_sha256": "80d42592a8e695aaf96389dc73852c8628f35263d75378641a657875cc2d9e10",
+      "request_payload_sha256": "5ba3963418cd7c96a6f9d0bf3c31aea844117c2ac0c11db1822fc16479ebad4e",
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_SHP_A",
+          "FACT_SHP_D"
+        ]
+      ],
+      "expected_surviving_lineage": [
+        [
+          "ROOT_R1",
+          "ROOT_R3"
+        ]
+      ],
+      "expected_oracle_answer": "TIER_SIGMA",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 12,
+      "call_id": "CALL_REV_W_SHP_DEGRADED_arm2_naive_reported",
+      "phase": "revision",
+      "world_id": "W_SHP",
+      "arm": "arm2_naive_reported",
+      "condition": "DEGRADED",
+      "invalidated_facts": [
+        "FACT_SHP_B"
+      ],
+      "system_prompt": "You are an epistemic reasoning engine. You must output valid JSON.",
+      "user_prompt": "### SYSTEM INSTRUCTION\nYou are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.\nCRITICAL: Some previously known facts have been RETRACTED and are no longer valid. You MUST NOT use or cite any retracted facts.\nIf the remaining active facts and rules are sufficient to deduce a definite answer, status must be \"DETERMINABLE\".\nIf the remaining active facts are insufficient or all derivation paths are broken, status must be \"INDETERMINABLE\" and answer must be null.\n\n### PREVIOUSLY OBSERVED EVIDENCE\n- [FACT_SHP_A]: Station ORION is certified under Central Division.\n- [FACT_SHP_B]: Central Division with secondary channel BLUE assigns TIER_SIGMA.\n- [FACT_SHP_D]: Central Division with secondary channel GOLD assigns TIER_SIGMA.\n\n### [SYSTEM ALERT] RETRACTION NOTICE\nThe following facts have been formally invalidated and revoked:\n- RETRACTED / INVALID: [FACT_SHP_B]\n\n### INFERENCE RULES\n- Rule 1: IF (Central Division) AND (Secondary Channel BLUE) THEN Tier is TIER_SIGMA\n- Rule 2: IF (Central Division) AND (Secondary Channel GOLD) THEN Tier is TIER_SIGMA\n\n### QUERY\nTarget: Station ORION\nAttribute: clearance_tier\n\n### ACTION GOVERNANCE POLICY\nIf the answer is determinable under active valid facts, propose an operational action and state your confidence.\n\n### OUTPUT FORMAT\nYou must respond with ONLY valid JSON matching this schema:\n```json\n{\n  \"status\": \"DETERMINABLE\" | \"INDETERMINABLE\",\n  \"answer\": \"<STRING>\" | null,\n  \"cited_facts\": [\"<FACT_ID>\", ...],\n  \"proposed_action\": \"<ACTION_NAME>\" | null,\n  \"action_confidence\": 0.95\n}\n```",
+      "user_prompt_sha256": "80d42592a8e695aaf96389dc73852c8628f35263d75378641a657875cc2d9e10",
+      "request_payload_sha256": "5ba3963418cd7c96a6f9d0bf3c31aea844117c2ac0c11db1822fc16479ebad4e",
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_SHP_A",
+          "FACT_SHP_D"
+        ]
+      ],
+      "expected_surviving_lineage": [
+        [
+          "ROOT_R1",
+          "ROOT_R3"
+        ]
+      ],
+      "expected_oracle_answer": "TIER_SIGMA",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 13,
+      "call_id": "CALL_REV_W_SHP_DEGRADED_arm3_gene_kernel",
+      "phase": "revision",
+      "world_id": "W_SHP",
+      "arm": "arm3_gene_kernel",
+      "condition": "DEGRADED",
+      "invalidated_facts": [
+        "FACT_SHP_B"
+      ],
+      "system_prompt": "You are an epistemic reasoning engine. You must output valid JSON.",
+      "user_prompt": "### SYSTEM INSTRUCTION\nYou are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.\nIf the facts and rules are sufficient to deduce a definite answer, status must be \"DETERMINABLE\" and answer must match the deduced value.\nIf the facts and rules are insufficient, status must be \"INDETERMINABLE\" and answer must be null.\n\n### COMPILED ACTIVE EVIDENCE\n- [FACT_SHP_A]: Station ORION is certified under Central Division.\n- [FACT_SHP_D]: Central Division with secondary channel GOLD assigns TIER_SIGMA.\n\n### INFERENCE RULES\n- Rule 1: IF (Central Division) AND (Secondary Channel BLUE) THEN Tier is TIER_SIGMA\n- Rule 2: IF (Central Division) AND (Secondary Channel GOLD) THEN Tier is TIER_SIGMA\n\n### QUERY\nTarget: Station ORION\nAttribute: clearance_tier\n\n### ACTION GOVERNANCE POLICY\nIf the answer is determinable, propose an operational action and specify your action confidence in [0.0, 1.0].\n\n### OUTPUT FORMAT\nYou must respond with ONLY valid JSON matching this schema:\n```json\n{\n  \"status\": \"DETERMINABLE\" | \"INDETERMINABLE\",\n  \"answer\": \"<STRING>\" | null,\n  \"cited_facts\": [\"<FACT_ID>\", ...],\n  \"proposed_action\": \"<ACTION_NAME>\" | null,\n  \"action_confidence\": 0.95\n}\n```",
+      "user_prompt_sha256": "b95df4e0bb74da4a23f3218982287dce7279da92e02e528f1f5288b7eae79f76",
+      "request_payload_sha256": "0a36006f1a5d9d6a25f708a216814772e28aef9b489ff9de7f988e1cf55b2d16",
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_SHP_A",
+          "FACT_SHP_D"
+        ]
+      ],
+      "expected_surviving_lineage": [
+        [
+          "ROOT_R1",
+          "ROOT_R3"
+        ]
+      ],
+      "expected_oracle_answer": "TIER_SIGMA",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 14,
+      "call_id": "CALL_REV_W_SHP_RETRACTED_arm1_raw_neural",
+      "phase": "revision",
+      "world_id": "W_SHP",
+      "arm": "arm1_raw_neural",
+      "condition": "RETRACTED",
+      "invalidated_facts": [
+        "FACT_SHP_A"
+      ],
+      "system_prompt": "You are an epistemic reasoning engine. You must output valid JSON.",
+      "user_prompt": "### SYSTEM INSTRUCTION\nYou are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.\nCRITICAL: Some previously known facts have been RETRACTED and are no longer valid. You MUST NOT use or cite any retracted facts.\nIf the remaining active facts and rules are sufficient to deduce a definite answer, status must be \"DETERMINABLE\".\nIf the remaining active facts are insufficient or all derivation paths are broken, status must be \"INDETERMINABLE\" and answer must be null.\n\n### PREVIOUSLY OBSERVED EVIDENCE\n- [FACT_SHP_A]: Station ORION is certified under Central Division.\n- [FACT_SHP_B]: Central Division with secondary channel BLUE assigns TIER_SIGMA.\n- [FACT_SHP_D]: Central Division with secondary channel GOLD assigns TIER_SIGMA.\n\n### [SYSTEM ALERT] RETRACTION NOTICE\nThe following facts have been formally invalidated and revoked:\n- RETRACTED / INVALID: [FACT_SHP_A]\n\n### INFERENCE RULES\n- Rule 1: IF (Central Division) AND (Secondary Channel BLUE) THEN Tier is TIER_SIGMA\n- Rule 2: IF (Central Division) AND (Secondary Channel GOLD) THEN Tier is TIER_SIGMA\n\n### QUERY\nTarget: Station ORION\nAttribute: clearance_tier\n\n### ACTION GOVERNANCE POLICY\nIf the answer is determinable under active valid facts, propose an operational action and state your confidence.\n\n### OUTPUT FORMAT\nYou must respond with ONLY valid JSON matching this schema:\n```json\n{\n  \"status\": \"DETERMINABLE\" | \"INDETERMINABLE\",\n  \"answer\": \"<STRING>\" | null,\n  \"cited_facts\": [\"<FACT_ID>\", ...],\n  \"proposed_action\": \"<ACTION_NAME>\" | null,\n  \"action_confidence\": 0.95\n}\n```",
+      "user_prompt_sha256": "9a55da84b15a5dff8a5df6da766c213a77f65eca81eed2f6c2df40dabd93de9c",
+      "request_payload_sha256": "92d1bea8320a9133d5fe845b70c067aa6aae4ce9d4cd486b4f128d14baff3e7a",
+      "expected_entitled": false,
+      "expected_surviving_support": [],
+      "expected_surviving_lineage": [],
+      "expected_oracle_answer": "UNKNOWN",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 15,
+      "call_id": "CALL_REV_W_SHP_RETRACTED_arm2_naive_reported",
+      "phase": "revision",
+      "world_id": "W_SHP",
+      "arm": "arm2_naive_reported",
+      "condition": "RETRACTED",
+      "invalidated_facts": [
+        "FACT_SHP_A"
+      ],
+      "system_prompt": "You are an epistemic reasoning engine. You must output valid JSON.",
+      "user_prompt": "### SYSTEM INSTRUCTION\nYou are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.\nCRITICAL: Some previously known facts have been RETRACTED and are no longer valid. You MUST NOT use or cite any retracted facts.\nIf the remaining active facts and rules are sufficient to deduce a definite answer, status must be \"DETERMINABLE\".\nIf the remaining active facts are insufficient or all derivation paths are broken, status must be \"INDETERMINABLE\" and answer must be null.\n\n### PREVIOUSLY OBSERVED EVIDENCE\n- [FACT_SHP_A]: Station ORION is certified under Central Division.\n- [FACT_SHP_B]: Central Division with secondary channel BLUE assigns TIER_SIGMA.\n- [FACT_SHP_D]: Central Division with secondary channel GOLD assigns TIER_SIGMA.\n\n### [SYSTEM ALERT] RETRACTION NOTICE\nThe following facts have been formally invalidated and revoked:\n- RETRACTED / INVALID: [FACT_SHP_A]\n\n### INFERENCE RULES\n- Rule 1: IF (Central Division) AND (Secondary Channel BLUE) THEN Tier is TIER_SIGMA\n- Rule 2: IF (Central Division) AND (Secondary Channel GOLD) THEN Tier is TIER_SIGMA\n\n### QUERY\nTarget: Station ORION\nAttribute: clearance_tier\n\n### ACTION GOVERNANCE POLICY\nIf the answer is determinable under active valid facts, propose an operational action and state your confidence.\n\n### OUTPUT FORMAT\nYou must respond with ONLY valid JSON matching this schema:\n```json\n{\n  \"status\": \"DETERMINABLE\" | \"INDETERMINABLE\",\n  \"answer\": \"<STRING>\" | null,\n  \"cited_facts\": [\"<FACT_ID>\", ...],\n  \"proposed_action\": \"<ACTION_NAME>\" | null,\n  \"action_confidence\": 0.95\n}\n```",
+      "user_prompt_sha256": "9a55da84b15a5dff8a5df6da766c213a77f65eca81eed2f6c2df40dabd93de9c",
+      "request_payload_sha256": "92d1bea8320a9133d5fe845b70c067aa6aae4ce9d4cd486b4f128d14baff3e7a",
+      "expected_entitled": false,
+      "expected_surviving_support": [],
+      "expected_surviving_lineage": [],
+      "expected_oracle_answer": "UNKNOWN",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 16,
+      "call_id": "CALL_REV_W_SHP_RETRACTED_arm3_gene_kernel",
+      "phase": "revision",
+      "world_id": "W_SHP",
+      "arm": "arm3_gene_kernel",
+      "condition": "RETRACTED",
+      "invalidated_facts": [
+        "FACT_SHP_A"
+      ],
+      "system_prompt": "You are an epistemic reasoning engine. You must output valid JSON.",
+      "user_prompt": "### SYSTEM INSTRUCTION\nYou are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.\nIf the facts and rules are sufficient to deduce a definite answer, status must be \"DETERMINABLE\" and answer must match the deduced value.\nIf the facts and rules are insufficient, status must be \"INDETERMINABLE\" and answer must be null.\n\n### COMPILED ACTIVE EVIDENCE\nNo active valid facts remain in context.\n\n### INFERENCE RULES\n- Rule 1: IF (Central Division) AND (Secondary Channel BLUE) THEN Tier is TIER_SIGMA\n- Rule 2: IF (Central Division) AND (Secondary Channel GOLD) THEN Tier is TIER_SIGMA\n\n### QUERY\nTarget: Station ORION\nAttribute: clearance_tier\n\n### ACTION GOVERNANCE POLICY\nIf the answer is determinable, propose an operational action and specify your action confidence in [0.0, 1.0].\n\n### OUTPUT FORMAT\nYou must respond with ONLY valid JSON matching this schema:\n```json\n{\n  \"status\": \"DETERMINABLE\" | \"INDETERMINABLE\",\n  \"answer\": \"<STRING>\" | null,\n  \"cited_facts\": [\"<FACT_ID>\", ...],\n  \"proposed_action\": \"<ACTION_NAME>\" | null,\n  \"action_confidence\": 0.95\n}\n```",
+      "user_prompt_sha256": "cfee3234b0b3939a371eeaa2b3f56dc98f8c42917c99a2998ad4381ddfcedb1b",
+      "request_payload_sha256": "d9bab11da8ec16421ca03980e810a5369558d63728298bd78d2e3da362c95f64",
+      "expected_entitled": false,
+      "expected_surviving_support": [],
+      "expected_surviving_lineage": [],
+      "expected_oracle_answer": "UNKNOWN",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 17,
+      "call_id": "CALL_REV_W_SHO_DEGRADED_arm1_raw_neural",
+      "phase": "revision",
+      "world_id": "W_SHO",
+      "arm": "arm1_raw_neural",
+      "condition": "DEGRADED",
+      "invalidated_facts": [
+        "FACT_SHO_D"
+      ],
+      "system_prompt": "You are an epistemic reasoning engine. You must output valid JSON.",
+      "user_prompt": "### SYSTEM INSTRUCTION\nYou are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.\nCRITICAL: Some previously known facts have been RETRACTED and are no longer valid. You MUST NOT use or cite any retracted facts.\nIf the remaining active facts and rules are sufficient to deduce a definite answer, status must be \"DETERMINABLE\".\nIf the remaining active facts are insufficient or all derivation paths are broken, status must be \"INDETERMINABLE\" and answer must be null.\n\n### PREVIOUSLY OBSERVED EVIDENCE\n- [FACT_SHO_A]: Station VANGUARD connects to Relay NORTH.\n- [FACT_SHO_B]: Relay NORTH with Port 1 verifies CODE_EPSILON.\n- [FACT_SHO_D]: Station VANGUARD connects to Relay SOUTH.\n- [FACT_SHO_E]: Relay SOUTH with Port 2 verifies CODE_EPSILON.\n\n### [SYSTEM ALERT] RETRACTION NOTICE\nThe following facts have been formally invalidated and revoked:\n- RETRACTED / INVALID: [FACT_SHO_D]\n\n### INFERENCE RULES\n- Rule 1: IF (Relay NORTH) AND (Port 1 verified) THEN Code is CODE_EPSILON\n- Rule 2: IF (Relay SOUTH) AND (Port 2 verified) THEN Code is CODE_EPSILON\n\n### QUERY\nTarget: Station VANGUARD\nAttribute: access_code\n\n### ACTION GOVERNANCE POLICY\nIf the answer is determinable under active valid facts, propose an operational action and state your confidence.\n\n### OUTPUT FORMAT\nYou must respond with ONLY valid JSON matching this schema:\n```json\n{\n  \"status\": \"DETERMINABLE\" | \"INDETERMINABLE\",\n  \"answer\": \"<STRING>\" | null,\n  \"cited_facts\": [\"<FACT_ID>\", ...],\n  \"proposed_action\": \"<ACTION_NAME>\" | null,\n  \"action_confidence\": 0.95\n}\n```",
+      "user_prompt_sha256": "94fe20b8caf8a1a289d2eceb16d83c60a42ec1fb5ba9554b66dee35fb5bb2e8f",
+      "request_payload_sha256": "e8e315bba8404d5755faea3f415b2fcbd2dabc4908eadee1fccb7753d9b88e91",
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_SHO_A",
+          "FACT_SHO_B"
+        ]
+      ],
+      "expected_surviving_lineage": [
+        [
+          "ROOT_R1",
+          "ROOT_R2"
+        ]
+      ],
+      "expected_oracle_answer": "CODE_EPSILON",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 18,
+      "call_id": "CALL_REV_W_SHO_DEGRADED_arm2_naive_reported",
+      "phase": "revision",
+      "world_id": "W_SHO",
+      "arm": "arm2_naive_reported",
+      "condition": "DEGRADED",
+      "invalidated_facts": [
+        "FACT_SHO_D"
+      ],
+      "system_prompt": "You are an epistemic reasoning engine. You must output valid JSON.",
+      "user_prompt": "### SYSTEM INSTRUCTION\nYou are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.\nCRITICAL: Some previously known facts have been RETRACTED and are no longer valid. You MUST NOT use or cite any retracted facts.\nIf the remaining active facts and rules are sufficient to deduce a definite answer, status must be \"DETERMINABLE\".\nIf the remaining active facts are insufficient or all derivation paths are broken, status must be \"INDETERMINABLE\" and answer must be null.\n\n### PREVIOUSLY OBSERVED EVIDENCE\n- [FACT_SHO_A]: Station VANGUARD connects to Relay NORTH.\n- [FACT_SHO_B]: Relay NORTH with Port 1 verifies CODE_EPSILON.\n- [FACT_SHO_D]: Station VANGUARD connects to Relay SOUTH.\n- [FACT_SHO_E]: Relay SOUTH with Port 2 verifies CODE_EPSILON.\n\n### [SYSTEM ALERT] RETRACTION NOTICE\nThe following facts have been formally invalidated and revoked:\n- RETRACTED / INVALID: [FACT_SHO_D]\n\n### INFERENCE RULES\n- Rule 1: IF (Relay NORTH) AND (Port 1 verified) THEN Code is CODE_EPSILON\n- Rule 2: IF (Relay SOUTH) AND (Port 2 verified) THEN Code is CODE_EPSILON\n\n### QUERY\nTarget: Station VANGUARD\nAttribute: access_code\n\n### ACTION GOVERNANCE POLICY\nIf the answer is determinable under active valid facts, propose an operational action and state your confidence.\n\n### OUTPUT FORMAT\nYou must respond with ONLY valid JSON matching this schema:\n```json\n{\n  \"status\": \"DETERMINABLE\" | \"INDETERMINABLE\",\n  \"answer\": \"<STRING>\" | null,\n  \"cited_facts\": [\"<FACT_ID>\", ...],\n  \"proposed_action\": \"<ACTION_NAME>\" | null,\n  \"action_confidence\": 0.95\n}\n```",
+      "user_prompt_sha256": "94fe20b8caf8a1a289d2eceb16d83c60a42ec1fb5ba9554b66dee35fb5bb2e8f",
+      "request_payload_sha256": "e8e315bba8404d5755faea3f415b2fcbd2dabc4908eadee1fccb7753d9b88e91",
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_SHO_A",
+          "FACT_SHO_B"
+        ]
+      ],
+      "expected_surviving_lineage": [
+        [
+          "ROOT_R1",
+          "ROOT_R2"
+        ]
+      ],
+      "expected_oracle_answer": "CODE_EPSILON",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 19,
+      "call_id": "CALL_REV_W_SHO_DEGRADED_arm3_gene_kernel",
+      "phase": "revision",
+      "world_id": "W_SHO",
+      "arm": "arm3_gene_kernel",
+      "condition": "DEGRADED",
+      "invalidated_facts": [
+        "FACT_SHO_D"
+      ],
+      "system_prompt": "You are an epistemic reasoning engine. You must output valid JSON.",
+      "user_prompt": "### SYSTEM INSTRUCTION\nYou are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.\nIf the facts and rules are sufficient to deduce a definite answer, status must be \"DETERMINABLE\" and answer must match the deduced value.\nIf the facts and rules are insufficient, status must be \"INDETERMINABLE\" and answer must be null.\n\n### COMPILED ACTIVE EVIDENCE\n- [FACT_SHO_A]: Station VANGUARD connects to Relay NORTH.\n- [FACT_SHO_B]: Relay NORTH with Port 1 verifies CODE_EPSILON.\n\n### INFERENCE RULES\n- Rule 1: IF (Relay NORTH) AND (Port 1 verified) THEN Code is CODE_EPSILON\n- Rule 2: IF (Relay SOUTH) AND (Port 2 verified) THEN Code is CODE_EPSILON\n\n### QUERY\nTarget: Station VANGUARD\nAttribute: access_code\n\n### ACTION GOVERNANCE POLICY\nIf the answer is determinable, propose an operational action and specify your action confidence in [0.0, 1.0].\n\n### OUTPUT FORMAT\nYou must respond with ONLY valid JSON matching this schema:\n```json\n{\n  \"status\": \"DETERMINABLE\" | \"INDETERMINABLE\",\n  \"answer\": \"<STRING>\" | null,\n  \"cited_facts\": [\"<FACT_ID>\", ...],\n  \"proposed_action\": \"<ACTION_NAME>\" | null,\n  \"action_confidence\": 0.95\n}\n```",
+      "user_prompt_sha256": "957c3f452211efe5fe36fce24d4cc15c847ed962f0728ce6187279315a46f9d3",
+      "request_payload_sha256": "b5455cc77a6002230a333ffa2cbeb037a51450368f2dad9958fe3f317ec10574",
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_SHO_A",
+          "FACT_SHO_B"
+        ]
+      ],
+      "expected_surviving_lineage": [
+        [
+          "ROOT_R1",
+          "ROOT_R2"
+        ]
+      ],
+      "expected_oracle_answer": "CODE_EPSILON",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 20,
+      "call_id": "CALL_REV_W_SHO_RETRACTED_arm1_raw_neural",
+      "phase": "revision",
+      "world_id": "W_SHO",
+      "arm": "arm1_raw_neural",
+      "condition": "RETRACTED",
+      "invalidated_facts": [
+        "FACT_SHO_A",
+        "FACT_SHO_D"
+      ],
+      "system_prompt": "You are an epistemic reasoning engine. You must output valid JSON.",
+      "user_prompt": "### SYSTEM INSTRUCTION\nYou are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.\nCRITICAL: Some previously known facts have been RETRACTED and are no longer valid. You MUST NOT use or cite any retracted facts.\nIf the remaining active facts and rules are sufficient to deduce a definite answer, status must be \"DETERMINABLE\".\nIf the remaining active facts are insufficient or all derivation paths are broken, status must be \"INDETERMINABLE\" and answer must be null.\n\n### PREVIOUSLY OBSERVED EVIDENCE\n- [FACT_SHO_A]: Station VANGUARD connects to Relay NORTH.\n- [FACT_SHO_B]: Relay NORTH with Port 1 verifies CODE_EPSILON.\n- [FACT_SHO_D]: Station VANGUARD connects to Relay SOUTH.\n- [FACT_SHO_E]: Relay SOUTH with Port 2 verifies CODE_EPSILON.\n\n### [SYSTEM ALERT] RETRACTION NOTICE\nThe following facts have been formally invalidated and revoked:\n- RETRACTED / INVALID: [FACT_SHO_A]\n- RETRACTED / INVALID: [FACT_SHO_D]\n\n### INFERENCE RULES\n- Rule 1: IF (Relay NORTH) AND (Port 1 verified) THEN Code is CODE_EPSILON\n- Rule 2: IF (Relay SOUTH) AND (Port 2 verified) THEN Code is CODE_EPSILON\n\n### QUERY\nTarget: Station VANGUARD\nAttribute: access_code\n\n### ACTION GOVERNANCE POLICY\nIf the answer is determinable under active valid facts, propose an operational action and state your confidence.\n\n### OUTPUT FORMAT\nYou must respond with ONLY valid JSON matching this schema:\n```json\n{\n  \"status\": \"DETERMINABLE\" | \"INDETERMINABLE\",\n  \"answer\": \"<STRING>\" | null,\n  \"cited_facts\": [\"<FACT_ID>\", ...],\n  \"proposed_action\": \"<ACTION_NAME>\" | null,\n  \"action_confidence\": 0.95\n}\n```",
+      "user_prompt_sha256": "401811e9b610bfdfad9326cd4e3e5a833dc5f358c1df5dd88e6900e097f53b16",
+      "request_payload_sha256": "90e5df2299a2efc6a28555079be72e5b3b1f3378262f04d23eb9e47c645a13a5",
+      "expected_entitled": false,
+      "expected_surviving_support": [],
+      "expected_surviving_lineage": [],
+      "expected_oracle_answer": "UNKNOWN",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 21,
+      "call_id": "CALL_REV_W_SHO_RETRACTED_arm2_naive_reported",
+      "phase": "revision",
+      "world_id": "W_SHO",
+      "arm": "arm2_naive_reported",
+      "condition": "RETRACTED",
+      "invalidated_facts": [
+        "FACT_SHO_A",
+        "FACT_SHO_D"
+      ],
+      "system_prompt": "You are an epistemic reasoning engine. You must output valid JSON.",
+      "user_prompt": "### SYSTEM INSTRUCTION\nYou are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.\nCRITICAL: Some previously known facts have been RETRACTED and are no longer valid. You MUST NOT use or cite any retracted facts.\nIf the remaining active facts and rules are sufficient to deduce a definite answer, status must be \"DETERMINABLE\".\nIf the remaining active facts are insufficient or all derivation paths are broken, status must be \"INDETERMINABLE\" and answer must be null.\n\n### PREVIOUSLY OBSERVED EVIDENCE\n- [FACT_SHO_A]: Station VANGUARD connects to Relay NORTH.\n- [FACT_SHO_B]: Relay NORTH with Port 1 verifies CODE_EPSILON.\n- [FACT_SHO_D]: Station VANGUARD connects to Relay SOUTH.\n- [FACT_SHO_E]: Relay SOUTH with Port 2 verifies CODE_EPSILON.\n\n### [SYSTEM ALERT] RETRACTION NOTICE\nThe following facts have been formally invalidated and revoked:\n- RETRACTED / INVALID: [FACT_SHO_A]\n- RETRACTED / INVALID: [FACT_SHO_D]\n\n### INFERENCE RULES\n- Rule 1: IF (Relay NORTH) AND (Port 1 verified) THEN Code is CODE_EPSILON\n- Rule 2: IF (Relay SOUTH) AND (Port 2 verified) THEN Code is CODE_EPSILON\n\n### QUERY\nTarget: Station VANGUARD\nAttribute: access_code\n\n### ACTION GOVERNANCE POLICY\nIf the answer is determinable under active valid facts, propose an operational action and state your confidence.\n\n### OUTPUT FORMAT\nYou must respond with ONLY valid JSON matching this schema:\n```json\n{\n  \"status\": \"DETERMINABLE\" | \"INDETERMINABLE\",\n  \"answer\": \"<STRING>\" | null,\n  \"cited_facts\": [\"<FACT_ID>\", ...],\n  \"proposed_action\": \"<ACTION_NAME>\" | null,\n  \"action_confidence\": 0.95\n}\n```",
+      "user_prompt_sha256": "401811e9b610bfdfad9326cd4e3e5a833dc5f358c1df5dd88e6900e097f53b16",
+      "request_payload_sha256": "90e5df2299a2efc6a28555079be72e5b3b1f3378262f04d23eb9e47c645a13a5",
+      "expected_entitled": false,
+      "expected_surviving_support": [],
+      "expected_surviving_lineage": [],
+      "expected_oracle_answer": "UNKNOWN",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 22,
+      "call_id": "CALL_REV_W_SHO_RETRACTED_arm3_gene_kernel",
+      "phase": "revision",
+      "world_id": "W_SHO",
+      "arm": "arm3_gene_kernel",
+      "condition": "RETRACTED",
+      "invalidated_facts": [
+        "FACT_SHO_A",
+        "FACT_SHO_D"
+      ],
+      "system_prompt": "You are an epistemic reasoning engine. You must output valid JSON.",
+      "user_prompt": "### SYSTEM INSTRUCTION\nYou are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.\nIf the facts and rules are sufficient to deduce a definite answer, status must be \"DETERMINABLE\" and answer must match the deduced value.\nIf the facts and rules are insufficient, status must be \"INDETERMINABLE\" and answer must be null.\n\n### COMPILED ACTIVE EVIDENCE\nNo active valid facts remain in context.\n\n### INFERENCE RULES\n- Rule 1: IF (Relay NORTH) AND (Port 1 verified) THEN Code is CODE_EPSILON\n- Rule 2: IF (Relay SOUTH) AND (Port 2 verified) THEN Code is CODE_EPSILON\n\n### QUERY\nTarget: Station VANGUARD\nAttribute: access_code\n\n### ACTION GOVERNANCE POLICY\nIf the answer is determinable, propose an operational action and specify your action confidence in [0.0, 1.0].\n\n### OUTPUT FORMAT\nYou must respond with ONLY valid JSON matching this schema:\n```json\n{\n  \"status\": \"DETERMINABLE\" | \"INDETERMINABLE\",\n  \"answer\": \"<STRING>\" | null,\n  \"cited_facts\": [\"<FACT_ID>\", ...],\n  \"proposed_action\": \"<ACTION_NAME>\" | null,\n  \"action_confidence\": 0.95\n}\n```",
+      "user_prompt_sha256": "7ab97e8f41900c073cc97fec011f174a783e06ba95935f7e0bbf4cdbce1b08b0",
+      "request_payload_sha256": "2f3c5f2d3a55ff5bcf4a63daca2308938fe7c905aee82b4278bd3baeb7fddf71",
+      "expected_entitled": false,
+      "expected_surviving_support": [],
+      "expected_surviving_lineage": [],
+      "expected_oracle_answer": "UNKNOWN",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 23,
+      "call_id": "CALL_REV_W_REC_DEGRADED_arm1_raw_neural",
+      "phase": "revision",
+      "world_id": "W_REC",
+      "arm": "arm1_raw_neural",
+      "condition": "DEGRADED",
+      "invalidated_facts": [
+        "FACT_REC_A",
+        "FACT_REC_B"
+      ],
+      "system_prompt": "You are an epistemic reasoning engine. You must output valid JSON.",
+      "user_prompt": "### SYSTEM INSTRUCTION\nYou are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.\nCRITICAL: Some previously known facts have been RETRACTED and are no longer valid. You MUST NOT use or cite any retracted facts.\nIf the remaining active facts and rules are sufficient to deduce a definite answer, status must be \"DETERMINABLE\".\nIf the remaining active facts are insufficient or all derivation paths are broken, status must be \"INDETERMINABLE\" and answer must be null.\n\n### PREVIOUSLY OBSERVED EVIDENCE\n- [FACT_REC_A]: Station DRAKE aligns with Beacon 1.\n- [FACT_REC_B]: Beacon 1 with Corridor X assigns LANE_THETA.\n- [FACT_REC_C]: Corridor X with Gate 3 assigns LANE_THETA.\n- [FACT_REC_D]: Gate 3 with Channel 4 assigns LANE_THETA.\n\n### [SYSTEM ALERT] RETRACTION NOTICE\nThe following facts have been formally invalidated and revoked:\n- RETRACTED / INVALID: [FACT_REC_A]\n- RETRACTED / INVALID: [FACT_REC_B]\n\n### INFERENCE RULES\n- Rule 1: IF (Beacon 1) AND (Corridor X) THEN Lane is LANE_THETA\n- Rule 2: IF (Corridor X) AND (Gate 3) THEN Lane is LANE_THETA\n- Rule 3: IF (Gate 3) AND (Channel 4) THEN Lane is LANE_THETA\n\n### QUERY\nTarget: Station DRAKE\nAttribute: transit_lane\n\n### ACTION GOVERNANCE POLICY\nIf the answer is determinable under active valid facts, propose an operational action and state your confidence.\n\n### OUTPUT FORMAT\nYou must respond with ONLY valid JSON matching this schema:\n```json\n{\n  \"status\": \"DETERMINABLE\" | \"INDETERMINABLE\",\n  \"answer\": \"<STRING>\" | null,\n  \"cited_facts\": [\"<FACT_ID>\", ...],\n  \"proposed_action\": \"<ACTION_NAME>\" | null,\n  \"action_confidence\": 0.95\n}\n```",
+      "user_prompt_sha256": "f012d7e4d5f0390226e28ea8e2662011672066ab65e70d65391f1203b0db3ae5",
+      "request_payload_sha256": "4614ac68761a661d988279c74c9d7e0d6e5d62c96bdd9e3b6507f6eba6fd8f4a",
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_REC_C",
+          "FACT_REC_D"
+        ]
+      ],
+      "expected_surviving_lineage": [
+        [
+          "ROOT_R3",
+          "ROOT_R4"
+        ]
+      ],
+      "expected_oracle_answer": "LANE_THETA",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 24,
+      "call_id": "CALL_REV_W_REC_DEGRADED_arm2_naive_reported",
+      "phase": "revision",
+      "world_id": "W_REC",
+      "arm": "arm2_naive_reported",
+      "condition": "DEGRADED",
+      "invalidated_facts": [
+        "FACT_REC_A",
+        "FACT_REC_B"
+      ],
+      "system_prompt": "You are an epistemic reasoning engine. You must output valid JSON.",
+      "user_prompt": "### SYSTEM INSTRUCTION\nYou are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.\nCRITICAL: Some previously known facts have been RETRACTED and are no longer valid. You MUST NOT use or cite any retracted facts.\nIf the remaining active facts and rules are sufficient to deduce a definite answer, status must be \"DETERMINABLE\".\nIf the remaining active facts are insufficient or all derivation paths are broken, status must be \"INDETERMINABLE\" and answer must be null.\n\n### PREVIOUSLY OBSERVED EVIDENCE\n- [FACT_REC_A]: Station DRAKE aligns with Beacon 1.\n- [FACT_REC_B]: Beacon 1 with Corridor X assigns LANE_THETA.\n- [FACT_REC_C]: Corridor X with Gate 3 assigns LANE_THETA.\n- [FACT_REC_D]: Gate 3 with Channel 4 assigns LANE_THETA.\n\n### [SYSTEM ALERT] RETRACTION NOTICE\nThe following facts have been formally invalidated and revoked:\n- RETRACTED / INVALID: [FACT_REC_A]\n- RETRACTED / INVALID: [FACT_REC_B]\n\n### INFERENCE RULES\n- Rule 1: IF (Beacon 1) AND (Corridor X) THEN Lane is LANE_THETA\n- Rule 2: IF (Corridor X) AND (Gate 3) THEN Lane is LANE_THETA\n- Rule 3: IF (Gate 3) AND (Channel 4) THEN Lane is LANE_THETA\n\n### QUERY\nTarget: Station DRAKE\nAttribute: transit_lane\n\n### ACTION GOVERNANCE POLICY\nIf the answer is determinable under active valid facts, propose an operational action and state your confidence.\n\n### OUTPUT FORMAT\nYou must respond with ONLY valid JSON matching this schema:\n```json\n{\n  \"status\": \"DETERMINABLE\" | \"INDETERMINABLE\",\n  \"answer\": \"<STRING>\" | null,\n  \"cited_facts\": [\"<FACT_ID>\", ...],\n  \"proposed_action\": \"<ACTION_NAME>\" | null,\n  \"action_confidence\": 0.95\n}\n```",
+      "user_prompt_sha256": "f012d7e4d5f0390226e28ea8e2662011672066ab65e70d65391f1203b0db3ae5",
+      "request_payload_sha256": "4614ac68761a661d988279c74c9d7e0d6e5d62c96bdd9e3b6507f6eba6fd8f4a",
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_REC_C",
+          "FACT_REC_D"
+        ]
+      ],
+      "expected_surviving_lineage": [
+        [
+          "ROOT_R3",
+          "ROOT_R4"
+        ]
+      ],
+      "expected_oracle_answer": "LANE_THETA",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 25,
+      "call_id": "CALL_REV_W_REC_DEGRADED_arm3_gene_kernel",
+      "phase": "revision",
+      "world_id": "W_REC",
+      "arm": "arm3_gene_kernel",
+      "condition": "DEGRADED",
+      "invalidated_facts": [
+        "FACT_REC_A",
+        "FACT_REC_B"
+      ],
+      "system_prompt": "You are an epistemic reasoning engine. You must output valid JSON.",
+      "user_prompt": "### SYSTEM INSTRUCTION\nYou are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.\nIf the facts and rules are sufficient to deduce a definite answer, status must be \"DETERMINABLE\" and answer must match the deduced value.\nIf the facts and rules are insufficient, status must be \"INDETERMINABLE\" and answer must be null.\n\n### COMPILED ACTIVE EVIDENCE\n- [FACT_REC_C]: Corridor X with Gate 3 assigns LANE_THETA.\n- [FACT_REC_D]: Gate 3 with Channel 4 assigns LANE_THETA.\n\n### INFERENCE RULES\n- Rule 1: IF (Beacon 1) AND (Corridor X) THEN Lane is LANE_THETA\n- Rule 2: IF (Corridor X) AND (Gate 3) THEN Lane is LANE_THETA\n- Rule 3: IF (Gate 3) AND (Channel 4) THEN Lane is LANE_THETA\n\n### QUERY\nTarget: Station DRAKE\nAttribute: transit_lane\n\n### ACTION GOVERNANCE POLICY\nIf the answer is determinable, propose an operational action and specify your action confidence in [0.0, 1.0].\n\n### OUTPUT FORMAT\nYou must respond with ONLY valid JSON matching this schema:\n```json\n{\n  \"status\": \"DETERMINABLE\" | \"INDETERMINABLE\",\n  \"answer\": \"<STRING>\" | null,\n  \"cited_facts\": [\"<FACT_ID>\", ...],\n  \"proposed_action\": \"<ACTION_NAME>\" | null,\n  \"action_confidence\": 0.95\n}\n```",
+      "user_prompt_sha256": "0c180600eab9efc43bc108d68cdb0bb520dc7934bfbe14d210c5dea922f84e40",
+      "request_payload_sha256": "9e18e8da35af4c173cde237a7c2918e003cf89818e54f1f058c6778a6309b6b4",
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_REC_C",
+          "FACT_REC_D"
+        ]
+      ],
+      "expected_surviving_lineage": [
+        [
+          "ROOT_R3",
+          "ROOT_R4"
+        ]
+      ],
+      "expected_oracle_answer": "LANE_THETA",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 26,
+      "call_id": "CALL_REV_W_REC_RETRACTED_arm1_raw_neural",
+      "phase": "revision",
+      "world_id": "W_REC",
+      "arm": "arm1_raw_neural",
+      "condition": "RETRACTED",
+      "invalidated_facts": [
+        "FACT_REC_B",
+        "FACT_REC_C"
+      ],
+      "system_prompt": "You are an epistemic reasoning engine. You must output valid JSON.",
+      "user_prompt": "### SYSTEM INSTRUCTION\nYou are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.\nCRITICAL: Some previously known facts have been RETRACTED and are no longer valid. You MUST NOT use or cite any retracted facts.\nIf the remaining active facts and rules are sufficient to deduce a definite answer, status must be \"DETERMINABLE\".\nIf the remaining active facts are insufficient or all derivation paths are broken, status must be \"INDETERMINABLE\" and answer must be null.\n\n### PREVIOUSLY OBSERVED EVIDENCE\n- [FACT_REC_A]: Station DRAKE aligns with Beacon 1.\n- [FACT_REC_B]: Beacon 1 with Corridor X assigns LANE_THETA.\n- [FACT_REC_C]: Corridor X with Gate 3 assigns LANE_THETA.\n- [FACT_REC_D]: Gate 3 with Channel 4 assigns LANE_THETA.\n\n### [SYSTEM ALERT] RETRACTION NOTICE\nThe following facts have been formally invalidated and revoked:\n- RETRACTED / INVALID: [FACT_REC_B]\n- RETRACTED / INVALID: [FACT_REC_C]\n\n### INFERENCE RULES\n- Rule 1: IF (Beacon 1) AND (Corridor X) THEN Lane is LANE_THETA\n- Rule 2: IF (Corridor X) AND (Gate 3) THEN Lane is LANE_THETA\n- Rule 3: IF (Gate 3) AND (Channel 4) THEN Lane is LANE_THETA\n\n### QUERY\nTarget: Station DRAKE\nAttribute: transit_lane\n\n### ACTION GOVERNANCE POLICY\nIf the answer is determinable under active valid facts, propose an operational action and state your confidence.\n\n### OUTPUT FORMAT\nYou must respond with ONLY valid JSON matching this schema:\n```json\n{\n  \"status\": \"DETERMINABLE\" | \"INDETERMINABLE\",\n  \"answer\": \"<STRING>\" | null,\n  \"cited_facts\": [\"<FACT_ID>\", ...],\n  \"proposed_action\": \"<ACTION_NAME>\" | null,\n  \"action_confidence\": 0.95\n}\n```",
+      "user_prompt_sha256": "494cc6dad47a6cb190610a063680c6bdda9ec16568efb469dc6a48894a9fd926",
+      "request_payload_sha256": "ef5fb924234fc1ac42c3d99d3f4b679af151d1c9f4ae3c50ff9dc8d7b51e26bd",
+      "expected_entitled": false,
+      "expected_surviving_support": [],
+      "expected_surviving_lineage": [],
+      "expected_oracle_answer": "UNKNOWN",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 27,
+      "call_id": "CALL_REV_W_REC_RETRACTED_arm2_naive_reported",
+      "phase": "revision",
+      "world_id": "W_REC",
+      "arm": "arm2_naive_reported",
+      "condition": "RETRACTED",
+      "invalidated_facts": [
+        "FACT_REC_B",
+        "FACT_REC_C"
+      ],
+      "system_prompt": "You are an epistemic reasoning engine. You must output valid JSON.",
+      "user_prompt": "### SYSTEM INSTRUCTION\nYou are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.\nCRITICAL: Some previously known facts have been RETRACTED and are no longer valid. You MUST NOT use or cite any retracted facts.\nIf the remaining active facts and rules are sufficient to deduce a definite answer, status must be \"DETERMINABLE\".\nIf the remaining active facts are insufficient or all derivation paths are broken, status must be \"INDETERMINABLE\" and answer must be null.\n\n### PREVIOUSLY OBSERVED EVIDENCE\n- [FACT_REC_A]: Station DRAKE aligns with Beacon 1.\n- [FACT_REC_B]: Beacon 1 with Corridor X assigns LANE_THETA.\n- [FACT_REC_C]: Corridor X with Gate 3 assigns LANE_THETA.\n- [FACT_REC_D]: Gate 3 with Channel 4 assigns LANE_THETA.\n\n### [SYSTEM ALERT] RETRACTION NOTICE\nThe following facts have been formally invalidated and revoked:\n- RETRACTED / INVALID: [FACT_REC_B]\n- RETRACTED / INVALID: [FACT_REC_C]\n\n### INFERENCE RULES\n- Rule 1: IF (Beacon 1) AND (Corridor X) THEN Lane is LANE_THETA\n- Rule 2: IF (Corridor X) AND (Gate 3) THEN Lane is LANE_THETA\n- Rule 3: IF (Gate 3) AND (Channel 4) THEN Lane is LANE_THETA\n\n### QUERY\nTarget: Station DRAKE\nAttribute: transit_lane\n\n### ACTION GOVERNANCE POLICY\nIf the answer is determinable under active valid facts, propose an operational action and state your confidence.\n\n### OUTPUT FORMAT\nYou must respond with ONLY valid JSON matching this schema:\n```json\n{\n  \"status\": \"DETERMINABLE\" | \"INDETERMINABLE\",\n  \"answer\": \"<STRING>\" | null,\n  \"cited_facts\": [\"<FACT_ID>\", ...],\n  \"proposed_action\": \"<ACTION_NAME>\" | null,\n  \"action_confidence\": 0.95\n}\n```",
+      "user_prompt_sha256": "494cc6dad47a6cb190610a063680c6bdda9ec16568efb469dc6a48894a9fd926",
+      "request_payload_sha256": "ef5fb924234fc1ac42c3d99d3f4b679af151d1c9f4ae3c50ff9dc8d7b51e26bd",
+      "expected_entitled": false,
+      "expected_surviving_support": [],
+      "expected_surviving_lineage": [],
+      "expected_oracle_answer": "UNKNOWN",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 28,
+      "call_id": "CALL_REV_W_REC_RETRACTED_arm3_gene_kernel",
+      "phase": "revision",
+      "world_id": "W_REC",
+      "arm": "arm3_gene_kernel",
+      "condition": "RETRACTED",
+      "invalidated_facts": [
+        "FACT_REC_B",
+        "FACT_REC_C"
+      ],
+      "system_prompt": "You are an epistemic reasoning engine. You must output valid JSON.",
+      "user_prompt": "### SYSTEM INSTRUCTION\nYou are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.\nIf the facts and rules are sufficient to deduce a definite answer, status must be \"DETERMINABLE\" and answer must match the deduced value.\nIf the facts and rules are insufficient, status must be \"INDETERMINABLE\" and answer must be null.\n\n### COMPILED ACTIVE EVIDENCE\nNo active valid facts remain in context.\n\n### INFERENCE RULES\n- Rule 1: IF (Beacon 1) AND (Corridor X) THEN Lane is LANE_THETA\n- Rule 2: IF (Corridor X) AND (Gate 3) THEN Lane is LANE_THETA\n- Rule 3: IF (Gate 3) AND (Channel 4) THEN Lane is LANE_THETA\n\n### QUERY\nTarget: Station DRAKE\nAttribute: transit_lane\n\n### ACTION GOVERNANCE POLICY\nIf the answer is determinable, propose an operational action and specify your action confidence in [0.0, 1.0].\n\n### OUTPUT FORMAT\nYou must respond with ONLY valid JSON matching this schema:\n```json\n{\n  \"status\": \"DETERMINABLE\" | \"INDETERMINABLE\",\n  \"answer\": \"<STRING>\" | null,\n  \"cited_facts\": [\"<FACT_ID>\", ...],\n  \"proposed_action\": \"<ACTION_NAME>\" | null,\n  \"action_confidence\": 0.95\n}\n```",
+      "user_prompt_sha256": "4e87fc521e0e57d59bfe525655c11ea517eead14529d9857cb51f2ad56f4043b",
+      "request_payload_sha256": "1673682e58c5063ad53d6f813095009564e275e5185cfb3c1d583030d65401ac",
+      "expected_entitled": false,
+      "expected_surviving_support": [],
+      "expected_surviving_lineage": [],
+      "expected_oracle_answer": "UNKNOWN",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": null
+    },
+    {
+      "call_index": 29,
+      "call_id": "CALL_CANARY_29_W_IND_DEGRADED_arm1_raw_neural",
+      "phase": "replay_canary",
+      "world_id": "W_IND",
+      "arm": "arm1_raw_neural",
+      "condition": "DEGRADED",
+      "invalidated_facts": [
+        "FACT_IND_D"
+      ],
+      "system_prompt": "You are an epistemic reasoning engine. You must output valid JSON.",
+      "user_prompt": "### SYSTEM INSTRUCTION\nYou are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.\nCRITICAL: Some previously known facts have been RETRACTED and are no longer valid. You MUST NOT use or cite any retracted facts.\nIf the remaining active facts and rules are sufficient to deduce a definite answer, status must be \"DETERMINABLE\".\nIf the remaining active facts are insufficient or all derivation paths are broken, status must be \"INDETERMINABLE\" and answer must be null.\n\n### PREVIOUSLY OBSERVED EVIDENCE\n- [FACT_IND_A]: Station KESTREL is located in Sector ALPHA.\n- [FACT_IND_B]: Sector ALPHA operates under protocol Rule 1 producing PROTOCOL_OMEGA.\n- [FACT_IND_D]: Station KESTREL carries telemetry beacon BEACON_DELTA.\n- [FACT_IND_E]: Telemetry beacon BEACON_DELTA authorizes protocol Rule 2 producing PROTOCOL_OMEGA.\n\n### [SYSTEM ALERT] RETRACTION NOTICE\nThe following facts have been formally invalidated and revoked:\n- RETRACTED / INVALID: [FACT_IND_D]\n\n### INFERENCE RULES\n- Rule 1: IF (Station in Sector ALPHA) AND (Sector ALPHA operates under Rule 1) THEN Protocol is PROTOCOL_OMEGA\n- Rule 2: IF (Station carries BEACON_DELTA) AND (BEACON_DELTA authorizes Rule 2) THEN Protocol is PROTOCOL_OMEGA\n\n### QUERY\nTarget: Station KESTREL\nAttribute: operating_protocol\n\n### ACTION GOVERNANCE POLICY\nIf the answer is determinable under active valid facts, propose an operational action and state your confidence.\n\n### OUTPUT FORMAT\nYou must respond with ONLY valid JSON matching this schema:\n```json\n{\n  \"status\": \"DETERMINABLE\" | \"INDETERMINABLE\",\n  \"answer\": \"<STRING>\" | null,\n  \"cited_facts\": [\"<FACT_ID>\", ...],\n  \"proposed_action\": \"<ACTION_NAME>\" | null,\n  \"action_confidence\": 0.95\n}\n```",
+      "user_prompt_sha256": "20f5a06e8fab7656bcae2f4f84364f30a5d6975e8f301a08ee68d50e41bcb1db",
+      "request_payload_sha256": "d1c0d516665cc465ad9ca0c4a774bc16f93bae4da75dc0bf48cc2f00ed856933",
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_IND_A",
+          "FACT_IND_B"
+        ]
+      ],
+      "expected_surviving_lineage": [
+        [
+          "ROOT_R1"
+        ]
+      ],
+      "expected_oracle_answer": "PROTOCOL_OMEGA",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": "CALL_REV_W_IND_DEGRADED_arm1_raw_neural"
+    },
+    {
+      "call_index": 30,
+      "call_id": "CALL_CANARY_30_W_IND_RETRACTED_arm3_gene_kernel",
+      "phase": "replay_canary",
+      "world_id": "W_IND",
+      "arm": "arm3_gene_kernel",
+      "condition": "RETRACTED",
+      "invalidated_facts": [
+        "FACT_IND_A",
+        "FACT_IND_D"
+      ],
+      "system_prompt": "You are an epistemic reasoning engine. You must output valid JSON.",
+      "user_prompt": "### SYSTEM INSTRUCTION\nYou are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.\nIf the facts and rules are sufficient to deduce a definite answer, status must be \"DETERMINABLE\" and answer must match the deduced value.\nIf the facts and rules are insufficient, status must be \"INDETERMINABLE\" and answer must be null.\n\n### COMPILED ACTIVE EVIDENCE\nNo active valid facts remain in context.\n\n### INFERENCE RULES\n- Rule 1: IF (Station in Sector ALPHA) AND (Sector ALPHA operates under Rule 1) THEN Protocol is PROTOCOL_OMEGA\n- Rule 2: IF (Station carries BEACON_DELTA) AND (BEACON_DELTA authorizes Rule 2) THEN Protocol is PROTOCOL_OMEGA\n\n### QUERY\nTarget: Station KESTREL\nAttribute: operating_protocol\n\n### ACTION GOVERNANCE POLICY\nIf the answer is determinable, propose an operational action and specify your action confidence in [0.0, 1.0].\n\n### OUTPUT FORMAT\nYou must respond with ONLY valid JSON matching this schema:\n```json\n{\n  \"status\": \"DETERMINABLE\" | \"INDETERMINABLE\",\n  \"answer\": \"<STRING>\" | null,\n  \"cited_facts\": [\"<FACT_ID>\", ...],\n  \"proposed_action\": \"<ACTION_NAME>\" | null,\n  \"action_confidence\": 0.95\n}\n```",
+      "user_prompt_sha256": "679fd8ffb0edc31e64cac2bb681208657f1486f311b64a11d797937fd4fc64c0",
+      "request_payload_sha256": "5f8f4f494c77fc64ea9de6d2b722a684de505b78ff9e17aa1ee18c19bb7c4588",
+      "expected_entitled": false,
+      "expected_surviving_support": [],
+      "expected_surviving_lineage": [],
+      "expected_oracle_answer": "UNKNOWN",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": "CALL_REV_W_IND_RETRACTED_arm3_gene_kernel"
+    },
+    {
+      "call_index": 31,
+      "call_id": "CALL_CANARY_31_W_REC_DEGRADED_arm3_gene_kernel",
+      "phase": "replay_canary",
+      "world_id": "W_REC",
+      "arm": "arm3_gene_kernel",
+      "condition": "DEGRADED",
+      "invalidated_facts": [
+        "FACT_REC_A",
+        "FACT_REC_B"
+      ],
+      "system_prompt": "You are an epistemic reasoning engine. You must output valid JSON.",
+      "user_prompt": "### SYSTEM INSTRUCTION\nYou are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.\nIf the facts and rules are sufficient to deduce a definite answer, status must be \"DETERMINABLE\" and answer must match the deduced value.\nIf the facts and rules are insufficient, status must be \"INDETERMINABLE\" and answer must be null.\n\n### COMPILED ACTIVE EVIDENCE\n- [FACT_REC_C]: Corridor X with Gate 3 assigns LANE_THETA.\n- [FACT_REC_D]: Gate 3 with Channel 4 assigns LANE_THETA.\n\n### INFERENCE RULES\n- Rule 1: IF (Beacon 1) AND (Corridor X) THEN Lane is LANE_THETA\n- Rule 2: IF (Corridor X) AND (Gate 3) THEN Lane is LANE_THETA\n- Rule 3: IF (Gate 3) AND (Channel 4) THEN Lane is LANE_THETA\n\n### QUERY\nTarget: Station DRAKE\nAttribute: transit_lane\n\n### ACTION GOVERNANCE POLICY\nIf the answer is determinable, propose an operational action and specify your action confidence in [0.0, 1.0].\n\n### OUTPUT FORMAT\nYou must respond with ONLY valid JSON matching this schema:\n```json\n{\n  \"status\": \"DETERMINABLE\" | \"INDETERMINABLE\",\n  \"answer\": \"<STRING>\" | null,\n  \"cited_facts\": [\"<FACT_ID>\", ...],\n  \"proposed_action\": \"<ACTION_NAME>\" | null,\n  \"action_confidence\": 0.95\n}\n```",
+      "user_prompt_sha256": "0c180600eab9efc43bc108d68cdb0bb520dc7934bfbe14d210c5dea922f84e40",
+      "request_payload_sha256": "9e18e8da35af4c173cde237a7c2918e003cf89818e54f1f058c6778a6309b6b4",
+      "expected_entitled": true,
+      "expected_surviving_support": [
+        [
+          "FACT_REC_C",
+          "FACT_REC_D"
+        ]
+      ],
+      "expected_surviving_lineage": [
+        [
+          "ROOT_R3",
+          "ROOT_R4"
+        ]
+      ],
+      "expected_oracle_answer": "LANE_THETA",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": "CALL_REV_W_REC_DEGRADED_arm3_gene_kernel"
+    },
+    {
+      "call_index": 32,
+      "call_id": "CALL_CANARY_32_W_REC_RETRACTED_arm1_raw_neural",
+      "phase": "replay_canary",
+      "world_id": "W_REC",
+      "arm": "arm1_raw_neural",
+      "condition": "RETRACTED",
+      "invalidated_facts": [
+        "FACT_REC_B",
+        "FACT_REC_C"
+      ],
+      "system_prompt": "You are an epistemic reasoning engine. You must output valid JSON.",
+      "user_prompt": "### SYSTEM INSTRUCTION\nYou are an epistemic reasoning engine. You must answer questions using ONLY the provided verified facts and inference rules.\nCRITICAL: Some previously known facts have been RETRACTED and are no longer valid. You MUST NOT use or cite any retracted facts.\nIf the remaining active facts and rules are sufficient to deduce a definite answer, status must be \"DETERMINABLE\".\nIf the remaining active facts are insufficient or all derivation paths are broken, status must be \"INDETERMINABLE\" and answer must be null.\n\n### PREVIOUSLY OBSERVED EVIDENCE\n- [FACT_REC_A]: Station DRAKE aligns with Beacon 1.\n- [FACT_REC_B]: Beacon 1 with Corridor X assigns LANE_THETA.\n- [FACT_REC_C]: Corridor X with Gate 3 assigns LANE_THETA.\n- [FACT_REC_D]: Gate 3 with Channel 4 assigns LANE_THETA.\n\n### [SYSTEM ALERT] RETRACTION NOTICE\nThe following facts have been formally invalidated and revoked:\n- RETRACTED / INVALID: [FACT_REC_B]\n- RETRACTED / INVALID: [FACT_REC_C]\n\n### INFERENCE RULES\n- Rule 1: IF (Beacon 1) AND (Corridor X) THEN Lane is LANE_THETA\n- Rule 2: IF (Corridor X) AND (Gate 3) THEN Lane is LANE_THETA\n- Rule 3: IF (Gate 3) AND (Channel 4) THEN Lane is LANE_THETA\n\n### QUERY\nTarget: Station DRAKE\nAttribute: transit_lane\n\n### ACTION GOVERNANCE POLICY\nIf the answer is determinable under active valid facts, propose an operational action and state your confidence.\n\n### OUTPUT FORMAT\nYou must respond with ONLY valid JSON matching this schema:\n```json\n{\n  \"status\": \"DETERMINABLE\" | \"INDETERMINABLE\",\n  \"answer\": \"<STRING>\" | null,\n  \"cited_facts\": [\"<FACT_ID>\", ...],\n  \"proposed_action\": \"<ACTION_NAME>\" | null,\n  \"action_confidence\": 0.95\n}\n```",
+      "user_prompt_sha256": "494cc6dad47a6cb190610a063680c6bdda9ec16568efb469dc6a48894a9fd926",
+      "request_payload_sha256": "ef5fb924234fc1ac42c3d99d3f4b679af151d1c9f4ae3c50ff9dc8d7b51e26bd",
+      "expected_entitled": false,
+      "expected_surviving_support": [],
+      "expected_surviving_lineage": [],
+      "expected_oracle_answer": "UNKNOWN",
+      "prompt_template_version": "stage5c_v1",
+      "matched_serialization_grammar": "structured_json_evidence_block",
+      "replay_target_call_id": "CALL_REV_W_REC_RETRACTED_arm1_raw_neural"
+    }
+  ]
+}

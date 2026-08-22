@@ -1,0 +1,180 @@
+{
+  "assay_name": "Stage 6B.1 Multi-Update Temporal-Ordering Micro-Assay",
+  "timestamp_utc": "2026-08-21T04:50:22Z",
+  "total_test_coordinates": 12,
+  "policy_accuracies": {
+    "knowledge_time_lww": 0.3333,
+    "valid_time_lww": 0.75,
+    "bitemporal_engine": 1.0
+  },
+  "case_details": [
+    {
+      "case_id": "TC_01",
+      "query_coord": {
+        "t_v": 2.0,
+        "t_k": 0
+      },
+      "expected_value": "ALPHA",
+      "kt_lww_value": "ALPHA",
+      "vt_lww_value": "ALPHA",
+      "bitemporal_value": "ALPHA",
+      "kt_lww_correct": true,
+      "vt_lww_correct": true,
+      "bitemporal_correct": true
+    },
+    {
+      "case_id": "TC_02",
+      "query_coord": {
+        "t_v": 6.0,
+        "t_k": 0
+      },
+      "expected_value": "UNKNOWN",
+      "kt_lww_value": "ALPHA",
+      "vt_lww_value": "ALPHA",
+      "bitemporal_value": "UNKNOWN",
+      "kt_lww_correct": false,
+      "vt_lww_correct": false,
+      "bitemporal_correct": true
+    },
+    {
+      "case_id": "TC_03",
+      "query_coord": {
+        "t_v": 12.0,
+        "t_k": 0
+      },
+      "expected_value": "UNKNOWN",
+      "kt_lww_value": "ALPHA",
+      "vt_lww_value": "ALPHA",
+      "bitemporal_value": "UNKNOWN",
+      "kt_lww_correct": false,
+      "vt_lww_correct": false,
+      "bitemporal_correct": true
+    },
+    {
+      "case_id": "TC_04",
+      "query_coord": {
+        "t_v": 2.0,
+        "t_k": 1
+      },
+      "expected_value": "ALPHA",
+      "kt_lww_value": "BETA",
+      "vt_lww_value": "ALPHA",
+      "bitemporal_value": "ALPHA",
+      "kt_lww_correct": false,
+      "vt_lww_correct": true,
+      "bitemporal_correct": true
+    },
+    {
+      "case_id": "TC_05",
+      "query_coord": {
+        "t_v": 6.0,
+        "t_k": 1
+      },
+      "expected_value": "UNKNOWN",
+      "kt_lww_value": "BETA",
+      "vt_lww_value": "ALPHA",
+      "bitemporal_value": "UNKNOWN",
+      "kt_lww_correct": false,
+      "vt_lww_correct": false,
+      "bitemporal_correct": true
+    },
+    {
+      "case_id": "TC_06",
+      "query_coord": {
+        "t_v": 12.0,
+        "t_k": 1
+      },
+      "expected_value": "BETA",
+      "kt_lww_value": "BETA",
+      "vt_lww_value": "BETA",
+      "bitemporal_value": "BETA",
+      "kt_lww_correct": true,
+      "vt_lww_correct": true,
+      "bitemporal_correct": true
+    },
+    {
+      "case_id": "TC_07",
+      "query_coord": {
+        "t_v": 2.0,
+        "t_k": 2
+      },
+      "expected_value": "ALPHA",
+      "kt_lww_value": "GAMMA",
+      "vt_lww_value": "ALPHA",
+      "bitemporal_value": "ALPHA",
+      "kt_lww_correct": false,
+      "vt_lww_correct": true,
+      "bitemporal_correct": true
+    },
+    {
+      "case_id": "TC_08",
+      "query_coord": {
+        "t_v": 4.0,
+        "t_k": 2
+      },
+      "expected_value": "ALPHA",
+      "kt_lww_value": "GAMMA",
+      "vt_lww_value": "ALPHA",
+      "bitemporal_value": "ALPHA",
+      "kt_lww_correct": false,
+      "vt_lww_correct": true,
+      "bitemporal_correct": true
+    },
+    {
+      "case_id": "TC_09",
+      "query_coord": {
+        "t_v": 6.0,
+        "t_k": 2
+      },
+      "expected_value": "GAMMA",
+      "kt_lww_value": "GAMMA",
+      "vt_lww_value": "GAMMA",
+      "bitemporal_value": "GAMMA",
+      "kt_lww_correct": true,
+      "vt_lww_correct": true,
+      "bitemporal_correct": true
+    },
+    {
+      "case_id": "TC_10",
+      "query_coord": {
+        "t_v": 8.0,
+        "t_k": 2
+      },
+      "expected_value": "GAMMA",
+      "kt_lww_value": "GAMMA",
+      "vt_lww_value": "GAMMA",
+      "bitemporal_value": "GAMMA",
+      "kt_lww_correct": true,
+      "vt_lww_correct": true,
+      "bitemporal_correct": true
+    },
+    {
+      "case_id": "TC_11",
+      "query_coord": {
+        "t_v": 12.0,
+        "t_k": 2
+      },
+      "expected_value": "BETA",
+      "kt_lww_value": "GAMMA",
+      "vt_lww_value": "BETA",
+      "bitemporal_value": "BETA",
+      "kt_lww_correct": false,
+      "vt_lww_correct": true,
+      "bitemporal_correct": true
+    },
+    {
+      "case_id": "TC_12",
+      "query_coord": {
+        "t_v": 15.0,
+        "t_k": 2
+      },
+      "expected_value": "BETA",
+      "kt_lww_value": "GAMMA",
+      "vt_lww_value": "BETA",
+      "bitemporal_value": "BETA",
+      "kt_lww_correct": false,
+      "vt_lww_correct": true,
+      "bitemporal_correct": true
+    }
+  ]
+}
