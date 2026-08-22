@@ -25,7 +25,20 @@ GENE autonomously ingests unstructured scientific and system literature, constru
 
 ## 3. PROMOTED / ESTABLISHED (Durable Scientific Baseline)
 
-- **Stage 8A / 8B (Initial Ingress & Alias Resolution — PROMOTED)**: Established 100% precision on exact registered aliases and baseline ingress fail-closed guardrails.
+- **CHECKPOINT-R8-8A (Research Checkpoint: Stage 8A Autonomous Open Ingress (Promoted))**:
+  - **Checkpoint**: [`CHECKPOINT-R8-8A.md`](research/checkpoints/CHECKPOINT-R8-8A.md)
+  - **Candidate SHA**: `UNKNOWN`
+  - **Hypothesis Confirmed**: Removing explicit candidate menus does not degrade relation candidate generation or downstream safe bitemporal admission for `gemma3:12b` on synthetic single-document telemetry.
+  - **Empirical Baseline**:
+  - **Next Frontier**: Stage 8B — Multi-Document Entity Resolution and Cross-Document Temporal Fusion under Ambiguity.
+
+- **CHECKPOINT-R8-8B (Checkpoint Record: CHECKPOINT-R8-8B (Multi-Document Stream Coreference & Occurrence Splitting))**:
+  - **Checkpoint**: [`CHECKPOINT-R8-8B.md`](research/checkpoints/CHECKPOINT-R8-8B.md)
+  - **Candidate SHA**: `add7574737a88f43570d645a1a8e0dcae4b099d8`
+  - **Contract Promoted**: `CONTRACT-R8-8B-R1`
+  - **Promotion Artifact**: [`research/promotions/PROMOTION-CONTRACT-R8-8B-R1.md`](../promotions/PROMOTION-CONTRACT-R8-8B-R1.md)
+  - **Verified Code Baseline**: `add7574737a88f43570d645a1a8e0dcae4b099d8`
+  - **Empirical Confirmation**:
 
 ---
 
