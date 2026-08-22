@@ -1,19 +1,19 @@
 ---
 contract_id: CONTRACT-R8-8C-R1
-status: DRAFT
+status: FROZEN
 proposed_by: antigravity
-design_review: null
+design_review: APPROVED
 reviewed_by: chatgpt-pro
-authorized_by: null
+authorized_by: human
 base_sha: e7d921dfce8d5101f6f8758570a86ecbeac52e66
-execution_base_sha: null
+execution_base_sha: 2513f5c7b29a773f45a83aa8028aeb28a6e2fdec
 resource_class: gpu
 long_running: false
 exclusive_gpu: true
 interruptible: true
 ---
 
-# Research Contract Proposal: CONTRACT-R8-8C-R1 (Non-Durable Identity Hypotheses, Multi-Source Evidence Accumulation & Disconfirmation)
+# Research Contract: CONTRACT-R8-8C-R1 (Non-Durable Identity Hypotheses, Multi-Source Evidence Accumulation & Disconfirmation)
 
 ## Title
 Stage 8C-R1: Non-Durable Identity Hypotheses, Multi-Source Evidence Accumulation, and Delayed Commitment Under Streaming Feeds
@@ -29,7 +29,7 @@ Stage 8C-R1 tests the core architectural remedy: **Propose Early, Commit Late vi
 EPISTEMIC INGRESS PIPELINE (Stage 8C-R1):
 Incoming Stream Mention x_t (Source S_1)
         │
-        ├── 1. Exact Registered Alias? (Whole-Field Match under N(s)) ──► Immediate Durable LINK
+        ├── 1. Exact Registered Alias? (Whole-Field Match under N(s)) ──► Immediate Durable LINK (Assert 1-to-1)
         │
         ├── 2. Preregistered Partition Syntax? ────────────────────────► Link to Provisional Partition / Block Merge
         │
@@ -52,7 +52,7 @@ Incoming Stream Mention x_t (Source S_1)
           ├── REPEATED COMPOSITE (NO EVIDENCE) ──► Retain UNRESOLVED (durable_mutation: NONE)
           ├── CONFIRMS Candidate A ──────────────► Promote Hypothesis to Durable LINK (Target: A)
           ├── CONTRADICTS / Points to B ─────────► Retarget & Link to B; Discard Hypothesis A (0 residue on A)
-          └── ESTABLISHES Novel Entity ──────────► Create Provisional Entity; Discard Hypothesis A (0 residue on A)
+          └── EXPLICIT NOVELTY ASSERTION ────────► Create Provisional Entity; Discard Hypothesis A (0 residue on A)
 ```
 
 ### Core Research Question
@@ -62,9 +62,10 @@ Does decoupling non-durable identity hypothesizing from durable registry mutatio
 
 ## 2. Ingress Architecture & Epistemic Invariants
 
-### 1. Literal Mechanical Exact-Alias Normalizer $N(s)$
+### 1. Literal Mechanical Exact-Alias Normalizer $N(s)$ & Collision Invariant
 - The normalizer function $N(s)$ is strictly frozen across all pipeline and verifier components:
   $$N(s) = \text{re.sub}(r"[\backslash s\backslash -\_,.:;/ \backslash\backslash |()\[\]\{\}`'\" \sim *!?@\#\$\%\^\&\+\=]+", "", s.\text{strip}().\text{lower}())$$
+- **Collision Invariant Assertion**: The normalized alias table maps $N(\text{alias}) \to \text{entity\_id}$. The pipeline asserts that $N(\text{alias})$ maps to strictly exactly one entity. If ambiguous, it fails closed to `AMBIGUOUS_DEFER` and never links.
 - Immediate durable `LINK` is authorized **only if**:
   $$N(\text{mention}) \equiv N(\text{canonical\_name}) \quad \lor \quad N(\text{mention}) \in \{N(a) \mid a \in \text{registered\_aliases}\}$$
 - A known alias appearing merely as a substring of an unseen composite (e.g. `"Cluster One"` inside `"Cluster One Enclave"`) **must NEVER satisfy Rule 1**.
@@ -86,9 +87,13 @@ Does decoupling non-durable identity hypothesizing from durable registry mutatio
 - Entity rows, provisional rows, durable aliases, provenance edges, and $\text{hash}(\text{DurableState})$ must remain strictly unchanged (`durable_mutation: NONE`).
 - Unresolved surface forms must never enter the canonical alias table or be presented to the neural model as established identity.
 
-### 3. Whole-Field Evidence Promotion, Disconfirmation & No-Evidence Controls
+### 3. Whole-Field Evidence Promotion, Disconfirmation & Symmetric Novelty Controls
 - Ingest documents carry distinct source identifiers (`source_id: "ingest_stream_A"` for Doc 1 vs `source_id: "audit_stream_B"` for Doc 2).
 - Corroboration requires extracting the explicit parenthetical identifying string and performing a **whole-field match under $N(s)$**. Substring matching is strictly prohibited.
+- **Symmetric Novelty Requirement (Unknown $\ne$ Novel)**:
+  - An unmatched parenthetical identifier does NOT automatically authorize `CREATE_PROVISIONAL`.
+  - Creation requires: whole-field identifier unmatched $+$ explicit document novelty assertion (e.g. `"newly installed"`, `"new unit"`, `"standalone"`) $+$ neural judgment `NOVEL`.
+  - Otherwise, it fails closed to `UNRESOLVED_DEFER`.
 - The 15 Arm-4 worlds are structured as:
   - **Sub-Arm 4A: Permanent Non-Resolution (8 Worlds = 16 Decisions)**:
     - 4 Bare Generic Noun Worlds (permanent generic deferral across both docs).
@@ -102,7 +107,7 @@ Does decoupling non-durable identity hypothesizing from durable registry mutatio
 
 ## 3. Fresh Sealed 60-World Evaluation Benchmark
 
-All 60 evaluation worlds from R8-8C are treated as permanently burned. R8-8C-R1 evaluates a fresh, independently generated sealed benchmark of 60 worlds ($N = 120$ sequential document invocations) disjoint from all burned 8C worlds and Scouts A/B/C:
+All 60 evaluation worlds from R8-8C are treated as permanently burned. R8-8C-R1 evaluates a fresh, independently generated sealed benchmark of 60 worlds ($N = 120$ sequential document invocations) disjoint from all burned 8C worlds, Scouts A/B/C, and the R1 mini-scout:
 
 1. **Arm 1: Unseen Novel Hardware Systems (15 Worlds = 30 Decisions)**: Fresh novel entities evaluated for provisional entity instantiation without namespace collision.
 2. **Arm 2: Morphological & Syntactic Known Aliases (15 Worlds = 30 Decisions)**: Registered aliases evaluated for immediate whole-field linking under normalizer $N(s)$.
@@ -122,12 +127,24 @@ All 60 evaluation worlds from R8-8C are treated as permanently burned. R8-8C-R1 
 | **Gate 3: Provisional Entity Fragmentation** | Duplicate provisional entities across all provisional creations (Arm 1, Arm 3, and Arm 4B novel contradictions) | Reconstructed from raw SQLite mutation log | $\equiv \mathbf{0}$ duplicate provisional entities |
 | **Gate 4: Permanent Non-Resolution Invariant** | Non-durable rate across ungrounded bare tokens and repeated unevidenced composites (Sub-Arm 4A) | World-level evaluation across both docs | $\ge \mathbf{7 / 8}$ worlds ($87.5\%$) remain non-durable across both docs |
 | **Gate 5: Evidence Accumulation & Disconfirmation** | Paired recovery in Sub-Arm 4B: Doc 1 non-durable hypothesis $\land$ Doc 2 correct resolution | Paired sequence verification | $\ge \mathbf{6 / 7}$ correct final resolutions, $0$ premature Doc 1 mutations, $\mathbf{3/3}$ clean disconfirmations ($0$ residue) |
-| **Gate 6: Useful Resolvable Coverage** | Useful admissions across all non-bare mentions ($N = 97$) | Exact binomial denominator | $\ge \mathbf{85.0\%}$ ($83 / 97$ useful admissions) |
+| **Gate 6: Useful Resolvable Coverage** | Useful admissions across Gold-Resolvable Durable Decisions ($N = 97$) | Exact binomial denominator | $\ge \mathbf{85.0\%}$ ($83 / 97$ useful admissions) |
 | **Gate 7: Database & Gold-Manifest Integrity** | SQLite PRAGMA checks + full reconciliation of registry and hypothesis ledger against gold | Automated schema & graph assertion | $\equiv \mathbf{100.0\%}$ (zero cycles, zero orphan records, discarded hypotheses verified discarded) |
 
 ---
 
-## 5. Epistemic Scope Ceilings
+## 5. Sealing Manifest
+
+Before dispatching execution, the following components are cryptographically hashed and sealed:
+- **Neural Model**: `gemma3:12b-instruct-q4_K_M`
+- **Ingress Normalizer**: Mechanical whole-field function $N(s)$
+- **Collision Invariant**: Pre-execution 1-to-1 assertion
+- **Symmetric Novelty Rule**: Explicit novelty assertion gate
+- **Benchmark Worlds**: 60 fresh worlds strictly disjoint from burned 8C, Scouts A/B/C, and R1 mini-scout.
+- **Gold Manifest**: Immutable ground truth definitions for all 60 evaluation worlds.
+
+---
+
+## 6. Epistemic Scope Ceilings
 - **Claim Ceiling**: Claims safe, zero-false-merge streaming entity induction, non-durable hypothesis tracking, and multi-source evidence accumulation with disconfirmation in a hybrid neural-deterministic architecture.
 - **Exclusions**:
   - Does NOT claim general unconstrained open-domain coreference across unstructured natural text.
