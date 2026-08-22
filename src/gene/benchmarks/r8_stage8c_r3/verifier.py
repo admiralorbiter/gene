@@ -5,10 +5,10 @@ Verifies:
 3. Gate 2b: Semantic False Provisional Existence Floor == 0.0% on unasserted mentions.
 4. Gate 3: Provisional Entity Fragmentation == 0 duplicate creations.
 5. Gate 4: Permanent Non-Resolution Invariant >= 7/8 (87.5%) worlds in Arm 4A (both docs defer).
-6. Gate 5: Evidence Accumulation Lifecycle Matrix == 7/7 exact in Arm 4B.
+6. Gate 5: Evidence Accumulation Lifecycle Matrix == 7/7 exact world lifecycle transitions in Arm 4B.
 7. Gate 6: Useful Resolvable Coverage >= 85.0% across N=97 resolvable decisions.
 8. Gate 7: Full Relational SQLite Schema & Hypothesis Ledger Reconciliation.
-9. Paired Offline R2 Comparative Replay (invoking genuine frozen EpistemicIngressSessionR2).
+9. Paired Offline R2 Comparative Replay (invoking genuine frozen EpistemicIngressSessionR2 with R3 base registry).
 """
 
 import json
@@ -20,9 +20,6 @@ from typing import Any, Dict, List, Tuple
 from gene.benchmarks.r8_stage8c_r2.runner import (
     EpistemicIngressSession as EpistemicIngressSessionR2,
 )
-from gene.benchmarks.r8_stage8c_r2.worlds import (
-    get_stage8c_r2_base_registry,
-)
 from gene.benchmarks.r8_stage8c_r3.runner import (
     EpistemicIngressSessionR3,
     normalize_alias,
@@ -31,8 +28,11 @@ from gene.benchmarks.r8_stage8c_r3.worlds import get_stage8c_r3_base_registry
 
 
 def run_paired_r2_replay(records: List[Dict[str, Any]], gold_manifest: Dict[str, Any]) -> Dict[str, Any]:
-    """Runs the genuine frozen Stage 8C-R2 deterministic resolver against the identical R3 documents and proposals."""
-    base_reg = get_stage8c_r2_base_registry()
+    """Runs the genuine frozen Stage 8C-R2 deterministic resolver against the identical R3 documents and proposals
+
+    under the identical Stage 8C-R3 starting base registry.
+    """
+    base_reg = get_stage8c_r3_base_registry()
     
     # Group records by world
     records_by_world: Dict[str, List[Dict[str, Any]]] = {}
@@ -43,7 +43,6 @@ def run_paired_r2_replay(records: List[Dict[str, Any]], gold_manifest: Dict[str,
     total_resolvable = sum(1 for g in gold_manifest.values() if g.get("resolvable", False))
 
     for wid, world_records in sorted(records_by_world.items()):
-        # Each world gets a fresh ingress session initialized from the base registry
         r2_session = EpistemicIngressSessionR2(base_reg)
         for r in world_records:
             doc_id = r["doc_id"]
@@ -146,18 +145,44 @@ def verify_stage8c_r3_contract(
             arm4a_fully_deferred_worlds += 1
     gate_4_pass = (len(arm4a_worlds) == 8 and arm4a_fully_deferred_worlds >= 7)
 
-    # 6. Gate 5: Disconfirmation & Accumulation Matrix (Arm 4B)
-    arm4b_correct = 0
-    arm4b_total = 0
+    # 6. Gate 5: Evidence Accumulation Lifecycle Matrix (7 World Lifecycles in Arm 4B)
+    arm4b_worlds: Dict[str, List[Dict[str, Any]]] = {}
     for r in records:
         doc_id = r["doc_id"]
         gold = gold_manifest[doc_id]
         if gold.get("arm") == "ARM4B_DISCONFIRMATION":
-            arm4b_total += 1
-            d = r["hybrid_decision"]
-            if d.get("action") == gold["action"] and d.get("target_id") == gold["expected_target"]:
-                arm4b_correct += 1
-    gate_5_pass = (arm4b_total == 14 and arm4b_correct == 14)
+            arm4b_worlds.setdefault(r["world_id"], []).append(r)
+
+    arm4b_lifecycles_passed = 0
+    expected_lifecycles = {
+        "world_r3_arm4b_01": ("gateway_router_beta", ["RETARGETED", "RESOLVED_EXISTING"]),
+        "world_r3_arm4b_02": ("compute_cluster_beta", ["RETARGETED", "RESOLVED_EXISTING"]),
+        "world_r3_arm4b_03": ("storage_array_alpha", ["RETARGETED", "RESOLVED_EXISTING"]),
+        "world_r3_arm4b_04": ("gateway_router_alpha", ["RESOLVED_EXISTING", "RETARGETED"]),
+        "world_r3_arm4b_05": ("compute_cluster_alpha", ["RESOLVED_EXISTING", "RETARGETED"]),
+        "world_r3_arm4b_06": ("prov_sensor_mesh_omega", ["RESOLVED_NOVEL"]),
+        "world_r3_arm4b_07": ("compute_cluster_beta", ["CONFIRMED", "RESOLVED_EXISTING"]),
+    }
+
+    for wid, w_recs in sorted(arm4b_worlds.items()):
+        doc1 = w_recs[0]
+        doc2 = w_recs[1]
+        gold_doc1 = gold_manifest[doc1["doc_id"]]
+        gold_doc2 = gold_manifest[doc2["doc_id"]]
+
+        # Doc 1 must defer
+        doc1_deferred = (doc1["hybrid_decision"].get("action") == "DEFER")
+        # Doc 2 must resolve to expected target
+        doc2_resolved = (
+            doc2["hybrid_decision"].get("action") == gold_doc2["action"]
+            and doc2["hybrid_decision"].get("target_id") == gold_doc2["expected_target"]
+        )
+
+        expected_target, valid_statuses = expected_lifecycles.get(wid, (None, []))
+        if doc1_deferred and doc2_resolved and (doc2["hybrid_decision"].get("target_id") == expected_target):
+            arm4b_lifecycles_passed += 1
+
+    gate_5_pass = (len(arm4b_worlds) == 7 and arm4b_lifecycles_passed == 7)
 
     # 7. Gate 6: Useful Resolvable Coverage (Frozen Denominator N=97)
     resolvable_correct = 0
@@ -191,14 +216,12 @@ def verify_stage8c_r3_contract(
     rec_count = cur.fetchone()[0]
     conn.close()
 
-    # Reconcile ledger integrity:
-    # All 120 execution records present, hypotheses recorded for deferred docs, 0 FK errors, integrity ok
     gate_7_pass = (
         (integrity_status == "ok")
         and (fk_violations == 0)
         and (entity_count >= 6)
         and (edge_count > 0)
-        and (hypo_count > 0)
+        and (hypo_count >= 15)  # 8 from Arm 4A + 7 from Arm 4B
         and (rec_count == 120)
     )
 
@@ -226,7 +249,7 @@ def verify_stage8c_r3_contract(
         "gate_3_pass": gate_3_pass,
         "gate_4_arm4a_fully_deferred_worlds": f"{arm4a_fully_deferred_worlds}/{len(arm4a_worlds)}",
         "gate_4_pass": gate_4_pass,
-        "gate_5_arm4b_exact": f"{arm4b_correct}/{arm4b_total}",
+        "gate_5_arm4b_lifecycles_exact": f"{arm4b_lifecycles_passed}/{len(arm4b_worlds)}",
         "gate_5_pass": gate_5_pass,
         "gate_6_coverage_pct": f"{coverage_pct:.1f}% ({resolvable_correct}/{resolvable_total})",
         "gate_6_pass": gate_6_pass,

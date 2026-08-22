@@ -1,10 +1,10 @@
 """Confirmatory Benchmark Runner for Stage 8C-R3 (CONTRACT-R8-8C-R3).
-Implements the refined precedence rule with deterministic existence authority:
+Implements the refined precedence rule with deterministic existence authority and full hypothesis lifecycle tracking:
 - Rule 1: Exact Registered Alias / Name Match.
 - Rule 2: Structural First Refusal (Requires grounded parent AND discriminating sub-identifier).
 - Rule 3: Explicit Registered Parenthetical Identity Evidence in Mention/Context.
 - Rule 4: Novel Standalone System Commissioning Assertion (Deterministic Existence Authority).
-- Rule 5: Non-Resolvable Fail-Closed Deferral.
+- Rule 5: Non-Resolvable Fail-Closed Deferral (Hypothesis Ledger Creation).
 """
 
 import hashlib
@@ -65,6 +65,30 @@ class EpistemicIngressSessionR3:
     def extract_parentheticals(self, text: str) -> List[str]:
         return [m.strip() for m in re.findall(r"\(([^)]+)\)", text) if m.strip()]
 
+    def _resolve_open_hypotheses(self, doc_id: str, mention: str, action: str, target_id: str, rule: str):
+        """Updates open UNRESOLVED hypotheses in this session when evidence resolves an identity."""
+        for hid, hypo in self.hypothesis_ledger.items():
+            if hypo.get("status") == "UNRESOLVED":
+                cand = hypo.get("candidate_target")
+                if action == "LINK":
+                    if cand is not None and cand != target_id:
+                        hypo["status"] = "RETARGETED"
+                    elif cand is not None and cand == target_id:
+                        hypo["status"] = "CONFIRMED"
+                    else:
+                        hypo["status"] = "RESOLVED_EXISTING"
+                elif action == "CREATE_PROVISIONAL":
+                    hypo["status"] = "RESOLVED_NOVEL"
+                
+                hypo["resolved_target"] = target_id
+                hypo.setdefault("evidence_history", []).append({
+                    "resolving_doc_id": doc_id,
+                    "resolving_mention": mention,
+                    "rule": rule,
+                    "action": action,
+                    "target_id": target_id,
+                })
+
     def process_mention(
         self,
         doc_id: str,
@@ -93,6 +117,7 @@ class EpistemicIngressSessionR3:
                 self.mutation_log.append(
                     {"doc_id": doc_id, "action": "LINK", "target": reg_id, "durable": True}
                 )
+                self._resolve_open_hypotheses(doc_id, mention, "LINK", reg_id, "RULE_1_EXACT_ALIAS_MATCH")
                 return {
                     "action": "LINK",
                     "target_id": reg_id,
@@ -130,7 +155,6 @@ class EpistemicIngressSessionR3:
             sub_id = sub_id_match.group(0).strip().lower()
             prov_partition_id = f"prov_{grounded_parent_id}_{found_marker}_{sub_id}"
 
-            # Check if this exact structural partition is already registered
             if prov_partition_id in self.durable_registry:
                 edge = {
                     "doc_id": doc_id,
@@ -143,6 +167,7 @@ class EpistemicIngressSessionR3:
                 self.mutation_log.append(
                     {"doc_id": doc_id, "action": "LINK", "target": prov_partition_id, "durable": True}
                 )
+                self._resolve_open_hypotheses(doc_id, mention, "LINK", prov_partition_id, "RULE_2_STRUCTURAL_PARTITION_LINK")
                 return {
                     "action": "LINK",
                     "target_id": prov_partition_id,
@@ -150,7 +175,6 @@ class EpistemicIngressSessionR3:
                     "rule": "RULE_2_STRUCTURAL_PARTITION_LINK",
                 }
             else:
-                # Create provisional partition
                 self.durable_registry[prov_partition_id] = {
                     "entity_id": prov_partition_id,
                     "canonical_name": mention,
@@ -169,6 +193,7 @@ class EpistemicIngressSessionR3:
                 self.mutation_log.append(
                     {"doc_id": doc_id, "action": "CREATE_PROVISIONAL", "target": prov_partition_id, "durable": True}
                 )
+                self._resolve_open_hypotheses(doc_id, mention, "CREATE_PROVISIONAL", prov_partition_id, "RULE_2_STRUCTURAL_PARTITION_CREATE")
                 return {
                     "action": "CREATE_PROVISIONAL",
                     "target_id": prov_partition_id,
@@ -198,6 +223,7 @@ class EpistemicIngressSessionR3:
                     self.mutation_log.append(
                         {"doc_id": doc_id, "action": "LINK", "target": reg_id, "durable": True}
                     )
+                    self._resolve_open_hypotheses(doc_id, mention, "LINK", reg_id, "RULE_3_PARENTHETICAL_IDENTITY_LINK")
                     return {
                         "action": "LINK",
                         "target_id": reg_id,
@@ -207,8 +233,6 @@ class EpistemicIngressSessionR3:
 
         # ---------------------------------------------------------------------
         # Rule 4: Novel Standalone System Commissioning Assertion (Deterministic Existence Authority)
-        # Existence != Identity: Asserted commissioning notice deterministically creates provisional entity
-        # Neural proposal is logged as advisory telemetry
         # ---------------------------------------------------------------------
         unasserted_indicators = ["proposal", "pending", "rejected", "mock", "hypothetical", "generic", "unspecified", "ephemeral", "simulation"]
         ctx_lower = context.lower()
@@ -228,6 +252,7 @@ class EpistemicIngressSessionR3:
                     "action": "LINK",
                 }
                 self.provenance_edges.append(edge)
+                self._resolve_open_hypotheses(doc_id, mention, "LINK", prov_id, "RULE_4_NOVEL_SYSTEM_LINK")
                 return {
                     "action": "LINK",
                     "target_id": prov_id,
@@ -257,6 +282,7 @@ class EpistemicIngressSessionR3:
                 self.mutation_log.append(
                     {"doc_id": doc_id, "action": "CREATE_PROVISIONAL", "target": prov_id, "durable": True}
                 )
+                self._resolve_open_hypotheses(doc_id, mention, "CREATE_PROVISIONAL", prov_id, "RULE_4_NOVEL_SYSTEM_CREATE")
                 return {
                     "action": "CREATE_PROVISIONAL",
                     "target_id": prov_id,
@@ -268,10 +294,14 @@ class EpistemicIngressSessionR3:
         # Rule 5: Fail-Closed Ambiguous / Adversarial Deferral
         # ---------------------------------------------------------------------
         hypo_entry = {
+            "hypothesis_id": f"hypo_{doc_id}",
+            "doc_id": doc_id,
             "surface_form": mention,
             "candidate_target": neural_proposal.get("target_entity_id"),
-            "status": "deferred",
+            "status": "UNRESOLVED",
+            "resolved_target": None,
             "context_excerpt": context[:120],
+            "evidence_history": [{"doc_id": doc_id, "mention": mention, "context": context[:120]}],
         }
         self.hypothesis_ledger[doc_id] = hypo_entry
         self.mutation_log.append(

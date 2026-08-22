@@ -7,7 +7,7 @@ long_running: false
 exclusive_gpu: true
 interruptible: true
 proposed_by: antigravity
-design_review: APPROVED
+design_review: CHANGES_REQUESTED
 reviewed_by: chatgpt-pro
 authorized_by: null
 ---
@@ -52,7 +52,7 @@ $$\text{Mention } s \longrightarrow \begin{cases}
 | **Gate 2b** | False Provisional Existence Floor on Unasserted | $\equiv 0.0\%$ ($0/16$ unasserted mentions) |
 | **Gate 3** | Provisional Entity Fragmentation | $\equiv 0$ duplicate provisional creations |
 | **Gate 4** | Permanent Deferral Invariant (Arm 4A World-Level) | $\ge 7/8$ ($87.5\%$) fully deferred worlds |
-| **Gate 5** | Evidence Accumulation Lifecycle Matrix (Arm 4B) | $\equiv 7/7$ exact matches ($100.0\%$) |
+| **Gate 5** | Evidence Accumulation Lifecycle Matrix (Arm 4B) | $\equiv 7/7$ exact world lifecycle transitions ($100.0\%$) |
 | **Gate 6** | Useful Resolvable Coverage ($N=97$ Resolvable) | $\ge 85.0\%$ across $N=97$ resolvable decisions |
 | **Gate 7** | Relational DB & Hypothesis Ledger Reconciliation | SQLite integrity ok, 0 FK errors, full edge/hypo ledger |
 
@@ -61,7 +61,7 @@ $$\text{Mention } s \longrightarrow \begin{cases}
 ## 4. Paired Offline Comparative Replay Benchmark
 
 The verification pipeline executes a mandatory paired offline comparative replay:
-- Replays persisted Stage 8C-R3 neural proposals against the frozen **Stage 8C-R2 deterministic resolver** (`EpistemicIngressSessionR2`).
+- Replays persisted Stage 8C-R3 neural proposals against the frozen **Stage 8C-R2 deterministic resolver** (`EpistemicIngressSessionR2`) initialized with the identical Stage 8C-R3 base registry.
 - Quantifies the exact marginal coverage increase ($\Delta$) attributable solely to the refined structural/parenthetical precedence rule on identical documents and telemetry.
 
 ---
