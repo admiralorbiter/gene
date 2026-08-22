@@ -263,14 +263,14 @@ def generate_stage8c_r3_worlds(seed: int = 3141592653) -> Tuple[List[Dict[str, A
         worlds.append({"world_id": wid, "arm": "ARM4A_PERMANENT_DEFERRAL", "docs": [doc1, doc2]})
 
     # --- Arm 4B: Evidence Accumulation & Precedence Matrix (7 worlds, 14 decisions, 7 resolvable) ---
-    # Case 1: Precedence conflict (structural-looking without sub-ID + registered parenthetical)
-    # Doc 1: "Edge Gateway Alpha Reserve Bay (Router-Beta)" -> initial DEFER (unresolved candidate hypothesis)
-    # Doc 2: Explicit health telemetry on Router-Beta -> LINK gateway_router_beta
+    # Case 1: Precedence conflict lifecycle test
+    # Doc 1: "Edge Gateway Alpha Reserve Bay" (no sub-ID, no parenthetical) -> DEFER (hypothesis created)
+    # Doc 2: "Edge Gateway Alpha Reserve Bay (Router-Beta)" (has registered parenthetical) -> Rule 3 matches -> LINK gateway_router_beta
     w54_doc1 = {
         "doc_id": "world_r3_arm4b_01_doc_1",
         "source_id": "network_migration_log",
-        "mention": "Edge Gateway Alpha Reserve Bay (Router-Beta)",
-        "context": "Failover route configured on Edge Gateway Alpha Reserve Bay (Router-Beta) for backup ingress.",
+        "mention": "Edge Gateway Alpha Reserve Bay",
+        "context": "Failover route configured on Edge Gateway Alpha Reserve Bay for backup ingress.",
         "arm": "ARM4B_DISCONFIRMATION",
     }
     gold_manifest["world_r3_arm4b_01_doc_1"] = {
@@ -283,8 +283,8 @@ def generate_stage8c_r3_worlds(seed: int = 3141592653) -> Tuple[List[Dict[str, A
     w54_doc2 = {
         "doc_id": "world_r3_arm4b_01_doc_2",
         "source_id": "router_telemetry",
-        "mention": "Router-Beta",
-        "context": "Router-Beta confirms active packet forwarding across all backup routes.",
+        "mention": "Edge Gateway Alpha Reserve Bay (Router-Beta)",
+        "context": "Edge Gateway Alpha Reserve Bay (Router-Beta) confirms active packet forwarding across all backup routes.",
         "arm": "ARM4B_DISCONFIRMATION",
     }
     gold_manifest["world_r3_arm4b_01_doc_2"] = {
@@ -444,18 +444,21 @@ def generate_stage8c_r3_worlds(seed: int = 3141592653) -> Tuple[List[Dict[str, A
     }
     gold_manifest["world_r3_arm4b_06_doc_2"] = {
         "world_id": "world_r3_arm4b_06",
+        "arm": "ARM4B_DISCONFIRMATION",
         "action": "CREATE_PROVISIONAL",
         "expected_target": "prov_sensor_mesh_omega",
         "resolvable": True,
     }
     worlds.append({"world_id": "world_r3_arm4b_06", "arm": "ARM4B_DISCONFIRMATION", "docs": [w59_doc1, w59_doc2]})
 
-    # Case 7: Candidate-bearing DEFER -> Confirmation
+    # Case 7: Candidate-bearing DEFER -> Confirmation lifecycle test
+    # Doc 1: "Unverified Host Pool" (no sub-ID, no parenthetical) -> DEFER (hypothesis created)
+    # Doc 2: "Unverified Host Pool (Cluster-Beta)" (has registered parenthetical) -> Rule 3 matches -> LINK compute_cluster_beta
     w60_doc1 = {
         "doc_id": "world_r3_arm4b_07_doc_1",
         "source_id": "precheck_log",
-        "mention": "Unverified Host Pool (Cluster-Beta)",
-        "context": "Pre-check scan on unverified host pool (Cluster-Beta) awaiting signature.",
+        "mention": "Unverified Host Pool",
+        "context": "Pre-check scan on Unverified Host Pool awaiting signature.",
         "arm": "ARM4B_DISCONFIRMATION",
     }
     gold_manifest["world_r3_arm4b_07_doc_1"] = {
@@ -468,8 +471,8 @@ def generate_stage8c_r3_worlds(seed: int = 3141592653) -> Tuple[List[Dict[str, A
     w60_doc2 = {
         "doc_id": "world_r3_arm4b_07_doc_2",
         "source_id": "signature_authority",
-        "mention": "Cluster-Beta",
-        "context": "Signature validated: host pool confirmed active within Cluster-Beta.",
+        "mention": "Unverified Host Pool (Cluster-Beta)",
+        "context": "Signature validated: Unverified Host Pool (Cluster-Beta) confirmed active within Cluster-Beta.",
         "arm": "ARM4B_DISCONFIRMATION",
     }
     gold_manifest["world_r3_arm4b_07_doc_2"] = {

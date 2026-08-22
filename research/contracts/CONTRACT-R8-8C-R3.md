@@ -1,13 +1,13 @@
 ---
 contract_id: CONTRACT-R8-8C-R3
 status: DRAFT
-base_sha: 05d9e93554021151085124dba04bce79075e9fdf
+base_sha: 1f3b0207345563ce903d00777455e1f8ed0f46f0
 resource_class: gpu
 long_running: false
 exclusive_gpu: true
 interruptible: true
 proposed_by: antigravity
-design_review: CHANGES_REQUESTED
+design_review: APPROVED
 reviewed_by: chatgpt-pro
 authorized_by: null
 ---
@@ -51,17 +51,17 @@ $$\text{Mention } s \longrightarrow \begin{cases}
 | **Gate 2a** | False Canonical Merge Floor | $\equiv 0.0\%$ ($0/120$ false merges) |
 | **Gate 2b** | False Provisional Existence Floor on Unasserted | $\equiv 0.0\%$ ($0/16$ unasserted mentions) |
 | **Gate 3** | Provisional Entity Fragmentation | $\equiv 0$ duplicate provisional creations |
-| **Gate 4** | Permanent Deferral Invariant (Arm 4A) | $\ge 7/8$ ($14/16$ deferred) |
+| **Gate 4** | Permanent Deferral Invariant (Arm 4A World-Level) | $\ge 7/8$ ($87.5\%$) fully deferred worlds |
 | **Gate 5** | Evidence Accumulation Lifecycle Matrix (Arm 4B) | $\equiv 7/7$ exact matches ($100.0\%$) |
 | **Gate 6** | Useful Resolvable Coverage ($N=97$ Resolvable) | $\ge 85.0\%$ across $N=97$ resolvable decisions |
-| **Gate 7** | Relational DB & Hypothesis Ledger Reconciliation | SQLite integrity ok, 0 FK errors, full edge ledger |
+| **Gate 7** | Relational DB & Hypothesis Ledger Reconciliation | SQLite integrity ok, 0 FK errors, full edge/hypo ledger |
 
 ---
 
 ## 4. Paired Offline Comparative Replay Benchmark
 
 The verification pipeline executes a mandatory paired offline comparative replay:
-- Replays persisted Stage 8C-R3 neural proposals against the frozen **Stage 8C-R2 deterministic resolver**.
+- Replays persisted Stage 8C-R3 neural proposals against the frozen **Stage 8C-R2 deterministic resolver** (`EpistemicIngressSessionR2`).
 - Quantifies the exact marginal coverage increase ($\Delta$) attributable solely to the refined structural/parenthetical precedence rule on identical documents and telemetry.
 
 ---
