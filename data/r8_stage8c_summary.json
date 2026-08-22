@@ -1,0 +1,61 @@
+{
+  "benchmark": "CONTRACT-R8-8C",
+  "timestamp": "2026-08-22 02:04:06Z",
+  "model": "gemma3:12b",
+  "elapsed_seconds": 822.45,
+  "total_decisions": 120,
+  "neural_correct_total": 83,
+  "raw_neural_overall_acc": 0.6917,
+  "min_arm_neural_acc": 0.3667,
+  "false_merges_total": 2,
+  "fdar_merge": 0.0167,
+  "doc1_defer_correct": 13,
+  "doc1_defer_total": 15,
+  "ambig_defer_rate": 0.8667,
+  "subarm4b_doc2_correct": 6,
+  "subarm4b_doc2_total": 7,
+  "delay_res_rate": 0.8571,
+  "resolvable_correct": 72,
+  "resolvable_total": 97,
+  "useful_coverage": 0.7423,
+  "guardrail_rescues": 28,
+  "db_integrity_ok": true,
+  "total_entities_in_sqlite": 29,
+  "total_aliases_in_sqlite": 99,
+  "arm_stats": {
+    "ARM_1_NOVEL": {
+      "neural_correct": 16,
+      "hybrid_correct": 16,
+      "total": 30
+    },
+    "ARM_2_ALIAS": {
+      "neural_correct": 28,
+      "hybrid_correct": 28,
+      "total": 30
+    },
+    "ARM_3_COLLISION": {
+      "neural_correct": 11,
+      "hybrid_correct": 22,
+      "total": 30
+    },
+    "ARM_4A_PERM_AMBIG": {
+      "neural_correct": 16,
+      "hybrid_correct": 16,
+      "total": 16
+    },
+    "ARM_4B_RESOLVE": {
+      "neural_correct": 12,
+      "hybrid_correct": 11,
+      "total": 14
+    }
+  },
+  "gate_verdicts": {
+    "gate1_neural_quality": false,
+    "gate2_false_merge_invariant": false,
+    "gate3_provisional_fragmentation": true,
+    "gate4_ambiguous_deferral": true,
+    "gate5_delayed_resolution": true,
+    "gate6_resolvable_coverage": false,
+    "gate7_registry_integrity": true
+  }
+}
