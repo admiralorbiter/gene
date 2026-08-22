@@ -33,15 +33,15 @@ Autonomous, provably fail-closed epistemic knowledge discovery & entity resoluti
 ---
 
 ## 3. Human Decisions Pending
-- Strategic human authorization for `CONTRACT-R8-8C-R2.md` (`authorized_by: human`).
+- None. Strategic human authorization granted by Human Research Director (`authorized_by: human`).
 
 ---
 
 ## 4. First Actions on Resume
 1. Review [`BOOTSTRAP.md`](file:///c:/Users/admir/Github/gene/BOOTSTRAP.md) and [`HANDOFF.md`](file:///c:/Users/admir/Github/gene/HANDOFF.md).
-2. Obtain Strategic Human Authorization on `CONTRACT-R8-8C-R2.md`.
-3. Freeze contract to `status: FROZEN` and create dispatch branch `mb/CONTRACT-R8-8C-R2`.
-4. Arm operational state to `state: READY` and execute the sealed 120-decision confirmatory benchmark.
+2. On dispatch branch `mb/CONTRACT-R8-8C-R2`, implement Stage 8C-R2 benchmark runner, worlds, and verifier under `src/gene/benchmarks/r8_stage8c_r2/`.
+3. Compute `SEALING_MANIFEST-R8-8C-R2.json` with cryptographic SHA-256 digests.
+4. Arm operational state in `research/ACTIVE_CONTRACT.md` to `state: READY` and dispatch sealed 120-decision confirmatory run.
 
 ---
 
