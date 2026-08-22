@@ -4,8 +4,8 @@
   "assets": {
     "src/gene/benchmarks/r8_stage8c_r3/prompts.py": "0ef62621a79057fc1a2d9f0660a539ba045a8f730b6a3c4a1872f76959d816d7",
     "src/gene/benchmarks/r8_stage8c_r3/worlds.py": "197f6eb1aef1c7d929f6b583584c54ca70ea5510439039122b5f3858be255c35",
-    "src/gene/benchmarks/r8_stage8c_r3/runner.py": "ecd0dba1fa253d21bbbf4f958ea39e94030dfb1f6ccbb6c18ff1439316585fad",
-    "src/gene/benchmarks/r8_stage8c_r3/verifier.py": "5aeb51a8efb6adf0955e64250fd7c20f8afca76d70ac08d14ab49fa201221901",
+    "src/gene/benchmarks/r8_stage8c_r3/runner.py": "152c670ba595275409e8aeba780a231f9f96a0855e57feba683267560eedb002",
+    "src/gene/benchmarks/r8_stage8c_r3/verifier.py": "7e473d43697655a551eb9cabe71b010141955ad69afa6efc0cd89cb803f871fe",
     "research/contracts/CONTRACT-R8-8C-R3.md": "833a4214005ae1fe1aa6014fb95aa931fee95cd777432a28eaf9e2621bf1771c",
     "research/contracts/WORLDS-R8-8C-R3.json": "e447bb06f16c258086225ee27f1870c0d3f43f68aec1658880c2212540589016",
     "research/contracts/GOLD_MANIFEST-R8-8C-R3.json": "49cdc104596049dd8192943c8d160d5ccccc312ad33eef5e084a7533f539c0ba"

@@ -145,15 +145,11 @@ def verify_stage8c_r3_contract(
             arm4a_fully_deferred_worlds += 1
     gate_4_pass = (len(arm4a_worlds) == 8 and arm4a_fully_deferred_worlds >= 7)
 
-    # 6. Gate 5: Evidence Accumulation Lifecycle Matrix (7 World Lifecycles in Arm 4B)
-    arm4b_worlds: Dict[str, List[Dict[str, Any]]] = {}
-    for r in records:
-        doc_id = r["doc_id"]
-        gold = gold_manifest[doc_id]
-        if gold.get("arm") == "ARM4B_DISCONFIRMATION":
-            arm4b_worlds.setdefault(r["world_id"], []).append(r)
+    # Connect to SQLite DB for Gate 5 and Gate 7 verification
+    conn = sqlite3.connect(str(db_path))
+    cur = conn.cursor()
 
-    arm4b_lifecycles_passed = 0
+    # 6. Gate 5: Evidence Accumulation Lifecycle Matrix (7 World Lifecycles in Arm 4B)
     expected_lifecycles = {
         "world_r3_arm4b_01": ("gateway_router_beta", ["RETARGETED", "RESOLVED_EXISTING"]),
         "world_r3_arm4b_02": ("compute_cluster_beta", ["RETARGETED", "RESOLVED_EXISTING"]),
@@ -164,25 +160,23 @@ def verify_stage8c_r3_contract(
         "world_r3_arm4b_07": ("compute_cluster_beta", ["CONFIRMED", "RESOLVED_EXISTING"]),
     }
 
-    for wid, w_recs in sorted(arm4b_worlds.items()):
-        doc1 = w_recs[0]
-        doc2 = w_recs[1]
-        gold_doc1 = gold_manifest[doc1["doc_id"]]
-        gold_doc2 = gold_manifest[doc2["doc_id"]]
-
-        # Doc 1 must defer
-        doc1_deferred = (doc1["hybrid_decision"].get("action") == "DEFER")
-        # Doc 2 must resolve to expected target
-        doc2_resolved = (
-            doc2["hybrid_decision"].get("action") == gold_doc2["action"]
-            and doc2["hybrid_decision"].get("target_id") == gold_doc2["expected_target"]
+    arm4b_lifecycles_passed = 0
+    for wid, (expected_target, valid_statuses) in sorted(expected_lifecycles.items()):
+        cur.execute(
+            """SELECT hypothesis_id, doc_id, surface_form, status, resolved_target, resolving_doc_id, evidence_history_json
+               FROM hypothesis_ledger WHERE world_id = ?""",
+            (wid,),
         )
+        rows = cur.fetchall()
+        if len(rows) == 1:
+            hid, doc_id, s_form, status, res_target, res_doc, ev_json = rows[0]
+            status_valid = (status in valid_statuses)
+            target_valid = (res_target == expected_target)
+            doc_valid = (res_doc == f"{wid}_doc_2")
+            if status_valid and target_valid and doc_valid:
+                arm4b_lifecycles_passed += 1
 
-        expected_target, valid_statuses = expected_lifecycles.get(wid, (None, []))
-        if doc1_deferred and doc2_resolved and (doc2["hybrid_decision"].get("target_id") == expected_target):
-            arm4b_lifecycles_passed += 1
-
-    gate_5_pass = (len(arm4b_worlds) == 7 and arm4b_lifecycles_passed == 7)
+    gate_5_pass = (len(expected_lifecycles) == 7 and arm4b_lifecycles_passed == 7)
 
     # 7. Gate 6: Useful Resolvable Coverage (Frozen Denominator N=97)
     resolvable_correct = 0
@@ -200,8 +194,6 @@ def verify_stage8c_r3_contract(
     gate_6_pass = (coverage_pct >= 85.0)
 
     # 8. Gate 7: Full Relational SQLite DB & Hypothesis Ledger Reconciliation
-    conn = sqlite3.connect(str(db_path))
-    cur = conn.cursor()
     cur.execute("PRAGMA integrity_check")
     integrity_status = cur.fetchone()[0]
     cur.execute("PRAGMA foreign_key_check")
@@ -210,10 +202,22 @@ def verify_stage8c_r3_contract(
     entity_count = cur.fetchone()[0]
     cur.execute("SELECT COUNT(*) FROM provenance_edges")
     edge_count = cur.fetchone()[0]
-    cur.execute("SELECT COUNT(*) FROM hypothesis_ledger")
-    hypo_count = cur.fetchone()[0]
     cur.execute("SELECT COUNT(*) FROM execution_records")
     rec_count = cur.fetchone()[0]
+
+    # Reconcile exact hypothesis ledger statuses:
+    # Exactly 8 Arm 4A hypotheses permanently UNRESOLVED with resolved_target IS NULL
+    cur.execute("SELECT COUNT(*) FROM hypothesis_ledger WHERE world_id LIKE '%arm4a%' AND status == 'UNRESOLVED' AND resolved_target IS NULL")
+    arm4a_unresolved_count = cur.fetchone()[0]
+
+    # Exactly 7 Arm 4B hypotheses correctly transitioned out of UNRESOLVED with matching resolved targets
+    cur.execute("SELECT COUNT(*) FROM hypothesis_ledger WHERE world_id LIKE '%arm4b%' AND status != 'UNRESOLVED' AND resolved_target IS NOT NULL")
+    arm4b_resolved_count = cur.fetchone()[0]
+
+    # Total rows in hypothesis ledger must be exactly 15 (8 + 7)
+    cur.execute("SELECT COUNT(*) FROM hypothesis_ledger")
+    total_hypo_count = cur.fetchone()[0]
+
     conn.close()
 
     gate_7_pass = (
@@ -221,7 +225,9 @@ def verify_stage8c_r3_contract(
         and (fk_violations == 0)
         and (entity_count >= 6)
         and (edge_count > 0)
-        and (hypo_count >= 15)  # 8 from Arm 4A + 7 from Arm 4B
+        and (arm4a_unresolved_count == 8)
+        and (arm4b_resolved_count == 7)
+        and (total_hypo_count == 15)
         and (rec_count == 120)
     )
 
@@ -249,7 +255,7 @@ def verify_stage8c_r3_contract(
         "gate_3_pass": gate_3_pass,
         "gate_4_arm4a_fully_deferred_worlds": f"{arm4a_fully_deferred_worlds}/{len(arm4a_worlds)}",
         "gate_4_pass": gate_4_pass,
-        "gate_5_arm4b_lifecycles_exact": f"{arm4b_lifecycles_passed}/{len(arm4b_worlds)}",
+        "gate_5_arm4b_lifecycles_exact": f"{arm4b_lifecycles_passed}/7",
         "gate_5_pass": gate_5_pass,
         "gate_6_coverage_pct": f"{coverage_pct:.1f}% ({resolvable_correct}/{resolvable_total})",
         "gate_6_pass": gate_6_pass,
@@ -257,8 +263,10 @@ def verify_stage8c_r3_contract(
         "gate_7_fk_violations": fk_violations,
         "gate_7_entity_count": entity_count,
         "gate_7_edge_count": edge_count,
-        "gate_7_hypothesis_count": hypo_count,
-        "gate_7_record_count": rec_count,
+        "gate_7_arm4a_unresolved": f"{arm4a_unresolved_count}/8",
+        "gate_7_arm4b_resolved": f"{arm4b_resolved_count}/7",
+        "gate_7_total_hypotheses": f"{total_hypo_count}/15",
+        "gate_7_record_count": f"{rec_count}/120",
         "gate_7_pass": gate_7_pass,
         "paired_r2_replay_coverage": f"{r2_replay['r2_coverage_pct']:.1f}% ({r2_replay['r2_resolvable_correct']}/{r2_replay['total_resolvable']})",
         "coverage_gain_over_r2": f"+{coverage_pct - r2_replay['r2_coverage_pct']:.1f}%",

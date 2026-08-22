@@ -1,10 +1,10 @@
 """Confirmatory Benchmark Runner for Stage 8C-R3 (CONTRACT-R8-8C-R3).
-Implements the refined precedence rule with deterministic existence authority and full hypothesis lifecycle tracking:
-- Rule 1: Exact Registered Alias / Name Match.
-- Rule 2: Structural First Refusal (Requires grounded parent AND discriminating sub-identifier).
-- Rule 3: Explicit Registered Parenthetical Identity Evidence in Mention/Context.
-- Rule 4: Novel Standalone System Commissioning Assertion (Deterministic Existence Authority).
-- Rule 5: Non-Resolvable Fail-Closed Deferral (Hypothesis Ledger Creation).
+Executes 60 fresh sealed worlds (120 sequential decisions) with local Ollama Gemma 3 12B.
+Enforces:
+1. Existence vs Identity Decoupling (Deterministic Existence Authority on Asserted Commissioning).
+2. Refined Structural First Refusal (Requires grounded parent AND discriminating sub-identifier).
+3. Explicit Registered Parenthetical Identity Evidence (Resolves structural-looking mentions lacking sub-IDs).
+4. Full Hypothesis Accumulation Lifecycle (Unresolved, Retargeted, Confirmed, Resolved Existing, Resolved Novel).
 """
 
 import hashlib
@@ -17,10 +17,7 @@ import urllib.request
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from gene.benchmarks.r8_stage8c_r3.prompts import (
-    STAGE8C_R3_SYSTEM_PROMPT,
-    format_stage8c_r3_prompt,
-)
+from gene.benchmarks.r8_stage8c_r3.prompts import format_stage8c_r3_prompt
 from gene.benchmarks.r8_stage8c_r3.worlds import (
     generate_stage8c_r3_worlds,
     get_stage8c_r3_base_registry,
@@ -52,6 +49,50 @@ def compute_durable_state_hash(
     return hashlib.sha256(state_repr.encode("utf-8")).hexdigest()
 
 
+def call_gemma_api(prompt: str) -> Dict[str, Any]:
+    """Invokes local Ollama Gemma 3 12B at temperature 0.0 with fail-closed JSON fallback."""
+    payload = {
+        "model": MODEL_NAME,
+        "prompt": prompt,
+        "stream": False,
+        "format": "json",
+        "options": {
+            "temperature": 0.0,
+            "top_p": 1.0,
+            "num_predict": 512,
+        },
+    }
+    data = json.dumps(payload).encode("utf-8")
+    req = urllib.request.Request(
+        OLLAMA_API_URL, data=data, headers={"Content-Type": "application/json"}
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=120) as resp:
+            res = json.loads(resp.read().decode("utf-8"))
+            raw_text = res.get("response", "{}")
+            try:
+                return json.loads(raw_text)
+            except Exception:
+                match = re.search(r"\{.*\}", raw_text, re.DOTALL)
+                if match:
+                    return json.loads(match.group(0))
+                return {
+                    "identity_judgment": "AMBIGUOUS",
+                    "registry_mutation": "DEFER",
+                    "target_id": None,
+                    "confidence": 0.0,
+                    "rationale": f"JSON parse fallback on text: {raw_text[:100]}",
+                }
+    except Exception as e:
+        return {
+            "identity_judgment": "AMBIGUOUS",
+            "registry_mutation": "DEFER",
+            "target_id": None,
+            "confidence": 0.0,
+            "rationale": f"Ollama connection fallback: {str(e)}",
+        }
+
+
 class EpistemicIngressSessionR3:
     def __init__(self, base_registry: Dict[str, Any]):
         self.durable_registry = {k: dict(v) for k, v in base_registry.items()}
@@ -81,6 +122,7 @@ class EpistemicIngressSessionR3:
                     hypo["status"] = "RESOLVED_NOVEL"
                 
                 hypo["resolved_target"] = target_id
+                hypo["resolving_doc_id"] = doc_id
                 hypo.setdefault("evidence_history", []).append({
                     "resolving_doc_id": doc_id,
                     "resolving_mention": mention,
@@ -112,6 +154,8 @@ class EpistemicIngressSessionR3:
                     "mention": mention,
                     "target_id": reg_id,
                     "action": "LINK",
+                    "rule": "RULE_1_EXACT_ALIAS_MATCH",
+                    "timestamp": time.time(),
                 }
                 self.provenance_edges.append(edge)
                 self.mutation_log.append(
@@ -162,6 +206,8 @@ class EpistemicIngressSessionR3:
                     "mention": mention,
                     "target_id": prov_partition_id,
                     "action": "LINK",
+                    "rule": "RULE_2_STRUCTURAL_PARTITION_LINK",
+                    "timestamp": time.time(),
                 }
                 self.provenance_edges.append(edge)
                 self.mutation_log.append(
@@ -188,6 +234,8 @@ class EpistemicIngressSessionR3:
                     "mention": mention,
                     "target_id": prov_partition_id,
                     "action": "CREATE_PROVISIONAL",
+                    "rule": "RULE_2_STRUCTURAL_PARTITION_CREATE",
+                    "timestamp": time.time(),
                 }
                 self.provenance_edges.append(edge)
                 self.mutation_log.append(
@@ -218,6 +266,8 @@ class EpistemicIngressSessionR3:
                         "mention": mention,
                         "target_id": reg_id,
                         "action": "LINK",
+                        "rule": "RULE_3_PARENTHETICAL_IDENTITY_LINK",
+                        "timestamp": time.time(),
                     }
                     self.provenance_edges.append(edge)
                     self.mutation_log.append(
@@ -250,6 +300,8 @@ class EpistemicIngressSessionR3:
                     "mention": mention,
                     "target_id": prov_id,
                     "action": "LINK",
+                    "rule": "RULE_4_NOVEL_SYSTEM_LINK",
+                    "timestamp": time.time(),
                 }
                 self.provenance_edges.append(edge)
                 self._resolve_open_hypotheses(doc_id, mention, "LINK", prov_id, "RULE_4_NOVEL_SYSTEM_LINK")
@@ -277,6 +329,8 @@ class EpistemicIngressSessionR3:
                     "mention": mention,
                     "target_id": prov_id,
                     "action": "CREATE_PROVISIONAL",
+                    "rule": "RULE_4_NOVEL_SYSTEM_CREATE",
+                    "timestamp": time.time(),
                 }
                 self.provenance_edges.append(edge)
                 self.mutation_log.append(
@@ -295,11 +349,13 @@ class EpistemicIngressSessionR3:
         # ---------------------------------------------------------------------
         hypo_entry = {
             "hypothesis_id": f"hypo_{doc_id}",
+            "world_id": doc_id.rsplit("_doc_", 1)[0] if "_doc_" in doc_id else doc_id,
             "doc_id": doc_id,
             "surface_form": mention,
             "candidate_target": neural_proposal.get("target_entity_id"),
             "status": "UNRESOLVED",
             "resolved_target": None,
+            "resolving_doc_id": None,
             "context_excerpt": context[:120],
             "evidence_history": [{"doc_id": doc_id, "mention": mention, "context": context[:120]}],
         }
@@ -313,3 +369,253 @@ class EpistemicIngressSessionR3:
             "durable": False,
             "rule": "RULE_5_FAIL_CLOSED_DEFER",
         }
+
+
+def init_database(db_path: Path):
+    """Initializes the relational SQLite database with strict foreign key constraints."""
+    if db_path.exists():
+        db_path.unlink()
+    conn = sqlite3.connect(str(db_path))
+    cur = conn.cursor()
+    cur.execute("PRAGMA foreign_keys = ON;")
+    cur.execute("""
+        CREATE TABLE entities (
+            entity_id TEXT PRIMARY KEY,
+            canonical_name TEXT NOT NULL,
+            status TEXT NOT NULL,
+            parent_entity TEXT
+        )
+    """)
+    cur.execute("""
+        CREATE TABLE aliases (
+            alias_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            entity_id TEXT NOT NULL,
+            alias TEXT NOT NULL,
+            FOREIGN KEY (entity_id) REFERENCES entities(entity_id)
+        )
+    """)
+    cur.execute("""
+        CREATE TABLE provenance_edges (
+            edge_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            world_id TEXT NOT NULL,
+            doc_id TEXT NOT NULL,
+            source_id TEXT NOT NULL,
+            mention TEXT NOT NULL,
+            target_id TEXT NOT NULL,
+            action TEXT NOT NULL,
+            rule TEXT NOT NULL,
+            timestamp REAL NOT NULL,
+            FOREIGN KEY (target_id) REFERENCES entities(entity_id)
+        )
+    """)
+    cur.execute("""
+        CREATE TABLE hypothesis_ledger (
+            hypothesis_id TEXT PRIMARY KEY,
+            world_id TEXT NOT NULL,
+            doc_id TEXT NOT NULL,
+            surface_form TEXT NOT NULL,
+            candidate_target TEXT,
+            status TEXT NOT NULL,
+            resolved_target TEXT,
+            resolving_doc_id TEXT,
+            evidence_history_json TEXT NOT NULL
+        )
+    """)
+    cur.execute("""
+        CREATE TABLE execution_records (
+            record_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            world_id TEXT NOT NULL,
+            doc_id TEXT NOT NULL,
+            arm TEXT NOT NULL,
+            source_id TEXT NOT NULL,
+            mention TEXT NOT NULL,
+            context TEXT NOT NULL,
+            neural_proposal_json TEXT NOT NULL,
+            hybrid_decision_json TEXT NOT NULL,
+            durable_hash TEXT NOT NULL,
+            timestamp REAL NOT NULL
+        )
+    """)
+    conn.commit()
+    conn.close()
+
+
+def run_stage8c_r3_benchmark(
+    worlds: List[Dict[str, Any]],
+    gold_manifest: Dict[str, Any],
+    db_path: Path,
+    evidence_path: Path,
+) -> Dict[str, Any]:
+    """Executes the 60 fresh worlds (120 decisions) across all 4 benchmark arms."""
+    print("================================================================================")
+    print("RUNNING STAGE 8C-R3 CONFIRMATORY BENCHMARK (CONTRACT-R8-8C-R3)")
+    print(f"Model: {MODEL_NAME} via Ollama ({OLLAMA_API_URL})")
+    print("================================================================================\n")
+
+    base_registry = get_stage8c_r3_base_registry()
+    init_database(db_path)
+
+    if evidence_path.exists():
+        evidence_path.unlink()
+
+    conn = sqlite3.connect(str(db_path))
+    cur = conn.cursor()
+    cur.execute("PRAGMA foreign_keys = ON;")
+
+    total_decisions = 0
+    start_time = time.time()
+
+    for w_idx, world in enumerate(worlds, start=1):
+        wid = world["world_id"]
+        arm = world["arm"]
+        session = EpistemicIngressSessionR3(base_registry)
+
+        # Pre-seed base registry in DB
+        for eid, edata in session.durable_registry.items():
+            cur.execute(
+                "INSERT OR IGNORE INTO entities (entity_id, canonical_name, status, parent_entity) VALUES (?, ?, ?, ?)",
+                (eid, edata["canonical_name"], edata["status"], edata.get("parent_entity")),
+            )
+            for a in edata.get("aliases", []):
+                cur.execute("INSERT INTO aliases (entity_id, alias) VALUES (?, ?)", (eid, a))
+
+        print(f"[{w_idx:02d}/60] Executing World: {wid} ({arm})...")
+
+        for doc in world["docs"]:
+            doc_id = doc["doc_id"]
+            src_id = doc["source_id"]
+            mention = doc["mention"]
+            ctx = doc["context"]
+
+            # Format prompt with current session durable registry
+            reg_view = {
+                k: {
+                    "name": v["canonical_name"],
+                    "status": v["status"],
+                    "aliases": v.get("aliases", []),
+                }
+                for k, v in session.durable_registry.items()
+            }
+            prompt = format_stage8c_r3_prompt(
+                registry_json=json.dumps(reg_view, indent=2),
+                doc_id=doc_id,
+                source_id=src_id,
+                mention_text=mention,
+                narrative_context=ctx,
+            )
+
+            # Query Gemma 3 12B
+            neural_proposal = call_gemma_api(prompt)
+
+            # Process mention through hybrid ingress kernel
+            decision = session.process_mention(
+                doc_id=doc_id,
+                source_id=src_id,
+                mention=mention,
+                context=ctx,
+                neural_proposal=neural_proposal,
+            )
+
+            durable_hash = session.get_durable_hash()
+            total_decisions += 1
+
+            # Log to SQLite execution_records
+            cur.execute(
+                """INSERT INTO execution_records
+                   (world_id, doc_id, arm, source_id, mention, context, neural_proposal_json, hybrid_decision_json, durable_hash, timestamp)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (
+                    wid,
+                    doc_id,
+                    arm,
+                    src_id,
+                    mention,
+                    ctx,
+                    json.dumps(neural_proposal),
+                    json.dumps(decision),
+                    durable_hash,
+                    time.time(),
+                ),
+            )
+
+            # Log to evidence JSONL
+            record = {
+                "world_id": wid,
+                "arm": arm,
+                "doc_id": doc_id,
+                "source_id": src_id,
+                "mention": mention,
+                "context": ctx,
+                "neural_proposal": neural_proposal,
+                "hybrid_decision": decision,
+                "durable_hash": durable_hash,
+                "timestamp": time.time(),
+            }
+            with open(evidence_path, "a", encoding="utf-8") as f_jsonl:
+                f_jsonl.write(json.dumps(record) + "\n")
+
+        # Persist session entities
+        for eid, edata in session.durable_registry.items():
+            cur.execute(
+                "INSERT OR REPLACE INTO entities (entity_id, canonical_name, status, parent_entity) VALUES (?, ?, ?, ?)",
+                (eid, edata["canonical_name"], edata["status"], edata.get("parent_entity")),
+            )
+            for a in edata.get("aliases", []):
+                cur.execute("INSERT OR IGNORE INTO aliases (entity_id, alias) VALUES (?, ?)", (eid, a))
+
+        # Persist session provenance edges
+        for edge in session.provenance_edges:
+            cur.execute(
+                """INSERT INTO provenance_edges
+                   (world_id, doc_id, source_id, mention, target_id, action, rule, timestamp)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                (
+                    wid,
+                    edge["doc_id"],
+                    edge["source_id"],
+                    edge["mention"],
+                    edge["target_id"],
+                    edge["action"],
+                    edge.get("rule", "UNKNOWN"),
+                    edge.get("timestamp", time.time()),
+                ),
+            )
+
+        # Persist session hypothesis ledger
+        for doc_k, hyp in session.hypothesis_ledger.items():
+            cur.execute(
+                """INSERT OR REPLACE INTO hypothesis_ledger
+                   (hypothesis_id, world_id, doc_id, surface_form, candidate_target, status, resolved_target, resolving_doc_id, evidence_history_json)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (
+                    hyp["hypothesis_id"],
+                    wid,
+                    hyp["doc_id"],
+                    hyp["surface_form"],
+                    hyp.get("candidate_target"),
+                    hyp["status"],
+                    hyp.get("resolved_target"),
+                    hyp.get("resolving_doc_id"),
+                    json.dumps(hyp.get("evidence_history", [])),
+                ),
+            )
+
+        conn.commit()
+
+    conn.close()
+    elapsed = time.time() - start_time
+    print(f"\n================================================================================")
+    print(f"STAGE 8C-R3 BENCHMARK COMPLETED: {total_decisions} decisions in {elapsed:.2f}s")
+    print(f"Evidence JSONL:  {evidence_path.resolve()}")
+    print(f"SQLite Registry: {db_path.resolve()}")
+    print(f"================================================================================\n")
+    return {"total_decisions": total_decisions, "elapsed_seconds": elapsed}
+
+
+if __name__ == "__main__":
+    worlds, gold_manifest = generate_stage8c_r3_worlds(seed=3141592653)
+    data_dir = Path("data")
+    data_dir.mkdir(parents=True, exist_ok=True)
+    db_path = data_dir / "r8_stage8c_r3_registry.sqlite"
+    evidence_path = data_dir / "r8_stage8c_r3_candidate_evidence.jsonl"
+    run_stage8c_r3_benchmark(worlds, gold_manifest, db_path, evidence_path)
