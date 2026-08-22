@@ -112,11 +112,28 @@ $$\text{Hypothesis}(\text{surface\_form}, \text{candidate\_target} = \text{null}
 
 ---
 
-## 4. Sealing Section & Cryptographic Hash Manifest
+## 4. Authorized Claim Ceiling & Epistemic Scope
 
-All Stage 8C-R2 experimental assets are cryptographically sealed prior to execution:
+### Authorized Claim (If All Gates Pass)
+> "In this controlled synthetic streaming hardware-entity benchmark, deterministic separation of provisional-existence authority from canonical-identity authority can increase useful admission coverage while maintaining zero false canonical commitments and zero false provisional existence assertions under the preregistered adversarial controls."
 
-- **Base SHA**: `f7e178b871cffaf97f1f0a20468962629b3c4349`
+### Explicit Exclusions & Negative Scope (What is NOT Claimed)
+1. **Not general open-domain entity linking**: Does not establish performance on broad unstructured natural text without domain-specific ingress structure.
+2. **Not arbitrary natural-language existence inference**: Does not claim that existential assertions can be generalized beyond the declared vocabulary and syntax.
+3. **Not autonomous ontology induction**: Does not learn or induce new structural markers or relation types dynamically.
+4. **Not evidence of vocabulary generalization**: Does not establish that the rule vocabulary transfers to other domains without explicit calibration.
+
+---
+
+## 5. Executable Sealing Section (V0 Execution Gate)
+
+### Epistemic Boundary: FROZEN vs SEALED
+- **`FROZEN`**: Freezes the scientific contract, hypotheses, acceptance gates, and claim ceilings.
+- **`SEALED`**: Freezes the executable instantiation via cryptographic digests in `SEALING_MANIFEST-R8-8C-R2.json`.
+
+Prior to invoking Gemma 3 12B or mutating repository state on dispatch branch `mb/CONTRACT-R8-8C-R2`, the V0 execution harness must verify that the following assets match their recorded SHA-256 digests in `SEALING_MANIFEST-R8-8C-R2.json`:
+
+- **Base Commit SHA**: `f7e178b871cffaf97f1f0a20468962629b3c4349`
 - **World Generator Seed**: `2357947788` (integer `0x8C8C8C8C`)
 - **Model Target**: `gemma3:12b-instruct-q4_K_M`
 - **Prompt Specification**: `src/gene/benchmarks/r8_stage8c_r2/prompts.py`
