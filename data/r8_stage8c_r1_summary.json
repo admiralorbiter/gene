@@ -1,0 +1,39 @@
+{
+  "contract_id": "CONTRACT-R8-8C-R1",
+  "timestamp": "2026-08-22T02:59:36Z",
+  "model": "gemma3:12b",
+  "total_calls": 120,
+  "elapsed_sec": 553.7210826873779,
+  "neural_accuracy": 0.44166666666666665,
+  "hybrid_accuracy": 0.475,
+  "arm_breakdown": {
+    "ARM1_NOVEL": {
+      "total": 30,
+      "neural_correct": 0,
+      "hybrid_correct": 0
+    },
+    "ARM2_KNOWN_ALIAS": {
+      "total": 30,
+      "neural_correct": 30,
+      "hybrid_correct": 30
+    },
+    "ARM3_PARTITION": {
+      "total": 30,
+      "neural_correct": 0,
+      "hybrid_correct": 0
+    },
+    "ARM4A_PERMANENT_DEFERRAL": {
+      "total": 16,
+      "neural_correct": 12,
+      "hybrid_correct": 14
+    },
+    "ARM4B_DEFERRED_RESOLVED": {
+      "total": 14,
+      "neural_correct": 11,
+      "hybrid_correct": 13
+    }
+  },
+  "hypothesis_ledger_count": 0,
+  "durable_entity_count": 6,
+  "provenance_edge_count": 0
+}
