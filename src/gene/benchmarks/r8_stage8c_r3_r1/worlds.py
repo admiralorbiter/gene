@@ -1,6 +1,6 @@
 """Confirmatory Benchmark Worlds for Stage 8C-R3-R1 (CONTRACT-R8-8C-R3-R1).
-Generates 60 genuinely lexically fresh synthetic worlds (120 sequential decisions) with PRNG seed 2718281828.
-Includes a machine-verifiable freshness audit asserting disjointness with Stage 8C-R3 across Arms 1, 3, 4A, and 4B.
+Generates 60 sealed deterministic fresh worlds (120 sequential decisions) under generator version R3-R1 (PRNG seed 2718281828).
+Includes a machine-verifiable dual-freshness audit asserting zero mention-level and zero pair-level overlap with Stage 8C-R3 across Arms 1, 3, 4A, and 4B.
 """
 
 import random
@@ -62,7 +62,7 @@ def generate_stage8c_r3_r1_worlds(seed: int = 2718281828) -> Tuple[List[Dict[str
 
     # =========================================================================
     # ARM 1: Truly Fresh Novel Standalone Systems (15 Worlds, 30 Decisions)
-    # Genuinely disjoint from R3 (e.g. Cryogenic Core, Spintronic Fabric, etc.)
+    # Genuinely disjoint from R3 (e.g. Cryogenic Core Sigma, Spintronic Fabric Xi, etc.)
     # =========================================================================
     arm1_novel_names = [
         "Cryogenic Core Sigma",
@@ -118,6 +118,7 @@ def generate_stage8c_r3_r1_worlds(seed: int = 2718281828) -> Tuple[List[Dict[str
 
     # =========================================================================
     # ARM 2: Known Registered Systems via Aliases (15 Worlds, 30 Decisions)
+    # Deliberately replaying stable controlled ontology aliases
     # =========================================================================
     arm2_cases = [
         ("Compute Cluster Alpha", "CCA", "Alpha Compute Pool", "compute_cluster_alpha"),
@@ -172,7 +173,7 @@ def generate_stage8c_r3_r1_worlds(seed: int = 2718281828) -> Tuple[List[Dict[str
 
     # =========================================================================
     # ARM 3: Truly Fresh Structural Compositions with Discriminating Sub-IDs (15 Worlds, 30 Decisions)
-    # Using fresh combinations: tray, lun, bay, socket, enclosure, slice with sub-identifiers (1..4, a..d)
+    # Genuinely disjoint combinations of parents, markers (tray, lun, bay, socket, enclosure, slice), and sub-IDs
     # =========================================================================
     arm3_templates = [
         ("Compute Cluster Alpha tray 1", "compute_cluster_alpha", "tray", "1", "prov_compute_cluster_alpha_tray_1"),
@@ -287,16 +288,16 @@ def generate_stage8c_r3_r1_worlds(seed: int = 2718281828) -> Tuple[List[Dict[str
             "storage_array_alpha",
             "LINK",
         ),
-        # Case 2: Ambiguous node in Doc 1, disambiguated to registered alias in Doc 2
+        # Case 2: Ambiguous baremetal slice in Doc 1, disambiguated to registered alias in Doc 2 (Fresh surface replacing Unverified Host Pool)
         (
-            "Unverified Host Pool",
-            "Incident ticket: Unverified Host Pool reported degraded latency on interface 0.",
-            "Unverified Host Pool (Cluster-Beta)",
-            "Resolution log: Confirmed Unverified Host Pool refers to Cluster-Beta after routing check.",
+            "Unverified Baremetal Slice",
+            "Incident ticket: Unverified Baremetal Slice reported degraded latency on interface 0.",
+            "Unverified Baremetal Slice (Cluster-Beta)",
+            "Resolution log: Confirmed Unverified Baremetal Slice refers to Cluster-Beta after routing check.",
             "compute_cluster_beta",
             "LINK",
         ),
-        # Case 3: Structural blade lacking sub-ID in Doc 1, resolved to storage_array_beta in Doc 2
+        # Case 3: Structural bay lacking sub-ID in Doc 1, resolved to storage_array_beta in Doc 2
         (
             "Storage Array Beta Backup Bay",
             "Change ticket: Modifying configuration on Storage Array Beta Backup Bay.",
@@ -305,39 +306,39 @@ def generate_stage8c_r3_r1_worlds(seed: int = 2718281828) -> Tuple[List[Dict[str
             "storage_array_beta",
             "LINK",
         ),
-        # Case 4: Ambiguous router port in Doc 1, resolved to gateway_router_alpha in Doc 2
+        # Case 4: Ambiguous uplink interface in Doc 1, resolved to gateway_router_alpha in Doc 2
         (
             "Pending Uplink Interface",
             "Network log: Pending Uplink Interface undergoing loopback testing.",
-            "Router-Alpha",
-            "Topology update: Pending Uplink Interface is now bound to Router-Alpha.",
+            "Pending Uplink Interface (Router-Alpha)",
+            "Topology update: Pending Uplink Interface (Router-Alpha) is now bound and active.",
             "gateway_router_alpha",
             "LINK",
         ),
-        # Case 5: Ambiguous blade in Doc 1, resolved to compute_cluster_alpha in Doc 2
+        # Case 5: Ambiguous unallocated node in Doc 1, resolved to compute_cluster_alpha in Doc 2
         (
-            "Unallocated Server Blade",
-            "Inventory check: Unallocated Server Blade located in staging rack.",
-            "Cluster-Alpha",
-            "Provisioning log: Unallocated Server Blade assigned to Cluster-Alpha.",
+            "Unallocated Compute Node",
+            "Inventory check: Unallocated Compute Node located in staging rack.",
+            "Unallocated Compute Node (Cluster-Alpha)",
+            "Provisioning log: Unallocated Compute Node (Cluster-Alpha) assigned to primary compute tier.",
             "compute_cluster_alpha",
             "LINK",
         ),
-        # Case 6: Uncommissioned module in Doc 1, officially commissioned as novel system in Doc 2
+        # Case 6: Uncommissioned transceiver in Doc 1, officially commissioned as novel system in Doc 2
         (
-            "Uncommissioned Photonic Transceiver",
-            "Lab draft: Uncommissioned Photonic Transceiver under bench testing.",
+            "Uncommissioned Transceiver Bank",
+            "Lab draft: Uncommissioned Transceiver Bank under bench testing.",
             "Photonic Transceiver Omega",
             "Commissioning bulletin: Photonic Transceiver Omega is active in production.",
             "prov_photonic_transceiver_omega",
             "CREATE_PROVISIONAL",
         ),
-        # Case 7: Unverified cluster in Doc 1, disambiguated to compute_cluster_beta in Doc 2
+        # Case 7: Unconfirmed acceleration board in Doc 1, disambiguated to compute_cluster_beta in Doc 2
         (
-            "Unconfirmed Compute Node",
-            "Telemetry log: Unconfirmed Compute Node heartbeat observed on vlan 10.",
-            "Beta Compute Pool",
-            "Network audit: Unconfirmed Compute Node is part of Beta Compute Pool.",
+            "Unconfirmed Acceleration Board",
+            "Telemetry log: Unconfirmed Acceleration Board heartbeat observed on vlan 10.",
+            "Unconfirmed Acceleration Board (Beta Compute Pool)",
+            "Network audit: Unconfirmed Acceleration Board (Beta Compute Pool) verified active.",
             "compute_cluster_beta",
             "LINK",
         ),
@@ -371,35 +372,46 @@ def generate_stage8c_r3_r1_worlds(seed: int = 2718281828) -> Tuple[List[Dict[str
     return worlds, gold_manifest
 
 
-def normalize_audit_pair(mention: str, context: str) -> Tuple[str, str]:
-    """Normalizes mention and context for rigorous disjointness audit."""
-    m_norm = re.sub(r"[^a-z0-9]", "", mention.lower())
-    c_norm = re.sub(r"[^a-z0-9]", "", context.lower())
-    return m_norm, c_norm
+def normalize_audit_surface(s: str) -> str:
+    """Normalizes string to alphanumeric lowercase for rigorous lexical freshness audit."""
+    return re.sub(r"[^a-z0-9]", "", s.lower())
 
 
-def verify_r3r1_freshness_against_r3() -> Tuple[bool, Set[Tuple[str, str]]]:
-    """Rigorous machine-verifiable freshness audit asserting disjointness
+def verify_r3r1_freshness_against_r3() -> Tuple[bool, int, int, Set[str], Set[Tuple[str, str]]]:
+    """Rigorous machine-verifiable dual-freshness audit asserting BOTH:
 
-    between R3-R1 and frozen R3 across Arms 1, 3, 4A, and 4B.
+    1. Zero mention-level overlap with frozen R3 across Arms 1, 3, 4A, and 4B.
+    2. Zero pair-level (mention, context) overlap with frozen R3 across Arms 1, 3, 4A, and 4B.
     """
     from gene.benchmarks.r8_stage8c_r3.worlds import generate_stage8c_r3_worlds
 
     r3_worlds, _ = generate_stage8c_r3_worlds()
     r3r1_worlds, _ = generate_stage8c_r3_r1_worlds()
 
+    non_arm2_arms = ("ARM1_NOVEL", "ARM3_PARTITION", "ARM4A_PERMANENT_DEFERRAL", "ARM4B_DISCONFIRMATION")
+
+    r3_mentions: Set[str] = set()
     r3_pairs: Set[Tuple[str, str]] = set()
     for w in r3_worlds:
-        if w["arm"] in ("ARM1_NOVEL", "ARM3_PARTITION", "ARM4A_PERMANENT_DEFERRAL", "ARM4B_DISCONFIRMATION"):
+        if w["arm"] in non_arm2_arms:
             for d in w["docs"]:
-                r3_pairs.add(normalize_audit_pair(d["mention"], d["context"]))
+                m_norm = normalize_audit_surface(d["mention"])
+                c_norm = normalize_audit_surface(d["context"])
+                r3_mentions.add(m_norm)
+                r3_pairs.add((m_norm, c_norm))
 
+    r3r1_mentions: Set[str] = set()
     r3r1_pairs: Set[Tuple[str, str]] = set()
     for w in r3r1_worlds:
-        if w["arm"] in ("ARM1_NOVEL", "ARM3_PARTITION", "ARM4A_PERMANENT_DEFERRAL", "ARM4B_DISCONFIRMATION"):
+        if w["arm"] in non_arm2_arms:
             for d in w["docs"]:
-                r3r1_pairs.add(normalize_audit_pair(d["mention"], d["context"]))
+                m_norm = normalize_audit_surface(d["mention"])
+                c_norm = normalize_audit_surface(d["context"])
+                r3r1_mentions.add(m_norm)
+                r3r1_pairs.add((m_norm, c_norm))
 
-    overlap = r3r1_pairs.intersection(r3_pairs)
-    is_fresh = (len(overlap) == 0)
-    return is_fresh, overlap
+    mention_overlap = r3r1_mentions.intersection(r3_mentions)
+    pair_overlap = r3r1_pairs.intersection(r3_pairs)
+
+    is_fresh = (len(mention_overlap) == 0 and len(pair_overlap) == 0)
+    return is_fresh, len(mention_overlap), len(pair_overlap), mention_overlap, pair_overlap

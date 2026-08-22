@@ -2,7 +2,7 @@
 contract_id: CONTRACT-R8-8C-R3-R1
 status: DRAFT
 base_sha: 92400bf22a24316e5c1522489a1a003c365fe848
-created_at: "2026-08-22 10:55:00Z"
+created_at: "2026-08-22 11:15:00Z"
 proposed_by: antigravity
 design_review: CHANGES_REQUESTED
 reviewed_by: chatgpt-pro
@@ -30,11 +30,11 @@ When the neural prompt commanded *"Never guess or merge distinct entities withou
 
 **CONTRACT-R8-8C-R3-R1** delivers the surgical closure of Stage 8:
 1. **Decouples Live Lifecycle Testing from Neural Speculation**: Live Gate 5 validates that the hypothesis ledger transition matches the *actual* candidate proposal (`cand is None` $\to$ `RESOLVED_EXISTING`, `cand == target` $\to$ `CONFIRMED`, `cand != target` $\to$ `RETARGETED`, novel creation $\to$ `RESOLVED_NOVEL`).
-2. **Deterministic CPU Branch-Coverage Assay (Gate 5b)**: A standalone unit test that injects synthetic candidates to prove all four terminal transitions execute with 100% mathematical soundness.
+2. **Deterministic CPU Branch-Coverage Assay (Gate 5b)**: A standalone unit test that injects synthetic candidates into the production session to prove all four terminal transitions execute with 100% mathematical soundness.
 3. **Dual Paired Comparators**:
    - **Total Historical Gain**: $R3 - \text{Frozen } R2$.
-   - **Isolated Precedence Attribution**: $R3 - R3_{\text{ablation}}$ (a matched resolver where structural mentions lacking sub-IDs immediately defer without Rule 3 fall-through, while valid structural partitions with sub-IDs execute identically to R3-R1).
-4. **Fresh Sealed Worlds & Machine-Verifiable Freshness Audit**: 60 genuinely lexically fresh synthetic worlds ($120$ decisions) generated with PRNG seed `2718281828`, with an automated freshness assertion verifying zero lexical overlap with R3 across Arms 1, 3, 4A, and 4B.
+   - **Isolated Precedence Attribution**: $R3 - R3_{\text{ablation}}$ (a matched resolver where structural mentions lacking sub-IDs immediately defer through the hypothesis ledger without Rule 3 fall-through, while valid structural partitions with sub-IDs execute identically to R3-R1).
+4. **Sealed Deterministic Fresh Worlds & Dual Freshness Audit**: 60 sealed deterministic fresh worlds ($120$ decisions) under generator version R3-R1 (PRNG seed `2718281828`), with an automated dual-freshness assertion verifying strictly **zero mention-level overlap** and **zero pair-level overlap** with frozen R3 across Arms 1, 3, 4A, and 4B.
 
 ---
 
@@ -51,7 +51,7 @@ When the neural prompt commanded *"Never guess or merge distinct entities withou
 | **Gate 5b** | Deterministic CPU Branch Coverage | $\equiv \text{PASS}$ across all 5 branches | Synthetic injection proves `RETARGETED`, `CONFIRMED`, `RESOLVED_EXISTING`, `RESOLVED_NOVEL`, `UNRESOLVED` |
 | **Gate 6** | Useful Resolvable Coverage ($N=97$ Resolvable) | $\ge 85.0\%$ across $N=97$ resolvable events | Useful admissions / 97 resolvable events |
 | **Gate 7** | Relational DB & Ledger Reconciliation | Strict 8 UNRESOLVED + 7 Resolved == 15 Total | Integrity OK, 0 FK violations, 120 execution records, 15 hypothesis rows |
-| **Audit** | Freshness Audit vs Frozen R3 | $\equiv \text{PASS}$ ($\text{Overlap} \equiv \emptyset$) | Machine-verifiable disjointness across Arms 1, 3, 4A, and 4B |
+| **Audit** | Dual Freshness Audit vs Frozen R3 | $\equiv \text{PASS}$ ($\text{Mention Overlap} \equiv 0 \land \text{Pair Overlap} \equiv 0$) | Machine-verifiable disjointness across Arms 1, 3, 4A, and 4B |
 
 ---
 

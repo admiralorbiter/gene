@@ -319,8 +319,8 @@ def verify_stage8c_r3_r1_contract(
     r2_replay = run_paired_comparator_replay(records, gold_manifest, EpistemicIngressSessionR2)
     ablation_replay = run_paired_comparator_replay(records, gold_manifest, EpistemicIngressSessionR3Ablation)
 
-    # 10. Freshness Audit vs Frozen Stage 8C-R3
-    is_fresh, overlap = verify_r3r1_freshness_against_r3()
+    # 10. Dual Freshness Audit vs Frozen Stage 8C-R3 (Mention-Level and Pair-Level)
+    is_fresh, m_ov_cnt, p_ov_cnt, m_ov, p_ov = verify_r3r1_freshness_against_r3()
 
     all_passed = (
         gate_1_pass
@@ -360,7 +360,9 @@ def verify_stage8c_r3_r1_contract(
         "gate_7_record_count": f"{rec_count}/120",
         "gate_7_pass": gate_7_pass,
         "freshness_audit_pass": is_fresh,
-        "freshness_overlap_count": len(overlap),
+        "freshness_mention_overlap_count": m_ov_cnt,
+        "freshness_pair_overlap_count": p_ov_cnt,
+
         "historical_r2_replay": {
             "coverage_pct": f"{r2_replay['coverage_pct']:.1f}% ({r2_replay['resolvable_correct']}/{r2_replay['total_resolvable']})",
             "total_gain_over_r2": f"+{coverage_pct - r2_replay['coverage_pct']:.1f}%",

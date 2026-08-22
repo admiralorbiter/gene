@@ -978,14 +978,14 @@
       {
         "doc_id": "world_r3r1_arm4b_02_doc_1",
         "source_id": "src_eng_r3r1_a4b_2_1",
-        "mention": "Unverified Host Pool",
-        "context": "Incident ticket: Unverified Host Pool reported degraded latency on interface 0."
+        "mention": "Unverified Baremetal Slice",
+        "context": "Incident ticket: Unverified Baremetal Slice reported degraded latency on interface 0."
       },
       {
         "doc_id": "world_r3r1_arm4b_02_doc_2",
         "source_id": "src_eng_r3r1_a4b_2_2",
-        "mention": "Unverified Host Pool (Cluster-Beta)",
-        "context": "Resolution log: Confirmed Unverified Host Pool refers to Cluster-Beta after routing check."
+        "mention": "Unverified Baremetal Slice (Cluster-Beta)",
+        "context": "Resolution log: Confirmed Unverified Baremetal Slice refers to Cluster-Beta after routing check."
       }
     ]
   },
@@ -1020,8 +1020,8 @@
       {
         "doc_id": "world_r3r1_arm4b_04_doc_2",
         "source_id": "src_eng_r3r1_a4b_4_2",
-        "mention": "Router-Alpha",
-        "context": "Topology update: Pending Uplink Interface is now bound to Router-Alpha."
+        "mention": "Pending Uplink Interface (Router-Alpha)",
+        "context": "Topology update: Pending Uplink Interface (Router-Alpha) is now bound and active."
       }
     ]
   },
@@ -1032,14 +1032,14 @@
       {
         "doc_id": "world_r3r1_arm4b_05_doc_1",
         "source_id": "src_eng_r3r1_a4b_5_1",
-        "mention": "Unallocated Server Blade",
-        "context": "Inventory check: Unallocated Server Blade located in staging rack."
+        "mention": "Unallocated Compute Node",
+        "context": "Inventory check: Unallocated Compute Node located in staging rack."
       },
       {
         "doc_id": "world_r3r1_arm4b_05_doc_2",
         "source_id": "src_eng_r3r1_a4b_5_2",
-        "mention": "Cluster-Alpha",
-        "context": "Provisioning log: Unallocated Server Blade assigned to Cluster-Alpha."
+        "mention": "Unallocated Compute Node (Cluster-Alpha)",
+        "context": "Provisioning log: Unallocated Compute Node (Cluster-Alpha) assigned to primary compute tier."
       }
     ]
   },
@@ -1050,8 +1050,8 @@
       {
         "doc_id": "world_r3r1_arm4b_06_doc_1",
         "source_id": "src_eng_r3r1_a4b_6_1",
-        "mention": "Uncommissioned Photonic Transceiver",
-        "context": "Lab draft: Uncommissioned Photonic Transceiver under bench testing."
+        "mention": "Uncommissioned Transceiver Bank",
+        "context": "Lab draft: Uncommissioned Transceiver Bank under bench testing."
       },
       {
         "doc_id": "world_r3r1_arm4b_06_doc_2",
@@ -1068,14 +1068,14 @@
       {
         "doc_id": "world_r3r1_arm4b_07_doc_1",
         "source_id": "src_eng_r3r1_a4b_7_1",
-        "mention": "Unconfirmed Compute Node",
-        "context": "Telemetry log: Unconfirmed Compute Node heartbeat observed on vlan 10."
+        "mention": "Unconfirmed Acceleration Board",
+        "context": "Telemetry log: Unconfirmed Acceleration Board heartbeat observed on vlan 10."
       },
       {
         "doc_id": "world_r3r1_arm4b_07_doc_2",
         "source_id": "src_eng_r3r1_a4b_7_2",
-        "mention": "Beta Compute Pool",
-        "context": "Network audit: Unconfirmed Compute Node is part of Beta Compute Pool."
+        "mention": "Unconfirmed Acceleration Board (Beta Compute Pool)",
+        "context": "Network audit: Unconfirmed Acceleration Board (Beta Compute Pool) verified active."
       }
     ]
   }
