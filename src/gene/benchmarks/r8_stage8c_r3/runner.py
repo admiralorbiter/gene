@@ -1,9 +1,9 @@
 """Confirmatory Benchmark Runner for Stage 8C-R3 (CONTRACT-R8-8C-R3).
-Implements the refined precedence rule:
+Implements the refined precedence rule with deterministic existence authority:
 - Rule 1: Exact Registered Alias / Name Match.
 - Rule 2: Structural First Refusal (Requires grounded parent AND discriminating sub-identifier).
 - Rule 3: Explicit Registered Parenthetical Identity Evidence in Mention/Context.
-- Rule 4: Novel Standalone System Commissioning Assertion.
+- Rule 4: Novel Standalone System Commissioning Assertion (Deterministic Existence Authority).
 - Rule 5: Non-Resolvable Fail-Closed Deferral.
 """
 
@@ -29,7 +29,7 @@ from gene.benchmarks.r8_stage8c_r3.worlds import (
 OLLAMA_API_URL = "http://127.0.0.1:11434/api/generate"
 MODEL_NAME = "gemma3:12b"
 
-PARTITION_MARKERS = ["partition", "blade", "slice", "tray", "socket", "pool", "rack", "enclosure", "lun"]
+PARTITION_MARKERS = ["partition", "blade", "slice", "tray", "socket", "pool", "rack", "enclosure", "lun", "bay"]
 SUB_IDENTIFIER_REGEX = re.compile(r"(?:\b|\s)(?:[0-9]+|[a-d])\b", re.IGNORECASE)
 
 
@@ -206,7 +206,9 @@ class EpistemicIngressSessionR3:
                     }
 
         # ---------------------------------------------------------------------
-        # Rule 4: Novel Standalone System Commissioning Assertion
+        # Rule 4: Novel Standalone System Commissioning Assertion (Deterministic Existence Authority)
+        # Existence != Identity: Asserted commissioning notice deterministically creates provisional entity
+        # Neural proposal is logged as advisory telemetry
         # ---------------------------------------------------------------------
         unasserted_indicators = ["proposal", "pending", "rejected", "mock", "hypothetical", "generic", "unspecified", "ephemeral", "simulation"]
         ctx_lower = context.lower()
@@ -216,54 +218,51 @@ class EpistemicIngressSessionR3:
         is_commissioned = any(ind in ctx_lower for ind in commissioning_indicators)
 
         if not is_unasserted and is_commissioned:
-            cand_action = neural_proposal.get("candidate_action")
-            if cand_action in ("CREATE_PROVISIONAL", "LINK_EXISTING"):
-                prov_id = f"prov_{mention.lower().replace(' ', '_')}"
-                if prov_id in self.durable_registry:
-                    edge = {
-                        "doc_id": doc_id,
-                        "source_id": source_id,
-                        "mention": mention,
-                        "target_id": prov_id,
-                        "action": "LINK",
-                    }
-                    self.provenance_edges.append(edge)
-                    return {
-                        "action": "LINK",
-                        "target_id": prov_id,
-                        "durable": True,
-                        "rule": "RULE_4_NOVEL_SYSTEM_LINK",
-                    }
-                else:
-                    # Register provisional system
-                    aliases = [mention]
-                    for p in parentheticals:
-                        if p not in aliases:
-                            aliases.append(p)
-                    self.durable_registry[prov_id] = {
-                        "entity_id": prov_id,
-                        "canonical_name": mention,
-                        "status": "provisional",
-                        "parent_entity": None,
-                        "aliases": aliases,
-                    }
-                    edge = {
-                        "doc_id": doc_id,
-                        "source_id": source_id,
-                        "mention": mention,
-                        "target_id": prov_id,
-                        "action": "CREATE_PROVISIONAL",
-                    }
-                    self.provenance_edges.append(edge)
-                    self.mutation_log.append(
-                        {"doc_id": doc_id, "action": "CREATE_PROVISIONAL", "target": prov_id, "durable": True}
-                    )
-                    return {
-                        "action": "CREATE_PROVISIONAL",
-                        "target_id": prov_id,
-                        "durable": True,
-                        "rule": "RULE_4_NOVEL_SYSTEM_CREATE",
-                    }
+            prov_id = f"prov_{mention.lower().replace(' ', '_')}"
+            if prov_id in self.durable_registry:
+                edge = {
+                    "doc_id": doc_id,
+                    "source_id": source_id,
+                    "mention": mention,
+                    "target_id": prov_id,
+                    "action": "LINK",
+                }
+                self.provenance_edges.append(edge)
+                return {
+                    "action": "LINK",
+                    "target_id": prov_id,
+                    "durable": True,
+                    "rule": "RULE_4_NOVEL_SYSTEM_LINK",
+                }
+            else:
+                aliases = [mention]
+                for p in parentheticals:
+                    if p not in aliases:
+                        aliases.append(p)
+                self.durable_registry[prov_id] = {
+                    "entity_id": prov_id,
+                    "canonical_name": mention,
+                    "status": "provisional",
+                    "parent_entity": None,
+                    "aliases": aliases,
+                }
+                edge = {
+                    "doc_id": doc_id,
+                    "source_id": source_id,
+                    "mention": mention,
+                    "target_id": prov_id,
+                    "action": "CREATE_PROVISIONAL",
+                }
+                self.provenance_edges.append(edge)
+                self.mutation_log.append(
+                    {"doc_id": doc_id, "action": "CREATE_PROVISIONAL", "target": prov_id, "durable": True}
+                )
+                return {
+                    "action": "CREATE_PROVISIONAL",
+                    "target_id": prov_id,
+                    "durable": True,
+                    "rule": "RULE_4_NOVEL_SYSTEM_CREATE",
+                }
 
         # ---------------------------------------------------------------------
         # Rule 5: Fail-Closed Ambiguous / Adversarial Deferral

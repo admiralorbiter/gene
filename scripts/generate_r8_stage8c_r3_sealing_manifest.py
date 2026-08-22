@@ -7,7 +7,7 @@ from pathlib import Path
 
 def generate_sealing_manifest():
     root = Path(__file__).resolve().parent.parent
-    base_sha = "1f3b0207345563ce903d00777455e1f8ed0f46f0"
+    base_sha = "05d9e93554021151085124dba04bce79075e9fdf"
 
     assets = [
         "src/gene/benchmarks/r8_stage8c_r3/prompts.py",
@@ -32,7 +32,7 @@ def generate_sealing_manifest():
 
     manifest_path = root / "research" / "contracts" / "SEALING_MANIFEST-R8-8C-R3.json"
     manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
-    print(f"Generated sealing manifest at: {manifest_path}")
+    print(f"Generated fresh sealing manifest at: {manifest_path}")
     print(json.dumps(manifest, indent=2))
 
 
