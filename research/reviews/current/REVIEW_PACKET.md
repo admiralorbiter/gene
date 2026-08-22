@@ -1,6 +1,6 @@
 # Evidence Review Packet: GENE (gene)
 **Active Contract**: `None`
-**Repository HEAD**: `cf4cba9fdfa10bc384b7d017e54417fa3feabdf0`
+**Repository HEAD**: `ce244465b2603f66a174cdbee479165a29fc15d4`
 
 ## 1. Project Moonshot & Conceptual Formalism
 # BOOTSTRAP.md — GENE Project Manual & Epistemic Specification
