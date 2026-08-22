@@ -22,7 +22,7 @@ Autonomous, provably fail-closed epistemic knowledge discovery & entity resoluti
 ### CANDIDATE EXECUTION AUDIT (Stage 8C-R2)
 - **Contract**: [`research/contracts/CONTRACT-R8-8C-R2.md`](file:///c:/Users/admir/Github/gene/research/contracts/CONTRACT-R8-8C-R2.md) (`status: FROZEN`, `authorized_by: human`)
 - **Promotion Review**: [`research/promotions/PROMOTION-CONTRACT-R8-8C-R2.md`](file:///c:/Users/admir/Github/gene/research/promotions/PROMOTION-CONTRACT-R8-8C-R2.md) (`status: CANDIDATE`)
-- **Candidate Commit**: `7f164a5c4015f8be7e1dc58778f6ec4ec250c6ca`
+- **Candidate Commit**: `7f164a5ea6d50dc4199c8c32bc9cee180195b97b`
 - **Execution Telemetry (120 Decisions across 60 Worlds on Gemma 3 12B)**:
   - **Gate 1 (Neural Proposal Quality)**: 65.0% (78/120)
   - **Gate 2a (Hybrid Durable False Merge Floor)**: **0/120 (0.0%, PASS)**
