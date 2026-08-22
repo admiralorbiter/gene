@@ -5,13 +5,12 @@ proposed_by: antigravity
 design_review: APPROVED
 reviewed_by: chatgpt-pro
 authorized_by: human
-base_sha: f7e178b871cffaf97f1f0a20468962629b3c4349
+base_sha: f7e178bf979a3ebcec95d4c16269cf43f34cb77b
 execution_base_sha: 3694277012da8dae69bf185750d7f51b8d8a9931
-resource:
-  class: gpu
-  exclusive_gpu: true
-  long_running: true
-  interruptible: false
+resource_class: gpu
+long_running: true
+exclusive_gpu: true
+interruptible: false
 ---
 
 # Research Contract Proposal: CONTRACT-R8-8C-R2 (Two-Stage Epistemic Ingress: Existence vs Identity Decoupling)
