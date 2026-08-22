@@ -1,17 +1,17 @@
 ---
 promotion_id: PROMOTION-CONTRACT-R8-8C-R3-R1
 contract_id: CONTRACT-R8-8C-R3-R1
-status: REVISED_CONTRACT_REQUIRED
-candidate_sha: ad2295a27b93685b0cd85b3e1754742cdd1ad9be
-generated_at: "2026-08-22 11:43:00Z"
-repair_rounds: 0
+status: CANDIDATE
+candidate_sha: 295d1c78fd3ee2e11a5990f49e3520680a676ac5
+generated_at: "2026-08-22 11:54:00Z"
+repair_rounds: 1
 reviewed_by: chatgpt-pro
 authorized_by: null
 ---
 
-# Promotion Review Record: PROMOTION-CONTRACT-R8-8C-R3-R1 (Definitive Stage 8 Closure & Epistemic Ingress Decoupling)
+# Promotion Candidate Record: PROMOTION-CONTRACT-R8-8C-R3-R1 (Definitive Stage 8 Closure & Epistemic Ingress Decoupling)
 
-**Lifecycle Status**: `REVISED_CONTRACT_REQUIRED` (Confirmatory Evidence Preserved in Tree; Review Desk Evaluation: REVISED_CONTRACT_REQUIRED)
+**Lifecycle Status**: `CANDIDATE` (Implementation Repair Round 1: ALL 10 GATES PASS; Awaiting Review Desk Evaluation & Human Strategic Promotion Authorization)
 
 ---
 
@@ -20,10 +20,10 @@ authorized_by: null
 - **Target Contract**: `CONTRACT-R8-8C-R3-R1` ([`research/contracts/CONTRACT-R8-8C-R3-R1.md`](../contracts/CONTRACT-R8-8C-R3-R1.md))
 - **Base SHA**: `92400bf22a24316e5c1522489a1a003c365fe848`
 - **Execution Base SHA**: `c13fae42bfb064a01b7be5c205350038997fb97b`
-- **Candidate Evidence SHA**: `ad2295a27b93685b0cd85b3e1754742cdd1ad9be`
+- **Candidate Evidence SHA**: `295d1c78fd3ee2e11a5990f49e3520680a676ac5`
 - **Model**: Gemma 3 12B Instruct (Q4_K_M) via local Ollama endpoint.
-- **Hardware Environment**: NVIDIA GeForce RTX 3060 12GB (Exclusive GPU compute).
-- **Execution Performance**: 120 sequential decisions completed in **1070.66s**.
+- **Hardware Environment**: NVIDIA GeForce RTX 3060 12GB (Exclusive GPU execution).
+- **Execution Performance**: 120 sequential decisions completed in **333.23s (5.55 minutes)** on uncontested GPU (averaging **2.78s per decision**).
 - **Evidence Package**: Committed in tree at:
   - Evidence JSONL: [`data/r8_stage8c_r3_r1_candidate_evidence.jsonl`](../../data/r8_stage8c_r3_r1_candidate_evidence.jsonl)
   - Relational Database: [`data/r8_stage8c_r3_r1_registry.sqlite`](../../data/r8_stage8c_r3_r1_registry.sqlite)
@@ -37,12 +37,13 @@ authorized_by: null
 | **Gate 1** | Neural Proposal Telemetry Logging | Logged across all $N=120$ decisions | **120 / 120 logged (100.0%)** | **PASS** |
 | **Gate 2a** | False Canonical Merge Floor | $\equiv 0.0\%$ ($0/120$ false merges) | **0 / 120 false merges (0.0%)** | **PASS** |
 | **Gate 2b** | False Provisional on Unasserted (Arm 4A Sentinel) | $\equiv 0.0\%$ ($0/16$ unasserted) | **0 / 16 false creations (0.0%)** | **PASS** |
+| **Gate 2c** | Global False Provisional Invariant (Claim Ceiling) | $\equiv 0.0\%$ ($0/120$ decisions) | **0 / 120 false creations (0.0%)** | **PASS** |
 | **Gate 3** | Provisional Entity Fragmentation | $\equiv 0$ duplicate provisional creations | **0 duplicate creations** | **PASS** |
 | **Gate 4** | Permanent Deferral Invariant (Arm 4A) | $\ge 7/8$ ($87.5\%$) fully deferred worlds | **8 / 8 worlds fully deferred (100.0%)** | **PASS** |
-| **Gate 5** | Live Lifecycle State Machine (Arm 4B) | $\equiv 7/7$ sound transitions | **6 / 7 sound transitions** (See Dissection) | **FAILED** |
+| **Gate 5** | Live Lifecycle State Machine (Arm 4B) | $\equiv 7/7$ sound transitions | **7 / 7 sound transitions (100.0%)** | **PASS** |
 | **Gate 5b** | Deterministic CPU Branch Coverage | $\equiv \text{PASS}$ across all 5 branches | **All 5 branches PASS (100.0%)** | **PASS** |
 | **Gate 6** | Useful Resolvable Coverage ($N=97$ Resolvable) | $\ge 85.0\%$ across $N=97$ resolvable events | **97 / 97 (100.0% Coverage)** | **PASS** |
-| **Gate 7** | Relational DB & Ledger Reconciliation | Strict 8 UNRESOLVED + 7 Resolved == 15 Total | **14 / 15 Hypotheses (Arm 4B_05 missed)** | **FAILED** |
+| **Gate 7** | Relational DB & Ledger Reconciliation | Strict 8 UNRESOLVED + 7 Resolved == 15 Total | **15 / 15 Hypotheses, 120 Records, 0 FK Errors** | **PASS** |
 | **Audit** | Dual Freshness Audit vs Frozen R3 | $\equiv \text{PASS}$ (0 mention & 0 pair overlap) | **0 mention overlap, 0 pair overlap** | **PASS** |
 
 ---
@@ -57,23 +58,15 @@ $$\begin{array}{l|c|c|c|c|c}
 \text{Historical Frozen Stage 8C-R2} & 84.5\% \ (82/97) & \mathbf{+15.5\%} & 82 & \mathbf{15} & \mathbf{0}
 \end{array}$$
 
-- **Total Historical Gain over R2**: $+15.5\%$ ($15$ recoveries, $0$ regressions).
-- **Isolated Causal Effect of Precedence Refinement**: $+4.1\%$ ($4$ recoveries, $0$ regressions) directly attributable to allowing missing-sub-ID structural mentions to defer and resolve via registered parentheticals.
+- **Isolated Precedence Attribution**: $+4.1\%$ ($4$ recovered cases, $0$ regressions) directly isolated by the matched ablation.
+- **Total Historical Gain over R2**: $+15.5\%$ ($15$ recovered cases, $0$ regressions).
 
 ---
 
-## 4. Root Cause Dissection: Substring Collision on `"allocated"`
+## 4. Scientific Claim Ceiling
 
-In `world_r3r1_arm4b_05_doc_1`:
-- **Surface Mention**: `"Unallocated Compute Node"`
-- **Context**: `"Inventory check: Unallocated Compute Node located in staging rack."`
-- **Mechanism**: In `Rule 4`, the commissioning keyword list `["commissioning", "deployment", "active in production", "initial provisioning", "allocated"]` used raw substring matching (`any(ind in ctx_lower)`). The substring `"allocated"` matched inside `"Unallocated"`, falsely asserting commissioning existence and creating `prov_unallocated_compute_node` rather than deferring.
-- **Remedy**: Use literal whole-token/whole-phrase matching (`contains_literal_phrase`) to prevent prefix/antonym collisions.
+### Certified Finding Authorized Upon Promotion
+> In a controlled synthetic streaming hardware benchmark ($N=60$ fresh worlds, $120$ decisions), hybrid neural-symbolic ingress with refined precedence achieves $100.0\%$ useful admission coverage on resolvable events with $0.0\%$ false canonical merges and $0.0\%$ false provisional creations globally across the entire benchmark, while the deterministic hypothesis ledger maintains $100.0\%$ sound evidence accumulation across all lifecycle transitions.
 
----
-
-## 5. Epistemic Summary
-
-R3-R1 produced strong candidate support for the ingress architecture and causal precedence effect, but did not satisfy the promotion claim ceiling because one false provisional commitment occurred due to a deterministic substring-matching implementation defect.
-
-This defect is isolated and resolved under **Implementation Repair Round 1** (`CONTRACT-R8-8C-R3-R1`).
+### Explicit Exclusions
+This contract does **NOT** authorize claims of unstructured open-world entity resolution, unsupervised ontology discovery, or autonomous claim-level truth maintenance (which begins in Stage 9).
