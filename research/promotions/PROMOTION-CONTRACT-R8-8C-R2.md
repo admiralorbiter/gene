@@ -7,7 +7,7 @@ reviewed_by: chatgpt-pro
 authorized_by: human
 base_sha: f7e178bf979a3ebcec95d4c16269cf43f34cb77b
 execution_base_sha: 3694277012da8dae69bf185750d7f51b8d8a9931
-candidate_sha: 1a00901d72059119fda11ec14dbe5e8173b2ab86
+candidate_sha: 7f164a5ea6d50dc4199c8c32bc9cee180195b97b
 ---
 
 # Research Promotion Review: CONTRACT-R8-8C-R2 (Two-Stage Epistemic Ingress)
@@ -58,7 +58,7 @@ The sealed confirmatory benchmark for **CONTRACT-R8-8C-R2** was executed across 
 ## 3. Implementation Auditor & Review Desk Verdict
 
 - **Final Disposition**: `REVISED_CONTRACT_REQUIRED` (Stage 8C-R3).
-- **Provenance**: Candidate branch `mb/CONTRACT-R8-8C-R2` pinned at commit `1a00901d72059119fda11ec14dbe5e8173b2ab86`.
+- **Provenance**: Candidate branch `mb/CONTRACT-R8-8C-R2` pinned at commit `7f164a5ea6d50dc4199c8c32bc9cee180195b97b`.
 - **Roadmap Directive for Stage 8C-R3**:
   - Clarify Rule 2 & Rule 3 hierarchy: Structural first refusal activates *only* when a mention contains a grounded parent and a valid discriminating structural sub-identifier. Mentions lacking a discriminating sub-identifier defer *unless* explicit registered parenthetical identity evidence is present.
   - Generate fresh sealed synthetic worlds (R2 worlds preserved as burned development evidence).
