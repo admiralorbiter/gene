@@ -1,10 +1,10 @@
 ---
 contract_id: CONTRACT-R8-8C
-status: DRAFT
+status: FROZEN
 proposed_by: antigravity
 design_review: APPROVED
 reviewed_by: chatgpt-pro
-authorized_by: null
+authorized_by: human
 base_sha: ba6d5e10df44b36d4629053b13732c98cc1616e4
 execution_base_sha: null
 resource_class: llm_inference
