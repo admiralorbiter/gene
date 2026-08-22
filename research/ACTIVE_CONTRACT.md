@@ -1,22 +1,19 @@
 ---
-state: READY
-active_contract_id: CONTRACT-R8-8C-R3
-contract_path: research/contracts/CONTRACT-R8-8C-R3.md
-base_sha: 1f3b0207345563ce903d00777455e1f8ed0f46f0
-execution_base_sha: 19713d22c3b4fe50181fb82631eff8c242b5195a
+state: IDLE
+active_contract_id: null
+contract_path: null
+execution_base_sha: null
 last_checkpoint: research/checkpoints/CHECKPOINT-R8-8B.md
-last_promotion: research/promotions/PROMOTION-CONTRACT-R8-8C-R2.md
+last_promotion: research/promotions/PROMOTION-CONTRACT-R8-8C-R3.md
 ---
 
 # Active Research Contract Pointer
 
-**Current Operational State**: `READY`
+**Current Operational State**: `IDLE`
 
 This document provides the machine-discoverable operational entry point for autonomous research agents and Mother Base.
 
 ## Active Contract Details
-- **Active Contract ID**: `CONTRACT-R8-8C-R3`
-- **Contract Path**: [`research/contracts/CONTRACT-R8-8C-R3.md`](contracts/CONTRACT-R8-8C-R3.md)
-- **Base SHA**: `1f3b0207345563ce903d00777455e1f8ed0f46f0`
-- **Execution Base SHA**: `19713d22c3b4fe50181fb82631eff8c242b5195a`
-- **Sealing Manifest**: [`research/contracts/SEALING_MANIFEST-R8-8C-R3.json`](contracts/SEALING_MANIFEST-R8-8C-R3.json)
+- **Active Contract ID**: None (`IDLE` state following CONTRACT-R8-8C-R3 disposition `REVISED_CONTRACT_REQUIRED`)
+- **Last Checkpoint**: [`research/checkpoints/CHECKPOINT-R8-8B.md`](checkpoints/CHECKPOINT-R8-8B.md)
+- **Last Promotion**: [`research/promotions/PROMOTION-CONTRACT-R8-8C-R3.md`](promotions/PROMOTION-CONTRACT-R8-8C-R3.md) (`REVISED_CONTRACT_REQUIRED`)
