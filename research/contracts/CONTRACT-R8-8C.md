@@ -7,9 +7,9 @@ reviewed_by: chatgpt-pro
 authorized_by: human
 base_sha: ba6d5e10df44b36d4629053b13732c98cc1616e4
 execution_base_sha: 4af9c400540a685eea1182e59428fb8fca14add1
-resource_class: llm_inference
+resource_class: gpu
 long_running: false
-exclusive_gpu: false
+exclusive_gpu: true
 interruptible: true
 ---
 
