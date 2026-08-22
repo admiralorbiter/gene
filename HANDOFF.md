@@ -2,7 +2,7 @@
 
 **Generated**: 2026-08-22 03:50:00Z  
 **Project**: `gene`  
-**generated_from_sha**: `df914229b0f4fa9bdf01691a5be0cce434c06b24`  
+**generated_from_sha**: `df91422`  
 **Last Checkpointed State**: Merged `mb/CONTRACT-R8-8C-R1` into `main` (`f7e178b`)  
 **Operational State**: `IDLE` (Stage 8C-R2 contract design approved; awaiting strategic human authorization)
 
