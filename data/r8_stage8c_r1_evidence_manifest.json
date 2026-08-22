@@ -1,0 +1,8 @@
+{
+  "candidate_id": "CANDIDATE-R8-8C-R1",
+  "contract_id": "CONTRACT-R8-8C-R1",
+  "model_digest": "gemma3:12b",
+  "jsonl_sha256": "2c407126727456a09db74382067b9c88eec1f07dde30d0764e31717ad1394fa3",
+  "summary_sha256": "3bebea6bb159db167556a380937a775bd2b0b6f0f6d100c871c2ba1fafb5f0be",
+  "sqlite_sha256": "0cb71caf80514ac57fe9cc38889789705c2bb32856c3b529163350001167d4a4"
+}
