@@ -1,0 +1,11 @@
+{
+  "contract_id": "CONTRACT-R8-8C-R3",
+  "base_sha": "1f3b0207345563ce903d00777455e1f8ed0f46f0",
+  "assets": {
+    "src/gene/benchmarks/r8_stage8c_r3/prompts.py": "0ef62621a79057fc1a2d9f0660a539ba045a8f730b6a3c4a1872f76959d816d7",
+    "src/gene/benchmarks/r8_stage8c_r3/worlds.py": "804732196c0252bba7effc2340fc002d71eae112dfdb332469a5ae695a712b35",
+    "src/gene/benchmarks/r8_stage8c_r3/runner.py": "a8986e9ae97206b7c2a10ceec9a8c9b904d07af42b3365b198da5659ec6945bd",
+    "src/gene/benchmarks/r8_stage8c_r3/verifier.py": "92fd6cb988c0516aec59e65572ec88399daacf939595279126b62a7a100ac626",
+    "research/contracts/CONTRACT-R8-8C-R3.md": "ec525b0887d1221ea63eed584f4af98f55d4f15b8cbb7e7bf6d51b5d812e8d20"
+  }
+}
