@@ -514,11 +514,11 @@ def run_stage8c_r3_benchmark(
                 for k, v in session.durable_registry.items()
             }
             prompt = format_stage8c_r3_prompt(
-                registry_json=json.dumps(reg_view, indent=2),
                 doc_id=doc_id,
                 source_id=src_id,
-                mention_text=mention,
-                narrative_context=ctx,
+                mention=mention,
+                context=ctx,
+                durable_registry=session.durable_registry,
             )
 
             # Query Gemma 3 12B

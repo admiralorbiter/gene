@@ -1,15 +1,15 @@
 ---
 contract_id: CONTRACT-R8-8C-R3
-status: DRAFT
+status: FROZEN
 base_sha: 1f3b0207345563ce903d00777455e1f8ed0f46f0
 resource_class: gpu
 long_running: false
 exclusive_gpu: true
 interruptible: true
 proposed_by: antigravity
-design_review: CHANGES_REQUESTED
+design_review: APPROVED
 reviewed_by: chatgpt-pro
-authorized_by: null
+authorized_by: human
 ---
 
 # Research Contract: CONTRACT-R8-8C-R3 (Two-Stage Epistemic Ingress with Refined Precedence)
@@ -54,7 +54,7 @@ $$\text{Mention } s \longrightarrow \begin{cases}
 | **Gate 4** | Permanent Deferral Invariant (Arm 4A World-Level) | $\ge 7/8$ ($87.5\%$) fully deferred worlds |
 | **Gate 5** | Evidence Accumulation Lifecycle Matrix (Arm 4B) | $\equiv 7/7$ exact world lifecycle transitions ($100.0\%$) |
 | **Gate 6** | Useful Resolvable Coverage ($N=97$ Resolvable) | $\ge 85.0\%$ across $N=97$ resolvable decisions |
-| **Gate 7** | Relational DB & Hypothesis Ledger Reconciliation | SQLite integrity ok, 0 FK errors, full edge/hypo ledger |
+| **Gate 7** | Relational DB & Hypothesis Ledger Reconciliation | Strict 8 UNRESOLVED + 7 Resolved == 15 Total, 0 FK errors |
 
 ---
 

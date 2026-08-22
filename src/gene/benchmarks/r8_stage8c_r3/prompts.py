@@ -27,6 +27,7 @@ def format_stage8c_r3_prompt(
     context: str,
     durable_registry: Dict[str, Any],
 ) -> str:
+    """Formats the complete prompt incorporating the system instructions, current durable registry, and document mention."""
     entities_formatted = []
     for eid, edata in sorted(durable_registry.items()):
         cname = edata.get("canonical_name", "")
@@ -37,7 +38,9 @@ def format_stage8c_r3_prompt(
 
     reg_text = "\n".join(entities_formatted) if entities_formatted else "(Empty registry)"
 
-    return f"""Current Durable Entity Registry:
+    return f"""{STAGE8C_R3_SYSTEM_PROMPT}
+
+Current Durable Entity Registry:
 {reg_text}
 
 New Document Event:
