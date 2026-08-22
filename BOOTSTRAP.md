@@ -23,19 +23,15 @@ GENE autonomously ingests unstructured scientific and system literature, constru
 
 ---
 
-## 3. The Core Invariant: Existence Authority $\ne$ Identity Authority
+## 3. PROMOTED / ESTABLISHED (Durable Scientific Baseline)
 
-- **Question 1: Does strong evidence establish that a distinct device exists?**
-  Explicit deployment, commissioning, provisioning, or standalone hardware assertions in the text provide sufficient evidence of physical existence to authorize **reversible provisional entity creation** (`CREATE_PROVISIONAL`), without requiring neural model agreement.
-- **Question 2: Does strong evidence establish canonical identity?**
-  Strict whole-field exact matching or explicit parenthetical identifying corroboration is required to authorize a durable canonical `LINK`.
+- **Stage 8A / 8B (Initial Ingress & Alias Resolution — PROMOTED)**: Established 100% precision on exact registered aliases and baseline ingress fail-closed guardrails.
 
 ---
 
-## 4. Lineage Progression: Stage 8A $\to$ 8B $\to$ 8C-R1 $\to$ 8C-R2
+## 4. CANDIDATE & CHECKPOINTED WORK (Executed Benchmarks)
 
-- **Stage 8A / 8B (Initial Ingress & Alias Resolution — PROMOTED)**: Established $100\%$ precision on exact registered aliases and baseline ingress fail-closed guardrails.
-- **Stage 8C-R1 (Non-Durable Hypothesis Ledger — COMPLETED / REVISED_CONTRACT_REQUIRED)**:
+- **Stage 8C-R1 (Non-Durable Hypothesis Ledger — Checkpointed to `f7e178b`, Status: `SUPERSEDED` / `REVISED_CONTRACT_REQUIRED`)**:
   - Executed 120-decision confirmatory benchmark across 60 fresh synthetic worlds with Gemma 3 12B.
   - Rescored with world-local identity binding:
     - **Canonical False Merge Floor**: **$0 / 120$ ($0.0\%$, Gate 2a PASS)**.
@@ -44,16 +40,21 @@ GENE autonomously ingests unstructured scientific and system literature, constru
     - **Exact Aliases (Arm 2)**: **$30 / 30$ ($100.0\%$)**.
     - **Useful Resolvable Coverage**: **$76 / 97$ ($78.4\%$)**.
   - Identified the Existence vs Identity conflation bottleneck in Arm 1 ($12/30$) and ambiguous structural markers (World 53).
-- **Stage 8C-R2 (Two-Stage Epistemic Ingress — DRAFT / DESIGN APPROVED)**:
-  - Hardened with explicit Existence Authority vs Identity Authority decoupling.
-  - Precedence hierarchy: Registered Alias $\to$ Structural Partition $\to$ Parenthetical Corroboration $\to$ Standalone Existence $\to$ Unresolved Hypothesis.
-  - Discriminating sub-identifier regex requiring at least one digit (`(?i)\b(?:[a-z]*\d[a-z0-9_-]*|\d+[a-z0-9_-]*)\b`).
-  - Semantic False Provisional Existence Floor Gate 2b ($\text{FDAR}_{\text{prov}} \equiv 0.0\%$).
-  - First-class nullable hypothesis candidates ($\text{UNRESOLVED}(\text{candidate}=\text{null})$).
 
 ---
 
-## 5. Falsified Practices / DO NOT REOPEN
+## 5. ACTIVE PROPOSALS & BENCHMARKS (Pre-Execution / Design Approved)
+
+- **Stage 8C-R2 (Two-Stage Epistemic Ingress — Status: `DRAFT`, Design Review: `APPROVED`)**:
+  - Decouples provisional-existence authority from canonical-identity authority.
+  - Enforces precedence hierarchy: Exact Registered Alias $\to$ Grounded Structural Partition $\to$ Parenthetical Corroboration $\to$ Standalone Existence $\to$ Unresolved Hypothesis.
+  - Requires discriminating sub-identifier regex with at least one digit (`(?i)\b(?:[a-z]*\d[a-z0-9_-]*|\d+[a-z0-9_-]*)\b`).
+  - Preregisters Semantic False Provisional Existence Floor Gate 2b ($\text{FDAR}_{\text{prov}} \equiv 0.0\%$).
+  - Supports first-class nullable hypothesis candidates ($\text{UNRESOLVED}(\text{candidate}=\text{null})$).
+
+---
+
+## 6. FALSIFIED PRACTICES / DO NOT REOPEN (Epistemic Boundary)
 1. **Conflating Existence with Identity**: Forcing standalone deployment notices to require neural `NOVEL` keyword agreement suppresses resolvable coverage.
 2. **Permissive Structural Partitions without Sub-Identifiers**: Treating `"sub-unit"` alone as a partition creator causes benchmark/contract conflicts on ungrounded composites (World 53).
 3. **Forced Candidate Targets in Hypotheses**: Requiring non-null candidate targets forces guessing on unevidenced composites.
@@ -61,7 +62,7 @@ GENE autonomously ingests unstructured scientific and system literature, constru
 
 ---
 
-## 6. Canonical Evidence & Repositories
+## 7. Canonical Repositories & Evidence Paths
 - **Durable Checkpoints**: `research/checkpoints/`
 - **Research Contracts**: `research/contracts/`
 - **Promotion Records**: `research/promotions/`
