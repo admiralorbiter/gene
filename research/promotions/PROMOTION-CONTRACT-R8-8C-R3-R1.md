@@ -1,17 +1,17 @@
 ---
 promotion_id: PROMOTION-CONTRACT-R8-8C-R3-R1
 contract_id: CONTRACT-R8-8C-R3-R1
-status: CANDIDATE
+status: PROMOTED
 candidate_sha: 295d1c78fd3ee2e11a5990f49e3520680a676ac5
 generated_at: "2026-08-22 11:54:00Z"
 repair_rounds: 1
 reviewed_by: chatgpt-pro
-authorized_by: null
+authorized_by: human
 ---
 
-# Promotion Candidate Record: PROMOTION-CONTRACT-R8-8C-R3-R1 (Definitive Stage 8 Closure & Epistemic Ingress Decoupling)
+# Promotion Record: PROMOTION-CONTRACT-R8-8C-R3-R1 (Definitive Stage 8 Closure & Epistemic Ingress Decoupling)
 
-**Lifecycle Status**: `CANDIDATE` (Implementation Repair Round 1: ALL 10 GATES PASS; Awaiting Review Desk Evaluation & Human Strategic Promotion Authorization)
+**Lifecycle Status**: `PROMOTED` (Implementation Repair Round 1: ALL 10 GATES PASS; Scientifically Reviewed & Authorized for Promotion by Human Research Director)
 
 ---
 
@@ -63,10 +63,8 @@ $$\begin{array}{l|c|c|c|c|c}
 
 ---
 
-## 4. Scientific Claim Ceiling
+## 4. Certified Scientific Finding
 
-### Certified Finding Authorized Upon Promotion
 > In a controlled synthetic streaming hardware benchmark ($N=60$ fresh worlds, $120$ decisions), hybrid neural-symbolic ingress with refined precedence achieves $100.0\%$ useful admission coverage on resolvable events with $0.0\%$ false canonical merges and $0.0\%$ false provisional creations globally across the entire benchmark, while the deterministic hypothesis ledger maintains $100.0\%$ sound evidence accumulation across all lifecycle transitions.
 
-### Explicit Exclusions
-This contract does **NOT** authorize claims of unstructured open-world entity resolution, unsupervised ontology discovery, or autonomous claim-level truth maintenance (which begins in Stage 9).
+Stage 8 (Epistemic Ingress & Hypothesis Ledgering) is formally **PROMOTED** and closed.
