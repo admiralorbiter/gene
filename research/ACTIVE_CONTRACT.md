@@ -1,5 +1,5 @@
 ---
-state: READY
+state: RUNNING
 active_contract_id: CONTRACT-R8-8C-R2
 contract_path: research/contracts/CONTRACT-R8-8C-R2.md
 execution_base_sha: 3694277012da8dae69bf185750d7f51b8d8a9931
@@ -9,7 +9,7 @@ last_promotion: research/promotions/PROMOTION-CONTRACT-R8-8C-R1.md
 
 # Active Research Contract Pointer
 
-**Current Operational State**: `READY`
+**Current Operational State**: `RUNNING`
 
 This document provides the machine-discoverable operational entry point for autonomous research agents and Mother Base.
 
