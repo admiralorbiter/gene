@@ -1,12 +1,12 @@
 ---
 contract_id: CONTRACT-R8-8C-R1
-status: FROZEN
+status: SUPERSEDED
 proposed_by: antigravity
 design_review: APPROVED
 reviewed_by: chatgpt-pro
 authorized_by: human
-base_sha: e7d921dfce8d5101f6f8758570a86ecbeac52e66
-execution_base_sha: 2513f5c7b29a773f45a83aa8028aeb28a6e2fdec
+base_sha: 52ebfe1fa4a2ee6fca55a3f12461ff36fdfd5c8a
+execution_base_sha: 69949528d22736125026df16e91cb39f50e8b2ea
 resource_class: gpu
 long_running: false
 exclusive_gpu: true
