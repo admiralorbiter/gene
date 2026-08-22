@@ -2,7 +2,7 @@
 promotion_id: PROMOTION-CONTRACT-R8-8C
 contract_id: CONTRACT-R8-8C
 status: REVISED_CONTRACT_REQUIRED
-candidate_sha: 7b781ff9286d9b4b0e5ee05c0ec2826cfdb3c19e
+candidate_sha: 7b781ff553333cbfe7ec07b9087a5528d4a09016
 generated_at: "2026-08-22 02:04:00Z"
 repair_rounds: 0
 reviewed_by: chatgpt-pro
