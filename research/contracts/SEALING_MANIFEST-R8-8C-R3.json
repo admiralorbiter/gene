@@ -1,12 +1,13 @@
 {
   "contract_id": "CONTRACT-R8-8C-R3",
   "base_sha": "1f3b0207345563ce903d00777455e1f8ed0f46f0",
+  "execution_base_sha": "19713d22c3b4fe50181fb82631eff8c242b5195a",
   "assets": {
-    "src/gene/benchmarks/r8_stage8c_r3/prompts.py": "0ef62621a79057fc1a2d9f0660a539ba045a8f730b6a3c4a1872f76959d816d7",
+    "src/gene/benchmarks/r8_stage8c_r3/prompts.py": "ebcd549521468d3deeb619af7327c09d35552f65637fa67ef7902112ca246b5d",
     "src/gene/benchmarks/r8_stage8c_r3/worlds.py": "197f6eb1aef1c7d929f6b583584c54ca70ea5510439039122b5f3858be255c35",
-    "src/gene/benchmarks/r8_stage8c_r3/runner.py": "79a7ea82d404e7c2f0b0ffddaa4a43b325d3eac8df529b149e7e4a8d37867442",
+    "src/gene/benchmarks/r8_stage8c_r3/runner.py": "4e3437b1baba8c86c298c7f4264c34a90c77d9c8b83c3d9bc0fe1ddc0e44d2f2",
     "src/gene/benchmarks/r8_stage8c_r3/verifier.py": "e2fef0f5e1c870e22488cc8a2c9ee9632a948abe50e7bae866184c164427ba5e",
-    "research/contracts/CONTRACT-R8-8C-R3.md": "833a4214005ae1fe1aa6014fb95aa931fee95cd777432a28eaf9e2621bf1771c",
+    "research/contracts/CONTRACT-R8-8C-R3.md": "64a1422bad2440d2af46fe849ff7dd3c4f2247ddbcff6dbcc0dd5b531c1705cd",
     "research/contracts/WORLDS-R8-8C-R3.json": "e447bb06f16c258086225ee27f1870c0d3f43f68aec1658880c2212540589016",
     "research/contracts/GOLD_MANIFEST-R8-8C-R3.json": "49cdc104596049dd8192943c8d160d5ccccc312ad33eef5e084a7533f539c0ba"
   }

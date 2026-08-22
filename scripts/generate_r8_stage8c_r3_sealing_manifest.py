@@ -36,6 +36,7 @@ def generate_sealing_manifest():
     manifest = {
         "contract_id": "CONTRACT-R8-8C-R3",
         "base_sha": base_sha,
+        "execution_base_sha": "19713d22c3b4fe50181fb82631eff8c242b5195a",
         "assets": {},
     }
 
