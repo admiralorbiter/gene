@@ -2,7 +2,7 @@
 contract_id: CONTRACT-R8-8C-R2
 status: DRAFT
 proposed_by: antigravity
-design_review: null
+design_review: APPROVED
 reviewed_by: chatgpt-pro
 authorized_by: null
 base_sha: f7e178b871cffaf97f1f0a20468962629b3c4349
@@ -20,7 +20,7 @@ Stage 8C-R2 Confirmatory Benchmark: Two-Stage Epistemic Ingress via Existence vs
 
 ## 1. Context & Research Problem
 In `PROMOTION-CONTRACT-R8-8C-R1` (checkpointed to durable base `f7e178b`), the hybrid epistemic architecture established:
-- Zero canonical false merges ($0/120, 0.0\%$, Gate 2 PASS).
+- Zero canonical false merges ($0/120, 0.0\%$, Gate 2a PASS).
 - Zero provisional entity fragmentation (Gate 3 PASS).
 - 93.3% accuracy on structural partitions ($28/30$, Arm 3) and 100% on canonical alias linking ($30/30$, Arm 2).
 - Zero premature mutations on Document 1 and 92.9% resolution on Document 2 ($13/14$, Arm 4B).
@@ -57,15 +57,15 @@ However, R1 identified the following safety and structural boundaries:
 ```
 
 ### Principle B: Grounded Structural Partition Grammar & Literal Precedence
-Deterministic evaluation strictly follows this frozen precedence order:
-1. **Exact Registered Alias Match**: Whole-field normalized match against durable canonical registry $\implies$ `LINK`.
-2. **Parenthetical Corroboration**: Explicit `"Surface (Identifier)"` matching active hypothesis or registered entity $\implies$ `LINK` / `RETARGET`.
-3. **Grounded Structural Partition Parse**:
-   - Requires ALL THREE conjuncts:
-     1. *Grounded Parent*: Exact prefix match to an existing registered canonical entity (e.g. `"Compute Cluster 1"`).
-     2. *Structural Marker*: `{"partition", "shelf", "pool", "blade", "bay", "node", "unit", "subunit", "sub-unit", "core", "switch"}`.
-     3. *Distinct Sub-Identifier*: Explicit designator matching `\b(shelf|pool|blade|bay|node|unit|core|switch)?\s*([0-9]+[a-z0-9\-_]*|[a-z0-9\-_]+)\b` (e.g. `"1-A"`, `"Shelf 1"`, `"Pool 3"`).
-   - If parent + marker exist but **sub-identifier is absent** (e.g. `"Tensor Pod Three Sub-Unit"`), rule transitions directly to `UNRESOLVED` hypothesis without provisional creation.
+Deterministic evaluation strictly follows this frozen precedence hierarchy:
+1. **Exact Whole-Mention Registered Identity**: Whole-field normalized match against durable canonical registry $\implies$ `LINK`.
+2. **Structural-Form Detection / Partition Parse**:
+   - Matches if mention begins with a recognized registered parent stem + structural marker in `{"partition", "shelf", "pool", "blade", "bay", "node", "unit", "subunit", "sub-unit", "core", "switch"}`.
+   - *Structural First Refusal*: Generic parenthetical canonical linking is **strictly prohibited** whenever the structural-form predicate matches.
+   - Requires a distinct discriminating sub-identifier matching regex `(?i)\b(?:[a-z]*\d[a-z0-9_-]*|\d+[a-z0-9_-]*)\b` (requiring at least one digit, e.g. `"1-A"`, `"Shelf 1"`, `"Pool 3"`, `"Node A7"`).
+   - If sub-identifier is valid $\implies$ `CREATE_PROVISIONAL` (partition).
+   - If sub-identifier is missing (e.g. `"Tensor Pod Three Sub-Unit"`) $\implies$ transitions directly to `UNRESOLVED` hypothesis (no provisional created).
+3. **Explicit Parenthetical Corroboration (Non-Structural Mentions Only)**: Explicit `"Surface (Identifier)"` matching active hypothesis or registered entity $\implies$ `LINK` / `RETARGET`.
 4. **Standalone Existence Parse**:
    - Matches affirmative deployment/commissioning phrases:
      `{"initial deployment of", "newly installed", "standalone system", "provisioning notice", "commissioned in", "hardware deployment", "new physical device"}`
@@ -103,10 +103,10 @@ $$\text{Hypothesis}(\text{surface\_form}, \text{candidate\_target} = \text{null}
 | :--- | :--- | :--- | :--- |
 | **Gate 1** | Diagnostic Neural Proposal Quality | Telemetry report-only (no floor/ceiling) | Diagnoses raw Gemma 3 12B baseline |
 | **Gate 2a** | Hybrid Durable False Merge Floor | $\text{FDAR}_{\text{merge}} \equiv 0.0\%$ (0/120 canonical false merges) | Zero durable false merges into existing canonical entities |
-| **Gate 2b** | False Provisional Existence Floor | $\text{FDAR}_{\text{prov}} \equiv 0.0\%$ (0/16 false provisionals in Arm 4A) | Zero false provisional creations on non-asserted/negated hardware |
+| **Gate 2b** | Semantic False Provisional Existence Floor | $\text{FDAR}_{\text{prov}} \equiv 0.0\%$ across all gold decisions where `existence_established: false` | Zero false provisional creations on non-asserted/negated hardware |
 | **Gate 3** | Provisional Entity Fragmentation | 0 duplicate creations across all worlds | Prevents multiple provisional IDs for same entity within a world |
 | **Gate 4** | Permanent Non-Resolution Invariant | $\ge 7/8$ worlds ($87.5\%$) in Sub-Arm 4A | Both Doc 1 and Doc 2 remain non-durable |
-| **Gate 5** | Evidence Accumulation & Disconfirmation | - Doc 2 Resolution $\ge 6/7$<br>- Zero premature Doc 1 mutations<br>- Clean Retargeting ($3/3$, 0 residue)<br>- Nullable Hypothesis Resolution ($2/2$) | Validates hypothesis lifecycle and nullable candidate resolution |
+| **Gate 5** | Evidence Accumulation & Disconfirmation (Exact Matrix) | All 7 Arm-4B worlds reconciled:<br>- 3 candidate-bearing disconfirmations $\implies$ retarget ($3/3$)<br>- 2 nullable $\implies$ existing resolution ($2/2$)<br>- 1 nullable $\implies$ novel provisional resolution ($1/1$)<br>- 1 candidate-bearing confirmation ($1/1$)<br>- Zero premature Doc 1 mutations | Validates exact hypothesis lifecycle and nullable candidate resolution matrix |
 | **Gate 6** | Useful Resolvable Coverage | $\ge 85.0\%$ across $N=97$ resolvable decisions | Solves Arm 1 & Arm 3 coverage bottleneck |
 | **Gate 7** | Relational DB Schema & Ledger Audit | `PRAGMA integrity_check` (ok), FK check (0 violations), Full Ledger reconciliation | Verifies relational integrity and complete ledger audit trail |
 
@@ -117,8 +117,10 @@ $$\text{Hypothesis}(\text{surface\_form}, \text{candidate\_target} = \text{null}
 All Stage 8C-R2 experimental assets are cryptographically sealed prior to execution:
 
 - **Base SHA**: `f7e178b871cffaf97f1f0a20468962629b3c4349`
-- **World Generator Seed**: `0x8C8C8C8C_R2`
-- **Model Target**: `gemma3:12b` (Ollama digest verified)
+- **World Generator Seed**: `2357947788` (integer `0x8C8C8C8C`)
+- **Model Target**: `gemma3:12b-instruct-q4_K_M`
 - **Prompt Specification**: `src/gene/benchmarks/r8_stage8c_r2/prompts.py`
 - **Grammar & State Machine**: `src/gene/benchmarks/r8_stage8c_r2/runner.py`
 - **Acceptance Verifier**: `src/gene/benchmarks/r8_stage8c_r2/verifier.py`
+- **Worlds Specification**: `src/gene/benchmarks/r8_stage8c_r2/worlds.py`
+- **Gold Benchmark Manifest**: `data/r8_stage8c_r2_gold_manifest.json`
