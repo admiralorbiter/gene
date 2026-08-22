@@ -3,11 +3,11 @@
 > **Classification**: `PRE-EXECUTION PREREGISTRATION`  
 > **Target Contract**: `CONTRACT-R8-8C-R3`  
 > **Status**: Frozen Predeclaration (Specified Prior to Clean Benchmark Execution)  
-> **Objective**: Eliminate post-hoc rationalization by establishing the deterministic interpretation matrix for all possible Stage 8C-R3 empirical outcomes.
+> **Objective**: Eliminate post-hoc rationalization by establishing the deterministic interpretation matrix and paired discordance criteria for all possible Stage 8C-R3 empirical outcomes.
 
 ---
 
-## 1. Deterministic Decision Tree
+## 1. Deterministic Decision Tree & Governance Boundary
 
 ```mermaid
 graph TD
@@ -23,25 +23,44 @@ graph TD
     
     CHECK_LIFE -->|FAIL (< 7/7)| DIAG_LIFE["DISPOSITION: REVISED_CONTRACT_REQUIRED / FIX<br/>- Dissect Telemetry vs Kernel:<br/>  (A) Neural Proposal Defect (Gemma failed candidate)<br/>  (B) Kernel State Machine Defect (Transition logic error)"]
     
-    CHECK_LIFE -->|PASS (7/7 & 15/15)| PROMOTE["DISPOSITION: PROMOTION (CANDIDATE -> PROMOTED)<br/>- Ingress Kernel formally canonized<br/>- Stage 8 concluded; proceed to Stage 9 Horizon"]
+    CHECK_LIFE -->|PASS (7/7 & 15/15)| CANDIDATE["DISPOSITION: PROMOTION_CANDIDATE<br/>(SEAL CANDIDATE ARTIFACT)"]
+    
+    CANDIDATE --> REVIEW["Scientific Promotion Review Desk (ChatGPT Pro)"]
+    REVIEW -->|APPROVED| AUTH["Human Strategic Promotion Authorization"]
+    AUTH -->|AUTHORIZED| PROMOTED["FINAL STATUS: PROMOTED<br/>- Ingress Kernel formally canonized<br/>- Stage 8 concluded; proceed to Stage 9 Horizon"]
 ```
 
 ---
 
 ## 2. Quantitative Comparative Replay Attribution ($R3$ vs $R2$)
 
-The verification suite automatically runs the frozen Stage 8C-R2 deterministic resolver against the identical documents and proposals. The empirical delta $\Delta = \text{Coverage}_{R3} - \text{Coverage}_{R2}$ will be interpreted as follows:
+The verification suite automatically runs the frozen Stage 8C-R2 deterministic resolver against the identical documents and proposals.
 
-| Replay Delta ($\Delta$) | Empirical Interpretation | Epistemic Significance |
+### A. Paired Discordance Matrix ($2 \times 2$)
+To evaluate the true nature of policy changes rather than relying solely on net aggregate coverage delta ($\Delta$), the verifier computes the exact paired discordance:
+
+$$\begin{array}{c|c|c}
+& \text{R3 Correct} & \text{R3 Incorrect} \\
+\hline
+\text{R2 Correct} & n_{11} \text{ (Concordant Correct)} & n_{10} \text{ (R2 Right, R3 Wrong / Regressions)} \\
+\hline
+\text{R2 Incorrect} & n_{01} \text{ (R2 Wrong, R3 Right / Recovered)} & n_{00} \text{ (Concordant Incorrect)}
+\end{array}$$
+
+$$\Delta = \text{Coverage}_{R3} - \text{Coverage}_{R2} = \frac{n_{01} - n_{10}}{N_{\text{resolvable}}} \times 100\%$$
+
+### B. Pre-Registered Attribution Tiers
+
+| Observed Metric Profile | Empirical Interpretation | Epistemic Significance |
 | :--- | :--- | :--- |
-| **$\Delta \le 0.0\%$** | Precedence policy refinement added no useful admission capacity. | Reversion to simpler R2 policy recommended; sub-ID grammar unnecessary. |
-| **$0.0\% < \Delta < 15.0\%$** | Marginal improvement on edge cases. | Modest policy benefit; assess grammar complexity tradeoff. |
-| **$\Delta \ge 15.0\%$** | Substantial recovery of resolvable hardware mentions previously blocked by universal first refusal. | Validates the architectural necessity of discriminating sub-identifiers and explicit parenthetical evidence. |
+| **$n_{01} > 0$ and $n_{10} == 0$** | Pure Pareto improvement. Refined precedence cleanly recovers previously blocked cases without regressions. | Strong evidence that discriminating sub-identifiers and parenthetical evidence improve this benchmark. |
+| **$n_{01} > n_{10} > 0$ ($\Delta > 0$)** | Net positive coverage gain with isolated regressions. | Analyze $n_{10}$ failure cases; determine whether regressions stem from grammar edge cases or prompt ambiguity. |
+| **$\Delta \le 0.0\%$ ($n_{01} \le n_{10}$)** | Net coverage flat or negative. | Precedence policy refinement failed to improve net admission; inspect discordance breakdown across benchmark arms before considering policy reversion. |
 
 ---
 
 ## 3. Epistemic Protocol Commitment
 
-1. If any safety gate fails, no post-hoc excuse of "prompt nuance" or "ambiguous phrasing" will be accepted; the contract must fail closed.
-2. If Gate 5 fails, the root cause must be separated into **neural calibration variance** vs **deterministic kernel logic** with raw JSON telemetry evidence.
-3. Upon promotion, all synthetic naming grammar benchmarking ($R4, R5 \dots$) is permanently closed, and GENE transitions to Stage 9.
+1. **No Autonomous Auto-Promotion**: A passing run transitions the project to `PROMOTION_CANDIDATE`. Formal promotion requires Review Desk approval and explicit Human Strategic Authorization.
+2. **Deterministic Safety Enforcement**: If any safety gate fails, no post-hoc excuse will be accepted; the contract must fail closed.
+3. **Horizon Closure**: Upon promotion, all synthetic naming grammar benchmarking ($R4, R5 \dots$) is permanently closed, and GENE transitions to Stage 9.
