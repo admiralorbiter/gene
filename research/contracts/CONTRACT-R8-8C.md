@@ -1,6 +1,6 @@
 ---
 contract_id: CONTRACT-R8-8C
-status: FROZEN
+status: SUPERSEDED
 proposed_by: antigravity
 design_review: APPROVED
 reviewed_by: chatgpt-pro
