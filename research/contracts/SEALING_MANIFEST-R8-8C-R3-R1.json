@@ -2,11 +2,12 @@
   "contract_id": "CONTRACT-R8-8C-R3-R1",
   "base_sha": "92400bf22a24316e5c1522489a1a003c365fe848",
   "assets": {
+    "research/contracts/CONTRACT-R8-8C-R3-R1.md": "225f0d938209997eb89850fbe9aa9c4d656cf2879cf3ced72ac8d571b34eb69b",
     "src/gene/benchmarks/r8_stage8c_r3_r1/prompts.py": "04f55ac44d2c9b8aad836fefed95a406bade8678a4e04fced52adba2989d04e0",
-    "src/gene/benchmarks/r8_stage8c_r3_r1/worlds.py": "c652c3be617323b047843d1ea4296e71c1a9ad3ed28c51dee6a50feb266ac670",
-    "src/gene/benchmarks/r8_stage8c_r3_r1/runner.py": "ee47336a3e4e1b2711908f9f78781a74ad18c7bce7541a577c2e9ea74768d89c",
-    "src/gene/benchmarks/r8_stage8c_r3_r1/verifier.py": "be8c2d319cc74613b267992695fde639c4cf88d499bd39c583c4b91a3e1dddaa",
-    "research/contracts/WORLDS_SEALED-R8-8C-R3-R1.json": "382b2dac55c89297baeceda2e1ff67b44142fbaa1029adba9729284edd77d846",
-    "research/contracts/GOLD_MANIFEST-R8-8C-R3-R1.json": "54c89dc1be4a8b3c72a82c668628531f0172480212cf09819474418655244b08"
+    "src/gene/benchmarks/r8_stage8c_r3_r1/worlds.py": "bd6559e35b41c2a4116aa765fe0ef58c926d423bd901b6f3178b86e4f031e0a4",
+    "src/gene/benchmarks/r8_stage8c_r3_r1/runner.py": "3ff4136bc449a98b276d54e968dc1df6121a92108586fe673c1eab751d3ca4ce",
+    "src/gene/benchmarks/r8_stage8c_r3_r1/verifier.py": "c1c01988a538d13a5b3e9da1bc39f24b2073716bfc9e3a67db25fa3d38a12cc9",
+    "research/contracts/WORLDS_SEALED-R8-8C-R3-R1.json": "f485d85c94f93d802edafec169fbc98adc4e07c975277bab2faae82b7fecaa7c",
+    "research/contracts/GOLD_MANIFEST-R8-8C-R3-R1.json": "21ccbc11b201994cb2b8f037acbe61c73f5b782de6aa7e2b29d164c8587f4470"
   }
 }

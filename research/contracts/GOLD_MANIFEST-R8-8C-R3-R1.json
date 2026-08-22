@@ -1,839 +1,719 @@
 {
   "world_r3r1_arm1_01_doc_1": {
-    "world_id": "world_r3r1_arm1_01",
     "arm": "ARM1_NOVEL",
     "action": "CREATE_PROVISIONAL",
-    "expected_target": "prov_photonic_interconnect_zeta",
+    "expected_target": "prov_cryogenic_core_sigma",
     "resolvable": true
   },
   "world_r3r1_arm1_01_doc_2": {
-    "world_id": "world_r3r1_arm1_01",
     "arm": "ARM1_NOVEL",
     "action": "LINK",
-    "expected_target": "prov_photonic_interconnect_zeta",
+    "expected_target": "prov_cryogenic_core_sigma",
     "resolvable": true
   },
   "world_r3r1_arm1_02_doc_1": {
-    "world_id": "world_r3r1_arm1_02",
     "arm": "ARM1_NOVEL",
     "action": "CREATE_PROVISIONAL",
-    "expected_target": "prov_graph_accelerator_epsilon",
+    "expected_target": "prov_spintronic_fabric_xi",
     "resolvable": true
   },
   "world_r3r1_arm1_02_doc_2": {
-    "world_id": "world_r3r1_arm1_02",
     "arm": "ARM1_NOVEL",
     "action": "LINK",
-    "expected_target": "prov_graph_accelerator_epsilon",
+    "expected_target": "prov_spintronic_fabric_xi",
     "resolvable": true
   },
   "world_r3r1_arm1_03_doc_1": {
-    "world_id": "world_r3r1_arm1_03",
     "arm": "ARM1_NOVEL",
     "action": "CREATE_PROVISIONAL",
-    "expected_target": "prov_neuromorphic_mesh_theta",
+    "expected_target": "prov_topological_bus_mu",
     "resolvable": true
   },
   "world_r3r1_arm1_03_doc_2": {
-    "world_id": "world_r3r1_arm1_03",
     "arm": "ARM1_NOVEL",
     "action": "LINK",
-    "expected_target": "prov_neuromorphic_mesh_theta",
+    "expected_target": "prov_topological_bus_mu",
     "resolvable": true
   },
   "world_r3r1_arm1_04_doc_1": {
-    "world_id": "world_r3r1_arm1_04",
     "arm": "ARM1_NOVEL",
     "action": "CREATE_PROVISIONAL",
-    "expected_target": "prov_direct_memory_fabric_iota",
+    "expected_target": "prov_holographic_memory_lambda",
     "resolvable": true
   },
   "world_r3r1_arm1_04_doc_2": {
-    "world_id": "world_r3r1_arm1_04",
     "arm": "ARM1_NOVEL",
     "action": "LINK",
-    "expected_target": "prov_direct_memory_fabric_iota",
+    "expected_target": "prov_holographic_memory_lambda",
     "resolvable": true
   },
   "world_r3r1_arm1_05_doc_1": {
-    "world_id": "world_r3r1_arm1_05",
     "arm": "ARM1_NOVEL",
     "action": "CREATE_PROVISIONAL",
-    "expected_target": "prov_sparse_matrix_unit_kappa",
+    "expected_target": "prov_coherent_coprocessor_tau",
     "resolvable": true
   },
   "world_r3r1_arm1_05_doc_2": {
-    "world_id": "world_r3r1_arm1_05",
     "arm": "ARM1_NOVEL",
     "action": "LINK",
-    "expected_target": "prov_sparse_matrix_unit_kappa",
+    "expected_target": "prov_coherent_coprocessor_tau",
     "resolvable": true
   },
   "world_r3r1_arm1_06_doc_1": {
-    "world_id": "world_r3r1_arm1_06",
     "arm": "ARM1_NOVEL",
     "action": "CREATE_PROVISIONAL",
-    "expected_target": "prov_telemetry_aggregator_lambda",
+    "expected_target": "prov_dielectric_interposer_nu",
     "resolvable": true
   },
   "world_r3r1_arm1_06_doc_2": {
-    "world_id": "world_r3r1_arm1_06",
     "arm": "ARM1_NOVEL",
     "action": "LINK",
-    "expected_target": "prov_telemetry_aggregator_lambda",
+    "expected_target": "prov_dielectric_interposer_nu",
     "resolvable": true
   },
   "world_r3r1_arm1_07_doc_1": {
-    "world_id": "world_r3r1_arm1_07",
     "arm": "ARM1_NOVEL",
     "action": "CREATE_PROVISIONAL",
-    "expected_target": "prov_quantum_cryo_node_mu",
+    "expected_target": "prov_stochastic_matrix_engine_rho",
     "resolvable": true
   },
   "world_r3r1_arm1_07_doc_2": {
-    "world_id": "world_r3r1_arm1_07",
     "arm": "ARM1_NOVEL",
     "action": "LINK",
-    "expected_target": "prov_quantum_cryo_node_mu",
+    "expected_target": "prov_stochastic_matrix_engine_rho",
     "resolvable": true
   },
   "world_r3r1_arm1_08_doc_1": {
-    "world_id": "world_r3r1_arm1_08",
     "arm": "ARM1_NOVEL",
     "action": "CREATE_PROVISIONAL",
-    "expected_target": "prov_optoelectronic_switch_nu",
+    "expected_target": "prov_superconducting_interconnect_psi",
     "resolvable": true
   },
   "world_r3r1_arm1_08_doc_2": {
-    "world_id": "world_r3r1_arm1_08",
     "arm": "ARM1_NOVEL",
     "action": "LINK",
-    "expected_target": "prov_optoelectronic_switch_nu",
+    "expected_target": "prov_superconducting_interconnect_psi",
     "resolvable": true
   },
   "world_r3r1_arm1_09_doc_1": {
-    "world_id": "world_r3r1_arm1_09",
     "arm": "ARM1_NOVEL",
     "action": "CREATE_PROVISIONAL",
-    "expected_target": "prov_coherent_cache_pool_xi",
+    "expected_target": "prov_quantum_gateway_iota",
     "resolvable": true
   },
   "world_r3r1_arm1_09_doc_2": {
-    "world_id": "world_r3r1_arm1_09",
     "arm": "ARM1_NOVEL",
     "action": "LINK",
-    "expected_target": "prov_coherent_cache_pool_xi",
+    "expected_target": "prov_quantum_gateway_iota",
     "resolvable": true
   },
   "world_r3r1_arm1_10_doc_1": {
-    "world_id": "world_r3r1_arm1_10",
     "arm": "ARM1_NOVEL",
     "action": "CREATE_PROVISIONAL",
-    "expected_target": "prov_neural_ingress_gateway_omicron",
+    "expected_target": "prov_ferroelectric_array_omicron",
     "resolvable": true
   },
   "world_r3r1_arm1_10_doc_2": {
-    "world_id": "world_r3r1_arm1_10",
     "arm": "ARM1_NOVEL",
     "action": "LINK",
-    "expected_target": "prov_neural_ingress_gateway_omicron",
+    "expected_target": "prov_ferroelectric_array_omicron",
     "resolvable": true
   },
   "world_r3r1_arm1_11_doc_1": {
-    "world_id": "world_r3r1_arm1_11",
     "arm": "ARM1_NOVEL",
     "action": "CREATE_PROVISIONAL",
-    "expected_target": "prov_elastic_shard_node_pi",
+    "expected_target": "prov_photon_routing_matrix_kappa",
     "resolvable": true
   },
   "world_r3r1_arm1_11_doc_2": {
-    "world_id": "world_r3r1_arm1_11",
     "arm": "ARM1_NOVEL",
     "action": "LINK",
-    "expected_target": "prov_elastic_shard_node_pi",
+    "expected_target": "prov_photon_routing_matrix_kappa",
     "resolvable": true
   },
   "world_r3r1_arm1_12_doc_1": {
-    "world_id": "world_r3r1_arm1_12",
     "arm": "ARM1_NOVEL",
     "action": "CREATE_PROVISIONAL",
-    "expected_target": "prov_vector_reduction_pipeline_rho",
+    "expected_target": "prov_neuromorphic_lattice_upsilon",
     "resolvable": true
   },
   "world_r3r1_arm1_12_doc_2": {
-    "world_id": "world_r3r1_arm1_12",
     "arm": "ARM1_NOVEL",
     "action": "LINK",
-    "expected_target": "prov_vector_reduction_pipeline_rho",
+    "expected_target": "prov_neuromorphic_lattice_upsilon",
     "resolvable": true
   },
   "world_r3r1_arm1_13_doc_1": {
-    "world_id": "world_r3r1_arm1_13",
     "arm": "ARM1_NOVEL",
     "action": "CREATE_PROVISIONAL",
-    "expected_target": "prov_atomic_state_sequencer_sigma",
+    "expected_target": "prov_optoelectronic_module_chi",
     "resolvable": true
   },
   "world_r3r1_arm1_13_doc_2": {
-    "world_id": "world_r3r1_arm1_13",
     "arm": "ARM1_NOVEL",
     "action": "LINK",
-    "expected_target": "prov_atomic_state_sequencer_sigma",
+    "expected_target": "prov_optoelectronic_module_chi",
     "resolvable": true
   },
   "world_r3r1_arm1_14_doc_1": {
-    "world_id": "world_r3r1_arm1_14",
     "arm": "ARM1_NOVEL",
     "action": "CREATE_PROVISIONAL",
-    "expected_target": "prov_fast_transit_bus_tau",
+    "expected_target": "prov_synaptic_mesh_zeta",
     "resolvable": true
   },
   "world_r3r1_arm1_14_doc_2": {
-    "world_id": "world_r3r1_arm1_14",
     "arm": "ARM1_NOVEL",
     "action": "LINK",
-    "expected_target": "prov_fast_transit_bus_tau",
+    "expected_target": "prov_synaptic_mesh_zeta",
     "resolvable": true
   },
   "world_r3r1_arm1_15_doc_1": {
-    "world_id": "world_r3r1_arm1_15",
     "arm": "ARM1_NOVEL",
     "action": "CREATE_PROVISIONAL",
-    "expected_target": "prov_secure_enclave_host_upsilon",
+    "expected_target": "prov_silicon_photonic_interposer_delta",
     "resolvable": true
   },
   "world_r3r1_arm1_15_doc_2": {
-    "world_id": "world_r3r1_arm1_15",
     "arm": "ARM1_NOVEL",
     "action": "LINK",
-    "expected_target": "prov_secure_enclave_host_upsilon",
+    "expected_target": "prov_silicon_photonic_interposer_delta",
     "resolvable": true
   },
   "world_r3r1_arm2_01_doc_1": {
-    "world_id": "world_r3r1_arm2_01",
     "arm": "ARM2_KNOWN_ALIAS",
     "action": "LINK",
     "expected_target": "compute_cluster_alpha",
     "resolvable": true
   },
   "world_r3r1_arm2_01_doc_2": {
-    "world_id": "world_r3r1_arm2_01",
     "arm": "ARM2_KNOWN_ALIAS",
     "action": "LINK",
     "expected_target": "compute_cluster_alpha",
     "resolvable": true
   },
   "world_r3r1_arm2_02_doc_1": {
-    "world_id": "world_r3r1_arm2_02",
     "arm": "ARM2_KNOWN_ALIAS",
     "action": "LINK",
     "expected_target": "compute_cluster_beta",
     "resolvable": true
   },
   "world_r3r1_arm2_02_doc_2": {
-    "world_id": "world_r3r1_arm2_02",
     "arm": "ARM2_KNOWN_ALIAS",
     "action": "LINK",
     "expected_target": "compute_cluster_beta",
     "resolvable": true
   },
   "world_r3r1_arm2_03_doc_1": {
-    "world_id": "world_r3r1_arm2_03",
     "arm": "ARM2_KNOWN_ALIAS",
     "action": "LINK",
     "expected_target": "storage_array_alpha",
     "resolvable": true
   },
   "world_r3r1_arm2_03_doc_2": {
-    "world_id": "world_r3r1_arm2_03",
     "arm": "ARM2_KNOWN_ALIAS",
     "action": "LINK",
     "expected_target": "storage_array_alpha",
     "resolvable": true
   },
   "world_r3r1_arm2_04_doc_1": {
-    "world_id": "world_r3r1_arm2_04",
     "arm": "ARM2_KNOWN_ALIAS",
     "action": "LINK",
     "expected_target": "storage_array_beta",
     "resolvable": true
   },
   "world_r3r1_arm2_04_doc_2": {
-    "world_id": "world_r3r1_arm2_04",
     "arm": "ARM2_KNOWN_ALIAS",
     "action": "LINK",
     "expected_target": "storage_array_beta",
     "resolvable": true
   },
   "world_r3r1_arm2_05_doc_1": {
-    "world_id": "world_r3r1_arm2_05",
     "arm": "ARM2_KNOWN_ALIAS",
     "action": "LINK",
     "expected_target": "gateway_router_alpha",
     "resolvable": true
   },
   "world_r3r1_arm2_05_doc_2": {
-    "world_id": "world_r3r1_arm2_05",
     "arm": "ARM2_KNOWN_ALIAS",
     "action": "LINK",
     "expected_target": "gateway_router_alpha",
     "resolvable": true
   },
   "world_r3r1_arm2_06_doc_1": {
-    "world_id": "world_r3r1_arm2_06",
     "arm": "ARM2_KNOWN_ALIAS",
     "action": "LINK",
     "expected_target": "gateway_router_beta",
     "resolvable": true
   },
   "world_r3r1_arm2_06_doc_2": {
-    "world_id": "world_r3r1_arm2_06",
     "arm": "ARM2_KNOWN_ALIAS",
     "action": "LINK",
     "expected_target": "gateway_router_beta",
     "resolvable": true
   },
   "world_r3r1_arm2_07_doc_1": {
-    "world_id": "world_r3r1_arm2_07",
     "arm": "ARM2_KNOWN_ALIAS",
     "action": "LINK",
     "expected_target": "compute_cluster_alpha",
     "resolvable": true
   },
   "world_r3r1_arm2_07_doc_2": {
-    "world_id": "world_r3r1_arm2_07",
     "arm": "ARM2_KNOWN_ALIAS",
     "action": "LINK",
     "expected_target": "compute_cluster_alpha",
     "resolvable": true
   },
   "world_r3r1_arm2_08_doc_1": {
-    "world_id": "world_r3r1_arm2_08",
     "arm": "ARM2_KNOWN_ALIAS",
     "action": "LINK",
     "expected_target": "compute_cluster_beta",
     "resolvable": true
   },
   "world_r3r1_arm2_08_doc_2": {
-    "world_id": "world_r3r1_arm2_08",
     "arm": "ARM2_KNOWN_ALIAS",
     "action": "LINK",
     "expected_target": "compute_cluster_beta",
     "resolvable": true
   },
   "world_r3r1_arm2_09_doc_1": {
-    "world_id": "world_r3r1_arm2_09",
     "arm": "ARM2_KNOWN_ALIAS",
     "action": "LINK",
     "expected_target": "storage_array_alpha",
     "resolvable": true
   },
   "world_r3r1_arm2_09_doc_2": {
-    "world_id": "world_r3r1_arm2_09",
     "arm": "ARM2_KNOWN_ALIAS",
     "action": "LINK",
     "expected_target": "storage_array_alpha",
     "resolvable": true
   },
   "world_r3r1_arm2_10_doc_1": {
-    "world_id": "world_r3r1_arm2_10",
     "arm": "ARM2_KNOWN_ALIAS",
     "action": "LINK",
     "expected_target": "storage_array_beta",
     "resolvable": true
   },
   "world_r3r1_arm2_10_doc_2": {
-    "world_id": "world_r3r1_arm2_10",
     "arm": "ARM2_KNOWN_ALIAS",
     "action": "LINK",
     "expected_target": "storage_array_beta",
     "resolvable": true
   },
   "world_r3r1_arm2_11_doc_1": {
-    "world_id": "world_r3r1_arm2_11",
     "arm": "ARM2_KNOWN_ALIAS",
     "action": "LINK",
     "expected_target": "gateway_router_alpha",
     "resolvable": true
   },
   "world_r3r1_arm2_11_doc_2": {
-    "world_id": "world_r3r1_arm2_11",
     "arm": "ARM2_KNOWN_ALIAS",
     "action": "LINK",
     "expected_target": "gateway_router_alpha",
     "resolvable": true
   },
   "world_r3r1_arm2_12_doc_1": {
-    "world_id": "world_r3r1_arm2_12",
     "arm": "ARM2_KNOWN_ALIAS",
     "action": "LINK",
     "expected_target": "gateway_router_beta",
     "resolvable": true
   },
   "world_r3r1_arm2_12_doc_2": {
-    "world_id": "world_r3r1_arm2_12",
     "arm": "ARM2_KNOWN_ALIAS",
     "action": "LINK",
     "expected_target": "gateway_router_beta",
     "resolvable": true
   },
   "world_r3r1_arm2_13_doc_1": {
-    "world_id": "world_r3r1_arm2_13",
     "arm": "ARM2_KNOWN_ALIAS",
     "action": "LINK",
     "expected_target": "compute_cluster_alpha",
     "resolvable": true
   },
   "world_r3r1_arm2_13_doc_2": {
-    "world_id": "world_r3r1_arm2_13",
     "arm": "ARM2_KNOWN_ALIAS",
     "action": "LINK",
     "expected_target": "compute_cluster_alpha",
     "resolvable": true
   },
   "world_r3r1_arm2_14_doc_1": {
-    "world_id": "world_r3r1_arm2_14",
     "arm": "ARM2_KNOWN_ALIAS",
     "action": "LINK",
-    "expected_target": "compute_cluster_beta",
+    "expected_target": "storage_array_alpha",
     "resolvable": true
   },
   "world_r3r1_arm2_14_doc_2": {
-    "world_id": "world_r3r1_arm2_14",
     "arm": "ARM2_KNOWN_ALIAS",
     "action": "LINK",
-    "expected_target": "compute_cluster_beta",
+    "expected_target": "storage_array_alpha",
     "resolvable": true
   },
   "world_r3r1_arm2_15_doc_1": {
-    "world_id": "world_r3r1_arm2_15",
     "arm": "ARM2_KNOWN_ALIAS",
     "action": "LINK",
-    "expected_target": "storage_array_alpha",
+    "expected_target": "gateway_router_beta",
     "resolvable": true
   },
   "world_r3r1_arm2_15_doc_2": {
-    "world_id": "world_r3r1_arm2_15",
     "arm": "ARM2_KNOWN_ALIAS",
     "action": "LINK",
-    "expected_target": "storage_array_alpha",
+    "expected_target": "gateway_router_beta",
     "resolvable": true
   },
   "world_r3r1_arm3_01_doc_1": {
-    "world_id": "world_r3r1_arm3_01",
     "arm": "ARM3_PARTITION",
     "action": "CREATE_PROVISIONAL",
-    "expected_target": "prov_compute_cluster_alpha_partition_1",
+    "expected_target": "prov_compute_cluster_alpha_tray_1",
     "resolvable": true
   },
   "world_r3r1_arm3_01_doc_2": {
-    "world_id": "world_r3r1_arm3_01",
     "arm": "ARM3_PARTITION",
     "action": "LINK",
-    "expected_target": "prov_compute_cluster_alpha_partition_1",
+    "expected_target": "prov_compute_cluster_alpha_tray_1",
     "resolvable": true
   },
   "world_r3r1_arm3_02_doc_1": {
-    "world_id": "world_r3r1_arm3_02",
     "arm": "ARM3_PARTITION",
     "action": "CREATE_PROVISIONAL",
-    "expected_target": "prov_compute_cluster_beta_blade_2",
+    "expected_target": "prov_compute_cluster_alpha_socket_2",
     "resolvable": true
   },
   "world_r3r1_arm3_02_doc_2": {
-    "world_id": "world_r3r1_arm3_02",
     "arm": "ARM3_PARTITION",
     "action": "LINK",
-    "expected_target": "prov_compute_cluster_beta_blade_2",
+    "expected_target": "prov_compute_cluster_alpha_socket_2",
     "resolvable": true
   },
   "world_r3r1_arm3_03_doc_1": {
-    "world_id": "world_r3r1_arm3_03",
     "arm": "ARM3_PARTITION",
     "action": "CREATE_PROVISIONAL",
-    "expected_target": "prov_storage_array_alpha_slice_3",
+    "expected_target": "prov_compute_cluster_beta_enclosure_a",
     "resolvable": true
   },
   "world_r3r1_arm3_03_doc_2": {
-    "world_id": "world_r3r1_arm3_03",
     "arm": "ARM3_PARTITION",
     "action": "LINK",
-    "expected_target": "prov_storage_array_alpha_slice_3",
+    "expected_target": "prov_compute_cluster_beta_enclosure_a",
     "resolvable": true
   },
   "world_r3r1_arm3_04_doc_1": {
-    "world_id": "world_r3r1_arm3_04",
     "arm": "ARM3_PARTITION",
     "action": "CREATE_PROVISIONAL",
-    "expected_target": "prov_storage_array_beta_tray_4",
+    "expected_target": "prov_compute_cluster_beta_slice_b",
     "resolvable": true
   },
   "world_r3r1_arm3_04_doc_2": {
-    "world_id": "world_r3r1_arm3_04",
     "arm": "ARM3_PARTITION",
     "action": "LINK",
-    "expected_target": "prov_storage_array_beta_tray_4",
+    "expected_target": "prov_compute_cluster_beta_slice_b",
     "resolvable": true
   },
   "world_r3r1_arm3_05_doc_1": {
-    "world_id": "world_r3r1_arm3_05",
     "arm": "ARM3_PARTITION",
     "action": "CREATE_PROVISIONAL",
-    "expected_target": "prov_gateway_router_alpha_socket_a",
+    "expected_target": "prov_storage_array_alpha_lun_1",
     "resolvable": true
   },
   "world_r3r1_arm3_05_doc_2": {
-    "world_id": "world_r3r1_arm3_05",
     "arm": "ARM3_PARTITION",
     "action": "LINK",
-    "expected_target": "prov_gateway_router_alpha_socket_a",
+    "expected_target": "prov_storage_array_alpha_lun_1",
     "resolvable": true
   },
   "world_r3r1_arm3_06_doc_1": {
-    "world_id": "world_r3r1_arm3_06",
     "arm": "ARM3_PARTITION",
     "action": "CREATE_PROVISIONAL",
-    "expected_target": "prov_gateway_router_beta_partition_b",
+    "expected_target": "prov_storage_array_alpha_bay_3",
     "resolvable": true
   },
   "world_r3r1_arm3_06_doc_2": {
-    "world_id": "world_r3r1_arm3_06",
     "arm": "ARM3_PARTITION",
     "action": "LINK",
-    "expected_target": "prov_gateway_router_beta_partition_b",
+    "expected_target": "prov_storage_array_alpha_bay_3",
     "resolvable": true
   },
   "world_r3r1_arm3_07_doc_1": {
-    "world_id": "world_r3r1_arm3_07",
     "arm": "ARM3_PARTITION",
     "action": "CREATE_PROVISIONAL",
-    "expected_target": "prov_compute_cluster_alpha_blade_c",
+    "expected_target": "prov_storage_array_beta_lun_2",
     "resolvable": true
   },
   "world_r3r1_arm3_07_doc_2": {
-    "world_id": "world_r3r1_arm3_07",
     "arm": "ARM3_PARTITION",
     "action": "LINK",
-    "expected_target": "prov_compute_cluster_alpha_blade_c",
+    "expected_target": "prov_storage_array_beta_lun_2",
     "resolvable": true
   },
   "world_r3r1_arm3_08_doc_1": {
-    "world_id": "world_r3r1_arm3_08",
     "arm": "ARM3_PARTITION",
     "action": "CREATE_PROVISIONAL",
-    "expected_target": "prov_compute_cluster_beta_slice_d",
+    "expected_target": "prov_storage_array_beta_enclosure_c",
     "resolvable": true
   },
   "world_r3r1_arm3_08_doc_2": {
-    "world_id": "world_r3r1_arm3_08",
     "arm": "ARM3_PARTITION",
     "action": "LINK",
-    "expected_target": "prov_compute_cluster_beta_slice_d",
+    "expected_target": "prov_storage_array_beta_enclosure_c",
     "resolvable": true
   },
   "world_r3r1_arm3_09_doc_1": {
-    "world_id": "world_r3r1_arm3_09",
     "arm": "ARM3_PARTITION",
     "action": "CREATE_PROVISIONAL",
-    "expected_target": "prov_storage_array_alpha_tray_1",
+    "expected_target": "prov_gateway_router_alpha_bay_1",
     "resolvable": true
   },
   "world_r3r1_arm3_09_doc_2": {
-    "world_id": "world_r3r1_arm3_09",
     "arm": "ARM3_PARTITION",
     "action": "LINK",
-    "expected_target": "prov_storage_array_alpha_tray_1",
+    "expected_target": "prov_gateway_router_alpha_bay_1",
     "resolvable": true
   },
   "world_r3r1_arm3_10_doc_1": {
-    "world_id": "world_r3r1_arm3_10",
     "arm": "ARM3_PARTITION",
     "action": "CREATE_PROVISIONAL",
-    "expected_target": "prov_storage_array_beta_socket_2",
+    "expected_target": "prov_gateway_router_alpha_socket_d",
     "resolvable": true
   },
   "world_r3r1_arm3_10_doc_2": {
-    "world_id": "world_r3r1_arm3_10",
     "arm": "ARM3_PARTITION",
     "action": "LINK",
-    "expected_target": "prov_storage_array_beta_socket_2",
+    "expected_target": "prov_gateway_router_alpha_socket_d",
     "resolvable": true
   },
   "world_r3r1_arm3_11_doc_1": {
-    "world_id": "world_r3r1_arm3_11",
     "arm": "ARM3_PARTITION",
     "action": "CREATE_PROVISIONAL",
-    "expected_target": "prov_gateway_router_alpha_partition_3",
+    "expected_target": "prov_gateway_router_beta_tray_2",
     "resolvable": true
   },
   "world_r3r1_arm3_11_doc_2": {
-    "world_id": "world_r3r1_arm3_11",
     "arm": "ARM3_PARTITION",
     "action": "LINK",
-    "expected_target": "prov_gateway_router_alpha_partition_3",
+    "expected_target": "prov_gateway_router_beta_tray_2",
     "resolvable": true
   },
   "world_r3r1_arm3_12_doc_1": {
-    "world_id": "world_r3r1_arm3_12",
     "arm": "ARM3_PARTITION",
     "action": "CREATE_PROVISIONAL",
-    "expected_target": "prov_gateway_router_beta_blade_4",
+    "expected_target": "prov_gateway_router_beta_slice_4",
     "resolvable": true
   },
   "world_r3r1_arm3_12_doc_2": {
-    "world_id": "world_r3r1_arm3_12",
     "arm": "ARM3_PARTITION",
     "action": "LINK",
-    "expected_target": "prov_gateway_router_beta_blade_4",
+    "expected_target": "prov_gateway_router_beta_slice_4",
     "resolvable": true
   },
   "world_r3r1_arm3_13_doc_1": {
-    "world_id": "world_r3r1_arm3_13",
     "arm": "ARM3_PARTITION",
     "action": "CREATE_PROVISIONAL",
-    "expected_target": "prov_compute_cluster_alpha_slice_a",
+    "expected_target": "prov_compute_cluster_alpha_bay_a",
     "resolvable": true
   },
   "world_r3r1_arm3_13_doc_2": {
-    "world_id": "world_r3r1_arm3_13",
     "arm": "ARM3_PARTITION",
     "action": "LINK",
-    "expected_target": "prov_compute_cluster_alpha_slice_a",
+    "expected_target": "prov_compute_cluster_alpha_bay_a",
     "resolvable": true
   },
   "world_r3r1_arm3_14_doc_1": {
-    "world_id": "world_r3r1_arm3_14",
     "arm": "ARM3_PARTITION",
     "action": "CREATE_PROVISIONAL",
-    "expected_target": "prov_compute_cluster_beta_tray_b",
+    "expected_target": "prov_storage_array_alpha_tray_b",
     "resolvable": true
   },
   "world_r3r1_arm3_14_doc_2": {
-    "world_id": "world_r3r1_arm3_14",
     "arm": "ARM3_PARTITION",
     "action": "LINK",
-    "expected_target": "prov_compute_cluster_beta_tray_b",
+    "expected_target": "prov_storage_array_alpha_tray_b",
     "resolvable": true
   },
   "world_r3r1_arm3_15_doc_1": {
-    "world_id": "world_r3r1_arm3_15",
     "arm": "ARM3_PARTITION",
     "action": "CREATE_PROVISIONAL",
-    "expected_target": "prov_storage_array_alpha_socket_c",
+    "expected_target": "prov_gateway_router_beta_enclosure_1",
     "resolvable": true
   },
   "world_r3r1_arm3_15_doc_2": {
-    "world_id": "world_r3r1_arm3_15",
     "arm": "ARM3_PARTITION",
     "action": "LINK",
-    "expected_target": "prov_storage_array_alpha_socket_c",
+    "expected_target": "prov_gateway_router_beta_enclosure_1",
     "resolvable": true
   },
   "world_r3r1_arm4a_01_doc_1": {
-    "world_id": "world_r3r1_arm4a_01",
     "arm": "ARM4A_PERMANENT_DEFERRAL",
     "action": "DEFER",
     "expected_target": null,
     "resolvable": false
   },
   "world_r3r1_arm4a_01_doc_2": {
-    "world_id": "world_r3r1_arm4a_01",
     "arm": "ARM4A_PERMANENT_DEFERRAL",
     "action": "DEFER",
     "expected_target": null,
     "resolvable": false
   },
   "world_r3r1_arm4a_02_doc_1": {
-    "world_id": "world_r3r1_arm4a_02",
     "arm": "ARM4A_PERMANENT_DEFERRAL",
     "action": "DEFER",
     "expected_target": null,
     "resolvable": false
   },
   "world_r3r1_arm4a_02_doc_2": {
-    "world_id": "world_r3r1_arm4a_02",
     "arm": "ARM4A_PERMANENT_DEFERRAL",
     "action": "DEFER",
     "expected_target": null,
     "resolvable": false
   },
   "world_r3r1_arm4a_03_doc_1": {
-    "world_id": "world_r3r1_arm4a_03",
     "arm": "ARM4A_PERMANENT_DEFERRAL",
     "action": "DEFER",
     "expected_target": null,
     "resolvable": false
   },
   "world_r3r1_arm4a_03_doc_2": {
-    "world_id": "world_r3r1_arm4a_03",
     "arm": "ARM4A_PERMANENT_DEFERRAL",
     "action": "DEFER",
     "expected_target": null,
     "resolvable": false
   },
   "world_r3r1_arm4a_04_doc_1": {
-    "world_id": "world_r3r1_arm4a_04",
     "arm": "ARM4A_PERMANENT_DEFERRAL",
     "action": "DEFER",
     "expected_target": null,
     "resolvable": false
   },
   "world_r3r1_arm4a_04_doc_2": {
-    "world_id": "world_r3r1_arm4a_04",
     "arm": "ARM4A_PERMANENT_DEFERRAL",
     "action": "DEFER",
     "expected_target": null,
     "resolvable": false
   },
   "world_r3r1_arm4a_05_doc_1": {
-    "world_id": "world_r3r1_arm4a_05",
     "arm": "ARM4A_PERMANENT_DEFERRAL",
     "action": "DEFER",
     "expected_target": null,
     "resolvable": false
   },
   "world_r3r1_arm4a_05_doc_2": {
-    "world_id": "world_r3r1_arm4a_05",
     "arm": "ARM4A_PERMANENT_DEFERRAL",
     "action": "DEFER",
     "expected_target": null,
     "resolvable": false
   },
   "world_r3r1_arm4a_06_doc_1": {
-    "world_id": "world_r3r1_arm4a_06",
     "arm": "ARM4A_PERMANENT_DEFERRAL",
     "action": "DEFER",
     "expected_target": null,
     "resolvable": false
   },
   "world_r3r1_arm4a_06_doc_2": {
-    "world_id": "world_r3r1_arm4a_06",
     "arm": "ARM4A_PERMANENT_DEFERRAL",
     "action": "DEFER",
     "expected_target": null,
     "resolvable": false
   },
   "world_r3r1_arm4a_07_doc_1": {
-    "world_id": "world_r3r1_arm4a_07",
     "arm": "ARM4A_PERMANENT_DEFERRAL",
     "action": "DEFER",
     "expected_target": null,
     "resolvable": false
   },
   "world_r3r1_arm4a_07_doc_2": {
-    "world_id": "world_r3r1_arm4a_07",
     "arm": "ARM4A_PERMANENT_DEFERRAL",
     "action": "DEFER",
     "expected_target": null,
     "resolvable": false
   },
   "world_r3r1_arm4a_08_doc_1": {
-    "world_id": "world_r3r1_arm4a_08",
     "arm": "ARM4A_PERMANENT_DEFERRAL",
     "action": "DEFER",
     "expected_target": null,
     "resolvable": false
   },
   "world_r3r1_arm4a_08_doc_2": {
-    "world_id": "world_r3r1_arm4a_08",
     "arm": "ARM4A_PERMANENT_DEFERRAL",
     "action": "DEFER",
     "expected_target": null,
     "resolvable": false
   },
   "world_r3r1_arm4b_01_doc_1": {
-    "world_id": "world_r3r1_arm4b_01",
     "arm": "ARM4B_DISCONFIRMATION",
     "action": "DEFER",
     "expected_target": null,
     "resolvable": false
   },
   "world_r3r1_arm4b_01_doc_2": {
-    "world_id": "world_r3r1_arm4b_01",
     "arm": "ARM4B_DISCONFIRMATION",
     "action": "LINK",
-    "expected_target": "gateway_router_beta",
+    "expected_target": "storage_array_alpha",
     "resolvable": true
   },
   "world_r3r1_arm4b_02_doc_1": {
-    "world_id": "world_r3r1_arm4b_02",
     "arm": "ARM4B_DISCONFIRMATION",
     "action": "DEFER",
     "expected_target": null,
     "resolvable": false
   },
   "world_r3r1_arm4b_02_doc_2": {
-    "world_id": "world_r3r1_arm4b_02",
     "arm": "ARM4B_DISCONFIRMATION",
     "action": "LINK",
     "expected_target": "compute_cluster_beta",
     "resolvable": true
   },
   "world_r3r1_arm4b_03_doc_1": {
-    "world_id": "world_r3r1_arm4b_03",
     "arm": "ARM4B_DISCONFIRMATION",
     "action": "DEFER",
     "expected_target": null,
     "resolvable": false
   },
   "world_r3r1_arm4b_03_doc_2": {
-    "world_id": "world_r3r1_arm4b_03",
     "arm": "ARM4B_DISCONFIRMATION",
     "action": "LINK",
-    "expected_target": "storage_array_alpha",
+    "expected_target": "storage_array_beta",
     "resolvable": true
   },
   "world_r3r1_arm4b_04_doc_1": {
-    "world_id": "world_r3r1_arm4b_04",
     "arm": "ARM4B_DISCONFIRMATION",
     "action": "DEFER",
     "expected_target": null,
     "resolvable": false
   },
   "world_r3r1_arm4b_04_doc_2": {
-    "world_id": "world_r3r1_arm4b_04",
     "arm": "ARM4B_DISCONFIRMATION",
     "action": "LINK",
     "expected_target": "gateway_router_alpha",
     "resolvable": true
   },
   "world_r3r1_arm4b_05_doc_1": {
-    "world_id": "world_r3r1_arm4b_05",
     "arm": "ARM4B_DISCONFIRMATION",
     "action": "DEFER",
     "expected_target": null,
     "resolvable": false
   },
   "world_r3r1_arm4b_05_doc_2": {
-    "world_id": "world_r3r1_arm4b_05",
     "arm": "ARM4B_DISCONFIRMATION",
     "action": "LINK",
     "expected_target": "compute_cluster_alpha",
     "resolvable": true
   },
   "world_r3r1_arm4b_06_doc_1": {
-    "world_id": "world_r3r1_arm4b_06",
     "arm": "ARM4B_DISCONFIRMATION",
     "action": "DEFER",
     "expected_target": null,
     "resolvable": false
   },
   "world_r3r1_arm4b_06_doc_2": {
-    "world_id": "world_r3r1_arm4b_06",
     "arm": "ARM4B_DISCONFIRMATION",
     "action": "CREATE_PROVISIONAL",
-    "expected_target": "prov_sensor_mesh_omega",
+    "expected_target": "prov_photonic_transceiver_omega",
     "resolvable": true
   },
   "world_r3r1_arm4b_07_doc_1": {
-    "world_id": "world_r3r1_arm4b_07",
     "arm": "ARM4B_DISCONFIRMATION",
     "action": "DEFER",
     "expected_target": null,
     "resolvable": false
   },
   "world_r3r1_arm4b_07_doc_2": {
-    "world_id": "world_r3r1_arm4b_07",
     "arm": "ARM4B_DISCONFIRMATION",
     "action": "LINK",
     "expected_target": "compute_cluster_beta",

@@ -2,9 +2,9 @@
 contract_id: CONTRACT-R8-8C-R3-R1
 status: DRAFT
 base_sha: 92400bf22a24316e5c1522489a1a003c365fe848
-created_at: "2026-08-22 10:45:00Z"
+created_at: "2026-08-22 10:55:00Z"
 proposed_by: antigravity
-design_review: APPROVED
+design_review: CHANGES_REQUESTED
 reviewed_by: chatgpt-pro
 authorized_by: null
 resource_class: gpu
@@ -15,15 +15,15 @@ interruptible: false
 
 # Research Contract: CONTRACT-R8-8C-R3-R1 (Definitive Stage 8 Closure & Epistemic Ingress Decoupling)
 
-**Lifecycle Status**: `DRAFT` (Scientific Review: APPROVED; Awaiting Human Strategic Authorization)
+**Lifecycle Status**: `DRAFT` (Scientific Review: CHANGES_REQUESTED; Awaiting Re-Review & Human Strategic Authorization)
 
 ---
 
 ## 1. Executive Summary & Epistemic Motivation
 
-Stage 8C-R3 proved that refining structural first refusal to require discriminating sub-identifiers yields **100.0% useful resolvable coverage** ($97/97$), producing a $+40.2\%$ Pareto improvement over Stage 8C-R2 with zero regressions.
+Stage 8C-R3 observed candidate evidence showing 97/97 resolvable coverage and a 39-recovery/0-regression historical replay, but ended `REVISED_CONTRACT_REQUIRED` because Gate 5 did not meet its preregistered lifecycle criterion.
 
-However, R3 also exposed a key architectural insight:
+Specifically, R3 revealed a crucial architectural insight:
 $$\textbf{Neural Proposal Conservatism} \neq \textbf{Lifecycle State Machine Correctness}$$
 
 When the neural prompt commanded *"Never guess or merge distinct entities without strong evidence"*, Gemma 3 12B safely proposed `candidate_action: "DEFER"` with `target_entity_id: null` on all ungrounded ambiguous mentions. This caused Gate 5 to observe $3/7$ exact matches rather than $7/7$ because the live neural proposer refused to speculate on ungrounded candidate targets.
@@ -32,9 +32,9 @@ When the neural prompt commanded *"Never guess or merge distinct entities withou
 1. **Decouples Live Lifecycle Testing from Neural Speculation**: Live Gate 5 validates that the hypothesis ledger transition matches the *actual* candidate proposal (`cand is None` $\to$ `RESOLVED_EXISTING`, `cand == target` $\to$ `CONFIRMED`, `cand != target` $\to$ `RETARGETED`, novel creation $\to$ `RESOLVED_NOVEL`).
 2. **Deterministic CPU Branch-Coverage Assay (Gate 5b)**: A standalone unit test that injects synthetic candidates to prove all four terminal transitions execute with 100% mathematical soundness.
 3. **Dual Paired Comparators**:
-   - **Total Historical Gain**: $R3 - \text{Frozen } R2$
-   - **Isolated Precedence Attribution**: $R3 - R3_{\text{ablation}}$ (restoring universal first refusal without sub-IDs to isolate the exact causal effect of the precedence refinement).
-4. **Fresh Sealed Worlds**: 60 fresh synthetic worlds ($120$ decisions) generated with PRNG seed `2718281828` to provide unburned confirmatory evidence.
+   - **Total Historical Gain**: $R3 - \text{Frozen } R2$.
+   - **Isolated Precedence Attribution**: $R3 - R3_{\text{ablation}}$ (a matched resolver where structural mentions lacking sub-IDs immediately defer without Rule 3 fall-through, while valid structural partitions with sub-IDs execute identically to R3-R1).
+4. **Fresh Sealed Worlds & Machine-Verifiable Freshness Audit**: 60 genuinely lexically fresh synthetic worlds ($120$ decisions) generated with PRNG seed `2718281828`, with an automated freshness assertion verifying zero lexical overlap with R3 across Arms 1, 3, 4A, and 4B.
 
 ---
 
@@ -51,6 +51,7 @@ When the neural prompt commanded *"Never guess or merge distinct entities withou
 | **Gate 5b** | Deterministic CPU Branch Coverage | $\equiv \text{PASS}$ across all 5 branches | Synthetic injection proves `RETARGETED`, `CONFIRMED`, `RESOLVED_EXISTING`, `RESOLVED_NOVEL`, `UNRESOLVED` |
 | **Gate 6** | Useful Resolvable Coverage ($N=97$ Resolvable) | $\ge 85.0\%$ across $N=97$ resolvable events | Useful admissions / 97 resolvable events |
 | **Gate 7** | Relational DB & Ledger Reconciliation | Strict 8 UNRESOLVED + 7 Resolved == 15 Total | Integrity OK, 0 FK violations, 120 execution records, 15 hypothesis rows |
+| **Audit** | Freshness Audit vs Frozen R3 | $\equiv \text{PASS}$ ($\text{Overlap} \equiv \emptyset$) | Machine-verifiable disjointness across Arms 1, 3, 4A, and 4B |
 
 ---
 

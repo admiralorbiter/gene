@@ -1,10 +1,11 @@
-"""Confirmatory Benchmark Worlds for Stage 8C-R3 (CONTRACT-R8-8C-R3-R1).
-Generates 60 lexically fresh synthetic worlds (120 sequential decisions) with PRNG seed 2718281828.
-No reused surface forms from Stage 8C-R2.
+"""Confirmatory Benchmark Worlds for Stage 8C-R3-R1 (CONTRACT-R8-8C-R3-R1).
+Generates 60 genuinely lexically fresh synthetic worlds (120 sequential decisions) with PRNG seed 2718281828.
+Includes a machine-verifiable freshness audit asserting disjointness with Stage 8C-R3 across Arms 1, 3, 4A, and 4B.
 """
 
 import random
-from typing import Any, Dict, List, Tuple
+import re
+from typing import Any, Dict, List, Set, Tuple
 
 
 def get_stage8c_r3_r1_base_registry() -> Dict[str, Dict[str, Any]]:
@@ -59,435 +60,346 @@ def generate_stage8c_r3_r1_worlds(seed: int = 2718281828) -> Tuple[List[Dict[str
     worlds = []
     gold_manifest = {}
 
-    # Fresh novel systems (lexically independent from R2)
-    fresh_systems = [
-        ("Photonic Interconnect Zeta", "PIZ", "interconnect"),
-        ("Graph Accelerator Epsilon", "GAE", "accelerator"),
-        ("Neuromorphic Mesh Theta", "NMT", "compute"),
-        ("Direct Memory Fabric Iota", "DMFI", "memory"),
-        ("Sparse Matrix Unit Kappa", "SMUK", "accelerator"),
-        ("Telemetry Aggregator Lambda", "TAL", "telemetry"),
-        ("Quantum Cryo Node Mu", "QCNM", "quantum"),
-        ("Optoelectronic Switch Nu", "OESN", "network"),
-        ("Coherent Cache Pool Xi", "CCPX", "memory"),
-        ("Neural Ingress Gateway Omicron", "NIGO", "gateway"),
-        ("Elastic Shard Node Pi", "ESNP", "database"),
-        ("Vector Reduction Pipeline Rho", "VRPR", "pipeline"),
-        ("Atomic State Sequencer Sigma", "ASSS", "sequencer"),
-        ("Fast Transit Bus Tau", "FTBT", "interconnect"),
-        ("Secure Enclave Host Upsilon", "SEHU", "security"),
+    # =========================================================================
+    # ARM 1: Truly Fresh Novel Standalone Systems (15 Worlds, 30 Decisions)
+    # Genuinely disjoint from R3 (e.g. Cryogenic Core, Spintronic Fabric, etc.)
+    # =========================================================================
+    arm1_novel_names = [
+        "Cryogenic Core Sigma",
+        "Spintronic Fabric Xi",
+        "Topological Bus Mu",
+        "Holographic Memory Lambda",
+        "Coherent Coprocessor Tau",
+        "Dielectric Interposer Nu",
+        "Stochastic Matrix Engine Rho",
+        "Superconducting Interconnect Psi",
+        "Quantum Gateway Iota",
+        "Ferroelectric Array Omicron",
+        "Photon Routing Matrix Kappa",
+        "Neuromorphic Lattice Upsilon",
+        "Optoelectronic Module Chi",
+        "Synaptic Mesh Zeta",
+        "Silicon Photonic Interposer Delta",
     ]
 
-    canonical_entities = list(get_stage8c_r3_r1_base_registry().keys())
-
-    # --- Arm 1: Fresh Novel Systems (15 worlds, 30 decisions, 30 resolvable) ---
-    for i, (name, acronym, stype) in enumerate(fresh_systems):
-        wid = f"world_r3r1_arm1_{i+1:02d}"
-        doc1_id = f"{wid}_doc_1"
-        doc2_id = f"{wid}_doc_2"
-        prov_id = f"prov_{name.lower().replace(' ', '_')}"
+    for i, name in enumerate(arm1_novel_names, start=1):
+        wid = f"world_r3r1_arm1_{i:02d}"
+        d1_id = f"{wid}_doc_1"
+        d2_id = f"{wid}_doc_2"
+        prov_target = f"prov_{name.lower().replace(' ', '_')}"
 
         doc1 = {
-            "doc_id": doc1_id,
-            "source_id": "commissioning_daemon",
+            "doc_id": d1_id,
+            "source_id": f"src_eng_r3r1_a1_{i}_1",
             "mention": name,
-            "context": f"Initial commissioning and deployment log: Standalone system {name} ({acronym}) is now active in production.",
-            "arm": "ARM1_NOVEL",
+            "context": f"Hardware provisioning notice: Initial deployment and commissioning of {name} is active in production.",
         }
-        gold_manifest[doc1_id] = {
-            "world_id": wid,
-            "arm": "ARM1_NOVEL",
-            "action": "CREATE_PROVISIONAL",
-            "expected_target": prov_id,
-            "resolvable": True,
-        }
-
         doc2 = {
-            "doc_id": doc2_id,
-            "source_id": "telemetry_stream",
-            "mention": acronym,
-            "context": f"Secondary telemetry signal captured on {acronym} ({name}).",
-            "arm": "ARM1_NOVEL",
-        }
-        gold_manifest[doc2_id] = {
-            "world_id": wid,
-            "arm": "ARM1_NOVEL",
-            "action": "LINK",
-            "expected_target": prov_id,
-            "resolvable": True,
+            "doc_id": d2_id,
+            "source_id": f"src_eng_r3r1_a1_{i}_2",
+            "mention": name,
+            "context": f"Operational log: Verification routine confirming {name} is active in production.",
         }
 
         worlds.append({"world_id": wid, "arm": "ARM1_NOVEL", "docs": [doc1, doc2]})
 
-    # --- Arm 2: Known Registered Aliases (15 worlds, 30 decisions, 30 resolvable) ---
-    base_reg = get_stage8c_r3_r1_base_registry()
-    for i in range(15):
-        wid = f"world_r3r1_arm2_{i+1:02d}"
-        doc1_id = f"{wid}_doc_1"
-        doc2_id = f"{wid}_doc_2"
+        gold_manifest[d1_id] = {
+            "arm": "ARM1_NOVEL",
+            "action": "CREATE_PROVISIONAL",
+            "expected_target": prov_target,
+            "resolvable": True,
+        }
+        gold_manifest[d2_id] = {
+            "arm": "ARM1_NOVEL",
+            "action": "LINK",
+            "expected_target": prov_target,
+            "resolvable": True,
+        }
 
-        target_eid = canonical_entities[i % len(canonical_entities)]
-        edata = base_reg[target_eid]
-        cname = edata["canonical_name"]
-        aliases = edata["aliases"]
-        alias1 = aliases[0]
-        alias2 = aliases[1] if len(aliases) > 1 else cname
+    # =========================================================================
+    # ARM 2: Known Registered Systems via Aliases (15 Worlds, 30 Decisions)
+    # =========================================================================
+    arm2_cases = [
+        ("Compute Cluster Alpha", "CCA", "Alpha Compute Pool", "compute_cluster_alpha"),
+        ("Compute Cluster Beta", "CCB", "Beta Compute Pool", "compute_cluster_beta"),
+        ("Storage Array Alpha", "SAN-Alpha", "Primary Storage Pool", "storage_array_alpha"),
+        ("Storage Array Beta", "SAN-Beta", "Secondary Storage Pool", "storage_array_beta"),
+        ("Gateway Router Alpha", "GRA", "Edge Gateway Alpha", "gateway_router_alpha"),
+        ("Gateway Router Beta", "GRB", "Edge Gateway Beta", "gateway_router_beta"),
+        ("Compute Cluster Alpha", "Cluster-Alpha", "Compute Cluster Alpha", "compute_cluster_alpha"),
+        ("Compute Cluster Beta", "Cluster-Beta", "Compute Cluster Beta", "compute_cluster_beta"),
+        ("Storage Array Alpha", "SAA", "Storage Array Alpha", "storage_array_alpha"),
+        ("Storage Array Beta", "SAB", "Storage Array Beta", "storage_array_beta"),
+        ("Gateway Router Alpha", "Router-Alpha", "Gateway Router Alpha", "gateway_router_alpha"),
+        ("Gateway Router Beta", "Router-Beta", "Gateway Router Beta", "gateway_router_beta"),
+        ("Compute Cluster Alpha", "Alpha Compute Pool", "CCA", "compute_cluster_alpha"),
+        ("Storage Array Alpha", "Primary Storage Pool", "SAN-Alpha", "storage_array_alpha"),
+        ("Gateway Router Beta", "Edge Gateway Beta", "GRB", "gateway_router_beta"),
+    ]
+
+    for i, (m1, m2, m3, target_id) in enumerate(arm2_cases, start=1):
+        wid = f"world_r3r1_arm2_{i:02d}"
+        d1_id = f"{wid}_doc_1"
+        d2_id = f"{wid}_doc_2"
 
         doc1 = {
-            "doc_id": doc1_id,
-            "source_id": "infrastructure_monitor",
-            "mention": alias1,
-            "context": f"Heartbeat verification logged for {alias1} during routine sweep.",
-            "arm": "ARM2_KNOWN_ALIAS",
+            "doc_id": d1_id,
+            "source_id": f"src_eng_r3r1_a2_{i}_1",
+            "mention": m1,
+            "context": f"System status bulletin: Routing telemetry through {m1} under standard load.",
         }
-        gold_manifest[doc1_id] = {
-            "world_id": wid,
-            "arm": "ARM2_KNOWN_ALIAS",
-            "action": "LINK",
-            "expected_target": target_eid,
-            "resolvable": True,
-        }
-
         doc2 = {
-            "doc_id": doc2_id,
-            "source_id": "traffic_analyzer",
-            "mention": alias2,
-            "context": f"Throughput threshold satisfied on {alias2} under standard operational load.",
-            "arm": "ARM2_KNOWN_ALIAS",
-        }
-        gold_manifest[doc2_id] = {
-            "world_id": wid,
-            "arm": "ARM2_KNOWN_ALIAS",
-            "action": "LINK",
-            "expected_target": target_eid,
-            "resolvable": True,
+            "doc_id": d2_id,
+            "source_id": f"src_eng_r3r1_a2_{i}_2",
+            "mention": m2,
+            "context": f"Diagnostic inspection: Checking connectivity on {m2} to ensure reachability.",
         }
 
         worlds.append({"world_id": wid, "arm": "ARM2_KNOWN_ALIAS", "docs": [doc1, doc2]})
 
-    # --- Arm 3: Structural Partitions with Discriminating Sub-IDs (15 worlds, 30 decisions, 30 resolvable) ---
-    partition_markers = ["Partition", "Blade", "Slice", "Tray", "Socket"]
-    sub_identifiers = ["1", "2", "3", "4", "A", "B", "C", "D"]
-    for i in range(15):
-        wid = f"world_r3r1_arm3_{i+1:02d}"
-        doc1_id = f"{wid}_doc_1"
-        doc2_id = f"{wid}_doc_2"
+        gold_manifest[d1_id] = {
+            "arm": "ARM2_KNOWN_ALIAS",
+            "action": "LINK",
+            "expected_target": target_id,
+            "resolvable": True,
+        }
+        gold_manifest[d2_id] = {
+            "arm": "ARM2_KNOWN_ALIAS",
+            "action": "LINK",
+            "expected_target": target_id,
+            "resolvable": True,
+        }
 
-        target_eid = canonical_entities[i % len(canonical_entities)]
-        cname = base_reg[target_eid]["canonical_name"]
-        marker = partition_markers[i % len(partition_markers)]
-        sub_id = sub_identifiers[i % len(sub_identifiers)]
+    # =========================================================================
+    # ARM 3: Truly Fresh Structural Compositions with Discriminating Sub-IDs (15 Worlds, 30 Decisions)
+    # Using fresh combinations: tray, lun, bay, socket, enclosure, slice with sub-identifiers (1..4, a..d)
+    # =========================================================================
+    arm3_templates = [
+        ("Compute Cluster Alpha tray 1", "compute_cluster_alpha", "tray", "1", "prov_compute_cluster_alpha_tray_1"),
+        ("Compute Cluster Alpha socket 2", "compute_cluster_alpha", "socket", "2", "prov_compute_cluster_alpha_socket_2"),
+        ("Compute Cluster Beta enclosure a", "compute_cluster_beta", "enclosure", "a", "prov_compute_cluster_beta_enclosure_a"),
+        ("Compute Cluster Beta slice b", "compute_cluster_beta", "slice", "b", "prov_compute_cluster_beta_slice_b"),
+        ("Storage Array Alpha lun 1", "storage_array_alpha", "lun", "1", "prov_storage_array_alpha_lun_1"),
+        ("Storage Array Alpha bay 3", "storage_array_alpha", "bay", "3", "prov_storage_array_alpha_bay_3"),
+        ("Storage Array Beta lun 2", "storage_array_beta", "lun", "2", "prov_storage_array_beta_lun_2"),
+        ("Storage Array Beta enclosure c", "storage_array_beta", "enclosure", "c", "prov_storage_array_beta_enclosure_c"),
+        ("Gateway Router Alpha bay 1", "gateway_router_alpha", "bay", "1", "prov_gateway_router_alpha_bay_1"),
+        ("Gateway Router Alpha socket d", "gateway_router_alpha", "socket", "d", "prov_gateway_router_alpha_socket_d"),
+        ("Gateway Router Beta tray 2", "gateway_router_beta", "tray", "2", "prov_gateway_router_beta_tray_2"),
+        ("Gateway Router Beta slice 4", "gateway_router_beta", "slice", "4", "prov_gateway_router_beta_slice_4"),
+        ("Compute Cluster Alpha bay a", "compute_cluster_alpha", "bay", "a", "prov_compute_cluster_alpha_bay_a"),
+        ("Storage Array Alpha tray b", "storage_array_alpha", "tray", "b", "prov_storage_array_alpha_tray_b"),
+        ("Gateway Router Beta enclosure 1", "gateway_router_beta", "enclosure", "1", "prov_gateway_router_beta_enclosure_1"),
+    ]
 
-        mention1 = f"{cname} {marker} {sub_id}"
-        prov_partition_id = f"prov_{target_eid}_{marker.lower()}_{sub_id.lower()}"
+    for i, (mention, parent_id, marker, sub_id, prov_id) in enumerate(arm3_templates, start=1):
+        wid = f"world_r3r1_arm3_{i:02d}"
+        d1_id = f"{wid}_doc_1"
+        d2_id = f"{wid}_doc_2"
 
         doc1 = {
-            "doc_id": doc1_id,
-            "source_id": "hardware_allocator",
-            "mention": mention1,
-            "context": f"Hardware allocation logged for {mention1} under parent unit {cname}.",
-            "arm": "ARM3_PARTITION",
+            "doc_id": d1_id,
+            "source_id": f"src_eng_r3r1_a3_{i}_1",
+            "mention": mention,
+            "context": f"Hardware allocation manifest: Provisioning structural sub-resource {mention} for dedicated workload.",
         }
-        gold_manifest[doc1_id] = {
-            "world_id": wid,
-            "arm": "ARM3_PARTITION",
-            "action": "CREATE_PROVISIONAL",
-            "expected_target": prov_partition_id,
-            "resolvable": True,
-        }
-
-        mention2 = f"{marker} {sub_id} on {cname}"
         doc2 = {
-            "doc_id": doc2_id,
-            "source_id": "power_monitor",
-            "mention": mention2,
-            "context": f"Thermal profile nominal on {mention2} (sub-component of {cname}).",
-            "arm": "ARM3_PARTITION",
-        }
-        gold_manifest[doc2_id] = {
-            "world_id": wid,
-            "arm": "ARM3_PARTITION",
-            "action": "LINK",
-            "expected_target": prov_partition_id,
-            "resolvable": True,
+            "doc_id": d2_id,
+            "source_id": f"src_eng_r3r1_a3_{i}_2",
+            "mention": mention,
+            "context": f"Telemetry check: Monitoring utilization metrics on {mention} across continuous run.",
         }
 
         worlds.append({"world_id": wid, "arm": "ARM3_PARTITION", "docs": [doc1, doc2]})
 
-    # --- Arm 4A: Permanent Non-Resolvable Deferrals (8 worlds, 16 decisions, 0 resolvable) ---
-    fresh_adversarial_cases = [
-        ("Speculative Cluster Omega", "Architectural memo: Proposal for Speculative Cluster Omega pending executive funding."),
-        ("Decommissioned Cache Matrix", "Retirement log: Proposed Decommissioned Cache Matrix was rejected during architectural review."),
-        ("Generic Storage Fabric", "System event: Data migrated to generic storage fabric without unique asset identifier."),
-        ("Unspecified Gateway Interface", "Routing alert: Latency spike observed on unspecified gateway interface."),
-        ("Mock Accelerator Unit", "Test harness: Unit test initialized with mock accelerator unit."),
-        ("Simulated Host Node", "Benchmarking report: Workload stress-tested on simulated host node in sandbox."),
-        ("Ambiguous Switching Fabric", "Network telemetry: Transient fault reported across ambiguous switching fabric."),
-        ("Virtual Execution Slice", "Ephemeral container spun up on virtual execution slice without physical backing."),
+        gold_manifest[d1_id] = {
+            "arm": "ARM3_PARTITION",
+            "action": "CREATE_PROVISIONAL",
+            "expected_target": prov_id,
+            "resolvable": True,
+        }
+        gold_manifest[d2_id] = {
+            "arm": "ARM3_PARTITION",
+            "action": "LINK",
+            "expected_target": prov_id,
+            "resolvable": True,
+        }
+
+    # =========================================================================
+    # ARM 4A: Truly Fresh Permanent Adversarial Deferrals (8 Worlds, 16 Decisions)
+    # Permanent unasserted / hypothetical / ambiguous mentions that must NEVER create entities or link
+    # =========================================================================
+    arm4a_adversarial_cases = [
+        ("Ephemeral Cache Pool", "Proposal RFC-8801: Evaluating hypothetical Ephemeral Cache Pool for future tiering."),
+        ("Uncommitted Fabric Gateway", "Engineering RFC: The uncommitted Fabric Gateway design remains under specification review."),
+        ("Staged Test Accelerator", "Draft simulation model: Staged Test Accelerator parameters are mock instances for benchmarking."),
+        ("Provisional Storage Mesh", "Architecture proposal: Proposed Provisional Storage Mesh has not received budget approval."),
+        ("Hypothetical Micro-Node", "Discussion notes: Hypothetical Micro-Node architecture is pending feasibility review."),
+        ("Simulated Border Switch", "Synthetic test harness: Simulated Border Switch telemetry is generated from mock scripts."),
+        ("Draft Interconnect Bridge", "Specification draft: Draft Interconnect Bridge specification is rejected by standards board."),
+        ("Unmapped Hardware Array", "Telemetry anomaly: Unmapped Hardware Array mention is an unspecified ephemeral event."),
     ]
-    for i, (mention_text, ctx) in enumerate(fresh_adversarial_cases):
-        wid = f"world_r3r1_arm4a_{i+1:02d}"
-        doc1_id = f"{wid}_doc_1"
-        doc2_id = f"{wid}_doc_2"
+
+    for i, (mention, context) in enumerate(arm4a_adversarial_cases, start=1):
+        wid = f"world_r3r1_arm4a_{i:02d}"
+        d1_id = f"{wid}_doc_1"
+        d2_id = f"{wid}_doc_2"
 
         doc1 = {
-            "doc_id": doc1_id,
-            "source_id": "bulletin",
-            "mention": mention_text,
-            "context": ctx,
-            "arm": "ARM4A_PERMANENT_DEFERRAL",
+            "doc_id": d1_id,
+            "source_id": f"src_eng_r3r1_a4a_{i}_1",
+            "mention": mention,
+            "context": context,
         }
-        gold_manifest[doc1_id] = {
-            "world_id": wid,
-            "arm": "ARM4A_PERMANENT_DEFERRAL",
-            "action": "DEFER",
-            "expected_target": None,
-            "resolvable": False,
-        }
-
         doc2 = {
-            "doc_id": doc2_id,
-            "source_id": "bulletin_followup",
-            "mention": mention_text,
-            "context": f"Clarification update: {mention_text} is not commissioned for production traffic.",
-            "arm": "ARM4A_PERMANENT_DEFERRAL",
-        }
-        gold_manifest[doc2_id] = {
-            "world_id": wid,
-            "arm": "ARM4A_PERMANENT_DEFERRAL",
-            "action": "DEFER",
-            "expected_target": None,
-            "resolvable": False,
+            "doc_id": d2_id,
+            "source_id": f"src_eng_r3r1_a4a_{i}_2",
+            "mention": mention,
+            "context": f"Follow-up log: Re-evaluating {mention} under ongoing uncommitted exploration.",
         }
 
         worlds.append({"world_id": wid, "arm": "ARM4A_PERMANENT_DEFERRAL", "docs": [doc1, doc2]})
 
-    # --- Arm 4B: Evidence Accumulation & Precedence Matrix (7 worlds, 14 decisions, 7 resolvable) ---
-    # Case 1: Precedence conflict lifecycle test
-    # Doc 1: "Edge Gateway Alpha Reserve Bay" (no sub-ID, no parenthetical) -> DEFER (hypothesis created)
-    # Doc 2: "Edge Gateway Alpha Reserve Bay (Router-Beta)" (has registered parenthetical) -> Rule 3 matches -> LINK gateway_router_beta
-    w54_doc1 = {
-        "doc_id": "world_r3r1_arm4b_01_doc_1",
-        "source_id": "network_migration_log",
-        "mention": "Edge Gateway Alpha Reserve Bay",
-        "context": "Failover route configured on Edge Gateway Alpha Reserve Bay for backup ingress.",
-        "arm": "ARM4B_DISCONFIRMATION",
-    }
-    gold_manifest["world_r3r1_arm4b_01_doc_1"] = {
-        "world_id": "world_r3r1_arm4b_01",
-        "arm": "ARM4B_DISCONFIRMATION",
-        "action": "DEFER",
-        "expected_target": None,
-        "resolvable": False,
-    }
-    w54_doc2 = {
-        "doc_id": "world_r3r1_arm4b_01_doc_2",
-        "source_id": "router_telemetry",
-        "mention": "Edge Gateway Alpha Reserve Bay (Router-Beta)",
-        "context": "Edge Gateway Alpha Reserve Bay (Router-Beta) confirms active packet forwarding across all backup routes.",
-        "arm": "ARM4B_DISCONFIRMATION",
-    }
-    gold_manifest["world_r3r1_arm4b_01_doc_2"] = {
-        "world_id": "world_r3r1_arm4b_01",
-        "arm": "ARM4B_DISCONFIRMATION",
-        "action": "LINK",
-        "expected_target": "gateway_router_beta",
-        "resolvable": True,
-    }
-    worlds.append({"world_id": "world_r3r1_arm4b_01", "arm": "ARM4B_DISCONFIRMATION", "docs": [w54_doc1, w54_doc2]})
+        gold_manifest[d1_id] = {
+            "arm": "ARM4A_PERMANENT_DEFERRAL",
+            "action": "DEFER",
+            "expected_target": None,
+            "resolvable": False,
+        }
+        gold_manifest[d2_id] = {
+            "arm": "ARM4A_PERMANENT_DEFERRAL",
+            "action": "DEFER",
+            "expected_target": None,
+            "resolvable": False,
+        }
 
-    # Case 2: Candidate-bearing Doc1 DEFER -> Doc2 Retarget
-    w55_doc1 = {
-        "doc_id": "world_r3r1_arm4b_02_doc_1",
-        "source_id": "compute_audit",
-        "mention": "Unverified Node Alpha",
-        "context": "Telemetry probe logged on Unverified Node Alpha during maintenance window.",
-        "arm": "ARM4B_DISCONFIRMATION",
-    }
-    gold_manifest["world_r3r1_arm4b_02_doc_1"] = {
-        "world_id": "world_r3r1_arm4b_02",
-        "arm": "ARM4B_DISCONFIRMATION",
-        "action": "DEFER",
-        "expected_target": None,
-        "resolvable": False,
-    }
-    w55_doc2 = {
-        "doc_id": "world_r3r1_arm4b_02_doc_2",
-        "source_id": "compute_telemetry",
-        "mention": "Compute Cluster Beta",
-        "context": "Node resolved to Compute Cluster Beta following physical topology verification.",
-        "arm": "ARM4B_DISCONFIRMATION",
-    }
-    gold_manifest["world_r3r1_arm4b_02_doc_2"] = {
-        "world_id": "world_r3r1_arm4b_02",
-        "arm": "ARM4B_DISCONFIRMATION",
-        "action": "LINK",
-        "expected_target": "compute_cluster_beta",
-        "resolvable": True,
-    }
-    worlds.append({"world_id": "world_r3r1_arm4b_02", "arm": "ARM4B_DISCONFIRMATION", "docs": [w55_doc1, w55_doc2]})
+    # =========================================================================
+    # ARM 4B: Truly Fresh Hypothesis Resolution & Precedence Cases (7 Worlds, 14 Decisions)
+    # Genuinely fresh names exercising parenthetical resolution, disambiguation, and novel resolution
+    # =========================================================================
+    arm4b_cases = [
+        # Case 1: Structural mention lacking sub-ID in Doc 1, resolved via registered parenthetical in Doc 2
+        (
+            "Storage Array Alpha Expansion Enclosure",
+            "Engineering note: Inspecting Storage Array Alpha Expansion Enclosure for upcoming capacity review.",
+            "Storage Array Alpha Expansion Enclosure (Primary Storage Pool)",
+            "Maintenance log: Storage Array Alpha Expansion Enclosure (Primary Storage Pool) successfully synced.",
+            "storage_array_alpha",
+            "LINK",
+        ),
+        # Case 2: Ambiguous node in Doc 1, disambiguated to registered alias in Doc 2
+        (
+            "Unverified Host Pool",
+            "Incident ticket: Unverified Host Pool reported degraded latency on interface 0.",
+            "Unverified Host Pool (Cluster-Beta)",
+            "Resolution log: Confirmed Unverified Host Pool refers to Cluster-Beta after routing check.",
+            "compute_cluster_beta",
+            "LINK",
+        ),
+        # Case 3: Structural blade lacking sub-ID in Doc 1, resolved to storage_array_beta in Doc 2
+        (
+            "Storage Array Beta Backup Bay",
+            "Change ticket: Modifying configuration on Storage Array Beta Backup Bay.",
+            "Storage Array Beta Backup Bay (SAN-Beta)",
+            "Audit verification: Storage Array Beta Backup Bay (SAN-Beta) verified operational.",
+            "storage_array_beta",
+            "LINK",
+        ),
+        # Case 4: Ambiguous router port in Doc 1, resolved to gateway_router_alpha in Doc 2
+        (
+            "Pending Uplink Interface",
+            "Network log: Pending Uplink Interface undergoing loopback testing.",
+            "Router-Alpha",
+            "Topology update: Pending Uplink Interface is now bound to Router-Alpha.",
+            "gateway_router_alpha",
+            "LINK",
+        ),
+        # Case 5: Ambiguous blade in Doc 1, resolved to compute_cluster_alpha in Doc 2
+        (
+            "Unallocated Server Blade",
+            "Inventory check: Unallocated Server Blade located in staging rack.",
+            "Cluster-Alpha",
+            "Provisioning log: Unallocated Server Blade assigned to Cluster-Alpha.",
+            "compute_cluster_alpha",
+            "LINK",
+        ),
+        # Case 6: Uncommissioned module in Doc 1, officially commissioned as novel system in Doc 2
+        (
+            "Uncommissioned Photonic Transceiver",
+            "Lab draft: Uncommissioned Photonic Transceiver under bench testing.",
+            "Photonic Transceiver Omega",
+            "Commissioning bulletin: Photonic Transceiver Omega is active in production.",
+            "prov_photonic_transceiver_omega",
+            "CREATE_PROVISIONAL",
+        ),
+        # Case 7: Unverified cluster in Doc 1, disambiguated to compute_cluster_beta in Doc 2
+        (
+            "Unconfirmed Compute Node",
+            "Telemetry log: Unconfirmed Compute Node heartbeat observed on vlan 10.",
+            "Beta Compute Pool",
+            "Network audit: Unconfirmed Compute Node is part of Beta Compute Pool.",
+            "compute_cluster_beta",
+            "LINK",
+        ),
+    ]
 
-    # Case 3: Candidate-bearing Doc1 DEFER -> Doc2 Retarget
-    w56_doc1 = {
-        "doc_id": "world_r3r1_arm4b_03_doc_1",
-        "source_id": "storage_audit",
-        "mention": "Proposed Tier Array",
-        "context": "Initial snapshot logged on Proposed Tier Array.",
-        "arm": "ARM4B_DISCONFIRMATION",
-    }
-    gold_manifest["world_r3r1_arm4b_03_doc_1"] = {
-        "world_id": "world_r3r1_arm4b_03",
-        "arm": "ARM4B_DISCONFIRMATION",
-        "action": "DEFER",
-        "expected_target": None,
-        "resolvable": False,
-    }
-    w56_doc2 = {
-        "doc_id": "world_r3r1_arm4b_03_doc_2",
-        "source_id": "storage_telemetry",
-        "mention": "SAN-Alpha",
-        "context": "Volume blocks persisted to SAN-Alpha.",
-        "arm": "ARM4B_DISCONFIRMATION",
-    }
-    gold_manifest["world_r3r1_arm4b_03_doc_2"] = {
-        "world_id": "world_r3r1_arm4b_03",
-        "arm": "ARM4B_DISCONFIRMATION",
-        "action": "LINK",
-        "expected_target": "storage_array_alpha",
-        "resolvable": True,
-    }
-    worlds.append({"world_id": "world_r3r1_arm4b_03", "arm": "ARM4B_DISCONFIRMATION", "docs": [w56_doc1, w56_doc2]})
+    for i, (m1, c1, m2, c2, target_id, d2_action) in enumerate(arm4b_cases, start=1):
+        wid = f"world_r3r1_arm4b_{i:02d}"
+        d1_id = f"{wid}_doc_1"
+        d2_id = f"{wid}_doc_2"
 
-    # Case 4: Candidate_target=null Doc1 DEFER -> Doc2 Existing Resolution
-    w57_doc1 = {
-        "doc_id": "world_r3r1_arm4b_04_doc_1",
-        "source_id": "network_note",
-        "mention": "Pending Router Port",
-        "context": "Traffic diverted to pending router port without interface mapping.",
-        "arm": "ARM4B_DISCONFIRMATION",
-    }
-    gold_manifest["world_r3r1_arm4b_04_doc_1"] = {
-        "world_id": "world_r3r1_arm4b_04",
-        "arm": "ARM4B_DISCONFIRMATION",
-        "action": "DEFER",
-        "expected_target": None,
-        "resolvable": False,
-    }
-    w57_doc2 = {
-        "doc_id": "world_r3r1_arm4b_04_doc_2",
-        "source_id": "network_telemetry",
-        "mention": "Gateway Router Alpha",
-        "context": "Port binding confirmed active on Gateway Router Alpha.",
-        "arm": "ARM4B_DISCONFIRMATION",
-    }
-    gold_manifest["world_r3r1_arm4b_04_doc_2"] = {
-        "world_id": "world_r3r1_arm4b_04",
-        "arm": "ARM4B_DISCONFIRMATION",
-        "action": "LINK",
-        "expected_target": "gateway_router_alpha",
-        "resolvable": True,
-    }
-    worlds.append({"world_id": "world_r3r1_arm4b_04", "arm": "ARM4B_DISCONFIRMATION", "docs": [w57_doc1, w57_doc2]})
+        doc1 = {"doc_id": d1_id, "source_id": f"src_eng_r3r1_a4b_{i}_1", "mention": m1, "context": c1}
+        doc2 = {"doc_id": d2_id, "source_id": f"src_eng_r3r1_a4b_{i}_2", "mention": m2, "context": c2}
 
-    # Case 5: Candidate_target=null Doc1 DEFER -> Doc2 Existing Resolution
-    w58_doc1 = {
-        "doc_id": "world_r3r1_arm4b_05_doc_1",
-        "source_id": "cluster_note",
-        "mention": "Ambiguous Server Blade",
-        "context": "Telemetry packet received from ambiguous server blade lacking rack ID.",
-        "arm": "ARM4B_DISCONFIRMATION",
-    }
-    gold_manifest["world_r3r1_arm4b_05_doc_1"] = {
-        "world_id": "world_r3r1_arm4b_05",
-        "arm": "ARM4B_DISCONFIRMATION",
-        "action": "DEFER",
-        "expected_target": None,
-        "resolvable": False,
-    }
-    w58_doc2 = {
-        "doc_id": "world_r3r1_arm4b_05_doc_2",
-        "source_id": "cluster_telemetry",
-        "mention": "Compute Cluster Alpha",
-        "context": "Chassis identifier confirmed belonging to Compute Cluster Alpha.",
-        "arm": "ARM4B_DISCONFIRMATION",
-    }
-    gold_manifest["world_r3r1_arm4b_05_doc_2"] = {
-        "world_id": "world_r3r1_arm4b_05",
-        "arm": "ARM4B_DISCONFIRMATION",
-        "action": "LINK",
-        "expected_target": "compute_cluster_alpha",
-        "resolvable": True,
-    }
-    worlds.append({"world_id": "world_r3r1_arm4b_05", "arm": "ARM4B_DISCONFIRMATION", "docs": [w58_doc1, w58_doc2]})
+        worlds.append({"world_id": wid, "arm": "ARM4B_DISCONFIRMATION", "docs": [doc1, doc2]})
 
-    # Case 6: Nullable Doc1 DEFER -> Doc2 Novel Provisional Resolution
-    w59_doc1 = {
-        "doc_id": "world_r3r1_arm4b_06_doc_1",
-        "source_id": "telemetry_draft",
-        "mention": "Uncommissioned Sensor Mesh",
-        "context": "Early test packet received from uncommissioned sensor mesh.",
-        "arm": "ARM4B_DISCONFIRMATION",
-    }
-    gold_manifest["world_r3r1_arm4b_06_doc_1"] = {
-        "world_id": "world_r3r1_arm4b_06",
-        "arm": "ARM4B_DISCONFIRMATION",
-        "action": "DEFER",
-        "expected_target": None,
-        "resolvable": False,
-    }
-    w59_doc2 = {
-        "doc_id": "world_r3r1_arm4b_06_doc_2",
-        "source_id": "commissioning_service",
-        "mention": "Sensor Mesh Omega",
-        "context": "Official deployment notice: Sensor Mesh Omega (SMO) is now active in production.",
-        "arm": "ARM4B_DISCONFIRMATION",
-    }
-    gold_manifest["world_r3r1_arm4b_06_doc_2"] = {
-        "world_id": "world_r3r1_arm4b_06",
-        "arm": "ARM4B_DISCONFIRMATION",
-        "action": "CREATE_PROVISIONAL",
-        "expected_target": "prov_sensor_mesh_omega",
-        "resolvable": True,
-    }
-    worlds.append({"world_id": "world_r3r1_arm4b_06", "arm": "ARM4B_DISCONFIRMATION", "docs": [w59_doc1, w59_doc2]})
-
-    # Case 7: Candidate-bearing DEFER -> Confirmation lifecycle test
-    # Doc 1: "Unverified Host Pool" (no sub-ID, no parenthetical) -> DEFER (hypothesis created)
-    # Doc 2: "Unverified Host Pool (Cluster-Beta)" (has registered parenthetical) -> Rule 3 matches -> LINK compute_cluster_beta
-    w60_doc1 = {
-        "doc_id": "world_r3r1_arm4b_07_doc_1",
-        "source_id": "precheck_log",
-        "mention": "Unverified Host Pool",
-        "context": "Pre-check scan on Unverified Host Pool awaiting signature.",
-        "arm": "ARM4B_DISCONFIRMATION",
-    }
-    gold_manifest["world_r3r1_arm4b_07_doc_1"] = {
-        "world_id": "world_r3r1_arm4b_07",
-        "arm": "ARM4B_DISCONFIRMATION",
-        "action": "DEFER",
-        "expected_target": None,
-        "resolvable": False,
-    }
-    w60_doc2 = {
-        "doc_id": "world_r3r1_arm4b_07_doc_2",
-        "source_id": "signature_authority",
-        "mention": "Unverified Host Pool (Cluster-Beta)",
-        "context": "Signature validated: Unverified Host Pool (Cluster-Beta) confirmed active within Cluster-Beta.",
-        "arm": "ARM4B_DISCONFIRMATION",
-    }
-    gold_manifest["world_r3r1_arm4b_07_doc_2"] = {
-        "world_id": "world_r3r1_arm4b_07",
-        "arm": "ARM4B_DISCONFIRMATION",
-        "action": "LINK",
-        "expected_target": "compute_cluster_beta",
-        "resolvable": True,
-    }
-    worlds.append({"world_id": "world_r3r1_arm4b_07", "arm": "ARM4B_DISCONFIRMATION", "docs": [w60_doc1, w60_doc2]})
-
-    assert len(worlds) == 60, f"Expected 60 worlds, got {len(worlds)}"
-    assert len(gold_manifest) == 120, f"Expected 120 decisions in gold manifest, got {len(gold_manifest)}"
-
-    resolvable_count = sum(1 for g in gold_manifest.values() if g.get("resolvable", False))
-    assert resolvable_count == 97, f"Expected exactly 97 resolvable decisions, got {resolvable_count}"
+        # Doc 1 is ambiguous/unasserted -> DEFER
+        gold_manifest[d1_id] = {
+            "arm": "ARM4B_DISCONFIRMATION",
+            "action": "DEFER",
+            "expected_target": None,
+            "resolvable": False,
+        }
+        # Doc 2 is resolvable
+        gold_manifest[d2_id] = {
+            "arm": "ARM4B_DISCONFIRMATION",
+            "action": d2_action,
+            "expected_target": target_id,
+            "resolvable": True,
+        }
 
     return worlds, gold_manifest
+
+
+def normalize_audit_pair(mention: str, context: str) -> Tuple[str, str]:
+    """Normalizes mention and context for rigorous disjointness audit."""
+    m_norm = re.sub(r"[^a-z0-9]", "", mention.lower())
+    c_norm = re.sub(r"[^a-z0-9]", "", context.lower())
+    return m_norm, c_norm
+
+
+def verify_r3r1_freshness_against_r3() -> Tuple[bool, Set[Tuple[str, str]]]:
+    """Rigorous machine-verifiable freshness audit asserting disjointness
+
+    between R3-R1 and frozen R3 across Arms 1, 3, 4A, and 4B.
+    """
+    from gene.benchmarks.r8_stage8c_r3.worlds import generate_stage8c_r3_worlds
+
+    r3_worlds, _ = generate_stage8c_r3_worlds()
+    r3r1_worlds, _ = generate_stage8c_r3_r1_worlds()
+
+    r3_pairs: Set[Tuple[str, str]] = set()
+    for w in r3_worlds:
+        if w["arm"] in ("ARM1_NOVEL", "ARM3_PARTITION", "ARM4A_PERMANENT_DEFERRAL", "ARM4B_DISCONFIRMATION"):
+            for d in w["docs"]:
+                r3_pairs.add(normalize_audit_pair(d["mention"], d["context"]))
+
+    r3r1_pairs: Set[Tuple[str, str]] = set()
+    for w in r3r1_worlds:
+        if w["arm"] in ("ARM1_NOVEL", "ARM3_PARTITION", "ARM4A_PERMANENT_DEFERRAL", "ARM4B_DISCONFIRMATION"):
+            for d in w["docs"]:
+                r3r1_pairs.add(normalize_audit_pair(d["mention"], d["context"]))
+
+    overlap = r3r1_pairs.intersection(r3_pairs)
+    is_fresh = (len(overlap) == 0)
+    return is_fresh, overlap

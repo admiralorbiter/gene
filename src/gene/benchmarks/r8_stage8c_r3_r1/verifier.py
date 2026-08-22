@@ -28,7 +28,10 @@ from gene.benchmarks.r8_stage8c_r3_r1.runner import (
     EpistemicIngressSessionR3R1,
     normalize_alias,
 )
-from gene.benchmarks.r8_stage8c_r3_r1.worlds import get_stage8c_r3_r1_base_registry
+from gene.benchmarks.r8_stage8c_r3_r1.worlds import (
+    get_stage8c_r3_r1_base_registry,
+    verify_r3r1_freshness_against_r3,
+)
 
 
 def verify_cpu_branch_coverage_state_machine() -> bool:
@@ -316,6 +319,9 @@ def verify_stage8c_r3_r1_contract(
     r2_replay = run_paired_comparator_replay(records, gold_manifest, EpistemicIngressSessionR2)
     ablation_replay = run_paired_comparator_replay(records, gold_manifest, EpistemicIngressSessionR3Ablation)
 
+    # 10. Freshness Audit vs Frozen Stage 8C-R3
+    is_fresh, overlap = verify_r3r1_freshness_against_r3()
+
     all_passed = (
         gate_1_pass
         and gate_2a_pass
@@ -326,6 +332,7 @@ def verify_stage8c_r3_r1_contract(
         and gate_5b_pass
         and gate_6_pass
         and gate_7_pass
+        and is_fresh
     )
 
     metrics = {
@@ -352,6 +359,8 @@ def verify_stage8c_r3_r1_contract(
         "gate_7_total_hypotheses": f"{total_hypo_count}/15",
         "gate_7_record_count": f"{rec_count}/120",
         "gate_7_pass": gate_7_pass,
+        "freshness_audit_pass": is_fresh,
+        "freshness_overlap_count": len(overlap),
         "historical_r2_replay": {
             "coverage_pct": f"{r2_replay['coverage_pct']:.1f}% ({r2_replay['resolvable_correct']}/{r2_replay['total_resolvable']})",
             "total_gain_over_r2": f"+{coverage_pct - r2_replay['coverage_pct']:.1f}%",
@@ -372,3 +381,4 @@ def verify_stage8c_r3_r1_contract(
     }
 
     return all_passed, metrics
+

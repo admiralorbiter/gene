@@ -1,8 +1,8 @@
 """Confirmatory Benchmark Runner for Stage 8C-R3-R1 (CONTRACT-R8-8C-R3-R1).
-Executes 60 fresh sealed worlds (120 sequential decisions) with local Ollama Gemma 3 12B.
+Executes 60 genuinely fresh sealed worlds (120 sequential decisions) with local Ollama Gemma 3 12B.
 Includes:
 1. Candidate Ingress Kernel with Refined Precedence (Structural parent + sub-ID, registered parentheticals).
-2. Matched Precedence Ablation Resolver (Restoring universal structural first refusal without sub-IDs).
+2. Matched Precedence Ablation Resolver (Structural parent without sub-ID immediately defers without Rule 3 fall-through, while preserving valid structural partitions).
 3. Decoupled Lifecycle State Machine & DB Ledger Reconciliation.
 """
 
@@ -118,7 +118,7 @@ class EpistemicIngressSessionR3R1:
                     hypo["status"] = "RESOLVED_EXISTING"
             elif action == "CREATE_PROVISIONAL":
                 hypo["status"] = "RESOLVED_NOVEL"
-            
+
             hypo["resolved_target"] = target_id
             hypo["resolving_doc_id"] = doc_id
             hypo.setdefault("evidence_history", []).append({
@@ -128,6 +128,51 @@ class EpistemicIngressSessionR3R1:
                 "action": action,
                 "target_id": target_id,
             })
+
+    def _handle_deferral(
+        self,
+        doc_id: str,
+        source_id: str,
+        mention: str,
+        context: str,
+        neural_proposal: Dict[str, Any],
+        rule_name: str = "RULE_5_FAIL_CLOSED_DEFER",
+    ) -> Dict[str, Any]:
+        cand_target = neural_proposal.get("target_entity_id") if neural_proposal else None
+        if self.world_id not in self.hypothesis_ledger:
+            hypo_entry = {
+                "hypothesis_id": f"hypo_{self.world_id}",
+                "world_id": self.world_id,
+                "originating_doc_id": doc_id,
+                "surface_form": mention,
+                "candidate_target": cand_target,
+                "status": "UNRESOLVED",
+                "resolved_target": None,
+                "resolving_doc_id": None,
+                "evidence_history": [{"doc_id": doc_id, "mention": mention, "context": context[:120], "action": "DEFER", "rule": rule_name}],
+            }
+            self.hypothesis_ledger[self.world_id] = hypo_entry
+        else:
+            hypo = self.hypothesis_ledger[self.world_id]
+            hypo.setdefault("evidence_history", []).append({
+                "doc_id": doc_id,
+                "mention": mention,
+                "context": context[:120],
+                "action": "DEFER",
+                "rule": rule_name,
+            })
+            if hypo.get("candidate_target") is None and cand_target:
+                hypo["candidate_target"] = cand_target
+
+        self.mutation_log.append(
+            {"doc_id": doc_id, "action": "DEFER", "target": None, "durable": False}
+        )
+        return {
+            "action": "DEFER",
+            "target_id": None,
+            "durable": False,
+            "rule": rule_name,
+        }
 
     def process_mention(
         self,
@@ -345,51 +390,17 @@ class EpistemicIngressSessionR3R1:
         # ---------------------------------------------------------------------
         # Rule 5: Fail-Closed Ambiguous / Adversarial Deferral (World-Scoped Hypothesis Ledger)
         # ---------------------------------------------------------------------
-        cand_target = neural_proposal.get("target_entity_id") if neural_proposal else None
-        if self.world_id not in self.hypothesis_ledger:
-            # First deferral in this world -> create world-local hypothesis
-            hypo_entry = {
-                "hypothesis_id": f"hypo_{self.world_id}",
-                "world_id": self.world_id,
-                "originating_doc_id": doc_id,
-                "surface_form": mention,
-                "candidate_target": cand_target,
-                "status": "UNRESOLVED",
-                "resolved_target": None,
-                "resolving_doc_id": None,
-                "evidence_history": [{"doc_id": doc_id, "mention": mention, "context": context[:120], "action": "DEFER"}],
-            }
-            self.hypothesis_ledger[self.world_id] = hypo_entry
-        else:
-            # Subsequent deferral in the same world -> accumulate evidence without creating a new row
-            hypo = self.hypothesis_ledger[self.world_id]
-            hypo.setdefault("evidence_history", []).append({
-                "doc_id": doc_id,
-                "mention": mention,
-                "context": context[:120],
-                "action": "DEFER",
-            })
-            if hypo.get("candidate_target") is None and cand_target:
-                hypo["candidate_target"] = cand_target
-
-        self.mutation_log.append(
-            {"doc_id": doc_id, "action": "DEFER", "target": None, "durable": False}
-        )
-        return {
-            "action": "DEFER",
-            "target_id": None,
-            "durable": False,
-            "rule": "RULE_5_FAIL_CLOSED_DEFER",
-        }
+        return self._handle_deferral(doc_id, source_id, mention, context, neural_proposal, "RULE_5_FAIL_CLOSED_DEFER")
 
 
 class EpistemicIngressSessionR3Ablation(EpistemicIngressSessionR3R1):
     """Matched Precedence Ablation Resolver:
 
-    Identical to R3-R1 in all normalizers, parentheticals, and existence grammar,
-    EXCEPT that Rule 2 (Structural First Refusal) activates on (parent + marker)
-    WITHOUT requiring a discriminating sub-identifier.
-    Isolates the exact causal effect of the sub-identifier requirement.
+    Differs from R3-R1 ONLY at Rule 2 when a mention has (parent + marker) but NO sub-identifier:
+    - R3-R1: allows fall-through to Rule 3 parentheticals and Rule 4 novel systems.
+    - Matched Ablation: immediately defers without Rule 3 fall-through.
+    Valid structural partitions with sub-IDs execute identically to R3-R1.
+    Isolates the exact causal effect of the sub-identifier precedence rule.
     """
 
     def process_mention(
@@ -402,14 +413,28 @@ class EpistemicIngressSessionR3Ablation(EpistemicIngressSessionR3R1):
     ) -> Dict[str, Any]:
         norm_mention = normalize_alias(mention)
 
-        # Rule 1: Exact Registered Alias
+        # Rule 1: Exact Registered Alias (Identical)
         for reg_id, reg_data in self.durable_registry.items():
             canon_norm = normalize_alias(reg_data.get("canonical_name", ""))
             aliases_norm = [normalize_alias(a) for a in reg_data.get("aliases", [])]
             if norm_mention == canon_norm or norm_mention in aliases_norm:
+                edge = {
+                    "doc_id": doc_id,
+                    "source_id": source_id,
+                    "mention": mention,
+                    "target_id": reg_id,
+                    "action": "LINK",
+                    "rule": "RULE_1_EXACT_ALIAS_MATCH",
+                    "timestamp": time.time(),
+                }
+                self.provenance_edges.append(edge)
+                self.mutation_log.append(
+                    {"doc_id": doc_id, "action": "LINK", "target": reg_id, "durable": True}
+                )
+                self._resolve_open_hypotheses(doc_id, mention, "LINK", reg_id, "RULE_1_EXACT_ALIAS_MATCH")
                 return {"action": "LINK", "target_id": reg_id, "durable": True, "rule": "RULE_1_EXACT_ALIAS_MATCH"}
 
-        # Rule 2 (Ablated): Universal Structural First Refusal without sub-ID requirement
+        # Rule 2: Structural First Refusal check
         grounded_parent_id = None
         for reg_id, reg_data in self.durable_registry.items():
             canon_norm = normalize_alias(reg_data.get("canonical_name", ""))
@@ -419,10 +444,56 @@ class EpistemicIngressSessionR3Ablation(EpistemicIngressSessionR3R1):
                 break
 
         found_marker = next((m for m in PARTITION_MARKERS if m in mention.lower()), None)
+        sub_id_match = SUB_IDENTIFIER_REGEX.search(mention)
 
         if grounded_parent_id and found_marker:
-            # Universal first refusal: fails closed to DEFER immediately
-            return {"action": "DEFER", "target_id": None, "durable": False, "rule": "RULE_2_ABLATED_UNIVERSAL_FIRST_REFUSAL"}
+            if sub_id_match:
+                # Valid sub-ID present -> EXACT SAME structural partition handling as R3-R1
+                sub_id = sub_id_match.group(0).strip().lower()
+                prov_partition_id = f"prov_{grounded_parent_id}_{found_marker}_{sub_id}"
+
+                if prov_partition_id in self.durable_registry:
+                    edge = {
+                        "doc_id": doc_id,
+                        "source_id": source_id,
+                        "mention": mention,
+                        "target_id": prov_partition_id,
+                        "action": "LINK",
+                        "rule": "RULE_2_STRUCTURAL_PARTITION_LINK",
+                        "timestamp": time.time(),
+                    }
+                    self.provenance_edges.append(edge)
+                    self.mutation_log.append(
+                        {"doc_id": doc_id, "action": "LINK", "target": prov_partition_id, "durable": True}
+                    )
+                    self._resolve_open_hypotheses(doc_id, mention, "LINK", prov_partition_id, "RULE_2_STRUCTURAL_PARTITION_LINK")
+                    return {"action": "LINK", "target_id": prov_partition_id, "durable": True, "rule": "RULE_2_STRUCTURAL_PARTITION_LINK"}
+                else:
+                    self.durable_registry[prov_partition_id] = {
+                        "entity_id": prov_partition_id,
+                        "canonical_name": mention,
+                        "status": "provisional",
+                        "parent_entity": grounded_parent_id,
+                        "aliases": [mention],
+                    }
+                    edge = {
+                        "doc_id": doc_id,
+                        "source_id": source_id,
+                        "mention": mention,
+                        "target_id": prov_partition_id,
+                        "action": "CREATE_PROVISIONAL",
+                        "rule": "RULE_2_STRUCTURAL_PARTITION_CREATE",
+                        "timestamp": time.time(),
+                    }
+                    self.provenance_edges.append(edge)
+                    self.mutation_log.append(
+                        {"doc_id": doc_id, "action": "CREATE_PROVISIONAL", "target": prov_partition_id, "durable": True}
+                    )
+                    self._resolve_open_hypotheses(doc_id, mention, "CREATE_PROVISIONAL", prov_partition_id, "RULE_2_STRUCTURAL_PARTITION_CREATE")
+                    return {"action": "CREATE_PROVISIONAL", "target_id": prov_partition_id, "durable": True, "rule": "RULE_2_STRUCTURAL_PARTITION_CREATE"}
+            else:
+                # Ablated behavior: Missing sub-ID triggers immediate DEFER without falling through to Rule 3 parentheticals
+                return self._handle_deferral(doc_id, source_id, mention, context, neural_proposal, "RULE_2_ABLATED_STRUCTURAL_FIRST_REFUSAL")
 
         # Fall through to standard Rule 3, Rule 4, Rule 5
         return super().process_mention(doc_id, source_id, mention, context, neural_proposal)
@@ -515,7 +586,7 @@ def run_stage8c_r3_r1_benchmark(
     db_path: Path,
     evidence_path: Path,
 ) -> Dict[str, Any]:
-    """Executes the 60 fresh worlds (120 decisions) across all 4 benchmark arms."""
+    """Executes the 60 genuinely fresh worlds (120 decisions) across all 4 benchmark arms."""
     print("================================================================================")
     print("RUNNING STAGE 8C-R3-R1 CONFIRMATORY BENCHMARK (CONTRACT-R8-8C-R3-R1)")
     print(f"Model: {MODEL_NAME} via Ollama ({OLLAMA_API_URL})")
