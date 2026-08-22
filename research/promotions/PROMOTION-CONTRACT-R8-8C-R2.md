@@ -7,7 +7,7 @@ reviewed_by: chatgpt-pro
 authorized_by: human
 base_sha: f7e178bf979a3ebcec95d4c16269cf43f34cb77b
 execution_base_sha: 3694277012da8dae69bf185750d7f51b8d8a9931
-candidate_sha: 7f164a5ea6d50dc4199c8c32bc9cee180195b97b
+candidate_sha: d40b6fa2f21e5a069c0819f6e4b2c9ca201f2b9f
 ---
 
 # Research Promotion Review: CONTRACT-R8-8C-R2 (Two-Stage Epistemic Ingress)
