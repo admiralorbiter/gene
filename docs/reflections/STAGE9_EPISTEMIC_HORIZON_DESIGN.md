@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-Stage 8 established the **Ingress Kernel**: how to ingest and resolve *entities* ("What things exist?").  
+Stage 8 has converged on a candidate **Ingress Kernel**, with final R3 confirmatory evidence pending.  
 Stage 9 addresses the next altitude of the GENE Moonshot: **Claims and Assertions** ("What is being claimed about these entities, and what is that claim entitled to change?").
 
 This research packet formalizes the conceptual questions, epistemic invariants, contradiction taxonomy, and temporal semantics necessary to design Stage 9 safely without pre-committing to rigid implementations.

@@ -1,17 +1,18 @@
-# Research Synthesis: The Stage 8 Ingress Kernel (R1 $\to$ R2 $\to$ R3)
+# Research Synthesis: The Stage 8 Ingress Kernel (R1 $\to$ R2 $\to$ R3 Candidate Architecture)
 
 > **Classification**: `RESEARCH SYNTHESIS — NON-CANONICAL REFLECTION`  
 > **Target System**: GENE (Autonomous Epistemic Knowledge Discovery)  
 > **Scope**: Stage 8 Ingress Kernel & Hybrid Entity Resolution Lifecycle  
+> **Status**: Synthesized Design; Stage 8C-R3 Confirmatory Benchmark Pending  
 > **Synthesis Desk**: Antigravity, ChatGPT Pro, Human Research Director  
 
 ---
 
 ## Executive Abstract
 
-Across Stages 8C-R1, 8C-R2, and 8C-R3, GENE investigated how an autonomous knowledge agent can safely ingest unstructured natural-language entities into a durable relational graph without succumbing to false canonical merges, provisional entity fragmentation, or hallucinated existence.
+Across Stages 8C-R1, 8C-R2, and the currently sealed 8C-R3 design, GENE investigated how an autonomous knowledge agent can safely ingest unstructured natural-language entities into a durable relational graph without succumbing to false canonical merges, provisional entity fragmentation, or hallucinated existence.
 
-This memo formalizes the foundational axioms and lifecycle dynamics discovered during Stage 8, establishing the architectural invariants that separate entity ingress from downstream claim evaluation.
+This memo formalizes the foundational axioms and lifecycle dynamics identified during Stage 8. If the candidate Stage 8C-R3 benchmark confirms its preregistered gates upon execution, the resulting promoted architecture will define the operational foundation for downstream claim evaluation.
 
 ---
 
@@ -76,18 +77,18 @@ graph TD
 
 ## 2. Evolution of the Precedence Hierarchy (R1 $\to$ R2 $\to$ R3)
 
-| Stage | Precedence Ordering | Core Failure Mode Discovered | Key Resolution |
+| Stage | Precedence Ordering | Core Evidence & Failure Mode | Status / Disposition |
 | :--- | :--- | :--- | :--- |
-| **8C-R1** | Structural First Refusal $\to$ Exact Alias $\to$ Deferral | Sub-component regex matched prefixes of legitimate canonical entities, causing false deferrals on known aliases. | Whole-field alias matching elevated to Rule 1. |
-| **8C-R2** | Exact Alias $\to$ Structural First Refusal (Universal) $\to$ Deferral | Structural first refusal blocked mentions lacking sub-IDs (e.g. `"Edge Gateway Alpha Reserve Bay (Router-Beta)"`) from using explicit registered parentheticals, causing false permanent deferral (World 55). | Discriminating Sub-ID requirement added to Rule 2; explicit parentheticals evaluated under Rule 3. |
-| **8C-R3** | Exact Alias $\to$ Structural (Parent + SubID) $\to$ Parenthetical Identity $\to$ Standalone Commissioning $\to$ Deferral | N/A (Stabilized & Certified). | Clean separation of structural partitions from parenthetical aliases. |
+| **8C-R1** | Structural First Refusal $\to$ Exact Alias $\to$ Deferral | Sub-component regex matched prefixes of legitimate canonical entities, causing false deferrals on known aliases. | `REVISED_CONTRACT_REQUIRED` (Whole-field alias matching elevated to Rule 1). |
+| **8C-R2** | Exact Alias $\to$ Structural First Refusal (Universal) $\to$ Deferral | Structural first refusal blocked mentions lacking sub-IDs (e.g. `"Edge Gateway Alpha Reserve Bay (Router-Beta)"`) from using explicit registered parentheticals, causing false permanent deferral (World 55). | `REVISED_CONTRACT_REQUIRED` (Discriminating Sub-ID requirement added to Rule 2; explicit parentheticals evaluated under Rule 3). |
+| **8C-R3** | Exact Alias $\to$ Structural (Parent + SubID) $\to$ Parenthetical Identity $\to$ Standalone Commissioning $\to$ Deferral | Candidate architecture designed to resolve the remaining precedence ambiguity and enforce world-scoped hypothesis accumulation. | `FROZEN / READY` (Sealed confirmatory contract awaiting execution on uncontested GPU). |
 
 ---
 
-## 3. Legacy for Downstream GENE Architecture
+## 3. Candidate Architectural Legacy for Downstream GENE
 
-The Stage 8 Ingress Kernel provides the immutable foundation for GENE's next research horizons:
+If Stage 8C-R3 confirms its preregistered gates, the resulting promoted architecture will provide:
 
-1. **Downstream Claims Stand on Grounded Entities**: Stage 9 (Claims and Assertions) can now assume that subjects of claims ($E_{\text{subj}}$) are either deterministically grounded in canonical/provisional entities or explicitly deferred, eliminating entity-level leakage.
-2. **Deterministic Fail-Closed Boundary**: The ingress kernel proves that combining neural hypothesis generation with deterministic algebraic gating achieves $100\%$ useful coverage on resolvable events with $0.0\%$ false canonical merges.
+1. **Grounded Subjects for Downstream Claims**: Stage 9 (Claims and Assertions) will be able to assume that subjects of claims ($E_{\text{subj}}$) are either deterministically grounded in canonical/provisional entities or explicitly deferred, eliminating entity-level leakage.
+2. **Deterministic Fail-Closed Boundary**: The candidate ingress kernel demonstrates how combining neural hypothesis generation with deterministic algebraic gating can eliminate false canonical merges while maintaining high useful admission coverage on resolvable events.
 3. **Auditability & Provenance**: Every entity, alias, and edge maintains cryptographic SHA-256 provenance linking it back to exact document IDs and timestamps.
