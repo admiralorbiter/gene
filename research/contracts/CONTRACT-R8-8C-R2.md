@@ -115,7 +115,7 @@ $$\text{Hypothesis}(\text{surface\_form}, \text{candidate\_target} = \text{null}
 ## 4. Authorized Claim Ceiling & Epistemic Scope
 
 ### Authorized Claim (If All Gates Pass)
-> "In this controlled synthetic streaming hardware-entity benchmark, deterministic separation of provisional-existence authority from canonical-identity authority can increase useful admission coverage while maintaining zero false canonical commitments and zero false provisional existence assertions under the preregistered adversarial controls."
+> "In this controlled synthetic streaming hardware-entity benchmark, deterministic separation of provisional-existence authority from canonical-identity authority can achieve $\ge 85.0\%$ useful admission coverage while maintaining zero false canonical commitments and zero false provisional existence assertions under the preregistered adversarial controls (evaluated alongside a paired offline replay diagnostic against the frozen Stage 8C-R1 deterministic policy on identical document and model proposal streams)."
 
 ### Explicit Exclusions & Negative Scope (What is NOT Claimed)
 1. **Not general open-domain entity linking**: Does not establish performance on broad unstructured natural text without domain-specific ingress structure.
