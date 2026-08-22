@@ -1,16 +1,17 @@
 ---
 contract_id: CONTRACT-R8-8C-R2
-status: DRAFT
+status: FROZEN
 proposed_by: antigravity
 design_review: APPROVED
 reviewed_by: chatgpt-pro
-authorized_by: null
+authorized_by: human
 base_sha: f7e178b871cffaf97f1f0a20468962629b3c4349
 execution_base_sha: null
-resource_class: local_gpu
-long_running: true
-exclusive_gpu: true
-interruptible: false
+resource:
+  class: gpu
+  exclusive_gpu: true
+  long_running: true
+  interruptible: false
 ---
 
 # Research Contract Proposal: CONTRACT-R8-8C-R2 (Two-Stage Epistemic Ingress: Existence vs Identity Decoupling)
