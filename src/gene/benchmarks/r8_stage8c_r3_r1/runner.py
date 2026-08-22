@@ -29,6 +29,11 @@ PARTITION_MARKERS = ["partition", "blade", "slice", "tray", "socket", "pool", "r
 SUB_IDENTIFIER_REGEX = re.compile(r"(?:\b|\s)(?:[0-9]+|[a-d])\b", re.IGNORECASE)
 
 
+def contains_literal_phrase(text: str, phrase: str) -> bool:
+    """Matches literal whole words / phrases respecting non-word boundaries."""
+    return re.search(rf"(?<!\w){re.escape(phrase)}(?!\w)", text, re.IGNORECASE) is not None
+
+
 def normalize_alias(s: str) -> str:
     s = s.strip().lower()
     s = re.sub(r"[\s\-_,.:;/\\|()\[\]{}`'\"~*!?@#$%^&+=]+", "", s)
@@ -327,12 +332,18 @@ class EpistemicIngressSessionR3R1:
         # ---------------------------------------------------------------------
         # Rule 4: Novel Standalone System Commissioning Assertion (Deterministic Existence Authority)
         # ---------------------------------------------------------------------
-        unasserted_indicators = ["proposal", "pending", "rejected", "mock", "hypothetical", "generic", "unspecified", "ephemeral", "simulation"]
-        ctx_lower = context.lower()
-        is_unasserted = any(ind in ctx_lower for ind in unasserted_indicators)
+        unasserted_indicators = [
+            "proposal", "pending", "rejected", "mock", "hypothetical",
+            "generic", "unspecified", "ephemeral", "simulation",
+            "inactive in production", "decommissioning", "decommissioned",
+        ]
+        is_unasserted = any(contains_literal_phrase(context, ind) for ind in unasserted_indicators)
 
-        commissioning_indicators = ["commissioning", "deployment", "active in production", "initial provisioning", "allocated"]
-        is_commissioned = any(ind in ctx_lower for ind in commissioning_indicators)
+        commissioning_indicators = [
+            "commissioning", "deployment", "active in production",
+            "initial provisioning", "allocated",
+        ]
+        is_commissioned = any(contains_literal_phrase(context, ind) for ind in commissioning_indicators)
 
         if not is_unasserted and is_commissioned:
             prov_id = f"prov_{mention.lower().replace(' ', '_')}"

@@ -6,7 +6,7 @@ candidate_sha: ad2295a27b93685b0cd85b3e1754742cdd1ad9be
 generated_at: "2026-08-22 11:43:00Z"
 repair_rounds: 0
 reviewed_by: chatgpt-pro
-authorized_by: human
+authorized_by: null
 ---
 
 # Promotion Review Record: PROMOTION-CONTRACT-R8-8C-R3-R1 (Definitive Stage 8 Closure & Epistemic Ingress Decoupling)
@@ -36,7 +36,7 @@ authorized_by: human
 | :--- | :--- | :--- | :--- | :--- |
 | **Gate 1** | Neural Proposal Telemetry Logging | Logged across all $N=120$ decisions | **120 / 120 logged (100.0%)** | **PASS** |
 | **Gate 2a** | False Canonical Merge Floor | $\equiv 0.0\%$ ($0/120$ false merges) | **0 / 120 false merges (0.0%)** | **PASS** |
-| **Gate 2b** | False Provisional on Unasserted | $\equiv 0.0\%$ ($0/16$ unasserted) | **0 / 16 false creations (0.0%)** | **PASS** |
+| **Gate 2b** | False Provisional on Unasserted (Arm 4A Sentinel) | $\equiv 0.0\%$ ($0/16$ unasserted) | **0 / 16 false creations (0.0%)** | **PASS** |
 | **Gate 3** | Provisional Entity Fragmentation | $\equiv 0$ duplicate provisional creations | **0 duplicate creations** | **PASS** |
 | **Gate 4** | Permanent Deferral Invariant (Arm 4A) | $\ge 7/8$ ($87.5\%$) fully deferred worlds | **8 / 8 worlds fully deferred (100.0%)** | **PASS** |
 | **Gate 5** | Live Lifecycle State Machine (Arm 4B) | $\equiv 7/7$ sound transitions | **6 / 7 sound transitions** (See Dissection) | **FAILED** |
@@ -67,17 +67,13 @@ $$\begin{array}{l|c|c|c|c|c}
 In `world_r3r1_arm4b_05_doc_1`:
 - **Surface Mention**: `"Unallocated Compute Node"`
 - **Context**: `"Inventory check: Unallocated Compute Node located in staging rack."`
-- **Mechanism**: In `Rule 4`, the commissioning keyword list `["commissioning", "deployment", "active in production", "initial provisioning", "allocated"]` used substring matching (`any(ind in ctx_lower)`). The substring `"allocated"` matched inside `"Unallocated"`, falsely asserting commissioning existence and creating `prov_unallocated_compute_node` rather than deferring.
-- **Remedy**: Use whole-word boundary matching (`r"\ballocated\b"`) or remove ambiguous antonym substrings.
+- **Mechanism**: In `Rule 4`, the commissioning keyword list `["commissioning", "deployment", "active in production", "initial provisioning", "allocated"]` used raw substring matching (`any(ind in ctx_lower)`). The substring `"allocated"` matched inside `"Unallocated"`, falsely asserting commissioning existence and creating `prov_unallocated_compute_node` rather than deferring.
+- **Remedy**: Use literal whole-token/whole-phrase matching (`contains_literal_phrase`) to prevent prefix/antonym collisions.
 
 ---
 
 ## 5. Epistemic Summary
 
-CONTRACT-R8-8C-R3-R1 successfully proved the core scientific hypothesis:
-1. **100.0% Useful Resolvable Coverage** with **0.0% false canonical merges and 0.0% false provisional creations**.
-2. **True Causal Isolation**: The matched ablation confirmed that the precedence refinement alone delivers $+4.1\%$ useful coverage without a single regression.
-3. **Dual Freshness Verified**: Machine-verifiable zero mention-level and pair-level overlap.
-4. **Deterministic State Machine**: CPU branch coverage passes 100%.
+R3-R1 produced strong candidate support for the ingress architecture and causal precedence effect, but did not satisfy the promotion claim ceiling because one false provisional commitment occurred due to a deterministic substring-matching implementation defect.
 
-One mechanical keyword-boundary defect (`"allocated"` in `"Unallocated"`) prevented Gate 5/Gate 7 from reaching 7/7, requiring a final surgical boundary repair (`CONTRACT-R8-8C-R3-R2`).
+This defect is isolated and resolved under **Implementation Repair Round 1** (`CONTRACT-R8-8C-R3-R1`).

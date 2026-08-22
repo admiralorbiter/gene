@@ -178,7 +178,7 @@ def verify_stage8c_r3_r1_contract(
                 false_canonical_merges += 1
     gate_2a_pass = (false_canonical_merges == 0)
 
-    # 3. Gate 2b: False Provisional Creations on Unasserted
+    # 3. Gate 2b: False Provisional Creations on Unasserted (Arm 4A Sentinel)
     false_prov_unasserted = 0
     for r in records:
         doc_id = r["doc_id"]
@@ -188,6 +188,17 @@ def verify_stage8c_r3_r1_contract(
             if d.get("action") == "CREATE_PROVISIONAL":
                 false_prov_unasserted += 1
     gate_2b_pass = (false_prov_unasserted == 0)
+
+    # 3b. Gate 2c: Global False Provisional Invariant (Claim Ceiling across all 120 decisions)
+    global_false_prov = 0
+    for r in records:
+        doc_id = r["doc_id"]
+        gold = gold_manifest[doc_id]
+        d = r["hybrid_decision"]
+        if d.get("action") == "CREATE_PROVISIONAL":
+            if gold.get("action") != "CREATE_PROVISIONAL":
+                global_false_prov += 1
+    gate_2c_pass = (global_false_prov == 0)
 
     # 4. Gate 3: Provisional Entity Fragmentation
     prov_created_per_world: Dict[str, List[str]] = {}
@@ -326,6 +337,7 @@ def verify_stage8c_r3_r1_contract(
         gate_1_pass
         and gate_2a_pass
         and gate_2b_pass
+        and gate_2c_pass
         and gate_3_pass
         and gate_4_pass
         and gate_5_pass
@@ -341,6 +353,8 @@ def verify_stage8c_r3_r1_contract(
         "gate_2a_pass": gate_2a_pass,
         "gate_2b_false_prov_unasserted": false_prov_unasserted,
         "gate_2b_pass": gate_2b_pass,
+        "gate_2c_global_false_prov": global_false_prov,
+        "gate_2c_pass": gate_2c_pass,
         "gate_3_duplicate_provisional_creations": duplicate_prov,
         "gate_3_pass": gate_3_pass,
         "gate_4_arm4a_fully_deferred_worlds": f"{arm4a_fully_deferred_worlds}/{len(arm4a_worlds)}",
