@@ -1,12 +1,12 @@
 ---
 contract_id: CONTRACT-R8-8C-R3-R1
-status: DRAFT
+status: FROZEN
 base_sha: 92400bf22a24316e5c1522489a1a003c365fe848
 created_at: "2026-08-22 11:15:00Z"
 proposed_by: antigravity
-design_review: CHANGES_REQUESTED
+design_review: APPROVED
 reviewed_by: chatgpt-pro
-authorized_by: null
+authorized_by: human
 resource_class: gpu
 long_running: false
 exclusive_gpu: true
@@ -15,7 +15,7 @@ interruptible: false
 
 # Research Contract: CONTRACT-R8-8C-R3-R1 (Definitive Stage 8 Closure & Epistemic Ingress Decoupling)
 
-**Lifecycle Status**: `DRAFT` (Scientific Review: CHANGES_REQUESTED; Awaiting Re-Review & Human Strategic Authorization)
+**Lifecycle Status**: `FROZEN` (Scientific Review: APPROVED; Strategic Execution Authorized by Human Research Director)
 
 ---
 
@@ -34,7 +34,7 @@ When the neural prompt commanded *"Never guess or merge distinct entities withou
 3. **Dual Paired Comparators**:
    - **Total Historical Gain**: $R3 - \text{Frozen } R2$.
    - **Isolated Precedence Attribution**: $R3 - R3_{\text{ablation}}$ (a matched resolver where structural mentions lacking sub-IDs immediately defer through the hypothesis ledger without Rule 3 fall-through, while valid structural partitions with sub-IDs execute identically to R3-R1).
-4. **Sealed Deterministic Fresh Worlds & Dual Freshness Audit**: 60 sealed deterministic fresh worlds ($120$ decisions) under generator version R3-R1 (PRNG seed `2718281828`), with an automated dual-freshness assertion verifying strictly **zero mention-level overlap** and **zero pair-level overlap** with frozen R3 across Arms 1, 3, 4A, and 4B.
+4. **Sealed Deterministic Fresh Worlds & Dual Freshness Audit**: 60 sealed deterministic fresh worlds ($120$ decisions) under generator version R3-R1 (PRNG seed `2718281828`), with an automated dual-freshness assertion verifying strictly **zero mention-level overlap** and **zero pair-level overlap** with frozen R3 across Arms 1, 3, 4A, and 4B (with Arm 2 intentionally replaying registered aliases).
 
 ---
 
