@@ -2,7 +2,7 @@
   "contract_id": "CONTRACT-R8-8C-R3-R1",
   "base_sha": "92400bf22a24316e5c1522489a1a003c365fe848",
   "assets": {
-    "research/contracts/CONTRACT-R8-8C-R3-R1.md": "8399f33ab7f6e89537e301bf3ff546b53e6af51850dfa5e78a806f9061b4b6f8",
+    "research/contracts/CONTRACT-R8-8C-R3-R1.md": "68c8f7809b13f80d7b429f47c5ea6418c1c3bf50221b6b11f58d64d97d886e39",
     "src/gene/benchmarks/r8_stage8c_r3_r1/prompts.py": "04f55ac44d2c9b8aad836fefed95a406bade8678a4e04fced52adba2989d04e0",
     "src/gene/benchmarks/r8_stage8c_r3_r1/worlds.py": "359ba0e75e803bc50149a9a37f6d043750d26afd675584807483f6bfbf14a14f",
     "src/gene/benchmarks/r8_stage8c_r3_r1/runner.py": "3ff4136bc449a98b276d54e968dc1df6121a92108586fe673c1eab751d3ca4ce",
