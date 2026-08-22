@@ -1,0 +1,17 @@
+{
+  "contract_id": "CONTRACT-R8-8C",
+  "artifacts": {
+    "evidence_jsonl": {
+      "path": "data/r8_stage8c_candidate_evidence.jsonl",
+      "sha256": "488103edf6b41eac8ecd4801f4a2fb83d9aa6a766fe2b9448682393769359764"
+    },
+    "summary_json": {
+      "path": "data/r8_stage8c_summary.json",
+      "sha256": "49dc0b451e6d3469bf9bfd48f971a21106bf73e3553cf86fc0ffd2dd3f05349c"
+    },
+    "registry_sqlite": {
+      "path": "data/r8_stage8c_registry.sqlite",
+      "sha256": "99c270993f00712f95656f62f650dea5d10cb4daca94ffdc213066e0819c3031"
+    }
+  }
+}
