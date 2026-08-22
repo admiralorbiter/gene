@@ -1,0 +1,1202 @@
+[
+  {
+    "world_id": "world_r3r1_arm1_01",
+    "arm": "ARM1_NOVEL",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm1_01_doc_1",
+        "source_id": "commissioning_daemon",
+        "mention": "Photonic Interconnect Zeta",
+        "context": "Initial commissioning and deployment log: Standalone system Photonic Interconnect Zeta (PIZ) is now active in production.",
+        "arm": "ARM1_NOVEL"
+      },
+      {
+        "doc_id": "world_r3r1_arm1_01_doc_2",
+        "source_id": "telemetry_stream",
+        "mention": "PIZ",
+        "context": "Secondary telemetry signal captured on PIZ (Photonic Interconnect Zeta).",
+        "arm": "ARM1_NOVEL"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm1_02",
+    "arm": "ARM1_NOVEL",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm1_02_doc_1",
+        "source_id": "commissioning_daemon",
+        "mention": "Graph Accelerator Epsilon",
+        "context": "Initial commissioning and deployment log: Standalone system Graph Accelerator Epsilon (GAE) is now active in production.",
+        "arm": "ARM1_NOVEL"
+      },
+      {
+        "doc_id": "world_r3r1_arm1_02_doc_2",
+        "source_id": "telemetry_stream",
+        "mention": "GAE",
+        "context": "Secondary telemetry signal captured on GAE (Graph Accelerator Epsilon).",
+        "arm": "ARM1_NOVEL"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm1_03",
+    "arm": "ARM1_NOVEL",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm1_03_doc_1",
+        "source_id": "commissioning_daemon",
+        "mention": "Neuromorphic Mesh Theta",
+        "context": "Initial commissioning and deployment log: Standalone system Neuromorphic Mesh Theta (NMT) is now active in production.",
+        "arm": "ARM1_NOVEL"
+      },
+      {
+        "doc_id": "world_r3r1_arm1_03_doc_2",
+        "source_id": "telemetry_stream",
+        "mention": "NMT",
+        "context": "Secondary telemetry signal captured on NMT (Neuromorphic Mesh Theta).",
+        "arm": "ARM1_NOVEL"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm1_04",
+    "arm": "ARM1_NOVEL",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm1_04_doc_1",
+        "source_id": "commissioning_daemon",
+        "mention": "Direct Memory Fabric Iota",
+        "context": "Initial commissioning and deployment log: Standalone system Direct Memory Fabric Iota (DMFI) is now active in production.",
+        "arm": "ARM1_NOVEL"
+      },
+      {
+        "doc_id": "world_r3r1_arm1_04_doc_2",
+        "source_id": "telemetry_stream",
+        "mention": "DMFI",
+        "context": "Secondary telemetry signal captured on DMFI (Direct Memory Fabric Iota).",
+        "arm": "ARM1_NOVEL"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm1_05",
+    "arm": "ARM1_NOVEL",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm1_05_doc_1",
+        "source_id": "commissioning_daemon",
+        "mention": "Sparse Matrix Unit Kappa",
+        "context": "Initial commissioning and deployment log: Standalone system Sparse Matrix Unit Kappa (SMUK) is now active in production.",
+        "arm": "ARM1_NOVEL"
+      },
+      {
+        "doc_id": "world_r3r1_arm1_05_doc_2",
+        "source_id": "telemetry_stream",
+        "mention": "SMUK",
+        "context": "Secondary telemetry signal captured on SMUK (Sparse Matrix Unit Kappa).",
+        "arm": "ARM1_NOVEL"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm1_06",
+    "arm": "ARM1_NOVEL",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm1_06_doc_1",
+        "source_id": "commissioning_daemon",
+        "mention": "Telemetry Aggregator Lambda",
+        "context": "Initial commissioning and deployment log: Standalone system Telemetry Aggregator Lambda (TAL) is now active in production.",
+        "arm": "ARM1_NOVEL"
+      },
+      {
+        "doc_id": "world_r3r1_arm1_06_doc_2",
+        "source_id": "telemetry_stream",
+        "mention": "TAL",
+        "context": "Secondary telemetry signal captured on TAL (Telemetry Aggregator Lambda).",
+        "arm": "ARM1_NOVEL"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm1_07",
+    "arm": "ARM1_NOVEL",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm1_07_doc_1",
+        "source_id": "commissioning_daemon",
+        "mention": "Quantum Cryo Node Mu",
+        "context": "Initial commissioning and deployment log: Standalone system Quantum Cryo Node Mu (QCNM) is now active in production.",
+        "arm": "ARM1_NOVEL"
+      },
+      {
+        "doc_id": "world_r3r1_arm1_07_doc_2",
+        "source_id": "telemetry_stream",
+        "mention": "QCNM",
+        "context": "Secondary telemetry signal captured on QCNM (Quantum Cryo Node Mu).",
+        "arm": "ARM1_NOVEL"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm1_08",
+    "arm": "ARM1_NOVEL",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm1_08_doc_1",
+        "source_id": "commissioning_daemon",
+        "mention": "Optoelectronic Switch Nu",
+        "context": "Initial commissioning and deployment log: Standalone system Optoelectronic Switch Nu (OESN) is now active in production.",
+        "arm": "ARM1_NOVEL"
+      },
+      {
+        "doc_id": "world_r3r1_arm1_08_doc_2",
+        "source_id": "telemetry_stream",
+        "mention": "OESN",
+        "context": "Secondary telemetry signal captured on OESN (Optoelectronic Switch Nu).",
+        "arm": "ARM1_NOVEL"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm1_09",
+    "arm": "ARM1_NOVEL",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm1_09_doc_1",
+        "source_id": "commissioning_daemon",
+        "mention": "Coherent Cache Pool Xi",
+        "context": "Initial commissioning and deployment log: Standalone system Coherent Cache Pool Xi (CCPX) is now active in production.",
+        "arm": "ARM1_NOVEL"
+      },
+      {
+        "doc_id": "world_r3r1_arm1_09_doc_2",
+        "source_id": "telemetry_stream",
+        "mention": "CCPX",
+        "context": "Secondary telemetry signal captured on CCPX (Coherent Cache Pool Xi).",
+        "arm": "ARM1_NOVEL"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm1_10",
+    "arm": "ARM1_NOVEL",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm1_10_doc_1",
+        "source_id": "commissioning_daemon",
+        "mention": "Neural Ingress Gateway Omicron",
+        "context": "Initial commissioning and deployment log: Standalone system Neural Ingress Gateway Omicron (NIGO) is now active in production.",
+        "arm": "ARM1_NOVEL"
+      },
+      {
+        "doc_id": "world_r3r1_arm1_10_doc_2",
+        "source_id": "telemetry_stream",
+        "mention": "NIGO",
+        "context": "Secondary telemetry signal captured on NIGO (Neural Ingress Gateway Omicron).",
+        "arm": "ARM1_NOVEL"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm1_11",
+    "arm": "ARM1_NOVEL",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm1_11_doc_1",
+        "source_id": "commissioning_daemon",
+        "mention": "Elastic Shard Node Pi",
+        "context": "Initial commissioning and deployment log: Standalone system Elastic Shard Node Pi (ESNP) is now active in production.",
+        "arm": "ARM1_NOVEL"
+      },
+      {
+        "doc_id": "world_r3r1_arm1_11_doc_2",
+        "source_id": "telemetry_stream",
+        "mention": "ESNP",
+        "context": "Secondary telemetry signal captured on ESNP (Elastic Shard Node Pi).",
+        "arm": "ARM1_NOVEL"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm1_12",
+    "arm": "ARM1_NOVEL",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm1_12_doc_1",
+        "source_id": "commissioning_daemon",
+        "mention": "Vector Reduction Pipeline Rho",
+        "context": "Initial commissioning and deployment log: Standalone system Vector Reduction Pipeline Rho (VRPR) is now active in production.",
+        "arm": "ARM1_NOVEL"
+      },
+      {
+        "doc_id": "world_r3r1_arm1_12_doc_2",
+        "source_id": "telemetry_stream",
+        "mention": "VRPR",
+        "context": "Secondary telemetry signal captured on VRPR (Vector Reduction Pipeline Rho).",
+        "arm": "ARM1_NOVEL"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm1_13",
+    "arm": "ARM1_NOVEL",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm1_13_doc_1",
+        "source_id": "commissioning_daemon",
+        "mention": "Atomic State Sequencer Sigma",
+        "context": "Initial commissioning and deployment log: Standalone system Atomic State Sequencer Sigma (ASSS) is now active in production.",
+        "arm": "ARM1_NOVEL"
+      },
+      {
+        "doc_id": "world_r3r1_arm1_13_doc_2",
+        "source_id": "telemetry_stream",
+        "mention": "ASSS",
+        "context": "Secondary telemetry signal captured on ASSS (Atomic State Sequencer Sigma).",
+        "arm": "ARM1_NOVEL"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm1_14",
+    "arm": "ARM1_NOVEL",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm1_14_doc_1",
+        "source_id": "commissioning_daemon",
+        "mention": "Fast Transit Bus Tau",
+        "context": "Initial commissioning and deployment log: Standalone system Fast Transit Bus Tau (FTBT) is now active in production.",
+        "arm": "ARM1_NOVEL"
+      },
+      {
+        "doc_id": "world_r3r1_arm1_14_doc_2",
+        "source_id": "telemetry_stream",
+        "mention": "FTBT",
+        "context": "Secondary telemetry signal captured on FTBT (Fast Transit Bus Tau).",
+        "arm": "ARM1_NOVEL"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm1_15",
+    "arm": "ARM1_NOVEL",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm1_15_doc_1",
+        "source_id": "commissioning_daemon",
+        "mention": "Secure Enclave Host Upsilon",
+        "context": "Initial commissioning and deployment log: Standalone system Secure Enclave Host Upsilon (SEHU) is now active in production.",
+        "arm": "ARM1_NOVEL"
+      },
+      {
+        "doc_id": "world_r3r1_arm1_15_doc_2",
+        "source_id": "telemetry_stream",
+        "mention": "SEHU",
+        "context": "Secondary telemetry signal captured on SEHU (Secure Enclave Host Upsilon).",
+        "arm": "ARM1_NOVEL"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm2_01",
+    "arm": "ARM2_KNOWN_ALIAS",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm2_01_doc_1",
+        "source_id": "infrastructure_monitor",
+        "mention": "Cluster-Alpha",
+        "context": "Heartbeat verification logged for Cluster-Alpha during routine sweep.",
+        "arm": "ARM2_KNOWN_ALIAS"
+      },
+      {
+        "doc_id": "world_r3r1_arm2_01_doc_2",
+        "source_id": "traffic_analyzer",
+        "mention": "CCA",
+        "context": "Throughput threshold satisfied on CCA under standard operational load.",
+        "arm": "ARM2_KNOWN_ALIAS"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm2_02",
+    "arm": "ARM2_KNOWN_ALIAS",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm2_02_doc_1",
+        "source_id": "infrastructure_monitor",
+        "mention": "Cluster-Beta",
+        "context": "Heartbeat verification logged for Cluster-Beta during routine sweep.",
+        "arm": "ARM2_KNOWN_ALIAS"
+      },
+      {
+        "doc_id": "world_r3r1_arm2_02_doc_2",
+        "source_id": "traffic_analyzer",
+        "mention": "CCB",
+        "context": "Throughput threshold satisfied on CCB under standard operational load.",
+        "arm": "ARM2_KNOWN_ALIAS"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm2_03",
+    "arm": "ARM2_KNOWN_ALIAS",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm2_03_doc_1",
+        "source_id": "infrastructure_monitor",
+        "mention": "SAN-Alpha",
+        "context": "Heartbeat verification logged for SAN-Alpha during routine sweep.",
+        "arm": "ARM2_KNOWN_ALIAS"
+      },
+      {
+        "doc_id": "world_r3r1_arm2_03_doc_2",
+        "source_id": "traffic_analyzer",
+        "mention": "SAA",
+        "context": "Throughput threshold satisfied on SAA under standard operational load.",
+        "arm": "ARM2_KNOWN_ALIAS"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm2_04",
+    "arm": "ARM2_KNOWN_ALIAS",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm2_04_doc_1",
+        "source_id": "infrastructure_monitor",
+        "mention": "SAN-Beta",
+        "context": "Heartbeat verification logged for SAN-Beta during routine sweep.",
+        "arm": "ARM2_KNOWN_ALIAS"
+      },
+      {
+        "doc_id": "world_r3r1_arm2_04_doc_2",
+        "source_id": "traffic_analyzer",
+        "mention": "SAB",
+        "context": "Throughput threshold satisfied on SAB under standard operational load.",
+        "arm": "ARM2_KNOWN_ALIAS"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm2_05",
+    "arm": "ARM2_KNOWN_ALIAS",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm2_05_doc_1",
+        "source_id": "infrastructure_monitor",
+        "mention": "Router-Alpha",
+        "context": "Heartbeat verification logged for Router-Alpha during routine sweep.",
+        "arm": "ARM2_KNOWN_ALIAS"
+      },
+      {
+        "doc_id": "world_r3r1_arm2_05_doc_2",
+        "source_id": "traffic_analyzer",
+        "mention": "GRA",
+        "context": "Throughput threshold satisfied on GRA under standard operational load.",
+        "arm": "ARM2_KNOWN_ALIAS"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm2_06",
+    "arm": "ARM2_KNOWN_ALIAS",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm2_06_doc_1",
+        "source_id": "infrastructure_monitor",
+        "mention": "Router-Beta",
+        "context": "Heartbeat verification logged for Router-Beta during routine sweep.",
+        "arm": "ARM2_KNOWN_ALIAS"
+      },
+      {
+        "doc_id": "world_r3r1_arm2_06_doc_2",
+        "source_id": "traffic_analyzer",
+        "mention": "GRB",
+        "context": "Throughput threshold satisfied on GRB under standard operational load.",
+        "arm": "ARM2_KNOWN_ALIAS"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm2_07",
+    "arm": "ARM2_KNOWN_ALIAS",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm2_07_doc_1",
+        "source_id": "infrastructure_monitor",
+        "mention": "Cluster-Alpha",
+        "context": "Heartbeat verification logged for Cluster-Alpha during routine sweep.",
+        "arm": "ARM2_KNOWN_ALIAS"
+      },
+      {
+        "doc_id": "world_r3r1_arm2_07_doc_2",
+        "source_id": "traffic_analyzer",
+        "mention": "CCA",
+        "context": "Throughput threshold satisfied on CCA under standard operational load.",
+        "arm": "ARM2_KNOWN_ALIAS"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm2_08",
+    "arm": "ARM2_KNOWN_ALIAS",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm2_08_doc_1",
+        "source_id": "infrastructure_monitor",
+        "mention": "Cluster-Beta",
+        "context": "Heartbeat verification logged for Cluster-Beta during routine sweep.",
+        "arm": "ARM2_KNOWN_ALIAS"
+      },
+      {
+        "doc_id": "world_r3r1_arm2_08_doc_2",
+        "source_id": "traffic_analyzer",
+        "mention": "CCB",
+        "context": "Throughput threshold satisfied on CCB under standard operational load.",
+        "arm": "ARM2_KNOWN_ALIAS"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm2_09",
+    "arm": "ARM2_KNOWN_ALIAS",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm2_09_doc_1",
+        "source_id": "infrastructure_monitor",
+        "mention": "SAN-Alpha",
+        "context": "Heartbeat verification logged for SAN-Alpha during routine sweep.",
+        "arm": "ARM2_KNOWN_ALIAS"
+      },
+      {
+        "doc_id": "world_r3r1_arm2_09_doc_2",
+        "source_id": "traffic_analyzer",
+        "mention": "SAA",
+        "context": "Throughput threshold satisfied on SAA under standard operational load.",
+        "arm": "ARM2_KNOWN_ALIAS"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm2_10",
+    "arm": "ARM2_KNOWN_ALIAS",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm2_10_doc_1",
+        "source_id": "infrastructure_monitor",
+        "mention": "SAN-Beta",
+        "context": "Heartbeat verification logged for SAN-Beta during routine sweep.",
+        "arm": "ARM2_KNOWN_ALIAS"
+      },
+      {
+        "doc_id": "world_r3r1_arm2_10_doc_2",
+        "source_id": "traffic_analyzer",
+        "mention": "SAB",
+        "context": "Throughput threshold satisfied on SAB under standard operational load.",
+        "arm": "ARM2_KNOWN_ALIAS"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm2_11",
+    "arm": "ARM2_KNOWN_ALIAS",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm2_11_doc_1",
+        "source_id": "infrastructure_monitor",
+        "mention": "Router-Alpha",
+        "context": "Heartbeat verification logged for Router-Alpha during routine sweep.",
+        "arm": "ARM2_KNOWN_ALIAS"
+      },
+      {
+        "doc_id": "world_r3r1_arm2_11_doc_2",
+        "source_id": "traffic_analyzer",
+        "mention": "GRA",
+        "context": "Throughput threshold satisfied on GRA under standard operational load.",
+        "arm": "ARM2_KNOWN_ALIAS"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm2_12",
+    "arm": "ARM2_KNOWN_ALIAS",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm2_12_doc_1",
+        "source_id": "infrastructure_monitor",
+        "mention": "Router-Beta",
+        "context": "Heartbeat verification logged for Router-Beta during routine sweep.",
+        "arm": "ARM2_KNOWN_ALIAS"
+      },
+      {
+        "doc_id": "world_r3r1_arm2_12_doc_2",
+        "source_id": "traffic_analyzer",
+        "mention": "GRB",
+        "context": "Throughput threshold satisfied on GRB under standard operational load.",
+        "arm": "ARM2_KNOWN_ALIAS"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm2_13",
+    "arm": "ARM2_KNOWN_ALIAS",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm2_13_doc_1",
+        "source_id": "infrastructure_monitor",
+        "mention": "Cluster-Alpha",
+        "context": "Heartbeat verification logged for Cluster-Alpha during routine sweep.",
+        "arm": "ARM2_KNOWN_ALIAS"
+      },
+      {
+        "doc_id": "world_r3r1_arm2_13_doc_2",
+        "source_id": "traffic_analyzer",
+        "mention": "CCA",
+        "context": "Throughput threshold satisfied on CCA under standard operational load.",
+        "arm": "ARM2_KNOWN_ALIAS"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm2_14",
+    "arm": "ARM2_KNOWN_ALIAS",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm2_14_doc_1",
+        "source_id": "infrastructure_monitor",
+        "mention": "Cluster-Beta",
+        "context": "Heartbeat verification logged for Cluster-Beta during routine sweep.",
+        "arm": "ARM2_KNOWN_ALIAS"
+      },
+      {
+        "doc_id": "world_r3r1_arm2_14_doc_2",
+        "source_id": "traffic_analyzer",
+        "mention": "CCB",
+        "context": "Throughput threshold satisfied on CCB under standard operational load.",
+        "arm": "ARM2_KNOWN_ALIAS"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm2_15",
+    "arm": "ARM2_KNOWN_ALIAS",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm2_15_doc_1",
+        "source_id": "infrastructure_monitor",
+        "mention": "SAN-Alpha",
+        "context": "Heartbeat verification logged for SAN-Alpha during routine sweep.",
+        "arm": "ARM2_KNOWN_ALIAS"
+      },
+      {
+        "doc_id": "world_r3r1_arm2_15_doc_2",
+        "source_id": "traffic_analyzer",
+        "mention": "SAA",
+        "context": "Throughput threshold satisfied on SAA under standard operational load.",
+        "arm": "ARM2_KNOWN_ALIAS"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm3_01",
+    "arm": "ARM3_PARTITION",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm3_01_doc_1",
+        "source_id": "hardware_allocator",
+        "mention": "Compute Cluster Alpha Partition 1",
+        "context": "Hardware allocation logged for Compute Cluster Alpha Partition 1 under parent unit Compute Cluster Alpha.",
+        "arm": "ARM3_PARTITION"
+      },
+      {
+        "doc_id": "world_r3r1_arm3_01_doc_2",
+        "source_id": "power_monitor",
+        "mention": "Partition 1 on Compute Cluster Alpha",
+        "context": "Thermal profile nominal on Partition 1 on Compute Cluster Alpha (sub-component of Compute Cluster Alpha).",
+        "arm": "ARM3_PARTITION"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm3_02",
+    "arm": "ARM3_PARTITION",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm3_02_doc_1",
+        "source_id": "hardware_allocator",
+        "mention": "Compute Cluster Beta Blade 2",
+        "context": "Hardware allocation logged for Compute Cluster Beta Blade 2 under parent unit Compute Cluster Beta.",
+        "arm": "ARM3_PARTITION"
+      },
+      {
+        "doc_id": "world_r3r1_arm3_02_doc_2",
+        "source_id": "power_monitor",
+        "mention": "Blade 2 on Compute Cluster Beta",
+        "context": "Thermal profile nominal on Blade 2 on Compute Cluster Beta (sub-component of Compute Cluster Beta).",
+        "arm": "ARM3_PARTITION"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm3_03",
+    "arm": "ARM3_PARTITION",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm3_03_doc_1",
+        "source_id": "hardware_allocator",
+        "mention": "Storage Array Alpha Slice 3",
+        "context": "Hardware allocation logged for Storage Array Alpha Slice 3 under parent unit Storage Array Alpha.",
+        "arm": "ARM3_PARTITION"
+      },
+      {
+        "doc_id": "world_r3r1_arm3_03_doc_2",
+        "source_id": "power_monitor",
+        "mention": "Slice 3 on Storage Array Alpha",
+        "context": "Thermal profile nominal on Slice 3 on Storage Array Alpha (sub-component of Storage Array Alpha).",
+        "arm": "ARM3_PARTITION"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm3_04",
+    "arm": "ARM3_PARTITION",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm3_04_doc_1",
+        "source_id": "hardware_allocator",
+        "mention": "Storage Array Beta Tray 4",
+        "context": "Hardware allocation logged for Storage Array Beta Tray 4 under parent unit Storage Array Beta.",
+        "arm": "ARM3_PARTITION"
+      },
+      {
+        "doc_id": "world_r3r1_arm3_04_doc_2",
+        "source_id": "power_monitor",
+        "mention": "Tray 4 on Storage Array Beta",
+        "context": "Thermal profile nominal on Tray 4 on Storage Array Beta (sub-component of Storage Array Beta).",
+        "arm": "ARM3_PARTITION"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm3_05",
+    "arm": "ARM3_PARTITION",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm3_05_doc_1",
+        "source_id": "hardware_allocator",
+        "mention": "Gateway Router Alpha Socket A",
+        "context": "Hardware allocation logged for Gateway Router Alpha Socket A under parent unit Gateway Router Alpha.",
+        "arm": "ARM3_PARTITION"
+      },
+      {
+        "doc_id": "world_r3r1_arm3_05_doc_2",
+        "source_id": "power_monitor",
+        "mention": "Socket A on Gateway Router Alpha",
+        "context": "Thermal profile nominal on Socket A on Gateway Router Alpha (sub-component of Gateway Router Alpha).",
+        "arm": "ARM3_PARTITION"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm3_06",
+    "arm": "ARM3_PARTITION",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm3_06_doc_1",
+        "source_id": "hardware_allocator",
+        "mention": "Gateway Router Beta Partition B",
+        "context": "Hardware allocation logged for Gateway Router Beta Partition B under parent unit Gateway Router Beta.",
+        "arm": "ARM3_PARTITION"
+      },
+      {
+        "doc_id": "world_r3r1_arm3_06_doc_2",
+        "source_id": "power_monitor",
+        "mention": "Partition B on Gateway Router Beta",
+        "context": "Thermal profile nominal on Partition B on Gateway Router Beta (sub-component of Gateway Router Beta).",
+        "arm": "ARM3_PARTITION"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm3_07",
+    "arm": "ARM3_PARTITION",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm3_07_doc_1",
+        "source_id": "hardware_allocator",
+        "mention": "Compute Cluster Alpha Blade C",
+        "context": "Hardware allocation logged for Compute Cluster Alpha Blade C under parent unit Compute Cluster Alpha.",
+        "arm": "ARM3_PARTITION"
+      },
+      {
+        "doc_id": "world_r3r1_arm3_07_doc_2",
+        "source_id": "power_monitor",
+        "mention": "Blade C on Compute Cluster Alpha",
+        "context": "Thermal profile nominal on Blade C on Compute Cluster Alpha (sub-component of Compute Cluster Alpha).",
+        "arm": "ARM3_PARTITION"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm3_08",
+    "arm": "ARM3_PARTITION",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm3_08_doc_1",
+        "source_id": "hardware_allocator",
+        "mention": "Compute Cluster Beta Slice D",
+        "context": "Hardware allocation logged for Compute Cluster Beta Slice D under parent unit Compute Cluster Beta.",
+        "arm": "ARM3_PARTITION"
+      },
+      {
+        "doc_id": "world_r3r1_arm3_08_doc_2",
+        "source_id": "power_monitor",
+        "mention": "Slice D on Compute Cluster Beta",
+        "context": "Thermal profile nominal on Slice D on Compute Cluster Beta (sub-component of Compute Cluster Beta).",
+        "arm": "ARM3_PARTITION"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm3_09",
+    "arm": "ARM3_PARTITION",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm3_09_doc_1",
+        "source_id": "hardware_allocator",
+        "mention": "Storage Array Alpha Tray 1",
+        "context": "Hardware allocation logged for Storage Array Alpha Tray 1 under parent unit Storage Array Alpha.",
+        "arm": "ARM3_PARTITION"
+      },
+      {
+        "doc_id": "world_r3r1_arm3_09_doc_2",
+        "source_id": "power_monitor",
+        "mention": "Tray 1 on Storage Array Alpha",
+        "context": "Thermal profile nominal on Tray 1 on Storage Array Alpha (sub-component of Storage Array Alpha).",
+        "arm": "ARM3_PARTITION"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm3_10",
+    "arm": "ARM3_PARTITION",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm3_10_doc_1",
+        "source_id": "hardware_allocator",
+        "mention": "Storage Array Beta Socket 2",
+        "context": "Hardware allocation logged for Storage Array Beta Socket 2 under parent unit Storage Array Beta.",
+        "arm": "ARM3_PARTITION"
+      },
+      {
+        "doc_id": "world_r3r1_arm3_10_doc_2",
+        "source_id": "power_monitor",
+        "mention": "Socket 2 on Storage Array Beta",
+        "context": "Thermal profile nominal on Socket 2 on Storage Array Beta (sub-component of Storage Array Beta).",
+        "arm": "ARM3_PARTITION"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm3_11",
+    "arm": "ARM3_PARTITION",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm3_11_doc_1",
+        "source_id": "hardware_allocator",
+        "mention": "Gateway Router Alpha Partition 3",
+        "context": "Hardware allocation logged for Gateway Router Alpha Partition 3 under parent unit Gateway Router Alpha.",
+        "arm": "ARM3_PARTITION"
+      },
+      {
+        "doc_id": "world_r3r1_arm3_11_doc_2",
+        "source_id": "power_monitor",
+        "mention": "Partition 3 on Gateway Router Alpha",
+        "context": "Thermal profile nominal on Partition 3 on Gateway Router Alpha (sub-component of Gateway Router Alpha).",
+        "arm": "ARM3_PARTITION"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm3_12",
+    "arm": "ARM3_PARTITION",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm3_12_doc_1",
+        "source_id": "hardware_allocator",
+        "mention": "Gateway Router Beta Blade 4",
+        "context": "Hardware allocation logged for Gateway Router Beta Blade 4 under parent unit Gateway Router Beta.",
+        "arm": "ARM3_PARTITION"
+      },
+      {
+        "doc_id": "world_r3r1_arm3_12_doc_2",
+        "source_id": "power_monitor",
+        "mention": "Blade 4 on Gateway Router Beta",
+        "context": "Thermal profile nominal on Blade 4 on Gateway Router Beta (sub-component of Gateway Router Beta).",
+        "arm": "ARM3_PARTITION"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm3_13",
+    "arm": "ARM3_PARTITION",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm3_13_doc_1",
+        "source_id": "hardware_allocator",
+        "mention": "Compute Cluster Alpha Slice A",
+        "context": "Hardware allocation logged for Compute Cluster Alpha Slice A under parent unit Compute Cluster Alpha.",
+        "arm": "ARM3_PARTITION"
+      },
+      {
+        "doc_id": "world_r3r1_arm3_13_doc_2",
+        "source_id": "power_monitor",
+        "mention": "Slice A on Compute Cluster Alpha",
+        "context": "Thermal profile nominal on Slice A on Compute Cluster Alpha (sub-component of Compute Cluster Alpha).",
+        "arm": "ARM3_PARTITION"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm3_14",
+    "arm": "ARM3_PARTITION",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm3_14_doc_1",
+        "source_id": "hardware_allocator",
+        "mention": "Compute Cluster Beta Tray B",
+        "context": "Hardware allocation logged for Compute Cluster Beta Tray B under parent unit Compute Cluster Beta.",
+        "arm": "ARM3_PARTITION"
+      },
+      {
+        "doc_id": "world_r3r1_arm3_14_doc_2",
+        "source_id": "power_monitor",
+        "mention": "Tray B on Compute Cluster Beta",
+        "context": "Thermal profile nominal on Tray B on Compute Cluster Beta (sub-component of Compute Cluster Beta).",
+        "arm": "ARM3_PARTITION"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm3_15",
+    "arm": "ARM3_PARTITION",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm3_15_doc_1",
+        "source_id": "hardware_allocator",
+        "mention": "Storage Array Alpha Socket C",
+        "context": "Hardware allocation logged for Storage Array Alpha Socket C under parent unit Storage Array Alpha.",
+        "arm": "ARM3_PARTITION"
+      },
+      {
+        "doc_id": "world_r3r1_arm3_15_doc_2",
+        "source_id": "power_monitor",
+        "mention": "Socket C on Storage Array Alpha",
+        "context": "Thermal profile nominal on Socket C on Storage Array Alpha (sub-component of Storage Array Alpha).",
+        "arm": "ARM3_PARTITION"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm4a_01",
+    "arm": "ARM4A_PERMANENT_DEFERRAL",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm4a_01_doc_1",
+        "source_id": "bulletin",
+        "mention": "Speculative Cluster Omega",
+        "context": "Architectural memo: Proposal for Speculative Cluster Omega pending executive funding.",
+        "arm": "ARM4A_PERMANENT_DEFERRAL"
+      },
+      {
+        "doc_id": "world_r3r1_arm4a_01_doc_2",
+        "source_id": "bulletin_followup",
+        "mention": "Speculative Cluster Omega",
+        "context": "Clarification update: Speculative Cluster Omega is not commissioned for production traffic.",
+        "arm": "ARM4A_PERMANENT_DEFERRAL"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm4a_02",
+    "arm": "ARM4A_PERMANENT_DEFERRAL",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm4a_02_doc_1",
+        "source_id": "bulletin",
+        "mention": "Decommissioned Cache Matrix",
+        "context": "Retirement log: Proposed Decommissioned Cache Matrix was rejected during architectural review.",
+        "arm": "ARM4A_PERMANENT_DEFERRAL"
+      },
+      {
+        "doc_id": "world_r3r1_arm4a_02_doc_2",
+        "source_id": "bulletin_followup",
+        "mention": "Decommissioned Cache Matrix",
+        "context": "Clarification update: Decommissioned Cache Matrix is not commissioned for production traffic.",
+        "arm": "ARM4A_PERMANENT_DEFERRAL"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm4a_03",
+    "arm": "ARM4A_PERMANENT_DEFERRAL",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm4a_03_doc_1",
+        "source_id": "bulletin",
+        "mention": "Generic Storage Fabric",
+        "context": "System event: Data migrated to generic storage fabric without unique asset identifier.",
+        "arm": "ARM4A_PERMANENT_DEFERRAL"
+      },
+      {
+        "doc_id": "world_r3r1_arm4a_03_doc_2",
+        "source_id": "bulletin_followup",
+        "mention": "Generic Storage Fabric",
+        "context": "Clarification update: Generic Storage Fabric is not commissioned for production traffic.",
+        "arm": "ARM4A_PERMANENT_DEFERRAL"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm4a_04",
+    "arm": "ARM4A_PERMANENT_DEFERRAL",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm4a_04_doc_1",
+        "source_id": "bulletin",
+        "mention": "Unspecified Gateway Interface",
+        "context": "Routing alert: Latency spike observed on unspecified gateway interface.",
+        "arm": "ARM4A_PERMANENT_DEFERRAL"
+      },
+      {
+        "doc_id": "world_r3r1_arm4a_04_doc_2",
+        "source_id": "bulletin_followup",
+        "mention": "Unspecified Gateway Interface",
+        "context": "Clarification update: Unspecified Gateway Interface is not commissioned for production traffic.",
+        "arm": "ARM4A_PERMANENT_DEFERRAL"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm4a_05",
+    "arm": "ARM4A_PERMANENT_DEFERRAL",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm4a_05_doc_1",
+        "source_id": "bulletin",
+        "mention": "Mock Accelerator Unit",
+        "context": "Test harness: Unit test initialized with mock accelerator unit.",
+        "arm": "ARM4A_PERMANENT_DEFERRAL"
+      },
+      {
+        "doc_id": "world_r3r1_arm4a_05_doc_2",
+        "source_id": "bulletin_followup",
+        "mention": "Mock Accelerator Unit",
+        "context": "Clarification update: Mock Accelerator Unit is not commissioned for production traffic.",
+        "arm": "ARM4A_PERMANENT_DEFERRAL"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm4a_06",
+    "arm": "ARM4A_PERMANENT_DEFERRAL",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm4a_06_doc_1",
+        "source_id": "bulletin",
+        "mention": "Simulated Host Node",
+        "context": "Benchmarking report: Workload stress-tested on simulated host node in sandbox.",
+        "arm": "ARM4A_PERMANENT_DEFERRAL"
+      },
+      {
+        "doc_id": "world_r3r1_arm4a_06_doc_2",
+        "source_id": "bulletin_followup",
+        "mention": "Simulated Host Node",
+        "context": "Clarification update: Simulated Host Node is not commissioned for production traffic.",
+        "arm": "ARM4A_PERMANENT_DEFERRAL"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm4a_07",
+    "arm": "ARM4A_PERMANENT_DEFERRAL",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm4a_07_doc_1",
+        "source_id": "bulletin",
+        "mention": "Ambiguous Switching Fabric",
+        "context": "Network telemetry: Transient fault reported across ambiguous switching fabric.",
+        "arm": "ARM4A_PERMANENT_DEFERRAL"
+      },
+      {
+        "doc_id": "world_r3r1_arm4a_07_doc_2",
+        "source_id": "bulletin_followup",
+        "mention": "Ambiguous Switching Fabric",
+        "context": "Clarification update: Ambiguous Switching Fabric is not commissioned for production traffic.",
+        "arm": "ARM4A_PERMANENT_DEFERRAL"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm4a_08",
+    "arm": "ARM4A_PERMANENT_DEFERRAL",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm4a_08_doc_1",
+        "source_id": "bulletin",
+        "mention": "Virtual Execution Slice",
+        "context": "Ephemeral container spun up on virtual execution slice without physical backing.",
+        "arm": "ARM4A_PERMANENT_DEFERRAL"
+      },
+      {
+        "doc_id": "world_r3r1_arm4a_08_doc_2",
+        "source_id": "bulletin_followup",
+        "mention": "Virtual Execution Slice",
+        "context": "Clarification update: Virtual Execution Slice is not commissioned for production traffic.",
+        "arm": "ARM4A_PERMANENT_DEFERRAL"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm4b_01",
+    "arm": "ARM4B_DISCONFIRMATION",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm4b_01_doc_1",
+        "source_id": "network_migration_log",
+        "mention": "Edge Gateway Alpha Reserve Bay",
+        "context": "Failover route configured on Edge Gateway Alpha Reserve Bay for backup ingress.",
+        "arm": "ARM4B_DISCONFIRMATION"
+      },
+      {
+        "doc_id": "world_r3r1_arm4b_01_doc_2",
+        "source_id": "router_telemetry",
+        "mention": "Edge Gateway Alpha Reserve Bay (Router-Beta)",
+        "context": "Edge Gateway Alpha Reserve Bay (Router-Beta) confirms active packet forwarding across all backup routes.",
+        "arm": "ARM4B_DISCONFIRMATION"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm4b_02",
+    "arm": "ARM4B_DISCONFIRMATION",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm4b_02_doc_1",
+        "source_id": "compute_audit",
+        "mention": "Unverified Node Alpha",
+        "context": "Telemetry probe logged on Unverified Node Alpha during maintenance window.",
+        "arm": "ARM4B_DISCONFIRMATION"
+      },
+      {
+        "doc_id": "world_r3r1_arm4b_02_doc_2",
+        "source_id": "compute_telemetry",
+        "mention": "Compute Cluster Beta",
+        "context": "Node resolved to Compute Cluster Beta following physical topology verification.",
+        "arm": "ARM4B_DISCONFIRMATION"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm4b_03",
+    "arm": "ARM4B_DISCONFIRMATION",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm4b_03_doc_1",
+        "source_id": "storage_audit",
+        "mention": "Proposed Tier Array",
+        "context": "Initial snapshot logged on Proposed Tier Array.",
+        "arm": "ARM4B_DISCONFIRMATION"
+      },
+      {
+        "doc_id": "world_r3r1_arm4b_03_doc_2",
+        "source_id": "storage_telemetry",
+        "mention": "SAN-Alpha",
+        "context": "Volume blocks persisted to SAN-Alpha.",
+        "arm": "ARM4B_DISCONFIRMATION"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm4b_04",
+    "arm": "ARM4B_DISCONFIRMATION",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm4b_04_doc_1",
+        "source_id": "network_note",
+        "mention": "Pending Router Port",
+        "context": "Traffic diverted to pending router port without interface mapping.",
+        "arm": "ARM4B_DISCONFIRMATION"
+      },
+      {
+        "doc_id": "world_r3r1_arm4b_04_doc_2",
+        "source_id": "network_telemetry",
+        "mention": "Gateway Router Alpha",
+        "context": "Port binding confirmed active on Gateway Router Alpha.",
+        "arm": "ARM4B_DISCONFIRMATION"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm4b_05",
+    "arm": "ARM4B_DISCONFIRMATION",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm4b_05_doc_1",
+        "source_id": "cluster_note",
+        "mention": "Ambiguous Server Blade",
+        "context": "Telemetry packet received from ambiguous server blade lacking rack ID.",
+        "arm": "ARM4B_DISCONFIRMATION"
+      },
+      {
+        "doc_id": "world_r3r1_arm4b_05_doc_2",
+        "source_id": "cluster_telemetry",
+        "mention": "Compute Cluster Alpha",
+        "context": "Chassis identifier confirmed belonging to Compute Cluster Alpha.",
+        "arm": "ARM4B_DISCONFIRMATION"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm4b_06",
+    "arm": "ARM4B_DISCONFIRMATION",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm4b_06_doc_1",
+        "source_id": "telemetry_draft",
+        "mention": "Uncommissioned Sensor Mesh",
+        "context": "Early test packet received from uncommissioned sensor mesh.",
+        "arm": "ARM4B_DISCONFIRMATION"
+      },
+      {
+        "doc_id": "world_r3r1_arm4b_06_doc_2",
+        "source_id": "commissioning_service",
+        "mention": "Sensor Mesh Omega",
+        "context": "Official deployment notice: Sensor Mesh Omega (SMO) is now active in production.",
+        "arm": "ARM4B_DISCONFIRMATION"
+      }
+    ]
+  },
+  {
+    "world_id": "world_r3r1_arm4b_07",
+    "arm": "ARM4B_DISCONFIRMATION",
+    "docs": [
+      {
+        "doc_id": "world_r3r1_arm4b_07_doc_1",
+        "source_id": "precheck_log",
+        "mention": "Unverified Host Pool",
+        "context": "Pre-check scan on Unverified Host Pool awaiting signature.",
+        "arm": "ARM4B_DISCONFIRMATION"
+      },
+      {
+        "doc_id": "world_r3r1_arm4b_07_doc_2",
+        "source_id": "signature_authority",
+        "mention": "Unverified Host Pool (Cluster-Beta)",
+        "context": "Signature validated: Unverified Host Pool (Cluster-Beta) confirmed active within Cluster-Beta.",
+        "arm": "ARM4B_DISCONFIRMATION"
+      }
+    ]
+  }
+]

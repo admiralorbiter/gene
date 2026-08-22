@@ -1,0 +1,12 @@
+{
+  "contract_id": "CONTRACT-R8-8C-R3-R1",
+  "base_sha": "92400bf22a24316e5c1522489a1a003c365fe848",
+  "assets": {
+    "src/gene/benchmarks/r8_stage8c_r3_r1/prompts.py": "04f55ac44d2c9b8aad836fefed95a406bade8678a4e04fced52adba2989d04e0",
+    "src/gene/benchmarks/r8_stage8c_r3_r1/worlds.py": "c652c3be617323b047843d1ea4296e71c1a9ad3ed28c51dee6a50feb266ac670",
+    "src/gene/benchmarks/r8_stage8c_r3_r1/runner.py": "ee47336a3e4e1b2711908f9f78781a74ad18c7bce7541a577c2e9ea74768d89c",
+    "src/gene/benchmarks/r8_stage8c_r3_r1/verifier.py": "be8c2d319cc74613b267992695fde639c4cf88d499bd39c583c4b91a3e1dddaa",
+    "research/contracts/WORLDS_SEALED-R8-8C-R3-R1.json": "382b2dac55c89297baeceda2e1ff67b44142fbaa1029adba9729284edd77d846",
+    "research/contracts/GOLD_MANIFEST-R8-8C-R3-R1.json": "54c89dc1be4a8b3c72a82c668628531f0172480212cf09819474418655244b08"
+  }
+}
