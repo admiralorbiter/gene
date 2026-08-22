@@ -1,6 +1,6 @@
 # Evidence Review Packet: GENE (gene)
-**Active Contract**: `None`
-**Repository HEAD**: `ce244465b2603f66a174cdbee479165a29fc15d4`
+**Active Contract**: `CONTRACT-R8-8C-R2`
+**Repository HEAD**: `368c3ee8a94ac6e0c542e9b7dd7ba7417b742277`
 
 ## 1. Project Moonshot & Conceptual Formalism
 # BOOTSTRAP.md — GENE Project Manual & Epistemic Specification
@@ -96,6 +96,8 @@ authorized_by: human
 ### `r8_stage8c_evidence_manifest.json` (568 bytes)
 ### `r8_stage8c_r1_evidence_manifest.json` (380 bytes)
 ### `r8_stage8c_r1_summary.json` (924 bytes)
+### `r8_stage8c_r2_gold_manifest.json` (25135 bytes)
+### `r8_stage8c_r2_summary.json` (620 bytes)
 ### `r8_stage8c_scout_b_summary.json` (27703 bytes)
 ### `r8_stage8c_scout_summary.json` (10645 bytes)
 ### `r8_stage8c_summary.json` (1582 bytes)

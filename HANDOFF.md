@@ -1,10 +1,10 @@
 # Project Handoff: GENE (General Epistemic Network Engine)
 
-**Generated**: 2026-08-22 04:38:00Z  
+**Generated**: 2026-08-22 05:02:00Z  
 **Project**: `gene`  
-**generated_from_sha**: `cc42bf2`  
-**Last Checkpointed State**: Merged `mb/CONTRACT-R8-8C-R1` into `main` (`f7e178b871cffaf97f1f0a20468962629b3c4349`)  
-**Operational State**: `IDLE` (CONTRACT-R8-8C-R2 authorized by human & frozen; dispatch branch mb/CONTRACT-R8-8C-R2 created)
+**generated_from_sha**: `368c3ee`  
+**Last Checkpointed State**: Merged `mb/CONTRACT-R8-8C-R1` into `main` (`f7e178bf979a3ebcec95d4c16269cf43f34cb77b`)  
+**Operational State**: `AUDITING` (Stage 8C-R2 benchmark executed on Gemma 3 12B; candidate evidence pinned)
 
 ---
 
@@ -19,33 +19,37 @@ Autonomous, provably fail-closed epistemic knowledge discovery & entity resoluti
 - **Stage 8A / 8B**: Initial Ingress & Alias Resolution (`PROMOTED`).
 - **Stage 8C-R1**: Non-Durable Hypothesis Ledger (`SUPERSEDED` / `REVISED_CONTRACT_REQUIRED` at candidate `f0219989b5c2aeb3eb8903c7379d460e5dfcfbc2`, checkpointed to `f7e178b`). Rescored audit: Gate 2a PASS ($0/120$ canonical false merges), Gate 3 PASS (0 duplicates), Useful Resolvable Coverage $78.4\%$.
 
-### ACTIVE CONTRACT PROPOSAL (Pre-Execution / Design Approved)
-- **Contract**: [`research/contracts/CONTRACT-R8-8C-R2.md`](file:///c:/Users/admir/Github/gene/research/contracts/CONTRACT-R8-8C-R2.md)
-- **Status**: `DRAFT` (Design Review: `APPROVED` by ChatGPT-Pro)
-- **Base SHA**: `f7e178b871cffaf97f1f0a20468962629b3c4349`
-- **Key Epistemic Hardening**:
-  1. Existence Authority $\ne$ Identity Authority decoupling.
-  2. Grounded structural partition grammar with discriminating sub-identifier regex (`(?i)\b(?:[a-z]*\d[a-z0-9_-]*|\d+[a-z0-9_-]*)\b`).
-  3. Semantic False Provisional Existence Floor Gate 2b ($\text{FDAR}_{\text{prov}} \equiv 0.0\%$).
-  4. First-class nullable hypothesis candidates ($\text{UNRESOLVED}(\text{candidate}=\text{null})$).
-  5. Refined Claim Ceiling ($\ge 85.0\%$ coverage + paired offline R1 replay) and V0 Executable Sealing Gate (`SEALING_MANIFEST-R8-8C-R2.json`).
+### CANDIDATE EXECUTION AUDIT (Stage 8C-R2)
+- **Contract**: [`research/contracts/CONTRACT-R8-8C-R2.md`](file:///c:/Users/admir/Github/gene/research/contracts/CONTRACT-R8-8C-R2.md) (`status: FROZEN`, `authorized_by: human`)
+- **Promotion Review**: [`research/promotions/PROMOTION-CONTRACT-R8-8C-R2.md`](file:///c:/Users/admir/Github/gene/research/promotions/PROMOTION-CONTRACT-R8-8C-R2.md) (`status: CANDIDATE`)
+- **Candidate Commit**: `7f164a5ea6d50dc4199c8c32bc9cee180195b97b`
+- **Execution Telemetry (120 Decisions across 60 Worlds on Gemma 3 12B)**:
+  - **Gate 1 (Neural Proposal Quality)**: 65.0% (78/120)
+  - **Gate 2a (Hybrid Durable False Merge Floor)**: **0/120 (0.0%, PASS)**
+  - **Gate 2b (Semantic False Prov Existence Floor)**: **0/120 (0.0%, PASS)**
+  - **Gate 3 (Provisional Entity Fragmentation)**: **0 duplicates (PASS)**
+  - **Gate 4 (Permanent Non-Resolution Invariant)**: **8/8 (100.0%, PASS)**
+  - **Gate 5 (Disconfirmation & Accumulation Matrix)**: 6/7 (85.7%, World 55 ungrounded structural match)
+  - **Gate 6 (Useful Resolvable Coverage)**: 68.0% (66/97, Doc 2 parenthetical context extraction defect)
+  - **Gate 7 (Relational DB & FK Audit)**: `PRAGMA integrity_check: ok`, `0 FK violations` (**PASS**)
 
 ---
 
 ## 3. Human Decisions Pending
-- None. Strategic human authorization granted by Human Research Director (`authorized_by: human`).
+- None. Review Desk promotion review of candidate artifact `PROMOTION-CONTRACT-R8-8C-R2.md`.
 
 ---
 
 ## 4. First Actions on Resume
 1. Review [`BOOTSTRAP.md`](file:///c:/Users/admir/Github/gene/BOOTSTRAP.md) and [`HANDOFF.md`](file:///c:/Users/admir/Github/gene/HANDOFF.md).
-2. On dispatch branch `mb/CONTRACT-R8-8C-R2`, implement Stage 8C-R2 benchmark runner, worlds, and verifier under `src/gene/benchmarks/r8_stage8c_r2/`.
-3. Compute `SEALING_MANIFEST-R8-8C-R2.json` with cryptographic SHA-256 digests.
-4. Arm operational state in `research/ACTIVE_CONTRACT.md` to `state: READY` and dispatch sealed 120-decision confirmatory run.
+2. Review [`research/reviews/current/REVIEW_PACKET.md`](file:///c:/Users/admir/Github/gene/research/reviews/current/REVIEW_PACKET.md).
+3. Await Review Desk disposition on `PROMOTION-CONTRACT-R8-8C-R2.md` and R3 revision / mechanical fix.
 
 ---
 
 ## 5. Canonical Evidence & Artifacts
-- **Stage 8C-R1 Promotion Record**: [`research/promotions/PROMOTION-CONTRACT-R8-8C-R1.md`](file:///c:/Users/admir/Github/gene/research/promotions/PROMOTION-CONTRACT-R8-8C-R1.md)
-- **Stage 8C-R2 Contract Draft**: [`research/contracts/CONTRACT-R8-8C-R2.md`](file:///c:/Users/admir/Github/gene/research/contracts/CONTRACT-R8-8C-R2.md)
-- **Verified Commit**: `2a87e35b7194f48b0a996f8c7e997e06ff4e8156`
+- **Candidate Evidence JSONL**: [`data/r8_stage8c_r2_candidate_evidence.jsonl`](file:///c:/Users/admir/Github/gene/data/r8_stage8c_r2_candidate_evidence.jsonl)
+- **Candidate SQLite Registry**: [`data/r8_stage8c_r2_registry.sqlite`](file:///c:/Users/admir/Github/gene/data/r8_stage8c_r2_registry.sqlite)
+- **Verifier Summary JSON**: [`data/r8_stage8c_r2_summary.json`](file:///c:/Users/admir/Github/gene/data/r8_stage8c_r2_summary.json)
+- **Stage 8C-R2 Promotion Record**: [`research/promotions/PROMOTION-CONTRACT-R8-8C-R2.md`](file:///c:/Users/admir/Github/gene/research/promotions/PROMOTION-CONTRACT-R8-8C-R2.md)
+- **Verified Candidate Commit**: `7f164a5c4015f8be7e1dc58778f6ec4ec250c6ca`

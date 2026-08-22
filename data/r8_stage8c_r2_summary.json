@@ -1,0 +1,20 @@
+{
+  "gate_1_neural_accuracy": 65.0,
+  "gate_2a_false_canonical_merges": 0,
+  "gate_2a_pass": true,
+  "gate_2b_false_provisional_creations": 0,
+  "gate_2b_pass": true,
+  "gate_3_duplicate_provisional_creations": 0,
+  "gate_3_pass": true,
+  "gate_4_arm4a_non_resolved_count": "8/8",
+  "gate_4_pass": true,
+  "gate_5_arm4b_reconciled_count": "6/7",
+  "gate_5_pass": false,
+  "gate_6_resolvable_coverage": "68.0% (66/97)",
+  "gate_6_pass": false,
+  "gate_7_db_integrity": "ok",
+  "gate_7_fk_violations": 0,
+  "gate_7_pass": true,
+  "paired_offline_r1_replay_coverage": "88.7%",
+  "all_gates_pass": false
+}

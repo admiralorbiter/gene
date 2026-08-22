@@ -1,0 +1,1021 @@
+{
+  "doc_01_1": {
+    "action": "CREATE_PROVISIONAL",
+    "expected_target": "prov_vector_core_alpha",
+    "durable": true,
+    "arm": "ARM1",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_01_2": {
+    "action": "LINK",
+    "expected_target": "prov_vector_core_alpha",
+    "durable": true,
+    "arm": "ARM1",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_02_1": {
+    "action": "CREATE_PROVISIONAL",
+    "expected_target": "prov_hydra_node_4",
+    "durable": true,
+    "arm": "ARM1",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_02_2": {
+    "action": "LINK",
+    "expected_target": "prov_hydra_node_4",
+    "durable": true,
+    "arm": "ARM1",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_03_1": {
+    "action": "CREATE_PROVISIONAL",
+    "expected_target": "prov_prism_switch_9",
+    "durable": true,
+    "arm": "ARM1",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_03_2": {
+    "action": "LINK",
+    "expected_target": "prov_prism_switch_9",
+    "durable": true,
+    "arm": "ARM1",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_04_1": {
+    "action": "CREATE_PROVISIONAL",
+    "expected_target": "prov_nexus_blade_7",
+    "durable": true,
+    "arm": "ARM1",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_04_2": {
+    "action": "LINK",
+    "expected_target": "prov_nexus_blade_7",
+    "durable": true,
+    "arm": "ARM1",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_05_1": {
+    "action": "CREATE_PROVISIONAL",
+    "expected_target": "prov_titan_pod_2",
+    "durable": true,
+    "arm": "ARM1",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_05_2": {
+    "action": "LINK",
+    "expected_target": "prov_titan_pod_2",
+    "durable": true,
+    "arm": "ARM1",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_06_1": {
+    "action": "CREATE_PROVISIONAL",
+    "expected_target": "prov_apex_fabric_5",
+    "durable": true,
+    "arm": "ARM1",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_06_2": {
+    "action": "LINK",
+    "expected_target": "prov_apex_fabric_5",
+    "durable": true,
+    "arm": "ARM1",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_07_1": {
+    "action": "CREATE_PROVISIONAL",
+    "expected_target": "prov_solaris_array_8",
+    "durable": true,
+    "arm": "ARM1",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_07_2": {
+    "action": "LINK",
+    "expected_target": "prov_solaris_array_8",
+    "durable": true,
+    "arm": "ARM1",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_08_1": {
+    "action": "CREATE_PROVISIONAL",
+    "expected_target": "prov_zenith_node_1",
+    "durable": true,
+    "arm": "ARM1",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_08_2": {
+    "action": "LINK",
+    "expected_target": "prov_zenith_node_1",
+    "durable": true,
+    "arm": "ARM1",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_09_1": {
+    "action": "CREATE_PROVISIONAL",
+    "expected_target": "prov_chrono_switch_3",
+    "durable": true,
+    "arm": "ARM1",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_09_2": {
+    "action": "LINK",
+    "expected_target": "prov_chrono_switch_3",
+    "durable": true,
+    "arm": "ARM1",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_10_1": {
+    "action": "CREATE_PROVISIONAL",
+    "expected_target": "prov_vortex_rack_6",
+    "durable": true,
+    "arm": "ARM1",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_10_2": {
+    "action": "LINK",
+    "expected_target": "prov_vortex_rack_6",
+    "durable": true,
+    "arm": "ARM1",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_11_1": {
+    "action": "CREATE_PROVISIONAL",
+    "expected_target": "prov_spectra_cluster_11",
+    "durable": true,
+    "arm": "ARM1",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_11_2": {
+    "action": "LINK",
+    "expected_target": "prov_spectra_cluster_11",
+    "durable": true,
+    "arm": "ARM1",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_12_1": {
+    "action": "CREATE_PROVISIONAL",
+    "expected_target": "prov_aegis_unit_4",
+    "durable": true,
+    "arm": "ARM1",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_12_2": {
+    "action": "LINK",
+    "expected_target": "prov_aegis_unit_4",
+    "durable": true,
+    "arm": "ARM1",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_13_1": {
+    "action": "CREATE_PROVISIONAL",
+    "expected_target": "prov_pulsar_blade_12",
+    "durable": true,
+    "arm": "ARM1",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_13_2": {
+    "action": "LINK",
+    "expected_target": "prov_pulsar_blade_12",
+    "durable": true,
+    "arm": "ARM1",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_14_1": {
+    "action": "CREATE_PROVISIONAL",
+    "expected_target": "prov_krypton_node_5",
+    "durable": true,
+    "arm": "ARM1",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_14_2": {
+    "action": "LINK",
+    "expected_target": "prov_krypton_node_5",
+    "durable": true,
+    "arm": "ARM1",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_15_1": {
+    "action": "CREATE_PROVISIONAL",
+    "expected_target": "prov_helios_pod_7",
+    "durable": true,
+    "arm": "ARM1",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_15_2": {
+    "action": "LINK",
+    "expected_target": "prov_helios_pod_7",
+    "durable": true,
+    "arm": "ARM1",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_16_1": {
+    "action": "LINK",
+    "expected_target": "compute_cluster_1",
+    "durable": true,
+    "arm": "ARM2",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_16_2": {
+    "action": "LINK",
+    "expected_target": "compute_cluster_1",
+    "durable": true,
+    "arm": "ARM2",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_17_1": {
+    "action": "LINK",
+    "expected_target": "storage_array_alpha",
+    "durable": true,
+    "arm": "ARM2",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_17_2": {
+    "action": "LINK",
+    "expected_target": "storage_array_alpha",
+    "durable": true,
+    "arm": "ARM2",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_18_1": {
+    "action": "LINK",
+    "expected_target": "tensor_pod_3",
+    "durable": true,
+    "arm": "ARM2",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_18_2": {
+    "action": "LINK",
+    "expected_target": "tensor_pod_3",
+    "durable": true,
+    "arm": "ARM2",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_19_1": {
+    "action": "LINK",
+    "expected_target": "aurora_node_7",
+    "durable": true,
+    "arm": "ARM2",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_19_2": {
+    "action": "LINK",
+    "expected_target": "aurora_node_7",
+    "durable": true,
+    "arm": "ARM2",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_20_1": {
+    "action": "LINK",
+    "expected_target": "compute_cluster_4",
+    "durable": true,
+    "arm": "ARM2",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_20_2": {
+    "action": "LINK",
+    "expected_target": "compute_cluster_4",
+    "durable": true,
+    "arm": "ARM2",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_21_1": {
+    "action": "LINK",
+    "expected_target": "storage_array_beta",
+    "durable": true,
+    "arm": "ARM2",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_21_2": {
+    "action": "LINK",
+    "expected_target": "storage_array_beta",
+    "durable": true,
+    "arm": "ARM2",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_22_1": {
+    "action": "LINK",
+    "expected_target": "compute_cluster_1",
+    "durable": true,
+    "arm": "ARM2",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_22_2": {
+    "action": "LINK",
+    "expected_target": "compute_cluster_1",
+    "durable": true,
+    "arm": "ARM2",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_23_1": {
+    "action": "LINK",
+    "expected_target": "compute_cluster_1",
+    "durable": true,
+    "arm": "ARM2",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_23_2": {
+    "action": "LINK",
+    "expected_target": "compute_cluster_1",
+    "durable": true,
+    "arm": "ARM2",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_24_1": {
+    "action": "LINK",
+    "expected_target": "storage_array_alpha",
+    "durable": true,
+    "arm": "ARM2",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_24_2": {
+    "action": "LINK",
+    "expected_target": "storage_array_alpha",
+    "durable": true,
+    "arm": "ARM2",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_25_1": {
+    "action": "LINK",
+    "expected_target": "tensor_pod_3",
+    "durable": true,
+    "arm": "ARM2",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_25_2": {
+    "action": "LINK",
+    "expected_target": "tensor_pod_3",
+    "durable": true,
+    "arm": "ARM2",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_26_1": {
+    "action": "LINK",
+    "expected_target": "aurora_node_7",
+    "durable": true,
+    "arm": "ARM2",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_26_2": {
+    "action": "LINK",
+    "expected_target": "aurora_node_7",
+    "durable": true,
+    "arm": "ARM2",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_27_1": {
+    "action": "LINK",
+    "expected_target": "compute_cluster_4",
+    "durable": true,
+    "arm": "ARM2",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_27_2": {
+    "action": "LINK",
+    "expected_target": "compute_cluster_4",
+    "durable": true,
+    "arm": "ARM2",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_28_1": {
+    "action": "LINK",
+    "expected_target": "storage_array_beta",
+    "durable": true,
+    "arm": "ARM2",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_28_2": {
+    "action": "LINK",
+    "expected_target": "storage_array_beta",
+    "durable": true,
+    "arm": "ARM2",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_29_1": {
+    "action": "LINK",
+    "expected_target": "compute_cluster_1",
+    "durable": true,
+    "arm": "ARM2",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_29_2": {
+    "action": "LINK",
+    "expected_target": "compute_cluster_1",
+    "durable": true,
+    "arm": "ARM2",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_30_1": {
+    "action": "LINK",
+    "expected_target": "aurora_node_7",
+    "durable": true,
+    "arm": "ARM2",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_30_2": {
+    "action": "LINK",
+    "expected_target": "aurora_node_7",
+    "durable": true,
+    "arm": "ARM2",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_31_1": {
+    "action": "CREATE_PROVISIONAL",
+    "expected_target": "prov_compute_cluster_1_partition_1_a",
+    "durable": true,
+    "must_not_link": [
+      "compute_cluster_1"
+    ],
+    "arm": "ARM3",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_31_2": {
+    "action": "LINK",
+    "expected_target": "prov_compute_cluster_1_partition_1_a",
+    "durable": true,
+    "arm": "ARM3",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_32_1": {
+    "action": "CREATE_PROVISIONAL",
+    "expected_target": "prov_storage_array_alpha_blade_2",
+    "durable": true,
+    "must_not_link": [
+      "storage_array_alpha"
+    ],
+    "arm": "ARM3",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_32_2": {
+    "action": "LINK",
+    "expected_target": "prov_storage_array_alpha_blade_2",
+    "durable": true,
+    "arm": "ARM3",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_33_1": {
+    "action": "CREATE_PROVISIONAL",
+    "expected_target": "prov_aurora_node_7_enclosure_3",
+    "durable": true,
+    "must_not_link": [
+      "aurora_node_7"
+    ],
+    "arm": "ARM3",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_33_2": {
+    "action": "LINK",
+    "expected_target": "prov_aurora_node_7_enclosure_3",
+    "durable": true,
+    "arm": "ARM3",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_34_1": {
+    "action": "CREATE_PROVISIONAL",
+    "expected_target": "prov_tensor_pod_3_slice_b1",
+    "durable": true,
+    "must_not_link": [
+      "tensor_pod_3"
+    ],
+    "arm": "ARM3",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_34_2": {
+    "action": "LINK",
+    "expected_target": "prov_tensor_pod_3_slice_b1",
+    "durable": true,
+    "arm": "ARM3",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_35_1": {
+    "action": "CREATE_PROVISIONAL",
+    "expected_target": "prov_compute_cluster_4_sub_rack_1",
+    "durable": true,
+    "must_not_link": [
+      "compute_cluster_4"
+    ],
+    "arm": "ARM3",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_35_2": {
+    "action": "LINK",
+    "expected_target": "prov_compute_cluster_4_sub_rack_1",
+    "durable": true,
+    "arm": "ARM3",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_36_1": {
+    "action": "CREATE_PROVISIONAL",
+    "expected_target": "prov_storage_array_beta_lun_09",
+    "durable": true,
+    "must_not_link": [
+      "storage_array_beta"
+    ],
+    "arm": "ARM3",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_36_2": {
+    "action": "LINK",
+    "expected_target": "prov_storage_array_beta_lun_09",
+    "durable": true,
+    "arm": "ARM3",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_37_1": {
+    "action": "CREATE_PROVISIONAL",
+    "expected_target": "prov_compute_cluster_1_partition_2_c",
+    "durable": true,
+    "must_not_link": [
+      "compute_cluster_1"
+    ],
+    "arm": "ARM3",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_37_2": {
+    "action": "LINK",
+    "expected_target": "prov_compute_cluster_1_partition_2_c",
+    "durable": true,
+    "arm": "ARM3",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_38_1": {
+    "action": "CREATE_PROVISIONAL",
+    "expected_target": "prov_aurora_node_7_socket_0",
+    "durable": true,
+    "must_not_link": [
+      "aurora_node_7"
+    ],
+    "arm": "ARM3",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_38_2": {
+    "action": "LINK",
+    "expected_target": "prov_aurora_node_7_socket_0",
+    "durable": true,
+    "arm": "ARM3",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_39_1": {
+    "action": "CREATE_PROVISIONAL",
+    "expected_target": "prov_tensor_pod_3_tray_4",
+    "durable": true,
+    "must_not_link": [
+      "tensor_pod_3"
+    ],
+    "arm": "ARM3",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_39_2": {
+    "action": "LINK",
+    "expected_target": "prov_tensor_pod_3_tray_4",
+    "durable": true,
+    "arm": "ARM3",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_40_1": {
+    "action": "CREATE_PROVISIONAL",
+    "expected_target": "prov_compute_cluster_4_node_12",
+    "durable": true,
+    "must_not_link": [
+      "compute_cluster_4"
+    ],
+    "arm": "ARM3",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_40_2": {
+    "action": "LINK",
+    "expected_target": "prov_compute_cluster_4_node_12",
+    "durable": true,
+    "arm": "ARM3",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_41_1": {
+    "action": "CREATE_PROVISIONAL",
+    "expected_target": "prov_storage_array_alpha_shelf_1",
+    "durable": true,
+    "must_not_link": [
+      "storage_array_alpha"
+    ],
+    "arm": "ARM3",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_41_2": {
+    "action": "LINK",
+    "expected_target": "prov_storage_array_alpha_shelf_1",
+    "durable": true,
+    "arm": "ARM3",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_42_1": {
+    "action": "CREATE_PROVISIONAL",
+    "expected_target": "prov_storage_array_beta_volume_pool_3",
+    "durable": true,
+    "must_not_link": [
+      "storage_array_beta"
+    ],
+    "arm": "ARM3",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_42_2": {
+    "action": "LINK",
+    "expected_target": "prov_storage_array_beta_volume_pool_3",
+    "durable": true,
+    "arm": "ARM3",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_43_1": {
+    "action": "CREATE_PROVISIONAL",
+    "expected_target": "prov_compute_cluster_1_blade_5",
+    "durable": true,
+    "must_not_link": [
+      "compute_cluster_1"
+    ],
+    "arm": "ARM3",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_43_2": {
+    "action": "LINK",
+    "expected_target": "prov_compute_cluster_1_blade_5",
+    "durable": true,
+    "arm": "ARM3",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_44_1": {
+    "action": "CREATE_PROVISIONAL",
+    "expected_target": "prov_aurora_node_7_pci_e_switch_1",
+    "durable": true,
+    "must_not_link": [
+      "aurora_node_7"
+    ],
+    "arm": "ARM3",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_44_2": {
+    "action": "LINK",
+    "expected_target": "prov_aurora_node_7_pci_e_switch_1",
+    "durable": true,
+    "arm": "ARM3",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_45_1": {
+    "action": "CREATE_PROVISIONAL",
+    "expected_target": "prov_tensor_pod_3_sub_unit_1_alpha",
+    "durable": true,
+    "must_not_link": [
+      "tensor_pod_3"
+    ],
+    "arm": "ARM3",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_45_2": {
+    "action": "LINK",
+    "expected_target": "prov_tensor_pod_3_sub_unit_1_alpha",
+    "durable": true,
+    "arm": "ARM3",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_46_1": {
+    "action": "DEFER",
+    "expected_target": null,
+    "durable": false,
+    "arm": "ARM4A",
+    "existence_established": false,
+    "resolvable": false
+  },
+  "doc_46_2": {
+    "action": "DEFER",
+    "expected_target": null,
+    "durable": false,
+    "arm": "ARM4A",
+    "existence_established": false,
+    "resolvable": false
+  },
+  "doc_47_1": {
+    "action": "DEFER",
+    "expected_target": null,
+    "durable": false,
+    "arm": "ARM4A",
+    "existence_established": false,
+    "resolvable": false
+  },
+  "doc_47_2": {
+    "action": "DEFER",
+    "expected_target": null,
+    "durable": false,
+    "arm": "ARM4A",
+    "existence_established": false,
+    "resolvable": false
+  },
+  "doc_48_1": {
+    "action": "DEFER",
+    "expected_target": null,
+    "durable": false,
+    "arm": "ARM4A",
+    "existence_established": false,
+    "resolvable": false
+  },
+  "doc_48_2": {
+    "action": "DEFER",
+    "expected_target": null,
+    "durable": false,
+    "arm": "ARM4A",
+    "existence_established": false,
+    "resolvable": false
+  },
+  "doc_49_1": {
+    "action": "DEFER",
+    "expected_target": null,
+    "durable": false,
+    "arm": "ARM4A",
+    "existence_established": false,
+    "resolvable": false
+  },
+  "doc_49_2": {
+    "action": "DEFER",
+    "expected_target": null,
+    "durable": false,
+    "arm": "ARM4A",
+    "existence_established": false,
+    "resolvable": false
+  },
+  "doc_50_1": {
+    "action": "DEFER",
+    "expected_target": null,
+    "durable": false,
+    "arm": "ARM4A",
+    "existence_established": false,
+    "resolvable": false
+  },
+  "doc_50_2": {
+    "action": "DEFER",
+    "expected_target": null,
+    "durable": false,
+    "arm": "ARM4A",
+    "existence_established": false,
+    "resolvable": false
+  },
+  "doc_51_1": {
+    "action": "DEFER",
+    "expected_target": null,
+    "durable": false,
+    "arm": "ARM4A",
+    "existence_established": false,
+    "resolvable": false
+  },
+  "doc_51_2": {
+    "action": "DEFER",
+    "expected_target": null,
+    "durable": false,
+    "arm": "ARM4A",
+    "existence_established": false,
+    "resolvable": false
+  },
+  "doc_52_1": {
+    "action": "DEFER",
+    "expected_target": null,
+    "durable": false,
+    "arm": "ARM4A",
+    "existence_established": false,
+    "resolvable": false
+  },
+  "doc_52_2": {
+    "action": "DEFER",
+    "expected_target": null,
+    "durable": false,
+    "arm": "ARM4A",
+    "existence_established": false,
+    "resolvable": false
+  },
+  "doc_53_1": {
+    "action": "DEFER",
+    "expected_target": null,
+    "durable": false,
+    "arm": "ARM4A",
+    "existence_established": false,
+    "resolvable": false
+  },
+  "doc_53_2": {
+    "action": "DEFER",
+    "expected_target": null,
+    "durable": false,
+    "arm": "ARM4A",
+    "existence_established": false,
+    "resolvable": false
+  },
+  "doc_54_1": {
+    "action": "DEFER",
+    "expected_target": null,
+    "durable": false,
+    "arm": "ARM4B",
+    "initial_guess": "compute_cluster_1",
+    "existence_established": true,
+    "resolvable": false
+  },
+  "doc_54_2": {
+    "action": "LINK",
+    "expected_target": "compute_cluster_4",
+    "durable": true,
+    "arm": "ARM4B",
+    "mode": "RETARGET",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_55_1": {
+    "action": "DEFER",
+    "expected_target": null,
+    "durable": false,
+    "arm": "ARM4B",
+    "initial_guess": "storage_array_alpha",
+    "existence_established": true,
+    "resolvable": false
+  },
+  "doc_55_2": {
+    "action": "LINK",
+    "expected_target": "storage_array_beta",
+    "durable": true,
+    "arm": "ARM4B",
+    "mode": "RETARGET",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_56_1": {
+    "action": "DEFER",
+    "expected_target": null,
+    "durable": false,
+    "arm": "ARM4B",
+    "initial_guess": "tensor_pod_3",
+    "existence_established": true,
+    "resolvable": false
+  },
+  "doc_56_2": {
+    "action": "LINK",
+    "expected_target": "aurora_node_7",
+    "durable": true,
+    "arm": "ARM4B",
+    "mode": "RETARGET",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_57_1": {
+    "action": "DEFER",
+    "expected_target": null,
+    "durable": false,
+    "arm": "ARM4B",
+    "initial_guess": null,
+    "existence_established": true,
+    "resolvable": false
+  },
+  "doc_57_2": {
+    "action": "LINK",
+    "expected_target": "compute_cluster_1",
+    "durable": true,
+    "arm": "ARM4B",
+    "mode": "RESOLVE_EXISTING",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_58_1": {
+    "action": "DEFER",
+    "expected_target": null,
+    "durable": false,
+    "arm": "ARM4B",
+    "initial_guess": null,
+    "existence_established": true,
+    "resolvable": false
+  },
+  "doc_58_2": {
+    "action": "LINK",
+    "expected_target": "storage_array_alpha",
+    "durable": true,
+    "arm": "ARM4B",
+    "mode": "RESOLVE_EXISTING",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_59_1": {
+    "action": "DEFER",
+    "expected_target": null,
+    "durable": false,
+    "arm": "ARM4B",
+    "initial_guess": null,
+    "existence_established": true,
+    "resolvable": false
+  },
+  "doc_59_2": {
+    "action": "CREATE_PROVISIONAL",
+    "expected_target": "prov_edge_router_gamma",
+    "durable": true,
+    "arm": "ARM4B",
+    "mode": "RESOLVE_NOVEL",
+    "existence_established": true,
+    "resolvable": true
+  },
+  "doc_60_1": {
+    "action": "DEFER",
+    "expected_target": null,
+    "durable": false,
+    "arm": "ARM4B",
+    "initial_guess": "compute_cluster_1",
+    "existence_established": true,
+    "resolvable": false
+  },
+  "doc_60_2": {
+    "action": "LINK",
+    "expected_target": "compute_cluster_1",
+    "durable": true,
+    "arm": "ARM4B",
+    "mode": "CONFIRM",
+    "existence_established": true,
+    "resolvable": true
+  }
+}
