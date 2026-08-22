@@ -1,12 +1,12 @@
 {
   "contract_id": "CONTRACT-R8-8C-R2",
-  "base_sha": "f7e178b871cffaf97f1f0a20468962629b3c4349",
+  "base_sha": "f7e178bf979a3ebcec95d4c16269cf43f34cb77b",
   "world_generator_seed": 2357947788,
   "model_target": "gemma3:12b-instruct-q4_K_M",
   "assets": {
     "src/gene/benchmarks/r8_stage8c_r2/prompts.py": "a709e1295b1abfe136390dc038c9e00efe9be289d1f5d9dbce07305d9925788d",
     "src/gene/benchmarks/r8_stage8c_r2/worlds.py": "0cc498bd76afcd8ba226288f4229aee97dc9163ae906c1080d7fc81b4e40230c",
-    "src/gene/benchmarks/r8_stage8c_r2/runner.py": "0883f797caedd78b9945a4d099ff0f3f4ddf39a8101d1bfabed2d6233ffea3eb",
+    "src/gene/benchmarks/r8_stage8c_r2/runner.py": "ff03a5a34af2bd185233748b070668f03a79a13fe572e70d8bf90e35a9369bb6",
     "src/gene/benchmarks/r8_stage8c_r2/verifier.py": "e254c69a693dde7d279ae5f712190d7c0ed40b99d013e97b5966e2026a2dc475",
     "data/r8_stage8c_r2_gold_manifest.json": "4abdfb1458f150b4e9376f8f88523594b3fd662429253984f956d8901825dc89"
   }

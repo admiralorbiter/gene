@@ -492,8 +492,6 @@ def run_stage8c_r2_benchmark():
     data_dir.mkdir(parents=True, exist_ok=True)
 
     gold_manifest_path = data_dir / "r8_stage8c_r2_gold_manifest.json"
-    with open(gold_manifest_path, "w", encoding="utf-8") as f:
-        json.dumps(gold_manifest, f, indent=2)
     gold_manifest_path.write_text(json.dumps(gold_manifest, indent=2), encoding="utf-8")
 
     db_path = data_dir / "r8_stage8c_r2_registry.sqlite"
